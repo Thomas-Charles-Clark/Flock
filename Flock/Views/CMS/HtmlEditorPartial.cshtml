@@ -1,0 +1,57 @@
+﻿@model Flock.ViewModels.HTML_PageSection
+@Html.DevExpress().HtmlEditor(
+    settings =>
+    {
+        settings.Name = "PageSection"+Model.PageSectionID.ToString()+"HtmlEditor";
+        settings.ClientSideEvents.BeginCallback = @"function OnBeginCallback(s, e) {
+            e.customArgs['PageSectionID'] = "+Model.PageSectionID.ToString()+@";
+            e.customArgs['HtmlID'] = "+Model.HTMLSectionID+@";
+            e.customArgs['Contents'] = s.GetHtml();
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function OnEndCallback(s, e) {
+        }";
+
+        settings.ClientSideEvents.CustomCommand = @"function SendSaveCommand(s, e) { 
+            switch(e.CommandName) {
+                case 'save':
+                    s.PerformDataCallback();
+                break;
+                default: break;
+            }
+        }";
+
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "HtmlPageSectionSave" };
+        settings.CustomDataActionRouteValues = new { Controller = "CMS", Action = "HtmlPageSectionSave" };
+        //settings.SettingsImageUpload.UploadCallbackRouteValues = new { Controller = "CMS", Action = "HtmlPageSectionImageUpload" };
+        settings.SettingsImageUpload.UploadImageFolder = "/images/htmlsectionimages/";
+        
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(450);
+        
+        //settings.SettingsHtmlEditing.AllowScripts = true;
+        //settings.SettingsHtmlEditing.AllowIFrames = true;
+        //settings.SettingsHtmlEditing.AllowFormElements = true;
+        //settings.SettingsHtmlEditing.UpdateDeprecatedElements = true;
+        //settings.SettingsHtmlEditing.UpdateBoldItalic = true;
+        //settings.SettingsHtmlEditing.EnterMode = HtmlEditorEnterMode.BR;
+        //settings.Settings.AllowContextMenu = DefaultBoolean.True;
+        //settings.Settings.AllowDesignView = true;
+        //settings.Settings.AllowHtmlView = true;
+        //settings.Settings.AllowPreview = true;
+        //settings.ActiveView = HtmlEditorView.Design; 
+        
+        settings.Toolbars.CreateDefaultToolbars();
+     
+        
+
+        //settings.Toolbars[0].Items.Add<CustomToolbarButton>(button =>
+        //{
+        //    button.BeginGroup = true;
+        //    button.ToolTip = "save";
+        //    button.Image.Url = "~/Images/SystemIcons/save-icon.gif";
+        //    button.CommandName = "save";
+        //});
+        //settings.Html = Model.Record.Contents;
+        
+    }).GetHtml()

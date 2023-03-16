@@ -1,0 +1,117 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@model List<Member_Basket_SelectResult>
+@{
+    using(var UoW = new UnitOfWork<FlockDataContext>())
+    {
+        if(Model.Count > 0)
+        {
+            var Grouped = Model.GroupBy(p => p.CountryID).ToList();
+            foreach(var g in Grouped)
+            {
+                <table class="basket-table">
+                    <thead>
+                        <tr>
+                            <th style="line-height: 22px;" colspan="8">
+                                @(UoW.GetRepository<Country>().GetAll().Where(p => p.CountryID == g.Key).Select(p => p.Name).Single())
+                                <img style="float: right;" src="/images/icons/countryflags/22px/@(g.Key).png" />
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width: 52px;">&nbsp;</th>
+                            <th style="width: 400px;">Product</th>
+                            <th>Quantity</th>
+                            <th>Size Metric</th>
+                            <th>Free Stock</th>
+                            <th>Stock Status</th>
+                            <th>Price Inc</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in g)
+                        {
+                            var productImage = b.ImageID == null ? "/images/admin/image-not-set-64.png" : "https://flock.designersguild.com/imagelibrary/90/" + b.ImageID.ToString() + ".jpeg";
+                            <tr>
+                                <td style="text-align: center;">
+                                    <img src="@(productImage)" style="width: 48px;" title="Product ID: @(b.ProductID) - Product Page ID: @(b.ProductPageID)" />
+                                </td>
+                                <td>
+                                   @(b.BasketName)
+                                </td>
+                                <td style="text-align: right;">
+                                    @(b.Quantity)
+                                </td>
+                                <td style="text-align: right;">
+                                    @(b.SizeMetric)
+                                </td>
+                                <td style="text-align: right;">
+                                    @(b.FreeStock)
+                                </td>
+                                <td style="text-align: right;">
+                                    @{
+                                        byte? StockStatusID = 0;
+
+                                        string stockStatus = "<i>Unknown</i>";
+
+                                        if (b.StockStatusID != null) 
+                                        {
+                                            StockStatusID = b.StockStatusID;
+
+                                            stockStatus = UoW.GetRepository<StockStatus>().GetAll().Where(p => p.StockStatusID == b.StockStatusID).Select(p => p.StockStatus1).Single();
+                                        }
+                                        
+                                        switch (StockStatusID)
+                                        {
+                                            case 1:
+                                                ViewContext.Writer.Write("<span style='color: green'>" + stockStatus + "</span>");
+                                                break;
+                                            case 2:
+                                            case 3:
+                                            case 4:
+                                                ViewContext.Writer.Write("<span style='color: orange'>" + stockStatus + "</span>");
+                                                break;
+                                            case 5:
+                                            case 6:
+                                            case 7:
+                                                ViewContext.Writer.Write("<span style='color: red'>" + stockStatus + "</span>");
+                                                break;
+
+                                            default:
+                                                ViewContext.Writer.Write("<span style='color: black'>" + stockStatus + "</span>");
+                                                break;
+                                        }
+                                    }
+                                </td>
+                                <td style="text-align: right;">
+                                    @(b.PriceInc)
+                                </td>
+                                <td style="text-align: right;">
+                                    @(b.CreatedDT)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            <div style="clear: both"></div>
+        }
+        else
+        {
+            <h6>No basket history to display.</h6>
+        }
+    }
+}
+
+@*SELECT	
+    MPB.CountryID,
+    MPB.ProductID,
+    P.ProductPageID,
+    MPB.Quantity,
+    P.BasketName,
+    P.SizeMetric,
+    PID.ImageID,
+    MPB.CreatedDT,
+    S.FreeStock,
+    S.StockStatusID,
+    PR.PriceInc*@

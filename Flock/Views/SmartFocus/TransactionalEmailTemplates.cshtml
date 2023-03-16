@@ -1,0 +1,264 @@
+﻿@using Flock.Classes.SmartFocus
+@using Flock.ViewModels
+@model SFTransactionalTemplateOverviewViewModel
+@{
+    ViewBag.Title = "TransactionalEmails";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    @Styles.Render("~/Content/smartfocus.css")
+}
+
+<h4 class="page-heading">Transactional Email Templates</h4>
+
+<div id="top-panel">
+    <p>
+        This page needs to permit CRUD of email templates for all purposes
+    </p>
+
+    <p>
+        Start with a list of all templates:
+    </p>
+
+    <div id="templates-list-container">
+        @Html.Partial("TemplatesListPartial", Model.Templates)
+    </div>
+
+    <p>
+        And a list of all 'Dynamic Content Blocks' (Banners in Templates)
+    </p>
+
+    <div id="dcb-list-container">
+        @Html.Partial("DynamicContentBlockListPartial", Model.Banners)
+    </div>
+
+    <p>
+        Continue with the ability to create a new Template, add a Dynamic Content Block to it, then send it to yourself!
+    </p>
+</div>
+
+<div id="create-template-form-container">
+    @Html.DevExpress().Label(settings => {
+        settings.Name = "NewTemplateNameLbl";
+        settings.Text = "Name";
+        settings.AssociatedControlName = "NewTemplateName";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings => {
+        settings.Name = "NewTemplateName";
+        settings.Properties.NullText = "Name";
+        settings.ShowModelErrors = true;
+    }).GetHtml()
+
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewTemplateSubjectLbl";
+        settings.Text = "Subject";
+        settings.AssociatedControlName = "NewTemplateSubject";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "NewTemplateSubject";
+        settings.Properties.NullText = "Subject";
+        settings.ShowModelErrors = true;
+    }).GetHtml()
+
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewTemplateDescriptionLbl";
+        settings.Text = "Description";
+        settings.AssociatedControlName = "NewTemplateDescription";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "NewTemplateDescription";
+        settings.Properties.NullText = "Description";
+        settings.ShowModelErrors = true;
+    }).GetHtml()
+
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewTemplateFromEmailLbl";
+        settings.Text = "From Email";
+        settings.AssociatedControlName = "NewTemplateFromEmail";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "NewTemplateFromEmail";
+        settings.Properties.NullText = "From Email";
+        settings.ShowModelErrors = true;
+    }).GetHtml()
+
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewTemplateFromNameLbl";
+        settings.Text = "From Name";
+        settings.AssociatedControlName = "NewTemplateFromName";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "NewTemplateFromName";
+        settings.Properties.NullText = "From Name";
+        settings.ShowModelErrors = true;
+    }).GetHtml()
+
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewTemplateToNameLbl";
+        settings.Text = "To Name";
+        settings.AssociatedControlName = "NewTemplateToName";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "NewTemplateToName";
+        settings.Properties.NullText = "To Name";
+        settings.ShowModelErrors = true;
+    }).GetHtml()
+
+
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewTemplateReplyToNameLbl";
+        settings.Text = "Reply To Name";
+        settings.AssociatedControlName = "NewTemplateReplyToName";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "NewTemplateReplyToName";
+        settings.Properties.NullText = "Reply To Name";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    }).GetHtml()
+
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewTemplateReplyToEmailLbl";
+        settings.Text = "Reply To Email";
+        settings.AssociatedControlName = "NewTemplateReplyToEmail";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "NewTemplateReplyToEmail";
+        settings.Properties.NullText = "Reply To Email";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    }).GetHtml()
+
+    @Html.DevExpress().Button(settings => {
+    settings.Name = "NewTemplateCreateButton";
+    settings.Text = "Create";
+    settings.ClientSideEvents.Click = @"function(s, e) { 
+        LoadingPanel.Show();
+        $.ajax({ 
+            url: '" + Url.Action("CreateNewTransactionalTemplate", "SmartFocus") + @"',
+            type: 'POST',
+            traditional: true,
+            data: { 
+                Name: NewTemplateName.GetValue(),
+                Description: NewTemplateDescription.GetValue(),
+                Subject: NewTemplateSubject.GetValue(),
+                FromEmail: NewTemplateFromEmail.GetValue(),
+                FromName: NewTemplateFromName.GetValue(),
+                ToName: NewTemplateToName.GetValue(),
+                ReplyToName: NewTemplateReplyToName.GetValue(),
+                ReplyToEmail: NewTemplateReplyToEmail.GetValue(),
+                Type: 'TRANSACTIONAL',
+                Encoding: 'UTF-8'
+            },
+            success: function(data) { 
+                $('#templates-list-container').html(data);
+            },
+            error: function(e, s, a) { 
+                LoadingPanel.Hide();
+                $('#create-dynamic-content-block-form-container').html(e.responseText);
+            },
+            timeout: 30000
+        });
+    }";
+    }).GetHtml() 
+</div>
+
+<div id="create-dynamic-content-block-form-container">
+    @Html.Partial("CreateDCBFormPartial", new SFDynamicContentBlock())
+</div>
+
+<div id="test-email-section" style="margin-top: 2em;">
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "EmailIDLbl";
+        settings.Text = "Email Template";
+        settings.AssociatedControlName = "EmailID";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "EmailID";
+        settings.Properties.NullText = "Email Template";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    }).GetHtml()
+
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "MemberIDLbl";
+        settings.Text = "Member ID";
+        settings.AssociatedControlName = "MemberID";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "MemberID";
+        settings.Properties.NullText = "MemberID";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    }).GetHtml()
+
+    @Html.DevExpress().Button(settings =>
+    {
+        settings.Name = "SendTestEmailButton";
+        settings.Text = "Send";
+        settings.ClientSideEvents.Click = @"function(s, e) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("SendTestEmail", "SmartFocus") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    EmailID: EmailID.GetValue(),
+                    MemberID: MemberID.GetValue()
+                },
+                success: function(data) {
+                    $('#test-email-section').append($('<p>' + data + '</p>'));
+                    LoadingPanel.Hide();
+                },
+                timeout: 30000
+            });
+        }";
+    }).GetHtml()
+</div>
+ 
+
+<div>
+    <input type="button" value="Update Template From Address" onclick="UpdateTemplateEmail()"/>
+
+    <script type="text/javascript">
+        function UpdateTemplateEmail() {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("UpdateTemplateField", "SmartFocus")',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    templateID: 1548483,
+                    field: 'from',
+                    value: 'Designers Guild'
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    alert(data);
+                },
+                timeout: 20000
+            });
+        }
+    </script>
+</div>
+
+@*@Html.Partial("TransactionalTemplateGridViewPartial", Model)*@

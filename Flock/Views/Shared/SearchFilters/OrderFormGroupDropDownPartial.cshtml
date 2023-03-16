@@ -1,0 +1,106 @@
+﻿@model List<Flock.Models.OrderFormGroup>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(270);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        
+        string name = "OrderFormGroupDD";
+        if (action == "PrimaryOrderFormGroupDropDownPartial" || action == "SecondaryOrderFormGroupDropDownPartial")
+        {
+            name = name + ViewBag.OrderFormGroupProductID;
+            settings.Name = name;
+        }
+        settings.Text = "Order Form Group";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+        settings.Properties.DropDownWindowWidth = System.Web.UI.WebControls.Unit.Pixel(270);
+
+        settings.Properties.EnableClientSideAPI = true;
+
+        if (action == "PrimaryOrderFormGroupDropDownPartial")
+        {
+            settings.Properties.ClientSideEvents.DropDown = @"function(s, e) {  
+                $('#primary-products-table > tbody').sortable('destroy');
+            }";
+
+            settings.Properties.ClientSideEvents.CloseUp = @"function(s, e) {
+                InitPrimaryProductDragDrop();
+            }";
+        }
+        else if (action == "SecondaryOrderFormGroupDropDownPartial")
+        {
+            settings.Properties.ClientSideEvents.DropDown = @"function(s, e) {  
+                $('#secondary-products-table > tbody').sortable('destroy');
+            }";
+
+            settings.Properties.ClientSideEvents.CloseUp = @"function(s, e) {
+                InitSecondaryProductDragDrop();
+            }";
+        }
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='orderformgroup-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/OrderFormGroupListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "PrimaryOrderFormGroupDropDownPartial" || action == "SecondaryOrderFormGroupDropDownPartial")
+                    {
+                        buttonSettings.Name = name + "ButtonManage";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            " + name + @".HideDropDown();
+                            $.ajax({ 
+                                url: '"+@Url.Action("OrderFormGroupManagerPartial")+ @"',
+                                data: {},
+                                success: function(data) { 
+                                    $('#dialog-orderformgroup-inner').html(data); 
+                                    $('#dialog-orderformgroup-manage').dialog('open');
+                                },
+                                error: function(e, r, s) {
+                                    if(typeof(e.responseText) != 'undefined' && typeof(e.responseText != false))
+                                        alert(e.responseText);
+                                    else
+                                        alert(e.statusText); 
+                                },
+                                timeout: 60000
+                            });
+                        }";
+                        buttonSettings.Text = "Manage";
+                        buttonSettings.Style.Add("float", "left");
+                    }
+                }
+                ).Render();
+            
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "PrimaryOrderFormGroupDropDownPartial")
+                    {
+                        buttonSettings.Name = name+"ButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            InitPrimaryProductDragDrop();
+                            " + name + @".HideDropDown();
+                        }";
+                    }
+                    else if (action == "SecondaryOrderFormGroupDropDownPartial")
+                    {
+                        buttonSettings.Name = name + "ButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            InitSecondaryProductDragDrop();
+                            " + name + @".HideDropDown();
+                        }";
+                    }
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }).Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

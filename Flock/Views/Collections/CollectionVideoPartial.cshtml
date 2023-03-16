@@ -1,0 +1,76 @@
+﻿@model Flock.ViewModels.CollectionViewModel
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#video-inner').slideToggle('fast')">Resources Section (click to expand / contract)</legend>
+        <div id="video-inner" style="background-color: white; padding-right: 1em; padding-left: 1em; position: relative; display: block; padding-top: 1em; padding-bottom: 1em;">
+            
+    @*<div id="video-image" style="position: relative;" class="video-section-part">
+                <span style='position: absolute; left: 0; top: 0; z-index: 10;'>Video Image: Landscape (shallow) only</span>
+
+                <img id="collection-video-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                <div id="collection-video-container" class="droppable" data-collection-id="@(Model.CollectionID)">
+                    @Html.Partial("CollectionVideoImage", Model.CollectionImages.Where(p => p.TemplateImageID == 8).ToList(), new ViewDataDictionary())
+                </div>
+            </div>
+            <div id="video-supporting-image" style="position: relative;" class="video-section-part">
+                <div class="bottom-item" style="margin-right: 0; position: relative;">
+                    <span style='position: absolute; left: 0; top: 0; z-index: 10;'>Brochure Image: Square only</span>
+                    <img id="collection-brochure-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                    <div id="collection-brochure-container" class="droppable" data-collection-id="@(Model.CollectionID)">
+                        @Html.Partial("CollectionBrochureImage", Model.CollectionImages.Where(p => p.TemplateImageID == 6).ToList(), new ViewDataDictionary())
+                    </div>
+                </div>
+                <div style="position: relative;" class="bottom-item">
+                    <span style='position: absolute; left: 0; top: 0; z-index: 10;'>View All Image: Square only</span>
+                    <img id="collection-viewall-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                    <div id="collection-viewall-container" class="droppable" data-collection-id="@(Model.CollectionID)">
+                        @Html.Partial("CollectionViewAllImage", Model.CollectionImages.Where(p => p.TemplateImageID == 5).ToList(), new ViewDataDictionary())
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>*@
+
+            <div id="video-select-container" style="float: right; width: 475px;" class="select-container">
+                @Html.Action("CollectionComposeVideoComboBoxPartial", "Collections")
+
+                @using (var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>())
+                {
+                    if (Model.VideoID == null)
+                    {
+                        <label style="font-style: italic; margin-bottom: 0; line-height: 32px;">No Video Assigned</label>
+                    }
+                    else
+                    {
+                        <label style="margin-bottom: 0; line-height: 32px;">Video: </label>
+                        var v = UoW.GetRepository<Flock.Models.Video>().GetAll().Where(p => p.VideoID == Model.VideoID).Single();
+                        <a href="#" target="_blank" style="line-height: 32px;">@(v.Name)</a>
+                    }
+                }
+
+                <img style="margin-left: 1em; width: 20px; position: relative; top: -1px; cursor: pointer; " src="/images/systemicons/remove-icon.png" onclick="$.confirm(function () { RemoveCollectionVideo(@(Model.CollectionID)); }, function () { })" />
+            </div>
+            <div id="brochure-select-container" style="float: left; width: 475px;" class="select-container">
+                @Html.Action("CollectionComposeBrochureComboBoxPartial", "Collections")
+
+                @using (var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>())
+                {
+                    if (Model.BrochureID == null)
+                    {
+                        <label style="font-style: italic; margin-bottom: 0; line-height: 32px;">No Brochure Assigned</label>
+                    }
+                    else
+                    {
+                        <label style="margin-bottom: 0; line-height: 32px;">Brochure: </label>
+                        var b = UoW.GetRepository<Flock.Models.Brochure>().GetAll().Where(p => p.BrochureID == Model.BrochureID).Single();
+                        <a href="/brochures/@(b.BrochureID).pdf" style="line-height: 32px;" target="_blank">@(b.Name)</a>
+                    }
+                }
+
+                <img style="margin-left: 1em; width: 20px; position: relative; top: -1px; cursor: pointer;" src="/images/systemicons/remove-icon.png" onclick="$.confirm(function () { RemoveCollectionBrochure(@(Model.CollectionID)); }, function () { })" />
+                @*@Html.DropDownListFor(m => Model.BrochureID, new SelectList(Model.Brochures, "BrochureID", "Name"), "Select Brochure", new { id = "brochure-selector", style = "height: 28px" })*@
+            </div>
+            <div style="clear: both;"></div>
+
+        </div>
+    </fieldset>
+</div>

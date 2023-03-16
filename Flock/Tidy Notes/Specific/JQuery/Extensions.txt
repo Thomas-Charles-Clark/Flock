@@ -1,0 +1,23 @@
+
+
+   ___ _____                          _____     _                 _                 
+  |_  |  _  |                        |  ___|   | |               (_)                
+    | | | | |_   _  ___ _ __ _   _   | |____  _| |_ ___ _ __  ___ _  ___  _ __  ___ 
+    | | | | | | | |/ _ | '__| | | |  |  __\ \/ | __/ _ | '_ \/ __| |/ _ \| '_ \/ __|
+/\__/ \ \/' | |_| |  __| |  | |_| |  | |___>  <| ||  __| | | \__ | | (_) | | | \__ \
+\____/ \_/\_\\__,_|\___|_|   \__, |  \____/_/\_\\__\___|_| |_|___|_|\___/|_| |_|___/
+                              __/ |                                                 
+                             |___/                                                  
+
+
+Confirm - to avoid having to use window.confirm()
+
+call $.confirm(yesCallback, noCallback, args)
+
+
+
+Error - out beautiful all purpose solution to error handling & friendly user display
+
+	var args = new Array();
+	args.push(x);
+	call $.showError(e, s, a, callback(args), args);

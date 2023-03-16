@@ -1,0 +1,70 @@
+﻿/*html, body {
+    height: 100%;
+    background-color: #DEDBD2;
+    color: #A8A8A8;
+    font-family: "helvetica", "arial", sans-serif;
+    font-size: 11px;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+#logon-wrapper { 
+    color: #A8A8A8;
+    margin: 0px auto 150px;
+    padding: 9px 0px;
+    text-align: center;
+    width: 1400px;
+}
+
+#logon-entry {
+    box-sizing: border-box;
+    margin: 20px auto;
+    padding: 0em;
+    width: 276px;
+}
+
+.buttonGreen {
+    background: url("../../../img/admin/green-fade.png") repeat-x #417B8F;
+    border: medium none currentColor;
+    border-radius: 12px;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 5px 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+}*/
+
+* {
+    box-sizing: border-box;
+
+    -moz-box-sizing: border-box;
+}
+
+input {
+    height: 30px !important;
+    font-family: "verdana";
+}
+
+label {
+    float: left;
+    line-height: 30px;
+    margin: 0px 0.5em 0px 0px;
+    text-align: right;
+    width: 128px;
+}
+
+.container {
+    width: 500px;
+}
+
+ul {
+    list-style-type: none;
+    margin-top: 1em;
+}
+
+    ul li {
+        margin-bottom: 0.4em;
+    }

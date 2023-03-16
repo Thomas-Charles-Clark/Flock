@@ -1,0 +1,36 @@
+﻿@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Name = "ProductTypeCheckComboBox";
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = "";
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "ProductTypeID";
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        if($('#product-data-view-container').length > 0) {
+                var textSearch = '';
+                if(ProductCollectionFreeTextSearchBox.GetValue() != null)                
+                    textSearch = ProductCollectionFreeTextSearchBox.GetValue();
+            $('#searching-icon').fadeIn('fast');
+            $.ajax({
+                url: '" + @Url.Action("ProductToCollection_ProductDataViewFilter", "Products") + @"',
+                data: { Brands: BrandCheckComboBox.GetSelectedValues().toString(), Launches: LaunchCheckComboBox.GetSelectedValues().toString(), ProductTypes: ProductTypeCheckComboBox.GetSelectedValues().toString(), TextSearch: textSearch.toString() },
+                success: function(data) { 
+                    $('#searching-icon').fadeOut('fast');
+                    $('#product-data-view-container').html(data);
+                },
+                error: function(e, s, a) { 
+                    $('#searching-icon').fadeOut('fast');
+                    alert(e.responseText); 
+                },
+                    timeout: 30000
+                });
+        }
+    }";
+}
+).BindList(Model).GetHtml()

@@ -1,0 +1,319 @@
+﻿@model Flock.ViewModels.PageComposeViewModel
+    <input type="hidden" id="current-page-id" value="@(Model.PageID)" />
+<script type="text/javascript">
+    function EnableFilterIndexingChanged(s, e) {
+        // we need to check if there are > 1 product page grids on this page, if so refuse the check
+
+        // this is trivial and insufficient: we need to check that there is one product page grid CURRENTLY AVAILABLE
+        // per SET OF COUNTRY RESTRICTIONS... ugh.
+
+        let unset = false;
+        if ($('.product-page-grid-container').length == 0 ||
+            $('.product-page-grid-container').length > 1) {
+            $.info('Sorry', 'Only pages with exactly 1 product page grid may perform filter indexing.');
+            unset = true;
+        } else {
+            let pageSectionId = $('.product-page-grid-container').first().data('page-section-id');
+            let productTypeId = window[`PageSection${pageSectionId}ProductTypeID`].GetValue();
+            if (!productTypeId) {
+                $.info('Sorry', `Page Section ${pageSectionId} must have a Product Type set to permit filter indexing.`);
+                unset = true;
+            }
+        }
+
+        if (unset) {
+            EnableFilterIndexing.SetValue(false);
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function PageProductTypeIDChanged(s, e) {
+        let selectedProductTypeId = s.GetValue();
+        let update = false;
+        if (selectedProductTypeId) {
+            let grids = document.querySelectorAll('.product-page-grid-container');
+            let nonConformingTypes = [];
+            grids.forEach(grid => {
+                nonConformingTypes = nonConformingTypes.concat([...grid.querySelectorAll('.product-page-cell:not([data-product-type-id="' + selectedProductTypeId + '"])')]);
+            });
+            if (nonConformingTypes.length) {
+                window.nonConforming = $.info('Sorry', 'You have ' + grids.length + ' Product Page Grid(s) on this page containing a total of ' + nonConformingTypes.length + ' product(s) which do not match that type. Please remove them before selecting a single product type for the page. <a href="javascript:;" style="color: #0072c6" onclick="PageRemoveNonConformingProductTypes(' + nonConformingTypes.length + ')">Click here</a> to remove them automatically.', () => {
+                    PageProductTypeID.SetValue(null);
+                });
+            } else {
+                update = true;
+            }
+        } else {
+            update = true;
+        }
+
+        if (update) {
+            $.ajax({
+                url: '/admin/cms/getProductTypeURLKeywordsById',
+                type: 'POST',
+                data: {
+                    productTypeId: selectedProductTypeId
+                },
+                success: (d) => {
+                    URLKeywords.SetValue(d);
+                    if (selectedProductTypeId)
+                        URLKeywords.SetEnabled(false);
+                    else
+                        URLKeywords.SetEnabled(true);
+                    SavePageDetails(@(Model.PageID));
+                    SavePageBasicDetails();
+                }
+            });
+        }
+    }
+    function PageRemoveNonConformingProductTypes(count) {
+        $.confirm(() => {
+            let selectedProductTypeId = PageProductTypeID.GetValue();
+            if (window.nonConforming) {
+                $(window.nonConforming).dialog('close');
+            }
+            let grids = document.querySelectorAll('.product-page-grid-container');
+            grids.forEach(grid => {
+                grid.querySelectorAll('.product-page-cell:not([data-product-type-id="' + selectedProductTypeId + '"])').forEach(e => {
+                    e.remove();
+                });
+                UpdateProductPageGrid(grid.dataset.pageSectionId);
+            });
+            setTimeout(() => {
+                PageProductTypeID.SetValue(selectedProductTypeId);
+                PageProductTypeIDChanged(PageProductTypeID);
+            });
+        }, null, null, 'This will remove a total of ' + count + ' product pages across the grids on this page.');
+    }
+</script>
+
+<div class="content-panel-container">
+    <fieldset id="page-basic-details-fieldset">
+        <legend onclick="$('#page-basic-details-section').slideToggle('fast');">
+            Page Basic Information (click to expand / contract)
+            <span style="float: right; margin: 0 4px;">Page ID: @(Model.PageID)</span>
+            <img id="page-details-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="page-basic-details-section" style="position: relative;" class="fieldset-inner">
+            @Html.HiddenFor(m => Model.PageID)
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Page Name (100):</label>
+            @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "PageName";
+                    settings.Style.Add("float", "left");
+                    settings.Properties.MaxLength = 100;
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            @Html.ValidationMessageFor(m => Model.Name)
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">New Status:</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.New, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "4px 7px 7px 0");
+
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+                @Html.ValidationMessageFor(m => Model.New)
+            @*<div style="clear:both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">See Also Bold:</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.RelatedFilterBold, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "4px 7px 7px 0");
+
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            @Html.ValidationMessageFor(m => Model.RelatedFilterBold)
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">See Also Colour:</label>
+            @Html.DevExpress().TextBoxFor(m => Model.RelatedFilterFontColour, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.Width = 200;
+                settings.Properties.MaxLength = 7;
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            }).GetHtml()
+            @Html.ValidationMessageFor(m => Model.RelatedFilterFontColour)
+            <label style="float: left; line-height: 30px; margin-left: 1em;">Please provide a correct <a href='http://html-color-codes.info/' target="_blank">HTML Colour Code</a>, with the preceeding hash</label>
+            <div style="clear: both;"></div>*@
+            @if (ViewData["EditError"] != null)
+            {
+                <span style="float: left; margin: 8px 0;" class="field-validation-error">@(ViewData["EditError"])</span>
+                <div style="clear: both;"></div>
+            }
+            <div style="clear: both;"></div>
+            @*<input type="submit" value="Save" style="height: 25px; float: left;" />*@
+            @*}*@
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Site Section:</label>
+            @Html.DevExpress().ComboBoxFor(m => Model.SiteSectionID, settings =>
+            {
+                settings.Name = "SiteSectionID";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.Width = 200;
+                settings.Properties.MaxLength = 7;
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                settings.Properties.ValueField = "SiteSectionID";
+                settings.Properties.ValueType = typeof(Byte);
+                settings.Properties.TextField = "Name";
+            }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetSiteSectionIDs, Flock.ViewModels.LargeDatabaseDataProvider.GetSiteSectionByID).GetHtml()
+            @Html.ValidationMessageFor(m => Model.SiteSectionID)
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Calculate Discount?</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.CalculateDiscount, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "4px 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Clearance?</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.Clearance, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "4px 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Show Recently Viewed?</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.ShowRecentlyViewed, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "4px 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <hr/>
+            <h5>Product Page Grid Filtering</h5>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Indexable Filters?</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.EnableFilterIndexing, settings =>
+       {
+           settings.Style.Add("float", "left");
+           settings.Style.Add("margin", "4px 7px 7px 0");
+           settings.ShowModelErrors = true;
+           settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           // The ideal check is extremely complex to implement and becomes stale immediately
+           // after being performed, so avoid it. If a page breaks, let them fix it.
+           //settings.Properties.ClientSideEvents.CheckedChanged = "EnableFilterIndexingChanged";
+           settings.Properties.ClientInstanceName = "EnableFilterIndexing";
+       }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">
+                Product Type
+            </label>
+            @Html.DevExpress().ComboBoxFor(m => Model.ProductTypeID, settings =>
+            {
+                settings.Name = "ProductTypeID";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.Width = 200;
+                settings.Properties.MaxLength = 7;
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                settings.Properties.ValueField = "ProductTypeID";
+                settings.Properties.TextField = "Name";
+                settings.Properties.NullText = "Please Select";
+                settings.Properties.AllowNull = true;
+                settings.Properties.ClientInstanceName = "PageProductTypeID";
+                settings.Properties.ClientSideEvents.SelectedIndexChanged = "PageProductTypeIDChanged";
+            }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetProductTypesForComboBox, Flock.ViewModels.LargeDatabaseDataProvider.GetProductTypeByIDForComboBox).GetHtml()
+            <div style="clear: both;"></div>
+            <hr/>
+            <h5>SEO</h5>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">No Index?</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.NoIndex, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "4px 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">No Follow?</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.NoFollow, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "4px 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Canonical Page</label>
+                @Html.Action("CanonicalPageIDComboBoxPartial", "CMS", new {  CanonicalPageID = Model.CanonicalPageID })
+               @if (Model.AttributeList?.Any() == true)
+                {
+                    <a id="page-@(Model.PageID)-canonical-name" class="page-canonical-name" href="javascript:;" onclick="LoadCanonicalPageAttributeSettings(CanonicalPageID.GetValue(), @(Model.PageID))">
+                       @foreach (var a in Model.Attributes
+                                               .OrderBy(a => a.AttributeGroup.AttributeGroup_ProductTypes
+                                               .FirstOrDefault(agpt => agpt.ProductTypeID == Model.ProductTypeID)?.LexicographicalSortOrder))
+                        {
+                            <span>
+                                @(a.Name)
+                            </span>
+                        }
+                        @(Model.CanonicalPage?.ProductType?.NamePlural)
+                    </a>
+                }
+                else
+                {
+                    <a id="page-@(Model.PageID)-canonical-name" class="page-canonical-name" href="javascript:;" onclick="LoadCanonicalPageAttributeSettings(CanonicalPageID.GetValue(), @(Model.PageID))">
+                        @(Model.CanonicalPage?.ProductType?.NamePlural)
+                    </a>
+                }
+            <div style="clear: both;"></div>
+            <hr class="margin-bottom-15"/>
+            <img id="page-basic-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0;" onclick="SavePageBasicDetails();" />
+            <div style="clear: both;"></div>
+        </div>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    function SavePageBasicDetails() {
+        $("#page-basic-details-busy").fadeIn("fast");
+        let cpid = CanonicalPageID.GetValue();
+        console.log(cpid);
+        $.ajax({
+            url: '@Url.Action("UpdatePageBasicDetails", "CMS")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                PageID: '@Model.PageID',
+                Name: PageName.GetValue(),
+                New: New.GetValue(),
+                //RelatedFilterFontColour: RelatedFilterFontColour.GetValue(),
+                //RelatedFilterBold: RelatedFilterBold.GetValue(),
+                SiteSectionID: SiteSectionID.GetValue(),
+                CalculateDiscount: CalculateDiscount.GetValue(),
+                ProductTypeID: PageProductTypeID.GetValue(),
+                Clearance: Clearance.GetValue(),
+                ShowRecentlyViewed: ShowRecentlyViewed.GetValue(),
+                NoIndex: NoIndex.GetValue(),
+                NoFollow: NoFollow.GetValue(),
+                CanonicalPageID: cpid,
+                EnableFilterIndexing: EnableFilterIndexing.GetValue()
+            },
+            success: function (data) {
+                $("#page-basic-details-container").html(data);
+                $("#page-basic-details-busy").fadeOut("fast");
+                SuccessFade($("#page-basic-details-save"));
+            },
+            error: function (e, s, a) {
+                $("#page-basic-details-container").html(e.responseText);
+                $("#page-basic-details-busy").fadeOut("fast");
+                FailureFade($("#page-basic-details-save"));
+            },
+            timeout: 20000
+        });
+    }
+</script>

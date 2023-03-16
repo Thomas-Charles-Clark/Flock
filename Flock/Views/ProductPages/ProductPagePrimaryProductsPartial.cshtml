@@ -1,0 +1,154 @@
+﻿@model List<Flock.Models.vwProductPage_PrimaryProduct>
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#primary-products').slideToggle('fast')">
+            Primary Product(s) (click to expand / contract)
+            <img id="primary-products-page-busy" class="busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+        </legend>
+        <div id="primary-products" style="background-color: white; padding: 1em;">
+            <table id="primary-products-table">
+                <thead>
+                    <tr>
+                        <th style="width: 53px;"></th>
+                        <th style="width: 290px;">
+                            Order Form Group
+                        </th>
+                        <th style="width: 187px">
+                            Order Form Name
+                        </th>
+                        <th style="width: 139px">
+                            Product Code
+                        </th>
+                        <th style="width: 130px">
+                            Stock Status
+                        </th>
+                        <th style="width: 82px">
+                            Enabled
+                        </th>
+                        <th style="width: 45px">
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="primary-product-sortable">
+                    @if (Model.Count == 0)
+                    {
+                        <tr id="primary-products-placeholder">
+                            <td style="width: 28px;"></td>
+                            <td colspan="7">
+                                <div style="padding: 1em; padding-left: 0px; font-size: 1.4em; background-color: white;">
+                                    No Primary Products have been set.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (Flock.Models.vwProductPage_PrimaryProduct i in Model)
+                        {
+                            <tr data-product-id="@i.ProductID">
+                                @if (i.ImageID != null)
+                                {
+                                    <td>
+                                        <div data-product-page-id="@i.ProductPageID" class="related-collection-sortable" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                            <img style="height: 64px; width: 64px;" src="https://flock.designersguild.com/imagelibrary/90/@(i.ImageID).jpeg" alt="@(i.Name)" title="Product ID: @(i.ProductID) - @(i.Name)" />
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <div data-collection-id="@i.ProductPageID" class="related-collection-sortable" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                            <img style="height: 64px; width: 64px;" src="/Images/Admin/image-not-set.png" alt="@(i.Name)" title="Product ID: @(i.ProductID) - @(i.Name)" />
+                                        </div>
+                                    </td>
+                                }
+                                <td>
+                                    @if (i.OrderFormGroup == "")
+                                    {
+                                        i.OrderFormGroup = "Not Set";
+                                    }
+                                    @Html.Action("PrimaryOrderFormGroupDropDownPartial", "ProductPages", new { ProductID = i.ProductID, ProductPageID = i.ProductPageID, SelectedOrderFormGroupID = i.OrderFormGroupID })
+                                </td>
+                                <td>
+                                    @Html.DevExpress().TextBox(settings => {
+                                        settings.Name = "OrderFormName" + i.ProductID;
+                                        settings.Enabled = true;
+                                        settings.ReadOnly = false;
+                                        settings.Text = i.OrderFormName;
+                                        settings.Width = 150;
+                                        settings.Height = 35;
+                                        settings.Properties.MaxLength = 50;
+                                        settings.Style.Add("float", "left");
+                                        settings.Style.Add("margin-right", "0");
+                                        settings.Properties.ClientSideEvents.LostFocus = @"function(s, e) { 
+                                            InitPrimaryProductDragDrop();
+                                            $.ajax({ 
+                                                url: '" + @Url.Action("UpdateProductOrderFormName", "ProductPages") + @"',
+                                                type: 'POST',
+                                                traditional: true,
+                                                data: { 
+                                                    ProductID: '" + i.ProductID + @"',
+                                                    OrderFormName: s.GetValue()
+                                                },
+                                                success: function(data) { 
+                                                    // should fade border green or something cool to indicate goodness
+                                                },
+                                                error: function(e, s, a) { 
+                                                    $.showError(e, s, a);
+                                                },
+                                                timeout: 20000
+                                            });
+                                        }";
+                                    }).GetHtml()
+                                    @Html.DevExpress().Button(settings =>
+                                    {
+                                        settings.Name = "OrderFormName" + i.ProductID + "EditButton";
+                                        settings.Style.Add("float", "left");
+                                        //settings.Style.Add("-moz-box-sizing", "content-box");
+                                        //settings.Style.Add("box-sizing", "border-box");
+                                        settings.Style.Add("line-height", "35px");
+                                        settings.Style.Add("display", "inline-block");
+                                        settings.Text = "«";
+                                        settings.Width = 22;
+                                        settings.Height = 35;
+                                        settings.Style["border-left"] = "0";
+                                        //settings.Style["padding"] = "5px 0 0 0";
+                                        settings.Style.Add("font-size", "1em");
+                                        settings.ClientSideEvents.Click = @"function(s, e) { 
+                                            $('#primary-products-table > tbody').sortable('destroy');
+                                            window['OrderFormName" + i.ProductID + @"'].SetFocus();
+                                        }";
+                                    }).GetHtml()
+                                </td>
+                                <td>
+                                    @i.Code
+                                </td>
+                                <td>
+                                    @i.StockStatus
+                                </td>
+                                <td>
+                                    @if (i.Enabled)
+                                    {
+                                        <span style="color: green">@i.Enabled.ToString()</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: red">@i.Enabled.ToString()</span>
+                                    }
+                                </td>
+                                <td>
+                                    <img src="~/Images/SystemIcons/remove-icon.png" class="product-remove-icon" title="Remove Product" onclick="RemovePrimaryProduct(@(i.ProductID))" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <script type="text/javascript">
+                if (typeof (InitPrimaryProductDragDrop) == 'function')
+                    InitPrimaryProductDragDrop();
+            </script>
+        </div>
+    </fieldset>
+</div>

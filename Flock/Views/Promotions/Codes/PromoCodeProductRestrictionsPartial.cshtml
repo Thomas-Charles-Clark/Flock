@@ -1,0 +1,24 @@
+﻿@model List<Flock.Models.vwPromoCodeProductImage>
+@{
+    foreach(var p in Model)
+    {
+        <div class="product-restriction-icon" data-product-id="@(p.ProductID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({ opacity: 1.0 }, 300);" onmouseout="$(this).find('.image-remove-icon').stop().animate({ opacity: 0.0 }, 300);">
+            @if(p.Front != null)
+            {
+                <img src="https://flock.designersguild.com/imagelibrary/90/@(p.Front).jpeg" style="width: 100%"/>
+            }
+            else
+            {
+                <img src="/images/admin/image-not-set-64.png" style="width: 100%;"/>
+            }
+            <p>@(p.Code)</p>
+            <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="removeProductRestriction($(this));"/>
+        </div>
+    }
+    if(Model.Count == 0)
+    {
+        <div id="product-restriction-placeholder">
+            <p style="font-style: italic;">This promotion code is not restricted to any particular products.</p>
+        </div>
+    }
+}

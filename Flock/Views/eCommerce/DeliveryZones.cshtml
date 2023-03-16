@@ -1,0 +1,181 @@
+﻿@model Flock.ViewModels.DeliveryZoneViewModel
+@{
+    ViewBag.Title = "Delivery Zones";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #container {
+            width: 1266px;
+        }
+        #DeliveryZoneGridView_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+        #delivery-zone-postcode-details {
+            border-collapse: collapse;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            margin-bottom: 0.5em;
+        }
+
+            #delivery-zone-postcode-details th {
+                padding: 0.5em;
+                text-align: left;
+            }
+
+            #delivery-zone-postcode-details td {
+                padding: 0.1em 0.5em;
+            }
+        #delivery-zone-postcode-details {
+            border-collapse: collapse;
+            border: 1px solid #a0a0a0;
+            width: 100%;
+        }
+
+            #delivery-zone-postcode-details th {
+                font-size: 1.1em;
+                padding: 3px !important;
+            }
+
+            #delivery-zone-postcode-details td, #delivery-zone-postcode-details th {
+                border: 1px solid #a0a0a0;
+                padding: 1px;
+                text-align: center;
+            }
+
+        #new-row td {
+            border: none !important;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        function SaveDeliveryZoneDetails() {
+            LoadingPanel.Show();
+
+            var Postcodes = new Array();
+
+            for (var i = 0; i < $(".delivery-zone-postcode").length; i++) {
+                Postcodes.push({
+                    DeliveryZone_PostcodeID: Number($("#DeliveryZone_Postcodes_"+i+"_PostcodeID").val()),
+                    Restriction: window["DeliveryZone_Postcodes[" + i + "].Restriction"].GetValue(),
+                    PostCode: window["DeliveryZone_Postcodes[" + i + "].Postcode"].GetValue()
+                })
+            }
+
+            //{
+            //    var Restriction = $(this).find("input[name^=Restriction]").val();
+            //});
+
+            $.ajax({
+                url: '@(Url.Action("SaveDeliveryZoneDetails", "eCommerce"))',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    DeliveryZoneID: $("#selected-delivery-zone-id").val(),
+                    Name: Name.GetValue(),
+                    CountryID: CountryID.GetValue(),
+                    CourierID: CourierID.GetValue(),
+                    Postcodes: JSON.stringify(Postcodes)
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#delivery-zone-compose-container").html(data);
+                    SuccessFade($("#delivery-zone-details-save"));
+                    DeliveryZoneGridView.Refresh();
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    $("#delivery-zone-compose-container").html(e.responseText);
+                    FailureFade($("#delivery-zone-details-save"));
+                },
+                timeout: 20000
+            });
+        }
+
+        function AddNewDeliveryZonePostcode() {
+            LoadingPanel.Show()
+            $.ajax({
+                url: '@Url.Action("AddNewDeliveryZonePostcode", "eCommerce")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    DeliveryZoneID: $("#selected-delivery-zone-id").val(),
+                    Restriction: NewRestriction.GetValue(),
+                    Postcode: NewPostcode.GetValue()
+                },
+                success: function (data) {
+                    $("#delivery-zone-compose-container").html(data);
+                    LoadingPanel.Hide();
+                    SuccessFade($("#delivery-zone-details-save"));
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    $("#delivery-zone-compose-container").html(e.responseText);
+                    //FailureFade($("#delivery-zone-details-save"));
+                },
+                timeout: 20000
+            });
+        }
+
+        function RemovePostcode(DeliveryZone_PostcodeID) {
+            var args = new Array();
+            args.push($("#selected-delivery-zone-id").val());
+            args.push(DeliveryZone_PostcodeID);
+
+            $.confirm(function (args) {
+                LoadingPanel.Show();
+                $.ajax({
+                    url: '@Url.Action("RemovePostcodeFromDeliveryZone", "eCommerce")',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        DeliveryZoneID: args[0],
+                        DeliveryZone_PostcodeID: args[1] 
+                        },
+                    success: function (data) {
+                        $("#delivery-zone-compose-container").html(data);
+                        LoadingPanel.Hide();
+                    },
+                    timeout: 20000
+                });
+                LoadingPanel.Hide();
+            }, function () {
+
+            }, args);
+        }
+    </script>
+}
+
+<input type="hidden" id="selected-delivery-zone-id" value="@(Model.DeliveryZoneID)" />
+
+<h4 class="page-heading">Delivery Zones</h4>
+
+<div>
+    <div id="delivery-zone-select-header-container" style="float: left; width: 850px; margin-right: 2em;">
+        <div class="content-panel-container">
+            <fieldset id="delivery-zone-select-header">
+                <legend style="color: black; border-bottom-color: #929292; cursor: default;">Delivery Zone Grid</legend>
+                <div id="delivery-zone-select-header-inner" style="">
+                    <div id="delivery-zone-header-grid-container">
+                        @Html.Action("DeliveryZoneGridViewPartial", "eCommerce")
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div id="delivery-zone-compose-container" style="float: left;">
+        @if (ViewData["InvalidDeliveryZoneIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidDeliveryZoneIDError"])</h5>
+        }
+        @if (Model.DeliveryZoneID != null)
+        {
+            @Html.Partial("DeliveryZoneComposePartial", Model)
+        }
+    </div>
+    <div style="clear: both;"></div>
+</div>
+<div style="clear: both;"></div>

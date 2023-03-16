@@ -1,0 +1,15 @@
+﻿@*This'll only return countries with a language set up in dbo.Country_Language - makes sense...*@
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "CountryComboBox";
+    settings.Properties.ValueField = "CountryID";
+    settings.CallbackRouteValues = new { Controller = "MailingListImport", Action = "CountryComboBoxPartial" };
+    settings.SelectedIndex = 0;
+    settings.Height = 24;
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Style.Add("padding", "4px 5px 5px 5px");
+    settings.Properties.ValueType = typeof(short);
+    settings.Properties.TextField = "Name";
+    settings.Properties.NullText = "Select Country...";
+    settings.Style.Add("float", "left");
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetCountriesForMailingList()).GetHtml()

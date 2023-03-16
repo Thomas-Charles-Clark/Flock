@@ -1,0 +1,211 @@
+﻿@model Flock.ViewModels.AttributeAssignmentViewModel
+@if (Model == null)
+{
+
+}
+else 
+{
+    <div class="content-panel-container">
+        <fieldset id="product-page-attributes-fieldset">
+            <legend onclick="" style="cursor: default;">
+                Product Page Attributes
+                <span style="float: right; cursor: pointer; margin-right: 8px;" onclick="ClearAttributes(); return false;">Clear</span>
+                <span style="float: right; cursor: pointer; margin-right: 8px;" onclick="ReloadProductPageAttributes(); return false;">Reset</span>
+                <span style="float: right; cursor: pointer; margin-right: 8px;" onclick="LoadSuggestions(); return false;">Suggest</span>
+                @*<img style="float: right; width: 24px; margin-top: 4px; margin-right: 8px;" src="/images/systemicons/streamline/32/sync.png" onclick="AutoPopulate(); return false;" />*@
+                <img id="save-attribute-button" class="button" style="float: right; width: 24px; margin-top: 4px; margin-right: 8px; " src="/images/icons/32/save.png" onclick="SaveAttributes(); return false" />
+                <img id="attribute-header-busy-icon" class="button" style="float: right; width: 24px; margin-top: 4px; display: none; margin-right: 8px; " src="/images/systemicons/busy-icon-grey.gif">
+            </legend>
+            <div id="product-page-attributes" class="fieldset-inner" style="padding-bottom: 0;">
+                <div id="attribute-header-container">
+                    <div id="attribute-assign-product-type-container">
+                        @Html.DevExpress().Label(settings =>
+                   {
+                       settings.Name = "ProductTypeLbl";
+                       settings.Text = "Product Type: ";
+                       settings.Style.Add("float", "left");
+                       settings.Style.Add("margin", "0 7px 7px 0");
+                       settings.Style.Add("height", "34px");
+                       settings.Style.Add("line-height", "34px");
+                   }).GetHtml()
+                        @Html.Action("AttributeProductTypeDropDown", "ProductPages", new { SelectedProductTypeID = Model.ProductTypeID })
+                    </div>
+
+                    <div id="attribute-assign-brand-container">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "BrandLbl";
+                            settings.Text = "Brand: ";
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("margin", "0 7px 7px 7px");
+                            settings.Style.Add("height", "34px");
+                            settings.Style.Add("line-height", "34px");
+                        }).GetHtml()
+                        @Html.Action("AttributeBrandDropDown", "ProductPages", new { SelectedBrandID = Model.BrandID })
+                    </div>
+
+                    <div id="attribute-assign-launch-container">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "LaunchLbl";
+                            settings.Text = "Launch: ";
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("margin", "0 7px 7px 7px");
+                            settings.Style.Add("height", "34px");
+                            settings.Style.Add("line-height", "34px");
+                        }).GetHtml()
+                        @Html.Action("AttributeLaunchDropDown", "ProductPages", new { SelectedLaunchID = Model.LaunchID })
+                    </div>
+
+                    <div id="attribute-assign-colour-container">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "ColourLbl";
+                            settings.Text = "Primary Colour: ";
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("margin", "0 7px 7px 7px");
+                            settings.Style.Add("height", "34px");
+                            settings.Style.Add("line-height", "34px");
+                        }).GetHtml()
+                        @Html.Action("AttributeColourDropDown", "ProductPages", new { SelectedColourID = Model.ColourID })
+                    </div>
+                    
+                    <div id="attribute-assign-pattern-container">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "PatternLbl";
+                            settings.Text = "Primary Pattern: ";
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("margin", "0 7px 7px 7px");
+                            settings.Style.Add("height", "34px");
+                            settings.Style.Add("line-height", "34px");
+                        }).GetHtml()
+                        @Html.Action("AttributePatternDropDown", "ProductPages", new { SelectedPatternID = Model.PatternID })
+                    </div>
+
+                    <div style="clear: both;"></div>
+                </div>
+                <div id="attribute-groups-container">
+                    @Html.Partial("AttributeGroupsPartial", Model)
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+    <div class="content-panel-container">
+        <fieldset id="product-page-info-fieldset">
+            <legend onclick="$('#product-page-info').slideToggle('fast');">Product Page Info (click to expand / contract)</legend>
+            <div id="product-page-info" class="fieldset-inner">
+                <div id="attribute-header-left">
+                    @if (Model.SlideshowImages.Count == 0)
+                    {
+                        if (Model.ImageID == null || Model.ImageID == 0)
+                        {
+                            <img src="/Images/admin/image-not-set.png" alt="Image not set." title="You must set a primary image for this page." />
+                        }
+                        else
+                        {
+                            <img style="width: 325px;" src="https://flock.designersguild.com/ImageLibrary/322/@(Model.ImageID).jpeg" />
+                        }
+                    }
+                    else
+                    {
+                        <div id="attributes-slideshow" style="width: @{ ViewContext.Writer.Write((Model.AspectRatio * 250).ToString());}px;">
+                            @Html.Partial("AttributesSlideshowPartial", Model)
+                        </div>
+                    }
+                </div>
+                <div id="attribute-header-right">
+                    <table id="product-page-info">
+                        <tr>
+                            <th>Product Page ID: </th>
+                            <td>@Model.ID</td>
+                        </tr>
+                        <tr>
+                            <th>Name: </th>
+                            <td>@Model.Name</td>
+                        </tr>
+                        <tr>
+                            <th>Heading: </th>
+                            <td>@Model.Heading</td>
+                        </tr>
+                        <tr>
+                            <th>Sub Heading: </th>
+                            <td>@Model.SubHeading</td>
+                        </tr>
+                        <tr>
+                            <th>Description: </th>
+                            <td>@Html.Raw(Model.Description)</td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+        </fieldset>
+    </div>
+
+    <div class="content-panel-container">
+        <fieldset id="associated-product-classification-fieldset">
+            <legend onclick="$('#associated-product-classification').slideToggle('fast');">Associated Product Classification (from Mertex) (click to expand / contract)</legend>
+            <div id="associated-product-classification" class="fieldset-inner">
+                @Html.Partial("AttributeSyncAssociatedProducts", Model.Products)
+            </div>
+        </fieldset>
+    </div>
+
+    <div class="content-panel-container">
+        <fieldset id="product-quality-fieldset">
+            <legend onclick="$('#product-quality').slideToggle('fast');">Associated Quality Information (click to expand / contract)</legend>
+            <div id="product-quality" class="fieldset-inner">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Quality ID</th>
+                            <th>Code</th>
+                            <th>Width</th>
+                            <th>Weight</th>
+                            <th>Horizontal Pattern Repeat</th>
+                            <th>Vertical Pattern Repeat</th>
+                            <th>Martindale</th>
+                            <th>Composition</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                @Model.QualityID &nbsp;
+                            </td>
+                            <td>
+                                @Model.Code &nbsp;
+                            </td>
+                            <td>
+                                @Model.Width &nbsp;
+                            </td>
+                            <td>
+                                @Model.Weight &nbsp;
+                            </td>
+                            <td>
+                                @Model.HPatternRepeat &nbsp;
+                            </td>
+                            <td>
+                                @Model.VPatternRepeat &nbsp;
+                            </td>
+                            <td>
+                                @Model.Martindale &nbsp;
+                            </td>
+                            <td>
+                                @Model.Composition &nbsp;
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
+    </div>
+
+    <div id="sync-container">
+        <div id="sync-inner">
+
+        </div>
+    </div>
+}

@@ -1,0 +1,70 @@
+﻿@model Flock.ViewModels.BundlePriceMergeResultViewModel
+
+@if (Model.AllRecords != null)
+{
+    <span class="mailing-list-hint" style="color: #0fdb0f; margin: 0 6px;">✔</span>
+    <h5 style="line-height: 2.2em">Processed @(Model.AllRecords.Count.ToString()) record(s).</h5>
+}
+
+@if (Model.Rejected != null)
+{
+    <span class="mailing-list-hint" style="color: red; margin: 0 6px;">✘</span>
+    <h5 style="line-height: 2.2em">Rejected @(Model.Rejected.Count.ToString()) record(s):</h5>
+    <table class="bundle-price-upload-rejects">
+        <thead>
+            <tr>
+                <th>
+                    NewBundleGrouping
+                </th>
+                <th>
+                    BundleProductCode
+                </th>
+                <th>
+                    BundleName
+                </th>
+                <th>
+                    ComponentProductCode
+                </th>
+                <th>
+                    ComponentQuantity
+                </th>
+                <th>
+                    PriceListCode
+                </th>
+                <th>
+                    PriceListName
+                </th>
+                <th>
+                    OriginalBundlePrice
+                </th>
+                <th>
+                    DiscountedBundlePrice
+                </th>
+                <th>
+                    OriginalComponentPrice
+                </th>
+                <th>
+                    DiscountedComponentPrice
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var r in Model.Rejected)
+            {
+                <tr style="color: red;">
+                    <td>@r.NewBundleGrouping</td>
+                    <td>@r.BundleProductCode</td>
+                    <td>@r.BundleName</td>
+                    <td>@r.ComponentProductCode</td>
+                    <td class="text-right">@r.ComponentQuantity</td>
+                    <td>@r.PriceListCode</td>
+                    <td>@r.PriceListName</td>
+                    <td class="text-right">@r.OriginalBundlePrice</td>
+                    <td class="text-right">@r.DiscountedBundlePrice</td>
+                    <td class="text-right">@r.OriginalComponentPrice</td>
+                    <td class="text-right">@r.DiscountedComponentPrice</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

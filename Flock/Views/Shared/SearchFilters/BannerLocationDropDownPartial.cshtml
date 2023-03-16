@@ -1,0 +1,91 @@
+﻿@model List<Flock.Models.BannerLocation>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        if (action == "BannerOverviewBannerLocationDropDownPartial")
+            settings.Name = "BannerOverviewBannerLocationDD";
+        else if (action == "ComposeBannerHeaderBannerLocationDropDownPartial")
+            settings.Name = "ComposeBannerHeaderLocationDD";
+        //else if (action == "ComposeBannerBannerLocationDropDownPartial")
+        //    settings.Name = "BannerLocationAssignmentDD";
+        
+
+        settings.Text = "Banner Location";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        settings.Properties.DropDownWindowHeight = System.Web.UI.WebControls.Unit.Pixel(250);
+        
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='banner-location-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/BannerLocationListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "BannerOverviewBannerLocationDropDownPartial")
+                    {
+                        buttonSettings.Name = "BannerOverviewBannerLocationButtonClear"; 
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            BannerOverviewBannerLocationListBox.UnselectAll();
+                            BannerOverviewBannerLocationDD.HideDropDown(); 
+                            BannerOverviewBannerLocationDD.SetText('Banner Location');
+                            $('#banner-searching-icon').fadeIn('fast');
+                            BannerOverviewGridView.PerformCallback();
+                        }";
+                    }
+                    else if (action == "ComposeBannerHeaderBannerLocationDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposeBannerHeaderLocationButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ComposeBannerHeaderLocationListBox.UnselectAll();
+                            ComposeBannerHeaderLocationDD.HideDropDown();
+                            ComposeBannerHeaderLocationDD.SetText('Banner Location');
+                            LoadingPanel.Show();
+                            BannerSelectorGridView.Refresh();
+                        }";
+                    }
+                    
+                    buttonSettings.Text = "Clear";
+                    buttonSettings.Style.Add("float", "left");
+                }
+            )
+            .Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "BannerOverviewBannerLocationDropDownPartial")
+                    {
+                        buttonSettings.Name = "BannerOverviewBannerLocationButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            BannerOverviewBannerLocationDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ComposeBannerHeaderBannerLocationDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposeBannerHeaderLocationButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            ComposeBannerHeaderLocationDD.HideDropDown();
+                        }";
+                    }
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

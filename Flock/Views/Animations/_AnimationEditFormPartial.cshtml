@@ -1,0 +1,373 @@
+﻿@model Flock.ViewModels.AnimationDetailModel
+
+<script type="text/javascript">
+    function LoadAnimationDetail(s, e) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '/admin/animations/AnimationEditFormPartial',
+            type: 'GET',
+            data: {
+                AnimationID: s.GetRowKey(e.visibleIndex)
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#animation-detail-container").html(data);
+            }
+        });
+    }
+
+    function SaveSlideDetails(slideId) {
+        $.ajax({
+            url: '/admin/animations/SaveSlideDetails',
+            type: 'POST',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                SlideID: slideId,
+                DisplayCallsToAction: DisplayCallsToAction.GetValue(),
+                AutoHideCallsToAction: AutoHideCallsToAction.GetValue(),
+                DisplayHotspots: DisplayHotspots.GetValue(),
+                AutoHideHotspots: AutoHideHotspots.GetValue(),
+                SlideArticleID: SlideArticleID.GetValue(),
+                SlideCollectionID: SlideCollectionID.GetValue(),
+                SlidePageID: SlidePageID.GetValue(),
+                SlideProductPageID: SlideProductPageID.GetValue(),
+                SlideExternalURL: SlideExternalURL.GetValue(),
+                SlideNewWindow: SlideNewWindow.GetValue()
+            },
+            success: function (data) {
+                $("#slide-compose-container").html(data);
+                GreenFade($("#slide-save-btn"));
+            }
+        });
+    }
+
+    function CancelNewSlide() {
+        SlideTypeID.SetValue(null);
+        AddSlidePopup.Hide();
+    }
+
+    function RemoveSlide(slideId) {
+        $.ajax({
+            url: '/admin/animations/RemoveSlide',
+            type: 'POST',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                SlideID: slideId
+            },
+            success: function (data) {
+                $("#edit-form-part-one-container").html(data);
+            }
+        });
+    }
+
+    function LoadSlideDetail(slideId) {
+        $.ajax({
+            url: '/admin/animations/LoadSlideDetail',
+            type: 'GET',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                SlideID: slideId
+            },
+            success: function (data) {
+                $(".animation-slide").removeClass('selected-slide');
+                $(".animation-slide[data-slide-id=" + slideId + "]").addClass('selected-slide');
+                $("#slide-compose-container").html(data);
+                initCallToActionDragDrop();
+            }
+        });
+    }
+
+    function AssignCallToActionToSlideArea(callToActionID, slideId, areaId) {
+        $.ajax({
+            url: '/admin/animations/AssignCallToActionToSlideArea',
+            type: 'POST',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                CallToActionID: callToActionID,
+                SlideID: slideId,
+                AreaID: areaId
+            },
+            success: function (data) {
+                $("#slide-compose-container").html(data);
+            }
+        });
+    }
+
+    function RemoveCallToAction(callToActionId, slideId) {
+        $.ajax({
+            url: '/admin/animations/RemoveCallToActionFromSlide',
+            type: 'POST',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                CallToActionID: callToActionId,
+                SlideID: slideId
+            },
+            success: function (data) {
+                $("#slide-compose-container").html(data);
+            }
+        });
+    }
+
+    function AddImageToAnimation(imageId) {
+        $.ajax({
+            url: '/admin/animations/AddImageToAnimation',
+            type: 'POST',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                ImageID: imageId
+            },
+            success: function (data) {
+                $("#edit-form-part-one-container").html(data);
+            }
+        });
+    }
+
+    function AssignImageToSlide(slideId, imageId) {
+        $.ajax({
+            url: '/admin/animations/AssignImageToSlide',
+            type: 'POST',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                SlideID: slideId,
+                ImageID: imageId
+            },
+            success: function (data) {
+                $("#edit-form-part-one-container").html(data);
+            }
+        });
+    }
+
+    function AddVideoToAnimation(videoId) {
+        $.ajax({
+            url: '/admin/animations/AddVideoToAnimation',
+            type: 'POST',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                VideoID: videoId
+            },
+            success: function (data) {
+                $("#edit-form-part-one-container").html(data);
+            }
+        });
+    }
+
+    function AssignVideoToSlide(slideId, videoId) {
+        $.ajax({
+            url: '/admin/animations/AssignVideoToSlide',
+            type: 'POST',
+            data: {
+                AnimationID: $("#animation-id").val(),
+                SlideID: slideId,
+                VideoID: videoId
+            },
+            success: function (data) {
+                $("#edit-form-part-one-container").html(data);
+            }
+        });
+    }
+
+    function initCallToActionDragDrop() {
+
+        $(".call-to-action-row").draggable({
+            helper: 'clone',
+            start: function (ev, ui) {
+                var $sourceElement = $(ui.helper.context);
+                var $draggingElement = $(ui.helper);
+
+                $sourceElement.addClass("draggingStyle");
+                $draggingElement.addClass("draggingStyle");
+            },
+            stop: function (e, ui) {
+                $(".draggingStyle").removeClass("draggingStyle");
+            }
+        });
+
+        initDroppable();
+    }
+
+    function initDroppable() {
+        $(".target").droppable({
+            accept: ".call-to-action-row, .call-to-action",
+            tolerance: "pointer",
+            drop: function (ev, ui) {
+                if (ui.draggable.parent().parent().data('area-id') == $(this).data('area-id')) {
+                    //console.log('droppable dropped on self')
+                } else {
+                    //console.log('droppable dropped from elsewhere');
+
+                    $(".targetArea").removeClass("targetArea");
+
+                    var callToActionId = ui.draggable.data("call-to-action-id");
+                    var areaId = $(this).data("area-id");
+                    var slideId = $(this).data("slide-id");
+
+                    AssignCallToActionToSlideArea(callToActionId, slideId, areaId);
+                }
+            },
+            over: function (ev, ui) {
+                $(ev.target).addClass("targetArea");
+            },
+            out: function (ev, ui) {
+                $(ev.target).removeClass("targetArea");
+            }
+        });
+    }
+
+    function initDragDrop() {
+        $(".ar@(Model.Animation.AspectRatioID)").draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "6000");
+            },
+            connectToSortable: "#animation-slides-container"
+        });
+        initVideoDragDrop();
+    }
+
+    function initVideoDragDrop() {
+        $(".video").draggable({
+            helper: 'clone',
+            zIndex: 7000,
+            connectToSortable: "#animation-slides-container"
+        });
+    }
+
+    function initAnimationSlideSortable() {
+        if ($("#animation-slides-container").hasClass('ui-sortable'))
+            $("#animation-slides-container").sortable('destroy');
+
+        $("#animation-slides-container").sortable({
+            placeholder: 'animation-slide-placeholder animation-slide-ar@(Model.Animation.AspectRatioID)',
+            zIndex: 50000,
+            distance: 5,
+            update: function (ev, ui) {
+                $(".animation-slide-placeholder").remove();
+                ui.item.css("display", "inline-block");
+                UpdateSlideSortOrders(ui.item.data("slide-id"));
+            },
+            over: function (e, ui) {
+                ui.helper.height('auto');
+            }
+        });
+    }
+
+    function UpdateSlideAreaSortOrders(slideId, areaId) {
+        var calls = [];
+        $(".target[data-area-id=" + areaId + "]").children(".call-to-action-wrapper").children(".call-to-action").each(function (index) {
+            calls.push({
+                CallToActionID: $(this).data("call-to-action-id"),
+                SortOrder: index
+            });
+        });
+
+        var obj = {
+            AnimationID: $("#animation-id").val(),
+            SlideID: slideId,
+            Calls: calls
+        };
+
+        var data = {
+            objUpdate: obj
+        }
+
+        $.ajax({
+            url: '/admin/animations/UpdateCallToActionSortOrders',
+            type: 'POST',
+            async: true,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data),
+            success: function (data) {
+
+            }
+        });
+    }
+
+    function UpdateSlideSortOrders(slideId) {
+        var slides = [];
+        $("#animation-slides-container").children("div").each(function(index) { 
+            slides.push({
+                SlideID: $(this).data("slide-id"),
+                ImageID: $(this).data("image-id"),
+                VideoID: $(this).data("video-id"),
+                SortOrder: index
+            });
+        });
+
+        var obj = {
+            AnimationID: $("#animation-id").val(),
+            SlideToLoad: slideId,
+            Slides: slides
+        };
+        
+        var data = {
+            objUpdate: obj
+        };
+
+        $.ajax({
+            url: '/admin/animations/UpdateSlideSortOrders',
+            type: 'POST',
+            async: true,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data),
+            success: function (data) {
+                $("#edit-form-part-one-container").html(data);
+            }
+        });
+    }
+
+    function OpenCallsDialog() {
+        initCallToActionDragDrop();
+        $("#call-to-action-grid-dialog").dialog("open");
+    }
+
+    function initAreaSortables() {
+        $(".call-to-action-wrapper").sortable({
+            helper: 'clone',
+            appendTo: 'body',
+            scroll: false,
+            update: function (ev, ui) {
+                //console.log('wrapper sortable update');
+                $(this).parent().removeClass('targetArea');
+
+                UpdateSlideAreaSortOrders($(this).parent().data("slide-id"), $(this).parent().data("area-id"));
+            }
+        });
+    }
+</script>
+
+<input type="hidden" id="animation-id" value="@(Model.Animation.AnimationID)" />
+
+<div class="animation-name">
+    @(Model.Animation.Name) - @(Model.Animation.AspectRatio.Name)
+
+    <button id="call-to-action-button" class="btn btn-primary" onclick="OpenCallsDialog()">Calls to Action</button>
+
+    <div class="clearfix"></div>
+</div>
+
+<div id="edit-form-part-one-container">
+    @Html.Partial("_EditFormPartOne", Model)
+</div>
+
+<div class="clearfix"></div>
+
+@*@Html.DevExpress().PopupControl(settings =>
+{
+    settings.Name = "AddSlidePopup";
+    settings.Modal = true;
+    settings.HeaderText = "Add Slide";
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.SetContent(() =>
+    {
+        Html.RenderAction("_AddSlidePartial", new { AnimationID = Model.Animation.AnimationID });
+    });
+    settings.EnableClientSideAPI = true;
+}).GetHtml()*@
+
+<script type="text/javascript">
+
+    initDragDrop();
+    initCallToActionDragDrop();
+
+</script>

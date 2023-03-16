@@ -1,0 +1,183 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@using Flock.ViewModels
+@model DeliveryZoneViewModel
+@{
+    using(var UoW = new UnitOfWork<FlockDataContext>()) 
+    {
+        <div class="content-panel-container">
+            <fieldset id="delivery-zone-details-header">
+                <legend style="color: black; border-bottom-color: #929292; cursor: default;">Delivery Zone Details</legend>
+                <div id="delivery-zone-details-inner" style="background-color: white; padding: 1em;">
+                    <div id="delivery-zone-details-container">
+                        <div style="margin-bottom: 1em;">
+                            @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "NameLbl";
+                            lbl.Text = "Name";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 50;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "Name";
+                        }).GetHtml()
+                            @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+                        {
+                            settings.Name = "Name";
+                            settings.Properties.NullDisplayText = "Name...";
+                            settings.Properties.NullText = "Name...";
+                            settings.Properties.MaxLength = 50;
+                            settings.Width = 220;
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                            settings.Style.Add("margin-right", "1em");
+                            settings.Style.Add("float", "left");
+                        }).GetHtml()
+                            <div style="clear: both"></div>
+                            @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "CountryLbl";
+                            lbl.Text = "Country";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 50;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "CountryID";
+                        }).GetHtml()
+                            @Html.DevExpress().ComboBoxFor(m => Model.CountryID, settings =>
+                        {
+                            settings.Name = "CountryID";
+                            settings.Properties.NullDisplayText = "Country...";
+                            settings.Properties.NullText = "Country...";
+                            settings.Properties.Width = 180;
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                            settings.Style.Add("margin-right", "1em");
+                            settings.Style.Add("float", "left");
+                            var prop = settings.Properties as ComboBoxProperties;
+                            prop.TextField = "Name";
+                            prop.ValueField = "CountryID";
+                            prop.ValueType = typeof(short);
+                        }).BindList(args =>
+                        {
+                            return LargeDatabaseDataProvider.GetCountryWithPriceList(args);
+                        }, LargeDatabaseDataProvider.GetCountryWithPriceListByID).GetHtml()
+                            <div style="clear: both;"></div>
+                            @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "CourierLbl";
+                            lbl.Text = "Courier";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 50;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "CourierID";
+                        }).GetHtml()
+                            @Html.DevExpress().ComboBoxFor(m => Model.CourierID, settings =>
+                        {
+                            settings.Name = "CourierID";
+                            settings.Properties.NullDisplayText = "Courier...";
+                            settings.Properties.NullText = "Courier...";
+                            settings.Properties.Width = 180;
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                            settings.Style.Add("margin-right", "1em");
+                            settings.Style.Add("float", "left");
+                            var prop = settings.Properties as ComboBoxProperties;
+                            prop.TextField = "Name";
+                            prop.ValueField = "CourierID";
+                            prop.ValueType = typeof(byte);
+                        }).BindList(args =>
+                        {
+                            return LargeDatabaseDataProvider.GetCouriers(args);
+                        }, LargeDatabaseDataProvider.GetCourierByID).GetHtml()
+                            <div style="clear: both;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        @{
+                            <div style="padding: 0; margin-bottom: 3em;">
+                                <table id="delivery-zone-postcode-details">
+                                    <tr>
+                                        <th>
+                                            PostCode
+                                        </th>
+                                        <th>
+                                            Restriction
+                                        </th>
+                                        <th>
+
+                                        </th>
+                                    </tr>
+                                    @for (var i = 0; i < Model.DeliveryZone_Postcodes.Count; i++)
+                                    {
+                                        <tbody data-delivery-zone-postcode-id="@(Model.DeliveryZone_Postcodes[i].DeliveryZone_PostcodeID)" class="delivery-zone-postcode">
+                                            <tr style="background-color: @(Model.DeliveryZone_Postcodes[i].Restriction ? "#B9FBB9" : "pink")">
+                                                <td>
+                                                    <input type="hidden" id="DeliveryZone_Postcodes_@(i.ToString())_PostcodeID" value="@(Model.DeliveryZone_Postcodes[i].DeliveryZone_PostcodeID)" />
+                                                    @Html.DevExpress().TextBoxFor(m => Model.DeliveryZone_Postcodes[i].Postcode, settings =>
+                                                    {
+                                                        settings.Properties.NullDisplayText = "PostCode";
+                                                        settings.Properties.NullText = "PostCode";
+                                                        settings.Properties.MaxLength = 10;
+                                                        settings.ShowModelErrors = true;
+                                                        settings.Properties.ValidationSettings.ValidateOnLeave = true;
+                                                        settings.Width = 150;
+                                                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                    }).GetHtml()
+                                                </td>
+                                                <td>
+                                                    @Html.DevExpress().CheckBoxFor(m => Model.DeliveryZone_Postcodes[i].Restriction, settings =>
+                                                    {
+                                                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                    }).GetHtml()
+                                                </td>
+                                                <td>
+                                                    <img src="/images/systemicons/remove-icon.png" style="width: 18px; cursor: pointer;" onclick="RemovePostcode(@(Model.DeliveryZone_Postcodes[i].DeliveryZone_PostcodeID))" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    }
+                                    <tbody id="new-row">
+                                        <tr>
+                                            <td>
+                                                @Html.DevExpress().TextBox(settings =>
+                                            {
+                                                settings.Name = "NewPostcode";
+                                                settings.Properties.NullDisplayText = "PostCode...";
+                                                settings.Properties.NullText = "PostCode...";
+                                                settings.Properties.MaxLength = 10;
+                                                settings.ShowModelErrors = true;
+                                                settings.Width = 150;
+                                                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                            }).GetHtml()
+                                            </td>
+                                            <td style="text-align: center !important;">
+                                                @Html.DevExpress().CheckBox(settings =>
+                                            {
+                                                settings.Name = "NewRestriction";
+                                                var nExProp = settings.Properties as CheckBoxProperties;
+                                                settings.Checked = true;
+                                            }).GetHtml()
+                                            </td>
+                                            <td>
+                                                <a href="javascript:;" style="float: right; font-size: 11px; line-height: 29px; margin-right: 4px;" onclick="AddNewDeliveryZonePostcode()">Add</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                    <div style='clear:both'></div>
+                    <div style='position: relative;'>
+                        <img id="delivery-zone-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 0px; right: 0px;" onclick="SaveDeliveryZoneDetails();" />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    }          
+}

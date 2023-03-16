@@ -1,0 +1,80 @@
+﻿@model Flock.ViewModels.MasonryTestViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Admin/_Layout-Bare.cshtml";
+}
+@section styles {
+    @Styles.Render("~/content/themes/admin/cms/cms.css")
+    @Styles.Render("~/content/masonry.css")
+    
+}
+@section scripts {
+    @Scripts.Render("~/scripts/masonry.pkgd.js")
+    @Scripts.Render("~/scripts/imagesLoaded.pkgd.js")
+}
+<h4 class="page-heading">Masonry</h4>
+
+<div class="page-subheading">
+    <input type="button" onclick="BeginTest()" value="Begin" />
+</div>
+<div id="items-container">
+    @foreach (var i in Model.Items)
+    {
+        <div class="masonry-item @(i.MasonryClass)">
+            <img src="https://flock.designersguild.com/imagelibrary/@(i.Width)/@(i.Image.ImageID).jpeg" />
+        </div>
+    }
+    <div style="clear: both;"></div>
+</div>
+
+<script type="text/javascript">
+    var $cont = $("#items-container");
+
+    var msnry = null;
+
+    $cont.imagesLoaded(function () {
+        $cont.masonry({
+            columnWidth: 113,
+            //gutter: 10,
+            itemSelector: '.masonry-item'
+        });
+
+        msnry = $cont.data('masonry');
+    });
+
+    function BeginTest() {
+
+        var $curs = $("<div class='masonry-item masonry-w4'><img src='/images/masonry-test.jpg'/></div>");
+
+        $cont.masonry({
+            columnWidth: 113,
+            //gutter: 10,
+            itemSelector: '.masonry-item'
+        });
+
+        msnry = $cont.data('masonry');
+
+        $("#items-container").append($curs);
+
+        $("#items-container").mousemove(function (event) {
+            $curs.position({
+                my: 'center',
+                at: 'center',
+                of: event
+            });
+
+            var offset = $curs.offset();
+            $curs.css("position", "absolute");
+            $curs.offset(offset);
+
+            msnry.layout();
+        });
+    }
+
+    // ok, so... on click 'begin' button, we want:
+    // add an element to the items-container
+    // ideally some image with a black square in the center and white around to provide visual padding?
+    // bind mousemove to position that thing's center at the mouse position
+    // and to call masonry.layout
+</script>
+

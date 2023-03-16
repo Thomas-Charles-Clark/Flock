@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Careers";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+@Styles.Render("~/Content/menu-builder.css")
+<style type="text/css">
+    input.dxb-hb {
+        font-size: 0 !important;
+    }
+
+    .dxgvFooter_MetropolisBlue td.dxgv {
+        border-top: 1px solid #c0c0c0 !important;
+    }
+</style>
+
+    <style type="text/css">
+        #container {
+            width: 1280px;
+        }
+    </style>
+}
+@section scripts {
+<script type="text/javascript">
+        function InitalizejQuery() {
+            $('.draggable').not('.dxgvEditForm_MetropolisBlue').draggable({
+                helper: 'clone',
+
+                start: function (ev, ui) {
+                    var $draggingElement = $(ui.helper);
+                    $draggingElement.width(window["CareersSelectorGridView"].GetWidth());
+                }
+            });
+
+            $('.draggable').not('.dxgvEditForm_MetropolisBlue').droppable({
+                activeClass: "menu-hover",
+                accept: '.dxgvDataRow_MetropolisBlue',
+                tolerance: "intersect",
+                hoverClass: "menu-activeHover",
+                drop: function (event, ui) {
+                    var draggingSortIndex = ui.draggable.data("sort-order");
+                    var targetSortIndex = $(this).data("sort-order");
+
+                    if (targetSortIndex == undefined || targetSortIndex == null)
+                        targetSortIndex = 0;
+
+                    var careerListingID = ui.draggable.data("career-listing-id");
+
+                    window.ForceUpdate = true;
+                    
+                    window["CareersSelectorGridView"].PerformCallback({ CommandType: "DragRow", CareerListingID: careerListingID, DraggingSI: draggingSortIndex, TargetSI: targetSortIndex });
+
+                }
+            });
+        }
+</script>
+}
+<h4 class="page-heading">Career Listings</h4>
+
+<div class="page-subheading">
+
+</div>
+
+<div id="careers-selector-grid-container">
+    @Html.Action("CareersSelectorGridViewPartial", "Careers")
+</div>

@@ -1,0 +1,44 @@
+﻿@model Flock.ViewModels.ArticleComposeViewModel
+
+<input type="hidden" id="selected-article-id" value="@(Model.ArticleID)" />
+
+<input type="hidden" id="selected-template-id" value="@(Model.ArticleTemplateID)" />
+
+<div id="article-basic-details-container">
+    @Html.Partial("ArticleBasicInfoPartial", Model)
+</div>
+
+<div id="article-details-container">
+    @Html.Partial("ArticleDetailsPartial", Model)
+</div>
+
+<div id="article-contents-container">
+    @switch (Model.ArticleTemplateID)
+    {
+        case 1: // SingleImage
+            @Html.Partial("ArticleSingleImagePartial", Model)
+            break;
+        case 2: // Slideshow
+            @Html.Partial("ArticleSlideshowPartial", Model)
+            break;
+        case 3:
+            @Html.Partial("ArticleVideoPartial", Model)
+            break;
+        case 4:
+            @Html.Partial("ArticleSlideshowPartial", Model)
+            break;
+        default: break;
+    }
+</div>
+
+<div id="related-articles-container">
+    @Html.Partial("ArticleRelatedArticlesPartial", Model.RelatedArticles)
+</div>
+
+<div id="country-restrictions-container">
+    @Html.Partial("ArticleCountryRestrictionsPartial", Model.Countries)
+</div>
+     @*<script type="text/javascript">
+        InitPodDragDrop();
+        InitSlideshowDragDrop();
+    </script>*@

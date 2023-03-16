@@ -1,0 +1,546 @@
+﻿@using Flock.Controllers
+@using Flock.ViewModels
+@using Flock.Models
+@using Flock.Models.ContentItems
+
+@model Flock.ViewModels.PageViewModel
+
+@{
+    ViewBag.Title = "Page";
+    Layout = "~/Views/CMS/Compose/_ComposerLayout.cshtml";
+}
+
+<h2>Compose Page</h2>
+<h4>PageID:</h4><div id="page-id-div">@Model.PageID</div>
+<h4>Controller: @ViewContext.RouteData.Values["controller"]</h4>
+<h4>Action: @ViewContext.RouteData.Values["action"]</h4>
+<div id="status-div"></div>
+<div id="page-information-area">
+<fieldset>
+    <legend>Page Information</legend>
+    @using (Html.BeginForm("SavePage", "CMS"))
+    {
+        <div>
+            @Html.LabelFor(m => Model.Title)
+            @Html.TextBoxFor(model => model.Title)
+            @Html.ValidationMessageFor(model => model.Title)
+            <br />
+            @Html.LabelFor(m => Model.Heading)
+            @Html.TextBoxFor(model => model.Heading)
+            @Html.ValidationMessageFor(model => model.Heading)
+            <br />
+        </div>
+        <div>
+            @Html.LabelFor(m => Model.MetaDescription)
+            @Html.TextAreaFor(model => model.MetaDescription, new { cols="20", rows="2", style="width: 252px !important; height: 69px !important;" })
+            @Html.ValidationMessageFor(model => model.MetaDescription)
+        </div>
+        <div>
+            @Html.LabelFor(m => Model.InternalName)
+            @Html.TextBoxFor(model => model.InternalName)
+            @Html.ValidationMessageFor(model => model.InternalName)
+        </div>
+        <div style="clear: both;"></div>
+        <em></em>
+        @Html.HiddenFor(model => Model.PageID)
+    <input type="submit" value="Save" />
+    }
+    @Html.ValidationSummary()
+</fieldset>
+</div>
+<div style="clear: both;"></div>
+<div id="menu-builder-content">
+    <div>
+        <div id="page-builder-lhs">
+            <div id="new-content-container">
+                <label for="new-content-container">Content</label>
+                <ul>
+                    <li id="section-type-new-product" class="section-type">Product</li>
+                    <li id="section-type-new-image" class="section-type">Image</li>
+                    <li id="section-type-new-html" class="section-type">HTML</li>
+                    <li id="section-type-new-slideshow" class="section-type">SlideShow</li>
+                    <li id="section-type-new-banner" class="section-type">Banner</li>
+                    <li id="section-type-form" class="section-type">Form</li>
+                    <li id="section-type-new-other" class="section-type">Other</li>
+                </ul>
+            </div>
+            <div id="layout-controls-container">
+                <label for="layout-controls-container">Layout Controls</label>
+                <ul>
+                    @*
+                    <li><div id="one-four-layout-control" class="layout-control"><div class="one-fifth"></div><div class="four-fifths"></div></div></li>
+                    <li><div id="four-one-layout-control" class="layout-control"><div class="four-fifths" style="margin: 0; margin-right: 4px;"></div><div class="one-fifth" style="margin: 0;"></div></div></li>*@
+                    <li><div id="full-width-layout-control-2-0" class="layout-control"><div class="full-width">1/1 (2.0)</div></div></li>
+                    <li><div id="full-width-layout-control-2-6" class="layout-control"><div class="full-width">1/1 (2.6)</div></div></li>
+                    <li><div id="one-half-layout-control" class="layout-control"><div class="one-half">1/2</div></div></li>
+                    <li><div id="one-third-layout-control" class="layout-control"><div class="one-third">1/3</div></div></li>
+                    <li><div id="one-quarter-layout-control" class="layout-control"><div class="one-quarter">1/4</div></div></li>
+                    <li><div id="one-sixth-layout-control" class="layout-control"><div class="one-sixth">1/6</div></div></li>
+                    <li>
+                        Content Grid
+                        <div id="content-grid-layout-control" class="layout-control">
+                            <div class="one-quarter-short"></div><div class="one-quarter-short"></div><div class="one-quarter-short" style="margin: 0"></div><div style="clear: both;"></div>
+                            <div class="one-quarter-short"></div><div class="one-quarter-short"></div><div class="one-quarter-short" style="margin: 0"></div>
+                        </div><div style="clear: both;"></div>
+                    </li>
+                    <li>
+                        Search Grid
+                        <div id="search-grid-layout-control" class="layout-control">
+                            <div class="one-quarter-tall"></div>
+                            <div class="one-quarter-short"></div><div class="one-quarter-short"></div><div class="one-quarter-short" style="margin: 0"></div>
+                            <div class="one-quarter-short"></div><div class="one-quarter-short"></div><div class="one-quarter-short" style="margin: 0"></div>
+                            <div class="one-quarter-short"></div><div class="one-quarter-short"></div><div class="one-quarter-short" style="margin: 0"></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div style="clear: both"></div>
+            <input type="button" value="Save" onclick="SavePage(@ViewData["PageID"])" />
+            
+            <input type="button" value="Clear" onclick="ClearPage(@ViewData["PageID"])" />
+        </div>
+        <div id="page-builder-rhs">
+            <div id="page-chassis" class="pure-g">
+                @foreach (PageSectionModel ps in Model.PageSectionModels)
+                {
+                    <div id="page-section-@ps.PageSection.PageSectionID" class="page-section pure-g">
+                    @foreach (ContentItem ci in ps.ContentItems)
+                    {
+                        // this... should definitely place them in order, because they should've been sorted by their sortorder already!
+                        switch (ci.ItemType)
+                        {
+                            case ContentItemType.HTML:
+                                HtmlItem htmlItem = (HtmlItem)ci;
+                                <div class="@htmlItem.Record.Class" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@htmlItem.Record.HtmlID">
+                                    <div class="section-inner">
+                                        <div class="section-contents">
+                                            @Html.Raw(htmlItem.Record.Contents)
+                                        </div>
+                                    </div>
+                                </div>
+                                break;
+                            case ContentItemType.SlideShow:
+                                SlideShowItem slideShowItem = (SlideShowItem)ci;
+                                <div class="@slideShowItem.Record.Class" style="height: 492px;" data-sort-order="@ci.SortOrder"  data-type="slideshow" data-content-id="@slideShowItem.Record.SlideShowID">
+                                    <div class="section-inner" style="height: 100%">
+                                        <div class="section-contents">
+                                            @{Html.RenderAction("ImageSliderPartial", "CMS", new { SlideShowID = @slideShowItem.Record.SlideShowID });}
+                                        </div>
+                                    </div>
+                                </div> 
+                                break;
+                            case ContentItemType.Form:
+                            FormItem formItem = (FormItem)ci;
+                                <div class="@formItem.ClassName" data-sort-order="@ci.SortOrder"  data-type="form" data-content-id="@formItem.Record.FormID">
+                                    @switch(formItem.Record.FormType)
+                                    {
+                                        case 1:
+                                            <div class="section-inner" id="form-id-@formItem.Record.FormID">
+                                                <div class="section-contents">
+                                                    @{Html.RenderAction("NewsletterFormDisplayPartial", "Forms", new { FormID = @formItem.Record.FormID });}
+                                                </div>
+                                            </div>
+                                            break;
+                                                
+                                        case 2:
+                                            <div class="section-inner" id="form-id-@formItem.Record.FormID">
+                                                <div class="section-contents">
+                                                    @{Html.RenderAction("CompetitionFormDisplayPartial", "Forms", new { FormID = @formItem.Record.FormID });}
+                                                </div>
+                                            </div>
+                                            break;
+
+                                        default: break;   
+                                    }
+                                </div>   
+                                break;
+                            case ContentItemType.Grid:
+                                      GridSectionItem gridItem = (GridSectionItem)ci;
+                                      switch (gridItem.Record.Purpose)
+                                      {
+                                          case 1:
+                                              <div class="@gridItem.Record.Class content-grid" style="background-color:#C0FAC9; min-height: 200px;" data-sort-order="@ci.SortOrder" data-type="grid" data-content-id="@gridItem.Record.GridID">
+                                                 <div class="pure-g" id="grid-section-@gridItem.Record.GridID">
+                                                     @foreach (ContentItem gridContentItem in gridItem.Contents)
+                                                     {
+                                                         switch (gridContentItem.ItemType)
+                                                         {
+                                                             case ContentItemType.HTML:
+                                                                 HtmlItem gridHtmlItem = (HtmlItem)gridContentItem;
+                                                                 <div class="@gridHtmlItem.Record.Class" style="background-color: #ff6a00" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@gridHtmlItem.Record.HtmlID">
+                                                                    <div class="section-inner">
+                                                                        @Html.Raw(gridHtmlItem.Record.Contents)
+                                                                    </div>
+                                                                </div>
+                                                                 break;
+                                                             // snip
+                                                             default: break;
+                                                         }
+                                                     }
+                                                </div>
+                                             </div>
+                                                     break;
+
+                                          case 2: // must present filters side and results side. in results side, echo contents of grid.
+                                              <div class='pure-u-1-4' style='min-height: 600px; background-color: #9DB9D5;'>
+                                                  <div class="section-inner">
+                                                      <em style="font-size: 2em">Here go some filter group things</em>
+                                                  </div>
+                                              </div>
+                                              <div class="pure-u-3-4" style='min-height: 600px; background-color: #DCEDFF;' class='@gridItem.Record.Class'>
+                                                  <div class="pure-g">
+                                                      @foreach (ContentItem gridContentItem in gridItem.Contents)
+                                                      {
+                                                          switch (gridContentItem.ItemType)
+                                                          {
+                                                              case ContentItemType.SearchResult:
+                                                                  SearchResultItem searchResultItem = (SearchResultItem)gridContentItem;
+                                                                     <div class="@searchResultItem.ClassName" data-sort-order="@searchResultItem.SortOrder"  data-type="" data-content-id="">
+                                                                        <div class="section-inner" style="padding: 5px;box-sizing: border-box; -moz-box-sizing: border-box;">
+                                                                            <div style="padding: 5px; height: 150px; box-sizing: border-box; -moz-box-sizing: border-box; background-color: #ff6a00">
+                                                                                @Html.Raw(searchResultItem.ArbitraryContents)
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                  break;
+                                                              case ContentItemType.HTML:
+                                                                  HtmlItem gridHtmlItem = (HtmlItem)gridContentItem;
+                                                                     <div class="@gridHtmlItem.Record.Class" style="background-color: #ff6a00" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@gridHtmlItem.Record.HtmlID">
+                                                                        <div class="section-inner">
+                                                                            @Html.Raw(gridHtmlItem.Record.Contents)
+                                                                        </div>
+                                                                    </div>
+                                                                  break;
+                                                              // snip
+                                                              default: break;
+                                                          }
+                                                      }
+                                                    </div>
+                                              </div>
+                                                      break;
+
+                                          default: break;
+                                      }
+
+                                      break;
+                                      
+                                      case ContentItemType.Blank:
+                                      Flock.Models.ContentItems.BlankContentItem blankItem = (Flock.Models.ContentItems.BlankContentItem)ci;
+                                        <div class="@blankItem.Record.Class" data-sort-order="@ci.SortOrder"  data-type="blank" data-content-id="@blankItem.Record.BlankContentItemID">
+                                            <div class="section-inner blank-item">
+                                                <div class="section-contents">
+                                                    &nbsp;
+                                                </div>
+                                            </div>
+                                        </div>
+                                      break;
+                            default: 
+                                <h4>Other Content Item!</h4>
+                                      break;
+                        }
+                    }
+                    </div>
+                }
+                @*@{ Html.RenderPartial("~/Views/Admin/CMS/Compose/PageDisplayPartial.cshtml", (object)Model); }*@
+            </div>
+            <div id="page-section-creation-button" class="new-page-section">
+                <div class="pure-u-inner" onclick="AddPageSection()">
+                    Add Page Section
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="clear: both;"></div>
+<div id="settings-arrow"></div>
+
+<div id="settings-pane">
+    <div id="settings-pane-inner">
+        <div id="slideshow-settings-container">
+        </div>
+        <div id="html-editor-container">
+        </div>
+        <div id="pagesection-settings-container">
+        </div>
+    </div>
+</div>
+
+<div id="dialog-form-select" title="Select Form">
+  <form>
+  <fieldset>
+    <legend>Form</legend>
+    @Html.DropDownList("FormSelector", new SelectList(Model.Forms, "FormID", "Name"), new { style="margin-top: 2em;", id="form-selector" })
+    <input type="hidden" id="dialog-form-hidden-psid" value="" />
+      <input type="hidden" id="dialog-form-hidden-classname" value="" />
+  </fieldset>
+  </form>
+</div>
+
+<div id="dialog-image-dataview" title="Select Images">
+    <div>
+        @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        //each two-zero take width divide by two set height
+        $(".two-zero").each(function() {
+            $(this).height($(this).width() / 2);
+        });
+        $(".two-six").each(function() { 
+            $(this).height($(this).width() * 0.3846);
+        });
+        if(typeof(window.slideShows) != "undefined" && window.slideShows != false) {
+            for(var i = 0; i < window.slideShows.length; i++)
+                window.slideShows[i].AdjustControl();
+        }
+
+        if(!$("#ShowNavigationBar").is(':checked')) {
+            $('#SettingsNavigationBar_Position, #SettingsNavigationBar_Mode, #SettingsNavigationBar_ThumbnailsModeNavigationButtonVisibility').attr('disabled', 'disabled');
+        }
+        $('form :input:checkbox, select').not('#PredefinedScenario').change(
+            function() {
+                $('#PredefinedScenario').val(null);
+            }
+        );
+        $('#PredefinedScenario').change(
+            function() {
+                if($(this).val())
+                    $('form').submit();
+            }
+        );
+        
+        ConfigureDragDrop();
+
+        $("#dialog-image-dataview").dialog({
+            autoOpen: false,
+            height: 680,
+            width: 860,
+            modal: true,
+            buttons: {
+                "Add": function() {
+                    AddImagesToSlideShow();
+                    $(this).dialog("close");
+                },
+                Cancel: function() {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $("#dialog-form-select").dialog({
+            autoOpen: false,
+            height: 300,
+            width: 350,
+            modal: true,
+            buttons: {
+                "Ok": function() {
+                    // insert the thingie!
+                    var pageSectionID = $("#dialog-form-hidden-psid").val();
+                    var formID = $("#form-selector").val();
+                    var className = $("#dialog-form-hidden-classname").val();
+                    //AssignContentToPageSection(long pageSectionID, string contentType, long contentID)
+                    $.ajax({
+                        url: '/admin/CMS/AssignContentToPageSection',
+                        type: 'POST',
+                        data: {
+                            "contentType" : "form",
+                            "pageSectionID" : pageSectionID,
+                            "contentID": formID, 
+                            "className": className
+                        },
+                        success: function (data) {
+                            $("#dialog-form-hidden-psid").val("");
+                            $("#dialog-form-hidden-classname").val("");
+                            ReloadSections();
+                            return; 
+                        },
+                        error: function (event, request, settings) {
+                            window.alert('AjaxError: ' + settings);
+                            },
+                            timeout: 20000
+                        });
+                    $(this).dialog("close");
+                },
+                Cancel: function() {
+                    $(this).dialog("close");
+                }
+            },
+            close: function() {
+            }
+        });
+
+        
+        PrefixedEvent(document, "AnimationEnd", dispatchMQEvent);//.addEventListener("animationEnd", dispatchMQEvent, false);
+
+    });
+    
+
+    function dispatchMQEvent(event) {
+        
+        $(".two-zero").each(function() {
+            $(this).height($(this).width() / 2);
+        });
+        $(".two-six").each(function() { 
+            $(this).height($(this).width() * 0.3846);
+        });
+
+        if(typeof(window.slideShows) != "undefined" && window.slideShows != false) {
+            for(var i = 0; i < window.slideShows.length; i++)
+                window.slideShows[i].AdjustControl();
+        }
+    }
+
+    var pfx = ["webkit", "moz", "MS", "o", ""];
+    function PrefixedEvent(element, type, callback) {
+        for (var p = 0; p < pfx.length; p++) {
+            if (!pfx[p]) type = type.toLowerCase();
+            element.addEventListener(pfx[p]+type, callback, false);
+        }
+    }
+
+    function AddPageSection() {
+        $.ajax({
+            url: '@Url.Action("AddPageSection", "CMS")',
+            type: 'POST',
+            data: {
+                type: "page",
+                pid: '@Model.PageID',
+                order: $(".page-section").length + 1
+            },
+            success: function () {
+                ReloadSections();
+            },
+            error: function (event, request, settings) {
+                window.alert('AjaxError' + ' : ' + settings);
+            },
+            timeout: 20000
+        });
+    }
+
+    function SortPageSections() {
+        var submission = [];
+
+        $(".page-section").each(function() {
+            submission.push({ 
+                PageSectionID: $(this).attr("id").replace("page-section-", "").toString(),
+                SortOrder: $(this).index().toString()
+            });
+        });
+
+        $.ajax({
+            url: '@Url.Action("SortPageSections", "CMS")',
+            type: 'POST',
+            data: {
+                PageID: '@Model.PageID',
+                'PageSectionInfo': JSON.stringify(submission)
+            }, 
+            error: function(e, a, g) {
+                alert(e.responseText);
+            }
+        });
+    }
+
+    function SortContentItems(PageSectionElement) {
+        var submission = [];
+
+        $(PageSectionElement).children().each(function() {
+            submission.push({
+                DataType: $(this).data("type"),
+                ContentID: $(this).data("content-id"),
+                SortOrder: $(this).index()
+                //data-type data-content-id data-sort-order
+            });
+        });
+
+        $.ajax({
+            url: '@Url.Action("SortSectionContents", "CMS")',
+            type: 'POST',
+            data: {
+                PageSectionID: $(PageSectionElement).attr("id").replace("page-section-", ""),
+                PageSectionContents: JSON.stringify(submission)
+            }
+        });
+    }
+
+    function ReloadSections()
+    {
+        window.slideShows = new Array();
+        $.ajax({
+            url: '@Url.Action("ComposePartial", "CMS")',
+            type: 'POST',
+            data: {
+                type: "page",
+                pid: '@Model.PageID'
+            },
+            success:function(d) {
+
+                $("#settings-pane").css("display", "none");
+                $("#page-chassis").html("");
+                $("#page-chassis").html(d);
+                
+                //while(window.elementsRemoved.length) {
+                //    var ele = window.elementsRemoved.pop();
+                //    $(ele.obj).insertAfter(ele.loc);// ele.loc.after(ele.obj);
+                //}
+
+                ConfigureDragDrop();
+            },
+            error: function(event, request, settings) {
+                alert("ReloadSections() Error: " + event.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function ReloadSect(s, e) {
+        ReloadSections();
+    }
+
+    function AddContentItem(type, destinationtype, classname, section, sortorder)
+    {
+        window.elementsRemoved = [];
+
+        $.ajax({
+            url: '@Url.Action("AddContentToPageSection", "CMS")',
+            type: 'POST',
+            data: {
+                type: type,
+                destinationtype: destinationtype,
+                sectionID: section,
+                className: classname,
+                sortOrder: sortorder
+            },
+            success: function(d) {
+                //$(".new-layout").each(function(i, o) {
+                //    var ele = $(o);
+                //    window.elementsRemoved.push({
+                //        loc: ele.prev(),
+                //        obj: ele.detach()
+                //    });
+                //});
+                ReloadSections();
+            },
+            error: function(event, request, settings) {
+                alert("AddContentItem() Error: " + event.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveBlankContentItem(id) {
+        $.ajax({
+            url: '@Url.Action("RemoveBlankContentItem", "CMS")',
+            type: 'POST',
+            data: { ContentID: id },
+            error: function(e, g, a) {
+                alert(e.responseText);
+            },
+            async: false,
+            timeout: 20000
+        });
+    }
+
+</script>

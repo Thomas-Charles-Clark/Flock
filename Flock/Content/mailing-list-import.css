@@ -1,0 +1,91 @@
+﻿#container {
+    width: 1274px;
+}
+
+.mailing-list-hint-img {
+    float: left;
+    margin-bottom: 2em;
+}
+
+.mailing-list-hint {
+    display: block;
+    float: left;
+    font-size: 2em;
+    margin: 11px 0px;
+    width: 25px;
+}
+
+#mailing-list-yes {
+    color: #0FBD0F;
+}
+
+#mailing-list-no {
+    color: red;
+}
+
+input[type="text"].dxucEditArea_MetropolisBlue {
+    height: 28px !important;
+}
+
+#upload-form {
+    line-height: 32px;
+}
+
+#mailing-list-helper {
+    /*display: none;*/
+}
+
+#uploaded-rows-table {
+    border-collapse: collapse;
+    border: 1px solid #c0c0c0;
+}
+
+#uploaded-rows-table td, #uploaded-rows-table th {
+    border: 1px solid #c0c0c0;
+}
+
+#merged-rows-table {
+    border-collapse: collapse;
+    border: 1px solid #c0c0c0;
+}
+
+#merged-rows-table td, #merged-rows-table th {
+    border: 1px solid #c0c0c0;
+}
+
+.invalid-email {
+    background-color: red;
+    color: white;
+}
+
+.duplicate-email {
+    background-color: orange;
+}
+
+#merge-button {
+    height: 30px;
+}
+
+#merge-button-container {
+    float: left;
+    margin-top: 40px;
+    width: 300px;
+    text-align: center;
+}
+
+#uploaded-results-container {
+    float: left;
+}
+
+#merge-results-container {
+    float: left;
+}
+
+table.custom th, table.custom td {
+    padding: 4px;
+    border: 1px solid #c0c0c0;
+}
+
+h5.key {
+    margin-top: 30px;
+}

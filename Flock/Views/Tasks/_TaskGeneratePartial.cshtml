@@ -1,0 +1,319 @@
+﻿@using Flock.ViewModels;
+@model TaskGenerateViewModel
+@{
+    var activeBugCount = Model.TasksInStatus.Where(p => p.TaskTypeID == 1 && p.TaskStatusID == 2).Select(p => p.Count).Sum();
+    var queuedBugCount = Model.TasksInStatus.Where(p => p.TaskTypeID == 1 && p.TaskStatusID == 1).Select(p => p.Count).Sum();
+    var activeTaskCount = Model.TasksInStatus.Where(p => p.TaskTypeID == 2 && p.TaskStatusID == 2).Select(p => p.Count).Sum();
+    var queuedTaskCount = Model.TasksInStatus.Where(p => p.TaskTypeID == 2 && p.TaskStatusID == 1).Select(p => p.Count).Sum();
+    var activeTotal = activeBugCount + activeTaskCount;
+    var queuedTotal = queuedBugCount + queuedTaskCount;
+
+    var perfNewBug7DayCount = Model.PerformanceNew.Where(p => p.TaskTypeID == 1).Select(p => p.LastSevenDays).Sum();
+    var perfNewBug6MonthCount = Model.PerformanceNew.Where(p => p.TaskTypeID == 1).Select(p => p.SixMonthAvg).Sum();
+    var perfNewTask7DayCount = Model.PerformanceNew.Where(p => p.TaskTypeID == 2).Select(p => p.LastSevenDays).Sum();
+    var perfNewTask6MonthCount = Model.PerformanceNew.Where(p => p.TaskTypeID == 2).Select(p => p.SixMonthAvg).Sum();
+    var perfNewTotal7DayCount = perfNewBug7DayCount + perfNewTask7DayCount;
+    var perfNewTotal6MonthCount = perfNewBug6MonthCount + perfNewTask6MonthCount;
+
+    var perfCompletedBug7DayCount = Model.PerformanceCompleted.Where(p => p.TaskTypeID == 1).Select(p => p.LastSevenDays).Sum();
+    var perfCompletedBug6MonthCount = Model.PerformanceCompleted.Where(p => p.TaskTypeID == 1).Select(p => p.SixMonthAvg).Sum();
+    var perfCompletedTask7DayCount = Model.PerformanceCompleted.Where(p => p.TaskTypeID == 2).Select(p => p.LastSevenDays).Sum();
+    var perfCompletedTask6MonthCount = Model.PerformanceCompleted.Where(p => p.TaskTypeID == 2).Select(p => p.SixMonthAvg).Sum();
+    var perfCompletedTotal7DayCount = perfCompletedBug7DayCount + perfCompletedTask7DayCount;
+    var perfCompletedTotal6MonthCount = perfCompletedBug6MonthCount + perfCompletedTask6MonthCount;
+}
+
+<script type="text/javascript">
+    function getAllTaskTypes() {
+        return @Html.Raw(Json.Encode(Model.TaskTypes));
+    }
+
+    function getTaskTypeByID(taskTypeID) {
+        return Enumerable.From(getAllTaskTypes()).Where("$.TaskTypeID == " + taskTypeID).Select("$.Name").Single();
+    }
+</script>
+
+<div id="task-search-wrapper">
+    <div id="task-search-lhs">
+        <div class="task-search-panel" style="background: none; border: none; position: relative; margin-bottom: 5px">
+            <div class="new-bug-btn-wrapper">
+                <div class="new-bug-btn">
+                    <span title="Click to add new Bug" class="bug-add ui-icon-green ui-icon-plus">
+                        <span></span>
+                    </span>
+                    New Bug
+                </div>
+            </div>
+            <div class="new-task-btn-wrapper">
+                <div class="new-task-btn">
+                    <span title="Click and Drag to create new Task" class="bug-add ui-icon-blue ui-icon-plus">
+                        <span></span>
+                    </span>
+                    New Task
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="task-search-panel">
+            <div class="task-search-panel-title-wrapper">
+                <h5 class="task-search-panel-title">Status</h5>
+                <h5 class="task-search-panel-control" onclick="searchPanelToggle($(this), $(this).parent().parent())">[<span class="task-search-minus-sign">-</span>]</h5>
+                <div class="clearfix"></div>
+            </div>
+            <div class="task-search-panel-inner">
+                <table>
+                    <tr>
+                        <th>
+                            &nbsp;
+                        </th>
+                        <th>
+                            Active
+                        </th>
+                        <th>
+                            Queued
+                        </th>
+                    </tr>
+                    <tr class="bug">
+                        <td style="text-align: left;">
+                            Bugs
+                        </td>
+                        <td>
+                            @(activeBugCount)
+                        </td>
+                        <td>
+                            @(queuedBugCount)
+                        </td>
+                    </tr>
+                    <tr class="task">
+                        <td style="text-align: left;">
+                            Tasks
+                        </td>
+                        <td>
+                            @(activeTaskCount)
+                        </td>
+                        <td>
+                            @(queuedTaskCount)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            Total
+                        </td>
+                        <td>
+                            @(activeTotal)
+                        </td>
+                        <td>
+                            @(queuedTotal)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="task-search-panel">
+            <div class="task-search-panel-title-wrapper">
+                <h5 class="task-search-panel-title">Performance</h5>
+                <h5 class="task-search-panel-control" onclick="searchPanelToggle($(this), $(this).parent().parent())">[<span class="task-search-minus-sign">-</span>]</h5>
+                <div class="clearfix"></div>
+            </div>
+            <div class="task-search-panel-inner">
+                <table>
+                    <tr>
+                        <th>
+                            New
+                        </th>
+                        <th>
+                            Last 7 Days
+                        </th>
+                        <th>
+                            Last 6 Months
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            Bugs
+                        </td>
+                        <td>
+                            @(perfNewBug7DayCount)
+                        </td>
+                        <td>
+                            @(perfNewBug6MonthCount.ToString("F2"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Tasks
+                        </td>
+                        <td>
+                            @(perfNewTask7DayCount)
+                        </td>
+                        <td>
+                            @(perfNewTask6MonthCount.ToString("F2"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Total
+                        </td>
+                        <td>
+                            @(perfNewTotal7DayCount)
+                        </td>
+                        <td>
+                            @(perfNewTotal6MonthCount.ToString("F2"))
+                        </td>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <th>
+                            Closed
+                        </th>
+                        <th>
+                            Last 7 Days
+                        </th>
+                        <th>
+                            Last 6 Months
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            Bugs
+                        </td>
+                        <td>
+                            @(perfCompletedBug7DayCount)
+                        </td>
+                        <td>
+                            @(perfCompletedBug6MonthCount.ToString("F2"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Tasks
+                        </td>
+                        <td>
+                            @(perfCompletedTask7DayCount)
+                        </td>
+                        <td>
+                            @(perfCompletedTask6MonthCount.ToString("F2"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Total
+                        </td>
+                        <td>
+                            @(perfCompletedTotal7DayCount)
+                        </td>
+                        <td>
+                            @(perfCompletedTotal6MonthCount.ToString("F2"))
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="task-search-panel" style="background: none; border: none; position: relative;">
+            @Html.DevExpress().TextBoxFor(m => Model.SearchTerm, tbSettings =>
+       {
+           tbSettings.Name = "SearchTerm";
+           tbSettings.Properties.NullText = "Search";
+           tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+           tbSettings.Style.Add("margin-bottom", "1em");
+           tbSettings.ControlStyle.Border.BorderColor = System.Drawing.ColorTranslator.FromHtml("#ababab");
+           tbSettings.Properties.FocusedStyle.Border.BorderColor = System.Drawing.ColorTranslator.FromHtml("#c0c0c0");
+
+           tbSettings.Properties.ClientSideEvents.KeyDown = @"function(s, e) {
+                    if(e.htmlEvent.keyCode == 13) {
+                        performSearch();
+                    }
+                }";
+       }).GetHtml()
+            <img class="task-search-mag-glass" src="~/Images/Icons/24/magnifying-glass.png" onclick="performSearch()" />
+            <div class="clearfix"></div>
+
+            @Html.DevExpress().CheckBoxFor(m => Model.Active, cbSettings =>
+       {
+           cbSettings.Name = "Active";
+           cbSettings.Style.Add("float", "left");
+           cbSettings.Style.Add("position", "relative");
+           cbSettings.Style.Add("left", "-5px");
+           cbSettings.Properties.ValueType = typeof(bool);
+           cbSettings.Properties.ValueChecked = true;
+           cbSettings.Properties.ValueUnchecked = false;
+           cbSettings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                    performSearch();
+                }";
+       }).GetHtml()
+            @Html.DevExpress().Label(lblSettings =>
+       {
+           lblSettings.Text = "Active";
+           lblSettings.Style.Add("float", "left");
+           lblSettings.Style.Add("line-height", "24px");
+           lblSettings.Style.Add("font-size", "14px");
+           lblSettings.ControlStyle.ForeColor = System.Drawing.ColorTranslator.FromHtml("#999999");
+           lblSettings.ControlStyle.Font.Name = "Gill Sans MT";
+       }).GetHtml()
+            <div class="clearfix"></div>
+
+            @Html.DevExpress().CheckBoxFor(m => Model.Queued, cbSettings =>
+       {
+           cbSettings.Name = "Queued";
+           cbSettings.Style.Add("float", "left");
+           cbSettings.Style.Add("position", "relative");
+           cbSettings.Style.Add("left", "-5px");
+           cbSettings.Properties.ValueType = typeof(bool);
+           cbSettings.Properties.ValueChecked = true;
+           cbSettings.Properties.ValueUnchecked = false;
+           cbSettings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                    performSearch();
+                }";
+       }).GetHtml()
+            @Html.DevExpress().Label(lblSettings =>
+       {
+           lblSettings.Text = "Queued";
+           lblSettings.Style.Add("float", "left");
+           lblSettings.Style.Add("line-height", "24px");
+           lblSettings.Style.Add("font-size", "14px");
+           lblSettings.ControlStyle.ForeColor = System.Drawing.ColorTranslator.FromHtml("#999999");
+           lblSettings.ControlStyle.Font.Name = "Gill Sans MT";
+       }).GetHtml()
+            <div class="clearfix"></div>
+
+            @Html.DevExpress().CheckBoxFor(m => Model.Closed, cbSettings =>
+       {
+           cbSettings.Name = "Closed";
+           cbSettings.Style.Add("float", "left");
+           cbSettings.Style.Add("position", "relative");
+           cbSettings.Style.Add("left", "-5px");
+           cbSettings.Properties.ValueType = typeof(bool);
+           cbSettings.Properties.ValueChecked = true;
+           cbSettings.Properties.ValueUnchecked = false;
+           cbSettings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                    performSearch();
+                }";
+       }).GetHtml()
+            @Html.DevExpress().Label(lblSettings =>
+       {
+           lblSettings.Text = "Closed";
+           lblSettings.Style.Add("float", "left");
+           lblSettings.Style.Add("line-height", "24px");
+           lblSettings.Style.Add("font-size", "14px");
+           lblSettings.ControlStyle.ForeColor = System.Drawing.ColorTranslator.FromHtml("#999999");
+           lblSettings.ControlStyle.Font.Name = "Gill Sans MT";
+       }).GetHtml()
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="task-search-panel">
+            <div class="task-search-panel-title-wrapper">
+                <h5 class="task-search-panel-title">Document Library</h5>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    <div id="task-search-container">
+        @Html.Action("TaskSearchPartial", Model)
+    </div>
+    <div class="clearfix"></div>
+</div>

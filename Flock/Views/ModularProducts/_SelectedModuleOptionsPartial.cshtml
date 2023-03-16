@@ -1,0 +1,39 @@
+﻿@using Flock.ViewModels
+@model ModularProduct_ModuleOptionViewModel
+<h3>Selected</h3>
+@{
+    var selectedModules = Model.SelectedOptions.GroupBy(p => p.Module);
+    foreach (var m in selectedModules)
+    {
+        <div data-module-id="@(m.Key.ModuleID)" class="module">
+            <h4 class="module-name"><span onclick="removeModule(@(m.Key.ModuleID))" class="ui-icon ui-icon-cancel ui-icon-red"><span></span></span>@(m.Key.Name)</h4>
+            @{
+        var g = m.GroupBy(p => p.ModuleOptionGroup);
+
+        foreach (var group in g)
+        {
+            if (group.Key != null)
+            {
+                <h5 class="module-option-group-name"><span onclick="removeModuleOptionGroup(@(group.Key.ModuleOptionGroupID))" class="ui-icon ui-icon-cancel ui-icon-red"><span></span></span>@(group.Key.Name)</h5>
+                <ul class="module-options module-list">
+                    @foreach (var opt in group)
+                    {
+                        <li data-module-option-id="@(opt.ModuleOptionID)"><span onclick="removeModuleOption(@(opt.ModuleOptionID))" class="ui-icon ui-icon-cancel ui-icon-red"><span></span></span>@(opt.Name)</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <ul class="module-options module-list">
+                    @foreach (var opt in group)
+                    {
+                        <li><span onclick="removeModuleOption(@(opt.ModuleOptionID))" class="ui-icon ui-icon-cancel ui-icon-red"><span></span></span>@(opt.Name)</li>
+                    }
+                </ul>
+            }
+        }
+            }
+        </div>
+    }
+}
+<div style="clear: both;"></div>

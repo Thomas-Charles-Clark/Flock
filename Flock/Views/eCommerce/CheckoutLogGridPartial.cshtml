@@ -1,0 +1,90 @@
+﻿@model List<Flock.Models.CheckoutLog_SelectResult>
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "CheckoutLogGridView_" + ViewData["CheckoutID"];
+    settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "CheckoutLogGridPartial" };
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        e.customArgs['CheckoutID'] = $('#selected-checkout-id').val();
+    }";
+
+    settings.SettingsDetail.MasterGridName = "CheckoutIDGridView";
+    
+    settings.ControlStyle.Border.BorderWidth = 0;
+    
+    settings.Settings.ShowFilterRow = true;
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    settings.SettingsPager.Visible = false;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.SettingsPager.PageSizeItemSettings.Visible = false;
+    settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+    settings.SettingsPager.PageSizeItemSettings.ShowAllItem = true;
+
+    settings.PreRender = (sender, e) =>
+    {
+        MVCxGridView gv = (MVCxGridView)sender;
+        gv.FocusedRowIndex = -1;
+    };
+    
+    settings.HtmlRowPrepared = (sender, e) =>
+    {
+        if (e.RowType != GridViewRowType.Data) return;
+
+        MVCxGridView gv = (MVCxGridView)sender;
+        if (e.GetValue("BackgroundColour") != null)
+        {
+            var x = e.GetValue("BackgroundColour").ToString();
+            e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml(x);
+        }
+        if (e.GetValue("Colour") != null)
+        {
+            var x = e.GetValue("Colour").ToString();
+            e.Row.ForeColor = System.Drawing.ColorTranslator.FromHtml(x);
+        }
+    };
+
+    settings.KeyFieldName = "RowID";
+
+    MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+    CreatedDTColumn.Name = "CreatedDT";
+    CreatedDTColumn.FieldName = "CreatedDT";
+    CreatedDTColumn.Caption = "Date";
+    CreatedDTColumn.Width = 140;
+    CreatedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    CreatedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    CreatedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(CreatedDTColumn);
+
+
+    MVCxGridViewColumn StageColumn = new MVCxGridViewColumn();
+    StageColumn.Name = "Stage";
+    StageColumn.FieldName = "Stage";
+    StageColumn.Caption = "Stage";
+    StageColumn.Width = 62;
+    StageColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    StageColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    StageColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    settings.Columns.Add(StageColumn);
+
+    MVCxGridViewColumn ActionColumn = new MVCxGridViewColumn();
+    ActionColumn.Name = "Action";
+    ActionColumn.FieldName = "Action";
+    ActionColumn.Caption = "Action";
+    ActionColumn.Width = 200;
+    ActionColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    ActionColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    ActionColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    settings.Columns.Add(ActionColumn);
+
+    MVCxGridViewColumn DetailsColumn = new MVCxGridViewColumn();
+    DetailsColumn.Name = "Details";
+    DetailsColumn.FieldName = "Details";
+    DetailsColumn.Caption = "Details";
+    DetailsColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    DetailsColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    DetailsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    DetailsColumn.PropertiesEdit.EncodeHtml = false;
+    settings.Columns.Add(DetailsColumn);
+    
+}).Bind(Model).GetHtml()

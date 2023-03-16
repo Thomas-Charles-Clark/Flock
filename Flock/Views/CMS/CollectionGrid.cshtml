@@ -1,0 +1,36 @@
+﻿@model List<Flock.Models.PageSection_ProductPage_SelectResult>
+@for(int i = 0; i < Model.Count; i++)
+{
+    if (Model[i].ImageID != null)
+    {
+        <div class="product-page-cell" data-product-page-id="@(Model[i].ProductPageID)">
+            <img src="https://flock.designersguild.com/imagelibrary/239/@(Model[i].ImageID).jpeg" />
+            <span>Product Page: @(Model[i].Name)</span>
+            <br/>
+            <span>Product Page ID: @(Model[i].ProductPageID)</span>
+        </div> 
+    }
+    else
+    {
+        <div class="product-page-cell" data-product-page-id="@(Model[i].ProductPageID)">
+            <img src="/images/admin/image-not-set.png" style="width: 156px;" />
+            <span>Product Page: @(Model[i].Name)</span>
+            <br />
+            <span>Product Page ID: @(Model[i].ProductPageID)</span>
+        </div>
+    }
+}
+@if(Model.Count == 0)
+{
+    <div class="product-page-cell product-page-placeholder">
+        <h5>No Product Pages have been assigned.</h5>
+    </div>
+}
+
+<div style="clear: both" class="product-page-placeholder"></div>
+
+<script type="text/javascript">
+    //$(".page-section-grid-container").sortable({
+    InitProductPagesDragDrop();
+    //});
+</script>

@@ -1,0 +1,440 @@
+﻿@model Flock.ViewModels.TranslateCollectionDetailViewModel
+
+<div id="translation-container" class="content-panel-container" style="width: 600px; float: right; margin-top: 2em;">
+    <fieldset style="padding-bottom: 0;">
+        <legend style="display: none;">
+
+        </legend>
+        <div class="fieldset-inner" style="height: 58px;">
+            <h4 style="float: left;">Translation (@(Model.TargetLanguage))</h4>
+
+            <img id="target-language-flag" style="float: right; margin-top: 3px; width: 32px;" src="/images/icons/languageicons/@(Model.TargetLanguageID).png" alt="@(Model.TargetLanguage) flag" title="@(Model.TargetLanguage)" />
+
+        </div>
+    </fieldset>
+    <fieldset id="translation-fieldset">
+        <legend style="display: none;">
+
+        </legend>
+        <div class="fieldset-inner">
+            <div>
+                @{
+                    @Html.DevExpress().LabelFor(m => Model.Translation.Heading, settings => { settings.Text = "Heading"; }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.Translation.Heading, settings =>
+                    {
+                        settings.Name = "TranslationHeading";
+                        settings.Properties.ClientInstanceName = "TranslationHeading";
+                        settings.Properties.ClientSideEvents.TextChanged = @"function(s, e) {
+                            var ctrl = s.GetInputElement();
+                            $(ctrl).parent().parent().parent().parent().css('border', '2px solid #5BBB4A');
+                            window.HeadingChanged = true;
+                        }";
+                        if (Model.FieldsNeedingReview.Heading)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+                        settings.TabIndex = 1;
+                        settings.Properties.MaxLength = 70;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.Translation.SubHeading, settings => { settings.Text = "Sub Heading"; settings.Style.Add("margin-top", "1em"); }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.Translation.SubHeading, settings =>
+                    {
+                        settings.Name = "TranslationSubHeading";
+                        settings.Properties.ClientInstanceName = "TranslationSubHeading";
+                        settings.Properties.ClientSideEvents.TextChanged = @"function(s, e) {
+                            var ctrl = s.GetInputElement();
+                            $(ctrl).parent().parent().parent().parent().css('border', '2px solid #5BBB4A');
+                            window.SubHeadingChanged = true;
+                        }";
+                        if (Model.FieldsNeedingReview.SubHeading)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+                        settings.TabIndex = 2;
+                        settings.Properties.MaxLength = 70;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.Translation.Description, settings => { settings.Text = "Description"; settings.Style.Add("margin-top", "1em"); }).GetHtml()
+                    @Html.DevExpress().MemoFor(m => Model.Translation.Description, settings =>
+                    {
+                        settings.Name = "TranslationDescription";
+                        settings.Properties.ClientInstanceName = "TranslationDescription";
+                        settings.Properties.ClientSideEvents.TextChanged = @"function(s, e) {
+                            var ctrl = s.GetInputElement();
+                            $(ctrl).parent().parent().parent().parent().css('border', '2px solid #5BBB4A');
+                            window.DescriptionChanged = true;
+                        }";
+                        if (Model.FieldsNeedingReview.Description)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+                        settings.TabIndex = 3;
+                        settings.Properties.MaxLength = 2000;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Properties.Rows = 8;
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.Translation.TitleTag, settings => { settings.Text = "Title"; settings.Style.Add("margin-top", "1em"); }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.Translation.TitleTag, settings =>
+                    {
+                        settings.Name = "TranslationTitleTag";
+                        settings.Properties.ClientInstanceName = "TranslationTitleTag";
+                        settings.Properties.ClientSideEvents.TextChanged = @"function(s, e) {
+                            var ctrl = s.GetInputElement();
+                            $(ctrl).parent().parent().parent().parent().css('border', '2px solid #5BBB4A');
+                            window.TitleTagChanged = true;
+                        }";
+                        if (Model.FieldsNeedingReview.TitleTag)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+                        settings.TabIndex = 4;
+                        settings.Properties.MaxLength = 70;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.Translation.MetaDescription, settings => { settings.Text = "Meta Description"; settings.Style.Add("margin-top", "1em"); }).GetHtml()
+                    @Html.DevExpress().MemoFor(m => Model.Translation.MetaDescription, settings =>
+                    {
+                        settings.Name = "TranslationMetaDescription";
+                        settings.Properties.ClientInstanceName = "TranslationMetaDescription";
+                        settings.Properties.ClientSideEvents.TextChanged = @"function(s, e) {
+                            var ctrl = s.GetInputElement();
+                            $(ctrl).parent().parent().parent().parent().css('border', '2px solid #5BBB4A');
+                            window.MetaDescriptionChanged = true;
+                        }";
+                        if (Model.FieldsNeedingReview.MetaDescription)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+
+                        settings.TabIndex = 6;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Properties.Rows = 8;
+                        settings.Properties.MaxLength = 155;
+                    }).GetHtml()
+                }
+            </div>
+        </div>
+        <div class="buttons-container fieldset-inner" style="padding-top: 0">
+            @*@Html.DevExpress().ValidationSummary(settings =>
+            {
+                settings.Name = "ValSum";
+                settings.ShowErrorsInEditors = true;
+                settings.ShowErrorAsLink = true;
+            }).GetHtml()*@
+            <table class="buttons-table">
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "SaveNextBtn";
+                            settings.Text = "Save & Next";
+                            settings.TabIndex = 8;
+                            settings.Width = System.Web.UI.WebControls.Unit.Pixel(140);
+                            //settings.Style.Add("float", "left");
+                            settings.Style.Add("margin", "0 0 0 0");
+                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                if(TranslateGridView.GetVisibleRowsOnPage() == 1) {
+                                    SaveTranslation(function() {
+                                        LoadTranslator(TranslateGridView.GetRowKey(TranslateGridView.GetFocusedRowIndex()), function() { TranslateGridView.Refresh(); });
+                                    });
+                                }
+                                else {
+                                    var prop = TranslateGridView.cpColumnsProp;
+                                    window.RowLoss = false;
+                                    for (var name in prop) {
+                                        if((name == 'FieldsToReview' && prop[name].filterValue.indexOf('<>') > -1)
+                                            || (name == 'Stage' && prop[name].filterValue.indexOf('[Stage]') > -1 && prop[name].filterValue.indexOf('True') == -1)) {
+                                                // We're filtered such that the Save & Next button would skip one ahead undesirably because a successful save will disappear the row from the grid.
+                                            window.RowLoss = true;
+                                        }
+                                    }
+
+                                    SaveTranslation(function() {
+                                        if(TranslateGridView.IsDataRow(window.NextIndex)) {
+                                            if(!window.RowLoss) {
+                                                TranslateGridView.SetFocusedRowIndex(window.NextIndex);
+                                                TranslateGridView.MakeRowVisible(window.NextIndex);
+                                                LoadTranslator(TranslateGridView.GetRowKey(window.NextIndex), function() {
+                                                    TranslateGridView.Refresh();
+                                                });
+                                                window.NextIndex++;
+                                            }
+                                            else {
+                                                LoadTranslator(TranslateGridView.GetRowKey(window.NextIndex), function() {
+                                                    TranslateGridView.Refresh();
+                                                });
+                                            }
+                                        }
+                                        else {
+                                            if(!window.RowLoss) {
+                                                window.ForcedPaging = true;
+                                                TranslateGridView.NextPage();
+                                            }
+                                            else {
+                                                window.ForcedPaging = true;
+                                                TranslateGridView.Refresh();
+                                            }
+                                        }
+                                    });
+                                }
+                            }";
+                        }).GetHtml()
+                    </td>
+
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "SaveBtn";
+                            settings.Text = "Save";
+                            settings.TabIndex = 8;
+                            settings.Width = System.Web.UI.WebControls.Unit.Pixel(140);
+                            //settings.Style.Add("float", "left");
+                            settings.Style.Add("margin", "0 0 0 0");
+                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                SaveTranslation(function() {
+                                    LoadTranslator(TranslateGridView.GetRowKey(TranslateGridView.GetFocusedRowIndex()), function() { TranslateGridView.Refresh(); });
+                                });
+                            }";
+                        }).GetHtml()
+                    </td>
+
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "UndoBtn";
+                            settings.Text = "Undo";
+                            settings.TabIndex = 9;
+                            settings.Width = System.Web.UI.WebControls.Unit.Pixel(140);
+                            settings.Style.Add("float", "right");
+                            settings.Style.Add("margin", "0 0 0 0");
+                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                if(DetectUnsavedChanges()) {
+                                    $.unsavedWarning(function() {
+                                        LoadTranslator(TranslateGridView.GetRowKey(TranslateGridView.GetFocusedRowIndex()));
+                                    }, function() {
+
+                                    }, null);
+                                }
+                                else {
+                                    LoadTranslator(TranslateGridView.GetRowKey(TranslateGridView.GetFocusedRowIndex()));
+                                }
+                            }";
+                        }).GetHtml()
+                    </td>
+
+                    <td>
+
+                    </td>
+                </tr>
+            </table>
+            <div class="clearfix"></div>
+        </div>
+    </fieldset>
+</div>
+
+<div id="default-container" class="content-panel-container" style="width: 600px; float: left; margin-top: 2em;">
+    <fieldset style="padding-bottom: 0;">
+        <legend style="display: none;">
+
+        </legend>
+        <div class="fieldset-inner" style="height: 58px; padding-bottom: 0;">
+            <h4 style="float: left;">Default (English - British)</h4>
+
+            <img id="default-language-flag" style="float: right; margin-top: 3px; width: 32px;" src="/images/icons/languageicons/1.png" alt="UK flag" title="Default: British English" />
+            @if (Model.Image != null)
+            {
+                if (Model.Image.ImageID != null && Model.Image.ImageID != 0)
+                {
+                    <img class="content-img" title="Details" src="https://flock.designersguild.com/imagelibrary/156/@(Model.Image.ImageID).jpeg" onclick="$('#content-details').dialog('open');" />
+                }
+                else
+                {
+                    <img class="content-img" title="Details" src="https://flock.designersguild.com/images/admin/image-not-set.png" onclick="$('#content-details').dialog('open');" />
+                }
+            }
+        </div>
+    </fieldset>
+    <fieldset id="default-fieldset">
+        <legend style="display: none;">
+
+        </legend>
+        <div class="fieldset-inner">
+            <div>
+                @{
+                    @Html.DevExpress().LabelFor(m => Model.English.Heading, settings => { settings.Text = "Heading"; }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.English.Heading, settings =>
+                    {
+                        settings.Name = "EnglishHeading";
+                        settings.Properties.ClientInstanceName = "EnglishHeading";
+                        
+                        if (Model.FieldsNeedingReview.Heading)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+
+                        settings.Properties.ReadOnlyStyle.BackColor = System.Drawing.Color.FromArgb(238, 238, 238);
+
+                        settings.ReadOnly = true;
+                        settings.Attributes.Add("maxlength", "70");
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.English.SubHeading, settings => { settings.Text = "Sub Heading"; settings.Style.Add("margin-top", "1em"); }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.English.SubHeading, settings =>
+                    {
+                        settings.Name = "EnglishSubHeading";
+                        settings.Properties.ClientInstanceName = "EnglishSubHeading";
+                        
+                        if (Model.FieldsNeedingReview.SubHeading)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+
+                        settings.Properties.ReadOnlyStyle.BackColor = System.Drawing.Color.FromArgb(238, 238, 238);
+
+                        settings.ReadOnly = true;
+                        settings.Attributes.Add("maxlength", "70");
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.English.Description, settings => { settings.Text = "Description"; settings.Style.Add("margin-top", "1em"); }).GetHtml()
+                    @Html.DevExpress().MemoFor(m => Model.English.Description, settings =>
+                    {
+                        settings.Name = "EnglishDescription";
+                        settings.Properties.ClientInstanceName = "EnglishDescription";
+                        
+                        if (Model.FieldsNeedingReview.Description)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+
+                        settings.Properties.ReadOnlyStyle.BackColor = System.Drawing.Color.FromArgb(238, 238, 238);
+
+                        settings.ReadOnly = true;
+                        settings.Attributes.Add("maxlength", "155");
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Properties.Rows = 8;
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.English.TitleTag, settings => { settings.Text = "Title"; settings.Style.Add("margin-top", "1em"); }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.English.TitleTag, settings =>
+                    {
+                        settings.Name = "EnglishTitleTag";
+                        settings.Properties.ClientInstanceName = "EnglishTitleTag";
+                        
+                        if (Model.FieldsNeedingReview.TitleTag)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+
+                        settings.Properties.ReadOnlyStyle.BackColor = System.Drawing.Color.FromArgb(238, 238, 238);
+
+                        settings.ReadOnly = true;
+                        settings.Attributes.Add("maxlength", "70");
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.English.MetaDescription, settings => { settings.Text = "Meta Description"; settings.Style.Add("margin-top", "1em"); }).GetHtml()
+                    @Html.DevExpress().MemoFor(m => Model.English.MetaDescription, settings =>
+                    {
+                        settings.Name = "EnglishMetaDescription";
+                        settings.Properties.ClientInstanceName = "EnglishMetaDescription";
+                        
+                        if (Model.FieldsNeedingReview.MetaDescription)
+                            settings.Style.Add("border", "2px solid #5A89DF");
+
+                        settings.Properties.ReadOnlyStyle.BackColor = System.Drawing.Color.FromArgb(238, 238, 238);
+
+                        settings.ReadOnly = true;
+                        settings.Attributes.Add("maxlength", "155");
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Properties.Rows = 8;
+                    }).GetHtml()
+                }
+            </div>
+        </div>
+
+        <div class="buttons-container fieldset-inner" style="padding-top: 0">
+            <table class="buttons-table">
+                <tr>
+                    <td style="text-align: left;">
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "BlueLbl";
+                            settings.Style.Add("border", "2px solid #5A89DF");
+                            settings.Style.Add("float", "left");
+                            settings.Height = 27;
+                            settings.Width = 40;
+                        }).GetHtml()
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "BlueTxtLbl";
+                            settings.Height = 27;
+                            settings.Text = " = To Review";
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("line-height", "27px;");
+                            settings.Style.Add("margin", "0 0 0 5px");
+                        }).GetHtml()
+                    </td>
+                    <td></td>
+                    <td>
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "GrbLbl";
+                            settings.Style.Add("border", "2px solid #5BBB4A");
+                            settings.Style.Add("float", "left");
+                            settings.Height = 27;
+                            settings.Width = 40;
+                        }).GetHtml()
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Name = "GrnTxtLbl";
+                            settings.Height = 27;
+                            settings.Text = " = Altered & Unsaved";
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("line-height", "27px;");
+                            settings.Style.Add("margin", "0 0 0 5px");
+                        }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+            <div class="clearfix"></div>
+        </div>
+        <div id="content-details">
+            <div id="content-details-inner" style="display: none;">
+                <h5 id="content-name" style="margin-top: 0;">@(Model.English.Heading)</h5>
+                @{
+                    <p>
+                        Collection ID: <span id="content-id-label">@(Model.CollectionID)</span>
+                    </p>
+                }
+                @if (Model.Image != null)
+                {
+                    if (Model.Image.ImageID != null && Model.Image.ImageID != 0)
+                    {
+                        <img id="content-img" style="width: 450px; display: block; margin: 0 auto;" src="https://flock.designersguild.com/imagelibrary/654/@(Model.Image.ImageID).jpeg" />
+                    }
+                    else
+                    {
+                        <img id="content-img" style="width: 450px; display: block; margin: 0 auto;" src="https://flock.designersguild.com/images/admin/image-not-set.png" />
+                    }
+                }
+            </div>
+        </div>
+
+
+    </fieldset>
+</div>
+
+<div style="clear: both;"></div>
+
+<input type="hidden" id="collection-id-hidden" value="@(Model.CollectionID)"/>
+
+<script type="text/javascript">
+    window.HeadingChanged = false;
+    window.SubHeadingChanged = false;
+    window.DescriptionChanged = false;
+    window.TitleTagChanged = false;
+    window.MetaDescriptionChanged = false;
+
+
+    $("#content-details").dialog({
+        title: "Details",
+        width: "auto",
+        height: "auto",
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        buttons: {
+            Ok: function () { $(this).dialog("close"); }
+        }
+    });
+    $("#content-details-inner").show();
+</script>

@@ -1,0 +1,20 @@
+﻿#container {
+    width: auto;
+}
+
+p {
+
+}
+
+p.hint-text {
+    font-size: 11px;
+    font-style: italic;
+}
+
+div.confirm-dialog {
+    width: 300px !important;
+}
+
+#MarginThresholdOutOfRWarn {
+    width: 120px !important;
+}

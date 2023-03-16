@@ -1,0 +1,138 @@
+﻿@using Flock.Models.ContentItems
+@model SlideShowSettings
+<div id="slideshow-settings-@Model.SlideShowID" style="display: none" class="slideshow-settings-half">
+    <h4 style="text-align: center;">Settings</h4>
+@using (Ajax.BeginForm("ImageSliderSaveSettings", "CMS", new { },
+  new AjaxOptions
+    {
+        UpdateTargetId = "slideshow-settings-container",
+        HttpMethod = "POST",
+        OnSuccess = "SlideShowSettingsSaveSuccess"
+    }))
+{
+    @Html.EditorForModel()
+    <input type="submit" value="save" />
+}
+</div>
+
+<div class="slideshow-settings-half">
+    <h4 style="text-align: center;">Images</h4>
+    <input type="button" id="add-image-slideshow-button" value="Select Images" onclick="OpenImageDataView()" />
+    @{ 
+        if(Model.Images.Count > 0) 
+        {
+            <ul id="slideshow-images">
+                @{for(var i = 0; i < Model.Images.Count; i++)
+                  {
+                   <li>
+                       <input type="hidden" class="slideshow-image-@(Model.SlideShowID)" value="@(Model.Images[i].ImageID)" />
+                       <img src="~/ImageLibrary/156/@(Model.Images[i].ImageID).jpeg" />
+                       <img src="~/Images/SystemIcons/remove-icon.png" class="slideshow-image-remove-icon" onclick="RemoveSlideShowImage(@(Model.Images[i].ImageID))" />
+                       @*@Html.DevExpress().TextBoxFor(Model.Images[i].Title).GetHtml()
+                       @Html.DevExpress().TextBoxFor(Model.Images[i].Description).GetHtml()*@
+
+                   </li>
+                  }
+                }
+            </ul>
+        }
+        else 
+        {
+            <h4>No images are assigned to this slideshow.</h4>   
+        }
+    }
+    
+</div>
+<div style="clear: both;"></div>
+<script type="text/javascript">
+
+    $("#slideshow-images").sortable({
+        update: function (e, ui) {
+            var images = [];
+
+            $("#slideshow-images li").each(function() {
+                images.push({ 
+                    ImageID: $(this).find("input").val(), 
+                    SortOrder: $(this).index()
+                });
+            });
+
+            $.ajax({
+                url: '@Url.Action("UpdateSlideShowOrder", "CMS")',
+                traditional: true,
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    slideshowID: '@Model.SlideShowID',
+                    imagesSort: JSON.stringify(images) 
+                }),
+                success: function (data) {
+                    ReloadSections();
+                },
+                error: function (ev, s, d) {
+                    alert(ev.responseText);
+                }
+            });
+        }
+    });
+
+    function AddImagesToSlideShow() {
+        //window.SelectedImages;
+        var images = [];
+
+        for(var i = 0; i < window.SelectedImages.length; i++)
+        {
+            images.push({ 
+                ImageID: window.SelectedImages[i],
+                SortOrder: i
+            });
+        }
+
+        $.ajax({
+            url: '@Url.Action("AddImagesToSlideShow", "CMS")',
+            traditional: true,
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                slideshowID: '@Model.SlideShowID',
+                imagesInput: JSON.stringify(images)
+            }),
+            success: function (data) {
+                ReloadSections();
+            },
+            error: function (ev, s, d) {
+                alert(ev.responseText);
+            }
+        });
+     
+    }
+
+    function RemoveSlideShowImage(imageID) {
+        $.ajax({
+            url: '@Url.Action("RemoveSlideShowImage", "CMS")',
+            traditional: true,
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                slideshowID: '@Model.SlideShowID',
+                imageID: imageID
+            }),
+            success: function (data) {
+                ReloadSections();
+            },
+            error: function (ev, s, d) {
+                alert(ev.responseText);
+            }
+        });
+    }
+
+function SlideShowSettingsSaveSuccess(arg) {
+    ReloadSections();
+}
+
+function OpenImageDataView() {
+    $("#dialog-image-dataview").dialog("open");
+}
+
+
+</script>

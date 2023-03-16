@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = "Competitions";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: 1275px !important;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Competitions</h4>
+
+@Html.Partial("CompetitionManagerGridView")

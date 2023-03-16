@@ -1,0 +1,344 @@
+﻿@{
+    ViewBag.Title = "Product Pages Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section Styles {
+
+    <style type="text/css">
+        .dxgvEditFormTable_MetropolisBlue {
+            float: right !important;
+            width: 50% !important;
+        }
+
+        table td label {
+            margin-bottom: 0 !important;
+        }
+    </style>
+}
+@section scripts {
+
+}
+
+<h4 class="page-heading">Product Page Overview</h4>
+
+<div class="page-subheading" style="margin-bottom: 4px;">
+    @Html.Action("ProductPagesOverviewCollectionDropDownPartial", "ProductPages")
+    @Html.Action("ProductPagesOverviewColourDropDownPartial", "ProductPages")
+    @Html.Action("ProductPagesOverviewCountryRestrictionsDropDownPartial", "ProductPages")
+    <div class="clearfix"></div>
+</div>
+
+<div id="bulk-action-panel" style="display: inline-block; margin-left: 0; margin-bottom: 1em; float: none; position: static; width: auto;">
+    <h4>Bulk Action Panel</h4>
+    <ul style="padding-right: 2em;">
+        <li>
+            <a href="javascript:;" title="Set Country Restrictions" onclick="$('#country-restrict-modal').dialog('open')">Set Country Restrictions</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$('#new-state-modal').dialog('open');">Set New State</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Enable" onclick="$('#date-picker-modal').dialog('option', 'title', 'Select On Date'); $('#date-picker-modal').data('for-date', 'on').dialog('open');">Set On Date</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Disable" onclick="$('#date-picker-modal').dialog('option', 'title', 'Select Off Date'); $('#date-picker-modal').data('for-date', 'off').dialog('open');">Set Off Date</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Specify Audience" onclick="$('#audience-modal').dialog('open')">Specify Audience</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$.confirm(CopyPodToSlideshow, function () { });">Copy Pod Images to Slideshow</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$.confirm(CopySlideshowToPod, function () { });">Copy Slideshow Images to Pod</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Delete" onclick="$.confirm(DeleteSelectedProductPages, function () { });">Delete</a>
+        </li>
+    </ul>
+</div>
+<div id="ProductPageGridContainer" style="display: block;">
+    @Html.Action("ProductPagesOverviewGridViewPartial", "ProductPages")
+</div>
+<div style="clear:both;"></div>
+
+<div id="country-restrict-modal" style="overflow: visible;">
+    @Html.Action("ProductPagesOverviewNewCountryRestrictionDropDownPartial")
+    <div style="clear: both;"></div>
+</div>
+
+<div id="new-state-modal">
+    @Html.DevExpress().Label(settings =>
+{
+    settings.Text = "New";
+}).GetHtml()
+    @Html.DevExpress().CheckBox(settings =>
+{
+    settings.Name = "NewStateCheckbox";
+}).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div id="date-picker-modal" data-for-date="null">
+    @Html.DevExpress().Calendar(settings =>
+{
+    settings.Name = "BulkActionDatePicker";
+    settings.Properties.DisplayFormatString = "d";
+}).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div id="bad-selection-dialog">
+    <h5 style="display: none;">You must select at least one Product Page.</h5>
+</div>
+
+<div id="audience-modal">
+    <select id="audience" class="field-control">
+        <option>Both</option>
+        <option value="false">Retail Only</option>
+        <option value="true">Trade Only</option>
+    </select>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#bad-selection-dialog").dialog({
+            title: "Bad Selection",
+            width: 240,
+            height: "auto",
+            resizable: false,
+            modal: true,
+            autoOpen: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog('close');
+                }
+            }
+        })
+        $("#bad-selection-dialog > h5").css("display", "block");
+
+        $("#country-restrict-modal").dialog({
+            title: "Set Country Restrictions",
+            autoOpen: false,
+            height: "auto",
+            width: 300,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    SetCountryRestrictions();
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    ProductPagesOverviewNewCountryRestrictionDD.SetText('Country');
+                    ProductPagesOverviewNewCountryRestrictionListBox.SetValue(null);
+                    $(this).dialog("close");
+                }
+            }
+        });
+        $("#country-restrict-modal").parent().css("overflow", "visible");
+
+        $("#new-state-modal").dialog({
+            title: "Set New State",
+            autoOpen: false,
+            height: "auto",
+            width: 160,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    SetNewStateForProductPages();
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    NewStateCheckbox.SetValue(false);
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $("#date-picker-modal").dialog({
+            autoOpen: false,
+            title: "Select Date",
+            height: "auto",
+            width: "auto",
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    switch ($(this).data("for-date")) {
+                        case "on":
+                            SetOnDateForProductPages();
+                            break;
+                        case "off":
+                            SetOffDateForProductPages();
+                            break;
+                    }
+                    $(this).data("for-date", "null")
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $('#audience-modal').dialog({
+            title: "Specify Audience",
+            autoOpen: false,
+            height: "auto",
+            width: 160,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    SpecifyAudienceForProductPages();
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    $('#audience').val('');
+                    $(this).dialog("close");
+                }
+            }
+        });
+    });
+
+    function SetCountryRestrictions() {
+        var keys = null;
+
+        if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+            keys = ProductPagesOverviewGridView.GetSelectedKeysOnPage();
+
+        var countries = null;
+
+        countries = ProductPagesOverviewNewCountryRestrictionListBox.GetSelectedValues() == null ? null : ProductPagesOverviewNewCountryRestrictionListBox.GetSelectedValues().toString();
+
+        if (typeof keys != "undefined" && keys != false) {
+            if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+                ProductPagesOverviewGridView.PerformCallback({ commandType: 'SetCountryRestrictions', keyString: keys.toString(), countryKeys: countries });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return true;
+    }
+
+    function SetOnDateForProductPages() {
+        var keys = null;
+
+        var dateString = "null";
+
+        if (BulkActionDatePicker.GetValue() != null)
+            dateString = BulkActionDatePicker.GetValue().toDateString();
+
+        if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+            keys = ProductPagesOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+                ProductPagesOverviewGridView.PerformCallback({ commandType: 'Enable', keyString: keys.toString(), dateString: dateString });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return false;
+    }
+
+    function SetOffDateForProductPages() {
+        var keys = null;
+
+        var dateString = "null";
+
+        if (BulkActionDatePicker.GetValue() != null)
+            dateString = BulkActionDatePicker.GetValue().toDateString();
+        if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+            keys = ProductPagesOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+                ProductPagesOverviewGridView.PerformCallback({ commandType: 'Disable', keyString: keys.toString(), dateString: dateString });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return false;
+    }
+
+    function DeleteSelectedProductPages() {
+        var keys = null;
+
+        if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+            keys = ProductPagesOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+                ProductPagesOverviewGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+
+    }
+
+    function SetNewStateForProductPages() {
+        var keys = null;
+
+        if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+            keys = ProductPagesOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false) {
+                ProductPagesOverviewGridView.PerformCallback({ commandType: 'setNewState', keyString: keys.toString(), newState: NewStateCheckbox.GetValue() });
+                NewStateCheckbox.SetValue(false);
+            }
+        }
+        else {
+            NewStateCheckbox.SetValue(false);
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+    
+    function SpecifyAudienceForProductPages() {
+        var keys = null;
+
+        if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+            keys = ProductPagesOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false) {
+                ProductPagesOverviewGridView.PerformCallback({ commandType: 'setAudience', keyString: keys.toString(), tradeSwitch: $('#audience').val() });
+                $('#audience').val('');
+                ProductPagesOverviewGridView.UnselectRows();
+            }
+        }
+        else {
+            NewStateCheckbox.SetValue(false);
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+
+    function CopyPodToSlideshow() {
+        var keys = null;
+
+        if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+            keys = ProductPagesOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false) {
+                ProductPagesOverviewGridView.PerformCallback({ commandType: 'copypodtoslideshow', keyString: keys.toString() });
+            }
+        }
+        else {
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+
+    function CopySlideshowToPod() {
+        var keys = null;
+
+        if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false)
+            keys = ProductPagesOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (ProductPagesOverviewGridView) != "undefined" && ProductPagesOverviewGridView != false) {
+                ProductPagesOverviewGridView.PerformCallback({ commandType: 'copyslideshowtopod', keyString: keys.toString() });
+            }
+        }
+        else {
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+</script>

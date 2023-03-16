@@ -1,0 +1,29 @@
+﻿@using Flock.ViewModels
+@model PopupsViewModel
+@{
+    ViewBag.Title = "Popups";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/Content/popups.css")
+}
+@section scripts {
+
+}
+<h4 class="page-heading">
+    Popups
+</h4>
+
+<div id="popup-select-header-container">
+    <div class="content-panel-container">
+        <fieldset id="popup-select-header">
+            <legend>
+                Popups
+            </legend>
+            <div id="popup-select-header-inner">
+                @Html.Partial("PopupGridViewPartial")
+            </div>
+        </fieldset>
+    </div>
+</div> 

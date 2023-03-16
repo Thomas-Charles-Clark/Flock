@@ -1,0 +1,188 @@
+﻿
+@{
+    ViewBag.Title = "Map Attributes to Product Types";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+    @Styles.Render("~/Content/attributes.css")
+<style>
+    .attribute-group {
+        width: 100%;
+        float: none;
+    }
+    .attribute-group-inner {
+        padding: 0;
+    }
+    h6 {
+        margin-top: 0;
+    }
+    </style>
+}
+@section scripts{
+    
+
+    <script type="text/javascript">
+
+        function SaveAttributeGroupProductTypeFlags(AttributeGroupID, ProductTypeID) {
+            $.ajax({
+                url: '@Url.Action("SaveAttributeGroupProductTypeFlags", "Attributes")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    AttributeGroupID: AttributeGroupID,
+                    ProductTypeID: ProductTypeID,
+                    Filter: window["Filter-"+AttributeGroupID+"-"+ProductTypeID].GetValue(), 
+                    Info: window["Info-" + AttributeGroupID + "-" + ProductTypeID].GetValue(),
+                    Mandatory: window["Mandatory-" + AttributeGroupID + "-" + ProductTypeID].GetValue(),
+                    AutoSync: window["AutoSync-" + AttributeGroupID + "-" + ProductTypeID].GetValue(),
+                    SortOrder: window["SortOrder-" + AttributeGroupID + "-" + ProductTypeID].GetValue()
+                },
+                success: function(data)  {
+                    SuccessFade($("#save-" + AttributeGroupID + "-" + ProductTypeID));
+                },
+                error: function (e, s, a) {
+                    FailureFade($("#save-" + AttributeGroupID + "-" + ProductTypeID));
+                }
+            });
+        }
+
+        function UpdateAttributes(AttributeGroupID) {
+            $.ajax({
+                url: '@(Url.Action("UpdateProductTypeAttributeGroupAttributes", "Attributes"))',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: MapAttributesProductTypeListBox.GetValue(),
+                    AttributeGroupID: AttributeGroupID,
+                    AttributeIDs: window.Attributes.toString()
+                },
+                success: function (data) {
+                    $("#attribute-group-" + AttributeGroupID).html(data);
+                    GreenFade($("#attribute-group-" + AttributeGroupID));
+                },
+                error: function (e, s, a) {
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                    RedFade($("attribute-group-" + AttributeGroupID));
+                },
+                timeout: 20000
+            });
+        }
+
+        function RemoveAttribute(AttributeID, AttributeGroupID) {
+            $.ajax({
+                url: '@(Url.Action("RemoveAttributeFromProductType", "Attributes"))',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: MapAttributesProductTypeListBox.GetValue(),
+                    AttributeGroupID: AttributeGroupID,
+                    AttributeID: AttributeID
+                },
+                success: function (data) { 
+                    $("#attribute-group-" + AttributeGroupID).html(data);
+                },
+                error: function (e, s, a) { 
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                    //log e
+                },
+                timeout: 20000
+            });
+        }
+
+        function RemoveAttributeGroup(AttributeGroupID) {
+            $.ajax({
+                url: '@Url.Action("RemoveAttributeGroupFromProductType", "Attributes")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: MapAttributesProductTypeListBox.GetValue(),
+                    AttributeGroupID: AttributeGroupID
+                },
+                success: function (data) {
+                    $("#ajax-target").html(data);
+                },
+                error: function (e, s, a) {
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                    //log e
+                },
+                timeout: 20000
+            });
+        }
+
+        function AddAttributeGroup(AttributeGroupID) {
+            $.ajax({
+                url: '@Url.Action("AddAttributeGroupToProductType", "Attributes")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: MapAttributesProductTypeListBox.GetValue(),
+                    AttributeGroupID: AttributeGroupID
+                },
+                success: function (data) {
+                    $("#ajax-target").html(data);
+                },
+                error: function (e, s, a) {
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                    //log e
+                },
+                timeout: 20000
+            });
+        }
+
+        function AddAllAttributes(AttributeGroupID) {
+            $.ajax({
+                url: '@Url.Action("AddAllAttributesToGroup", "Attributes")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: MapAttributesProductTypeListBox.GetValue(),
+                    AttributeGroupID: AttributeGroupID
+                },
+                success: function (data) {
+                    $("#attribute-group-" + AttributeGroupID).html(data);
+                },
+                error: function (e, s, a) {
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                    //log e
+                },
+                timeout: 20000
+            });
+        }
+
+        function ClearAllAttributes(AttributeGroupID) {
+            $.ajax({
+                url: '@Url.Action("RemoveAllAttributesFromGroup", "Attributes")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: MapAttributesProductTypeListBox.GetValue(),
+                    AttributeGroupID: AttributeGroupID
+                },
+                success: function (data) {
+                    $("#attribute-group-" + AttributeGroupID).html(data);
+                },
+                error: function (e, s, a) {
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                    //log e
+                },
+                timeout: 20000
+            });
+        }
+
+        function resizeLeftDroppable() {
+            $("#attribute-groups-assigned").height($("#attribute-groups-list").height());
+        }
+    </script>
+}
+<h4 class="page-heading">Map Attributes to Product Types</h4>
+
+<div class="page-subheading">
+    @Html.Action("MapAttributesProductTypeDropDown")
+    <label id="product-type-id-text"style="float: left; display: none; margin-right: 7px; font-size: 11px; line-height: 34px;">ID: </label>
+    <label id="product-type-id-display" style="float: left; font-size: 11px; line-height: 34px; "></label>
+    <div style="clear: both;"></div>
+</div>
+
+<div id="ajax-target"></div>
+
+<div style="clear: both;"></div>

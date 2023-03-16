@@ -1,0 +1,40 @@
+﻿textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="date"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="color"]:focus, .uneditable-input:focus { 
+border-bottom-color: rgba(82, 168, 236, 0.804);
+border-left-color: rgba(82, 168, 236, 0.804);
+border-right-color: rgba(82, 168, 236, 0.804);
+border-top-color: rgba(82, 168, 236, 0.804);
+box-shadow: none;
+outline: none;
+}
+textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input { 
+background-color: #FFFFFF;
+border: 1px solid #CCCCCC;
+box-shadow: none;
+transition: none;
+}
+select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input { 
+border-radius: 4px;
+color: #555555;
+display: inline-block;
+font-size: 14px;
+line-height: 20px;
+margin-bottom: 0;
+padding: 4px 6px;
+vertical-align: middle;
+}
+
+body {
+    line-height: normal;
+}
+
+label {
+    display: inline-block;
+}
+input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] { 
+background-color: #EEEEEE;
+cursor: pointer;
+}
+
+dd{
+    margin-bottom: 5px;
+}

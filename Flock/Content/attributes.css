@@ -1,0 +1,194 @@
+﻿.container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container { 
+    animation-name: min-width-1200px;
+    width: 1221px;
+}
+
+#attribute-product-page-select-busy {
+    display: none;
+    float: right;
+    margin-right: 20px;
+    margin-top: 2px;
+    width: 30px;
+}
+
+#attribute-compose-link {
+    background: url('/images/icons/32/o_collection/desktop.png') 0 0 no-repeat;
+    bottom: 5px;
+    display: block;
+    float: right;
+    height: 32px;
+    position: relative;
+    width: 32px;
+}
+
+.ui-state-highlight-attribute {
+    display: block;
+    float: left;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    background-color: #f7dd88;
+    border: 1px solid #e96712;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+#attribute-compose-link:hover {
+    background: url('/images/icons/32/o_collection/desktop_2.png') 0 0 no-repeat;
+}
+
+#attribute-header-container {
+    background-color: #E1E1E1;
+    border: 1px solid #A9A9A9;
+    border-radius: 5px;
+    display: inline-block;
+    padding-left: 7px;
+    padding-right: 1px;
+    padding-top: 9px;
+    width: 1120px;
+    margin-bottom: 1em;
+}
+
+#attribute-groups-container {
+    padding: 0;
+}
+
+#attribute-header-left {
+    float: left;
+    margin-right: 10px;
+}
+
+    #attribute-header-left img {
+        margin-right: 1em;
+        border: 1px solid #A9A9A9;
+    }
+    #attribute-header-left h5 {
+        margin-top: 0;
+    }
+
+#attribute-header-right {
+    float: left;
+}
+
+#product-page-info {
+    border-collapse: collapse;
+    border: none;
+}
+
+    #product-page-info td {
+        font-size: 1.1em;
+    }
+
+    #product-page-info th {
+        font-size: 1.1em;
+        text-align: right;
+        padding: 1em;
+    }
+
+.attribute-group {
+    width: 280px;
+    float: left;
+    background-color: #e1e1e1;
+    border: 1px solid #a9a9a9;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 3px;
+    width: 220px;
+    margin-bottom: 1em;
+}
+
+    .attribute-group h5 {
+        margin: 4px;
+        font-size: 12px; font-weight: 700;
+    }
+
+.attribute-group-disabled {
+    background-color: #eacbcb;
+}
+
+.attribute-group-disabled .attribute-group-inner {
+    background-color: #fff3f3;
+}
+
+.attribute-group-inner {
+    /*overflow-y: scroll;*/
+    /*min-height: 142px;*/
+    background-color: white;
+    border: 1px solid #A9A9A9;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+    .attribute-group:last-of-type {
+        margin-right: 0;
+    }
+
+    .attribute-group ul {
+        margin: 0 1em;
+        padding-left: 0;
+    }
+    .attribute-group ul li {
+        list-style-type: none;
+        margin-bottom: 0;
+        padding-left: 4px;
+        margin-top: 2px;
+        padding-bottom: 5px;
+    }
+        .attribute-group ul li label {
+            font-size: 10px;
+            display: inline;
+            margin-left: 6px;
+        }
+    .attribute-group input {
+        margin-top: 2px;
+        display: inline-block;
+        position: relative;
+        top: 3px;
+        margin-right: 5px;
+    }
+    
+.button:hover {
+    cursor: pointer;
+}
+
+#product-page-attributes-fieldset legend span:hover {
+    text-decoration: underline;
+}
+
+#attribute-sync-table {
+    border-collapse: collapse;
+}
+    
+    #attribute-sync-table th, #attribute-sync-table td {
+        padding: 6px !important;
+        border: 1px solid #a9a9a9;
+    }
+
+        #attribute-sync-table td input, #attribute-sync-table th input {
+            margin-top: 0;
+        }
+
+
+#product-quality table {
+    border-collapse: collapse;
+}
+    
+    #product-quality table th, #product-quality table td {
+        padding: 6px !important;
+        border: 1px solid #a9a9a9;
+    }
+
+
+
+.ui-state-highlight-delivery-matrix {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    background-color: #ffd800;
+    border: 1px solid #e96712;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}

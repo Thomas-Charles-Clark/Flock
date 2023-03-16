@@ -1,0 +1,182 @@
+@model short
+@Html.DevExpress().GridView(
+settings => {
+    //Flock.Controllers.BrochureRequestGridViewExportDemoHelper.CreateExportGridViewSettings(Html)
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    
+    settings.Name = "BrochureRequestGridView";
+    settings.CallbackRouteValues = new { Controller = "Assets", Action = "BrochureRequestGridViewPartial" };
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['BrochureID'] = BrochureIDComboBox.GetValue();
+    }";
+
+    settings.KeyFieldName = "Member_Brochure_ID";
+    settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "MemberID").DisplayFormat = "Total: {0:n0}";
+
+    settings.Settings.ShowFooter = true;
+    settings.SettingsPager.Visible = true;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.SettingsPager.PageSizeItemSettings.Visible = true;
+    settings.SettingsPager.PageSizeItemSettings.ShowAllItem = true;
+    settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+    settings.Settings.ShowGroupPanel = false;
+    settings.Settings.ShowFilterRow = true;
+    settings.SettingsBehavior.AllowSelectByRowClick = false;
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.VisibleIndex = 100;
+    settings.CommandColumn.ShowSelectCheckbox = true;
+    settings.CommandColumn.SetHeaderTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<a style=\"display: block;\" class=\"dxgvCommandColumnItem_MetropolisBlue dxgv__cci\" onclick=\"GetLabels();\" href=\"javascript:;\">Get Labels</a>");
+
+        Html.DevExpress().CheckBox(settingsCheckBox =>
+        {
+            settingsCheckBox.Name = "cbSelectAll";
+            settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+            settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+        }).Render();
+    });
+
+    settings.CommandButtonInitialize = (sender, e) =>
+    {
+        if (e.VisibleIndex == -1) return;
+        if (e.ButtonType == ColumnCommandButtonType.SelectCheckbox)
+        {
+            object processed = (sender as MVCxGridView).GetRowValues(e.VisibleIndex, "ProcessedDT");
+            //if (processed != null)
+            //    e.Enabled = false;
+        }
+    };
+    
+    settings.Columns.Add(column => {
+        column.Name = "Code";
+        column.FieldName = "Code";
+        column.Caption = "Product Code";
+        column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        column.SetDataItemTemplateContent(c => { 
+            var b = UoW.GetRepository<Flock.Models.Brochure>().GetAll().Where(p => p.BrochureID == Convert.ToInt16(DataBinder.Eval(c.DataItem, "BrochureID"))).Single();
+            ViewContext.Writer.Write(b.Code);
+        });
+    });
+    
+    settings.Columns.Add("MemberID");
+
+    settings.Columns.Add("Email");
+
+    settings.Columns.Add(column =>
+    {
+        column.Name = "LanguageID";
+        column.FieldName = "LanguageID";
+        column.Caption = "Language";
+        column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        column.Settings.AllowAutoFilter = DefaultBoolean.False;
+
+        column.SetDataItemTemplateContent(c =>
+        {
+            if(c.DataItem != null)
+                ViewContext.Writer.Write(UoW.GetRepository<Flock.Models.Language>().GetAll().Where(p => p.LanguageID == Convert.ToByte(DataBinder.Eval(c.DataItem, "LanguageID")))
+                    .Select(p => p.Name).Single());
+        });
+    });
+
+    settings.Columns.Add("FullName");
+    settings.Columns.Add("AddressLine1");
+    settings.Columns.Add("AddressLine2");
+    settings.Columns.Add("Town");
+    settings.Columns.Add("County");
+    settings.Columns.Add("Postcode");
+
+    
+    settings.Columns.Add(column =>
+    {
+        column.Name = "CountryID";
+        column.FieldName = "CountryID";
+        column.Caption = "Country";
+        column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        column.Settings.AllowAutoFilter = DefaultBoolean.False;
+        column.Width = 160;
+        column.SetDataItemTemplateContent(c =>
+        {
+            if(c.DataItem != null)
+                ViewContext.Writer.Write("<img src='/images/icons/countryflags/22px/" + DataBinder.Eval(c.DataItem, "CountryID").ToString() + ".png' style='float: left; margin-right: 4px;' />");
+        });
+    });
+    settings.Columns.Add("PhoneNumber");
+    settings.Columns.Add("CreatedDT", MVCxGridViewColumnType.DateEdit).Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    //settings.Columns.Add("ProcessedDT", MVCxGridViewColumnType.DateEdit).Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+    settings.Columns.Add(column =>
+    {
+        column.Name = "ProcessedDT";
+        column.FieldName = "ProcessedDT";
+        column.Caption = "Processed";
+        column.Settings.AllowAutoFilter = DefaultBoolean.False;
+        column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        column.ColumnType = MVCxGridViewColumnType.TextBox;
+        column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        column.ColumnType = MVCxGridViewColumnType.DateEdit;
+    });
+
+    settings.HeaderFilterFillItems = (sender, e) =>
+    {
+        MVCxGridView gridView = (MVCxGridView)sender;
+        switch (e.Column.Name)
+        {
+            case "CountryID":
+                e.Values.Clear();
+                var source = UoW.GetRepository<Flock.Models.Member_Brochure>().GetAll().Where(p => p.BrochureID == Model && p.DeletedDT == null && p.CreatedDT > DateTime.Now.AddMonths(-6)).Select(p => p.CountryID).ToList();
+                
+                //var cL = UoW.GetRepository<Flock.Models.PriceList>().GetAll().Select(p => p.PriceListID).ToList().ConvertAll(p => (byte?)p).ToList();
+                foreach (var v in UoW.GetRepository<Flock.Models.Country>().GetAll().Where(p => p.DeletedDT == null && source.Contains(p.CountryID)))//.Where(p => cL.Contains(p.PriceListID)))
+                {
+                    e.AddValue(v.Name, v.CountryID.ToString());
+                }
+                e.AddShowAll();
+            break;
+        }
+    };
+    
+}).BindToLINQ("", "", (s, e) => {
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    List<Flock.Models.Member_Brochure> source = UoW.GetRepository<Flock.Models.Member_Brochure>().GetAll().Where(p => p.BrochureID == Model && p.DeletedDT == null && p.CreatedDT > DateTime.Now.AddMonths(-6) ).ToList();
+
+    e.QueryableSource = source.AsQueryable();
+    e.KeyExpression = "Member_Brochure_ID";
+}).GetHtml()
+@*.Bind(Model).GetHtml()*@
+
+@*@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var grid = Html.DevExpress().GridView(Flock.Controllers.BrochureRequestGridViewExportDemoHelper.ExportGridViewSettings).Bind(Model).GetHtml()
+}*@
+
+@*
+        settings => {
+
+            settings.
+
+            settings.CommandColumn.SetHeaderTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<a style=\"display: block;\" class=\"dxgvCommandColumnItem_MetropolisBlue dxgv__cci\" onclick=\"GetLabels();\" href=\"javascript:;\">Get Labels</a>");
+                Html.DevExpress().CheckBox(settingsCheckBox =>
+                {
+                    settingsCheckBox.Name = "cbSelectAll";
+                    settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                    settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+                }).Render();
+            });
+
+            MVCxGridViewColumn LanguageIDColumn = settings.Columns["LanguageID"] as MVCxGridViewColumn;
+            LanguageIDColumn.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(UoW.GetRepository<Flock.Models.Language>().GetAll().Where(p => p.LanguageID == Convert.ToByte(DataBinder.Eval(c.DataItem, "LanguageID")))
+                    .Select(p => p.Name).Single());
+            });
+        });
+    }
+    
+*@

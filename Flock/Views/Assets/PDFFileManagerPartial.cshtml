@@ -1,0 +1,22 @@
+﻿@Html.DevExpress().FileManager(settings =>
+{
+    settings.Name = "PDFFileManager";
+    settings.CallbackRouteValues = new { Controller = "Assets", Action = "PDFFileManagerPartial" };
+    settings.Settings.AllowedFileExtensions = new String[] { ".pdf", ".html" };
+    settings.Settings.InitialFolder = "\\";
+    settings.SettingsUpload.Enabled = false;
+    settings.ClientVisible = true;
+    settings.Settings.ThumbnailFolder = Url.Content("~/Brochures");
+    settings.SettingsFileList.View = FileListView.Thumbnails;
+    settings.ClientSideEvents.CurrentFolderChanged = @"function(s, e) { 
+        InteractiveBrochureFileManager.SetCurrentFolderPath(s.GetCurrentFolderPath('/', true));
+        CoverImageFileManager.SetCurrentFolderPath(s.GetCurrentFolderPath('/', true));
+    }";
+
+    settings.ClientSideEvents.SelectedFileChanged = @"function(s, e) {
+        var s = e.file.GetFullName();
+        s = s.replace(new RegExp(/\\/g),'/');
+        s = s.substring(10, s.length);
+        PDFPath.SetText('http://brochures.designersguild.com/'+s);
+    }";
+}).BindToFolder("~/Brochures").GetHtml()

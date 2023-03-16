@@ -1,0 +1,36 @@
+﻿@model Flock.ViewModels.Bronto.BrontoListGridViewModel
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "ListGridView";
+    settings.CallbackRouteValues = new { Controller = "Bronto", Action = "ListGridViewPartial" };
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['SubAccountID'] = "+Model.SubAccountID+@";
+    }";
+
+    settings.Settings.ShowFilterRow = true;
+    settings.SettingsBehavior.FilterRowMode = GridViewFilterRowMode.Auto;
+
+    MVCxGridViewColumn ContactListIDColumn = new MVCxGridViewColumn();
+    ContactListIDColumn.Name = "ContactListID";
+    ContactListIDColumn.FieldName = "ContactListID";
+    ContactListIDColumn.Caption = "Contact List ID";
+    settings.Columns.Add(ContactListIDColumn);
+
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Name";
+    settings.Columns.Add(NameColumn);
+
+    MVCxGridViewColumn BrontoIDColumn = new MVCxGridViewColumn();
+    BrontoIDColumn.Name = "BrontoID";
+    BrontoIDColumn.FieldName = "BrontoID";
+    BrontoIDColumn.Caption = "Bronto ID";
+    settings.Columns.Add(BrontoIDColumn);
+
+    MVCxGridViewColumn ActiveContactsColumn = new MVCxGridViewColumn();
+    ActiveContactsColumn.Name = "ActiveContacts";
+    ActiveContactsColumn.FieldName = "ActiveContacts";
+    ActiveContactsColumn.Caption = "Active Contacts";
+    settings.Columns.Add(ActiveContactsColumn);
+
+}).Bind(Model.Results).GetHtml()

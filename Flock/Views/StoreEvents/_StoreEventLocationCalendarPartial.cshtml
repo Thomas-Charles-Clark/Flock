@@ -1,0 +1,58 @@
+﻿@using Flock.ViewModels
+@model StoreEventLocationCalendarViewModel
+@Html.DevExpress().Calendar(settings =>
+{
+    settings.Name = "Location" + Model.StoreEventLocationID + "Calendar";
+    settings.CallbackRouteValues = new { Controller = "StoreEvents", Action = "StoreEventLocationCalendarPartial", StoreEventID = Model.StoreEventID, StoreEventLocationID = Model.StoreEventLocationID };
+    settings.Properties.EnableMultiSelect = true;
+    settings.Properties.ShowTodayButton = false;
+    settings.Properties.ShowClearButton = false;
+    settings.Properties.EnableFocusedStyle = false;
+    settings.ControlStyle.BorderBottom.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+    settings.Style.Add("margin-top", "20px");
+    settings.Style.Add("border-collapse", "collapse");
+
+    settings.Properties.TodayStyle.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+    
+    if(Model.SelectedDates.Count > 0)
+    {
+        settings.VisibleDate = Model.SelectedDates.Min(p => p.EventDate);
+    }
+    
+    settings.DayCellPrepared += (sender, e) =>
+    {
+        e.Cell.Attributes["ondblclick"] = "selectDate(" + Model.StoreEventID + ", " + Model.StoreEventLocationID + ", $(this).data('date-id'), '" + String.Format("{0:dddd} {1} {2:MMMM yyyy}", e.Date, e.Date.Day.ToString(), e.Date) + "')";
+        if (Model.SelectedDates.Count > 0)
+        {
+            if (!Model.SelectedDates.Select(p => p.EventDate).Contains(e.Date))
+            {
+                e.Cell.Enabled = true;
+                //e.Cell.Enabled = false;
+                //e.Cell.ForeColor = System.Drawing.ColorTranslator.FromHtml("#BFBFBF");
+                //e.Cell.Attributes["style"] = "pointer-events:none";
+            }
+            else
+            {
+                e.Cell.Enabled = true;
+                //e.Cell.ForeColor = System.Drawing.Color.Black;
+                //e.Cell.BackColor = System.Drawing.ColorTranslator.FromHtml("#CAE8FF");
+                e.Cell.ControlStyle.CssClass = "selected-date dxeCalendarDay_MetropolisBlue";
+                //e.Cell.BorderStyle = System.Web.UI.WebControls.BorderStyle.Dashed;
+                //e.Cell.BorderColor = System.Drawing.ColorTranslator.FromHtml("#77DC8B");
+                //e.Cell.BorderWidth = 1;
+                /*
+                 So we'd like to use the calendar to display currently selected dates AND the selection which the user makes.
+                 */
+
+                e.Cell.Attributes["data-date-id"] = Model.SelectedDates.Where(p => p.EventDate == e.Date.Date).Select(p => p.StoreEvent_DateID).Single().ToString();
+            }
+        }
+        if (e.Date < DateTime.Now)
+        {
+            //e.Cell.Enabled = true;
+            //e.Cell.ForeColor = System.Drawing.ColorTranslator.FromHtml("#BFBFBF");
+            //e.Cell.Attributes["style"] = "pointer-events:none";
+        }
+    };
+
+}).GetHtml()

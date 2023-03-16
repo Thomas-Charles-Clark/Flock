@@ -1,0 +1,656 @@
+﻿@model Flock.ViewModels.PromoCodeViewModel
+<div id="primary-tab-container-wrapper" style="margin-bottom: 8px;">
+    <p id="loading-text" style="line-height: 20px; text-align: center; font-style: italic; font-size: 0.9em;">Loading...</p>
+    <div id="primary-tab-container">
+        <ul>
+            <li>
+                <a href="#basic-info">Basic Info</a>
+                @if (ViewData.ModelState.ContainsKey("Code") || ViewData.ModelState.ContainsKey("Description") ||
+                    ViewData.ModelState.ContainsKey("MinimumSpend") || ViewData.ModelState.ContainsKey("DeliveryBandPriceInc") ||
+                    ViewData.ModelState.ContainsKey("FreeGiftProductID") || ViewData.ModelState.ContainsKey("MaxUses"))
+                {
+                    <div class="val-icon"></div>
+                }
+            </li>
+            <li>
+                <a href="#promotion-types">Promotion Type</a>
+                @if (ViewData.ModelState.ContainsKey("DiscountType") || ViewData.ModelState.ContainsKey("Discount") ||
+                    ViewData.ModelState.ContainsKey("DeliveryBandPriceEx") || ViewData.ModelState.ContainsKey("DeliveryBandPriceInc") ||
+                    ViewData.ModelState.ContainsKey("FreeGiftProductID") || ViewData.ModelState.ContainsKey("FreeGiftQuantity") ||
+                    ViewData.ModelState.ContainsKey("GiftBoxPriceEx") || ViewData.ModelState.ContainsKey("GiftBoxPriceInc"))
+                {
+                    <div class="val-icon"></div>
+                }
+            </li>
+            <li>
+                <a href="#member-restrictions-tab">Member Restrictions</a>
+            </li>
+        </ul>
+        <div id="basic-info">
+            <table id="promo-code-edit-table">
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoGroupLbl"; settings.Text = "Promotion Group"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBoxFor(m => Model.PromotionGroupID, settings =>
+                        {
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValueField = "PromotionGroupID";
+                            settings.Properties.ValueType = typeof(byte);
+                            settings.Properties.TextField = "Name";
+                        }).BindList(
+                            args => { return Flock.ViewModels.LargeDatabaseDataProvider.GetPromotionGroups(args); },
+                            args => { return Flock.ViewModels.LargeDatabaseDataProvider.GetPromotionGroupByID(args); 
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoCodeLbl"; settings.Text = "Code"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().TextBoxFor(m => Model.Code, settings =>
+                        {
+                            settings.Properties.MaxLength = 20;
+                            settings.ShowModelErrors = true;
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoDescriptionLbl"; settings.Text = "Description"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().TextBoxFor(m => Model.Description, settings =>
+                        {
+                            settings.Properties.MaxLength = 60;
+                            settings.ShowModelErrors = true;
+                            settings.Width = 420;
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "MinimumSpendLbl"; settings.Text = "Minimum Spend"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().SpinEditFor(m => Model.MinimumSpend, settings =>
+                        {
+                            settings.Properties.MinValue = 0;
+                            settings.Properties.MaxValue = 99999;
+                            settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                            settings.Properties.DisplayFormatString = "F2";
+                            settings.Properties.DisplayFormatInEditMode = true;
+                            settings.Properties.DecimalPlaces = 2;
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="padding-bottom: 12px; font:12px 'Segoe UI', Helvetica, 'Droid Sans', Tahoma, Geneva, sans-serif; color: #333; font-style: italic;">
+                        Description limited to 60 characters as per <a href="https://support.google.com/merchants/answer/2906014" target="_blank">Google's Promotion Code Feed</a> specification (the Long Title field).
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoMaxUsesLbl"; settings.Text = "Max Uses"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    </td>
+                    <td colspan="1">
+                        @Html.DevExpress().SpinEditFor(m => Model.MaxUses, settings =>
+                        {
+                            settings.Style.Add("float", "left");
+                            settings.Properties.NumberType = SpinEditNumberType.Integer;
+                            settings.Properties.MinValue = 1;
+                            settings.Properties.MaxValue = System.Int32.MaxValue;
+                            settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                        }).GetHtml()
+                    
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoMaxUsesPerUserLbl"; settings.Text = "Max Uses Per User"; settings.Style.Add("line-height", "32px !important"); settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-left", "8px"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    
+                        @Html.DevExpress().SpinEditFor(m => Model.MaxUsesPerUser, settings =>
+                        {
+                            settings.Style.Add("float", "left");
+                            settings.Width = 136;
+                            settings.Properties.NumberType = SpinEditNumberType.Integer;
+                            settings.Properties.MinValue = 1;
+                            settings.Properties.MaxValue = System.Int32.MaxValue;
+                            settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                        }).GetHtml()
+                    </td>
+                    <td colspan="2">
+                        @Html.DevExpress().Label(settings => { settings.Name = "TransactionSequenceRestrictionLbl"; settings.Text = "Transaction Sequence Restriction"; settings.Style.Add("line-height", "32px !important"); settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-left", "8px"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+
+                        @Html.DevExpress().SpinEditFor(m => Model.TransactionSequenceRestriction, settings =>
+                        {
+                            settings.Style.Add("float", "left");
+                            settings.Width = 136;
+                            settings.Properties.NumberType = SpinEditNumberType.Integer;
+                            settings.Properties.MinValue = 0;
+                            settings.Properties.MaxValue = 3;
+                            settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                        }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoPriceListLbl"; settings.Text = "Price List"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().ComboBoxFor(m => Model.PriceListID, settings =>
+                        {
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValueField = "PriceListID";
+                            settings.Properties.ValueType = typeof(byte?);
+                            settings.Properties.TextField = "Name";
+                            settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                                LoadingPanel.Show();
+                                $.ajax({
+                                    url: '" + @Url.Action("PromoCodeDeliveryBandPartial", "Promotions") + @"',
+                                    type: 'GET',
+                                    traditional: true,
+                                    data: {
+                                        promotionCodeID: '" + Model.PromotionCodeID + @"',
+                                        priceListID: s.GetValue()
+                                    },
+                                    success: function(data) {
+                                        LoadingPanel.Hide();
+                                        $('#delivery-band-cell').html(data);
+                                    },
+                                    timeout: 20000
+                                });
+                            }";
+                        }).BindList(
+                            args => { return Flock.ViewModels.LargeDatabaseDataProvider.GetPriceLists(args); },
+                            args =>
+                            {
+                                return Flock.ViewModels.LargeDatabaseDataProvider.GetPriceListByID(args);
+                            }).GetHtml()
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoOnDateLbl"; settings.Text = "On Date"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().CalendarFor(m => Model.OnDate, settings =>
+                           {
+                                settings.ShowModelErrors = true;
+                           
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoOffDateLbl"; settings.Text = "Off Date"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().CalendarFor(m => Model.OffDate, settings =>
+                        {
+                            settings.ShowModelErrors = true;
+                        }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+            <div style="clear: both;"></div>
+        </div>
+        <div id="promotion-types">
+            <ul>
+                <li>
+                    <a href="#discount">Discount</a>
+                    @if (ViewData.ModelState.ContainsKey("DiscountType") || ViewData.ModelState.ContainsKey("Discount"))
+                    {
+                        <div class="val-icon"></div>
+                    }
+                </li>
+                <li>
+                    <a href="#delivery">Delivery</a>
+                    @if (ViewData.ModelState.ContainsKey("DeliveryBandPriceEx") || ViewData.ModelState.ContainsKey("DeliveryBandPriceInc"))
+                    {
+                        <div class="val-icon"></div>
+                    }
+                </li>
+                <li>
+                    <a href="#free-gift">Free Gift</a>
+                    @if (ViewData.ModelState.ContainsKey("FreeGiftProductID") || ViewData.ModelState.ContainsKey("FreeGiftQuantity"))
+                    {
+                        <div class="val-icon"></div>
+                    }
+                </li>
+                <li>
+                    <a href="#gift-box">Gift Box</a>
+                    @if (ViewData.ModelState.ContainsKey("GiftBoxPriceEx") || ViewData.ModelState.ContainsKey("GiftBoxPriceEx"))
+                    {
+                        <div class="val-icon"></div>
+                    }
+                </li>
+            </ul>
+
+            <div id="discount">
+                <div style="width: 50%; float: left;">
+                    <table id="promo-code-product-type-table">
+                        <tr>
+                            <td style="vertical-align: middle;">
+                                @Html.DevExpress().Label(settings => { settings.Name = "PromoDiscountTypeLbl"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-bottom", "4px"); settings.Style.Add("line-height", "32px!important"); settings.Text = "Discount Type"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+
+                                @Html.DevExpress().ComboBoxFor(m => Model.DiscountType, settings =>
+                                {
+                                    settings.Properties.Items.Clear();
+                                    settings.Properties.Items.Add("Monetary", true);
+                                    settings.Properties.Items.Add("Percentage", false);
+                                    settings.Properties.ValueType = typeof(bool);
+                                    settings.Style.Add("margin-bottom", "4px");
+                                    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                                        switch(s.GetValue())
+                                        {
+                                            case true:
+                                                $('.percentage-related').hide();
+                                                break;
+                                            case false:
+                                                $('.percentage-related').show();
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }";
+                                    settings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+                                        switch(s.GetValue())
+                                        {
+                                            case true:
+                                                $('.percentage-related').hide();
+                                                break;
+                                            case false:
+                                                $('.percentage-related').show();
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }";
+                                }).GetHtml()
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.DevExpress().Label(settings => { settings.Name = "PromoDiscountLbl"; settings.Style.Add("margin-right", "8px"); settings.Width = 76; settings.Style.Add("margin-bottom", "4px"); settings.Text = "Discount"; settings.Style.Add("line-height", "32px!important"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                            
+                                @Html.DevExpress().SpinEditFor(m => Model.Discount, settings =>
+                                {
+                                    settings.Properties.MaxValue = Int32.MaxValue;
+                                    settings.Properties.MinValue = 0;
+                                    settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                                    settings.Properties.DisplayFormatString = "F2";
+                                    settings.Properties.DisplayFormatInEditMode = true;
+                                    settings.Properties.DecimalPlaces = 2;
+                                    settings.Style.Add("margin-bottom", "4px");
+                                    settings.Style.Add("margin-left", "8px");
+                                }).GetHtml()
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.DevExpress().Label(settings => { settings.Name = "ApplyDiscountFullPriceLbl"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-bottom", "4px"); settings.Text = "Apply Discount to Full Price"; settings.Style.Add("line-height", "32px!important"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                                @Html.DevExpress().CheckBoxFor(m => Model.ApplyDiscountToFullPrice, settings =>
+                                {
+                                    settings.Properties.ValueChecked = true;
+                                    settings.Properties.ValueUnchecked = false;
+                                    settings.ShowModelErrors = true;
+                                    settings.Style.Add("line-height", "29px!important");
+                                    settings.Style.Add("margin-left", "8px");
+                                    settings.Style.Add("margin-bottom", "4px");
+                                }).GetHtml()
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.DevExpress().Label(settings => { settings.Name = "ApplyDiscountSalePriceLbl"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-bottom", "4px"); settings.Text = "Apply Discount to Sale Price"; settings.Style.Add("line-height", "32px!important"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                                @Html.DevExpress().CheckBoxFor(m => Model.ApplyDiscountToSalePrice, settings =>
+                                {
+                                    settings.Properties.ValueChecked = true;
+                                    settings.Properties.ValueUnchecked = false;
+                                    settings.ShowModelErrors = true;
+                                    settings.Style.Add("line-height", "29px!important");
+                                    settings.Style.Add("margin-left", "8px");
+                                    settings.Style.Add("margin-bottom", "4px");
+                                }).GetHtml()
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.DevExpress().Label(settings => { settings.Name = "ApplyDiscountTradePriceLbl"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-bottom", "4px"); settings.Text = "Apply Discount to Trade Price"; settings.Style.Add("line-height", "32px!important"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                                @Html.DevExpress().CheckBoxFor(m => Model.ApplyDiscountToTradePrice, settings =>
+                                {
+                                    settings.Properties.ValueChecked = true;
+                                    settings.Properties.ValueUnchecked = false;
+                                    settings.ShowModelErrors = true;
+                                    settings.Style.Add("line-height", "29px!important");
+                                    settings.Style.Add("margin-left", "8px");
+                                    settings.Style.Add("margin-bottom", "4px");
+                                }).GetHtml()
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.DevExpress().Label(settings => { settings.Name = "ApplyDiscountBundlesLbl"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-bottom", "4px"); settings.Text = "Apply Discount to Bundles"; settings.Style.Add("line-height", "32px!important"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                                @Html.DevExpress().CheckBoxFor(m => Model.DiscountBundles, settings =>
+                                {
+                                    settings.Properties.ValueChecked = true;
+                                    settings.Properties.ValueUnchecked = false;
+                                    settings.ShowModelErrors = true;
+                                    settings.Style.Add("line-height", "29px!important");
+                                    settings.Style.Add("margin-left", "8px");
+                                    settings.Style.Add("margin-bottom", "4px");
+                                }).GetHtml()
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="percentage-related" style="vertical-align: top;">
+                                <div style="width: 545px; margin-bottom: 0;" class="resource-panel-container">
+                                    <fieldset id="product-type-fieldset">
+                                        <legend style="font-size: 0.9em;" onclick="$('.hideable-dataview').not('#product-type-dataview').slideUp('fast'); $('#product-type-dataview').slideToggle('fast');">Product Types (click to expand / contract)</legend>
+                                        <div id="product-type-dataview" class="hideable-dataview" style="display: none;">
+                                            <div style="padding: 1em; background-color: white;">
+                                                @Html.DevExpress().CheckBoxList(settings =>
+                                                {
+                                                    settings.Name = "PromoCodeProductTypesUnbound";
+                                                    settings.Properties.RepeatLayout = System.Web.UI.WebControls.RepeatLayout.Table;
+                                                    settings.Properties.RepeatDirection = System.Web.UI.WebControls.RepeatDirection.Horizontal;
+                                                    settings.Properties.RepeatColumns = 5;
+                                                    settings.Height = 250;
+                                                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    settings.Properties.TextField = "Name";
+                                                    settings.Properties.ValueField = "ProductTypeID";
+                                                    settings.Properties.ValueType = typeof(byte);
+                                                    settings.PreRender = (sender, e) =>
+                                                    {
+                                                        ASPxCheckBoxList cbl = (ASPxCheckBoxList)sender;
+                                                        foreach (ListEditItem item in cbl.Items)
+                                                        {
+                                                            item.Selected = Model.PromoCode_ProductTypes.Select(p => p.ProductTypeID).Contains((byte)item.Value);
+                                                        }
+                                                    };
+                                                }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetProductTypes(null)).GetHtml()
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="percentage-related" id="promo-code-product-restriction-table">
+                        <tr>
+                            <td style="vertical-align: top;">
+                                <div style="width: 545px; margin-bottom: 0;" class="resource-panel-container">
+                                    <fieldset id="product-restrictions-fieldset">
+                                        <legend style="font-size: 0.9em;" onclick="$('.hideable-dataview').not('#product-restrictions-dataview').slideUp('fast'); $('#product-restrictions-dataview').slideToggle('fast');">Product Restrictions (click to expand / contract)</legend>
+                                        <div id="product-restrictions-dataview" class="hideable-dataview" style="display: none;">
+                                            <div style="padding: 1em 1em 0px; background-color: white;">
+                                                @if (Model.PromotionCodeID != null)
+                                                {
+                                                    <div id="product-pagesection-application">
+                                                        @Html.DevExpress().Label(settings => { settings.Name = "PageSectionSearchBoxLbl"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-bottom", "4px"); settings.Text = "Page Section ID"; settings.Style.Add("line-height", "32px!important"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+
+                                                        @Html.DevExpress().TextBox(settings =>
+                                                        {
+                                                            settings.Name = "PageSectionIDSearchBox";
+                                                            settings.Style.Add("margin-right", "8px");
+                                                            settings.Style.Add("margin-bottom", "4px");
+                                                            settings.Style.Add("float", "left");
+                                                            settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) {
+                                                                if (!((e.htmlEvent.keyCode >= 48 && e.htmlEvent.keyCode <= 57) || (e.htmlEvent.keyCode >= 97 && e.htmlEvent.keyCode <= 105) || (e.htmlEvent.keyCode == 8 || e.htmlEvent.keyCode == 46 || e.htmlEvent.keyCode == 37 || e.htmlEvent.keyCode == 39)))
+                                                                    ASPxClientUtils.PreventEventAndBubble(e.htmlEvent);
+                                                            }";
+                                                        }).GetHtml()
+                                                        @Html.DevExpress().Button(settings =>
+                                                        {
+                                                            settings.Name = "PageSectionSearchBtn";
+                                                            settings.Text = "Apply";
+                                                            settings.Style.Add("margin-right", "8px");
+                                                            settings.Style.Add("margin-bottom", "4px");
+                                                            settings.Style.Add("margin-top", "2px");
+                                                            settings.Style.Add("float", "left");
+                                                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                                                $.confirm(function() {
+                                                                    var psid = PageSectionIDSearchBox.GetValue();
+                                                                    if(psid == null) {  
+                                                                        return;
+                                                                    }
+                                                                    else {
+                                                                        LoadingPanel.Show();
+                                                                        $.ajax({
+                                                                            url: '" + @Url.Action("AddProductsFromPageSection", "Promotions") + @"',
+                                                                            type: 'POST',
+                                                                            traditional: true,
+                                                                            data: {
+                                                                                PromotionCodeID: " + Model.PromotionCodeID + @",
+                                                                                PageSectionID: PageSectionIDSearchBox.GetValue()
+                                                                            },
+                                                                            success: function(data) {
+                                                                                $('#product-restrictions').html(data);
+                                                                                LoadingPanel.Hide();
+                                                                            },
+                                                                            timeout: 20000
+                                                                        });
+                                                                    }
+                                                                }, function() { });
+                                                            }";
+                                                        }).GetHtml()
+                                                        @Html.DevExpress().Button(settings =>
+                                                        {
+                                                            settings.Name = "ProductRestrictionsRemoveAllBtn";
+                                                            settings.Text = "Remove All";
+                                                            settings.Style.Add("margin-right", "8px");
+                                                            settings.Style.Add("margin-bottom", "4px");
+                                                            settings.Style.Add("margin-top", "2px");
+                                                            settings.Style.Add("float", "right");
+                                                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                                                $.confirm(function() {
+                                                                    LoadingPanel.Show();
+                                                                    $.ajax({
+                                                                        url: '" + @Url.Action("RemoveProductsFromPromoCode", "Promotions") + @"',
+                                                                        type: 'POST',
+                                                                        traditional: true,
+                                                                        data: {
+                                                                            PromotionCodeID: " + Model.PromotionCodeID + @"
+                                                                        },
+                                                                        success: function(data) {
+                                                                            $('#product-restrictions').html(data);
+                                                                            LoadingPanel.Hide();
+                                                                        },
+                                                                        timeout: 20000
+                                                                    });
+                                                                }, function() { });
+                                                            }";
+                                                        }).GetHtml()
+                                                    </div>
+                                                }
+                                                <div id="product-restrictions">
+                                                    @Html.Partial("Codes/PromoCodeProductRestrictionsPartial", Model.PromoCode_Products)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="product-panel-target" class="percentage-related">
+                    
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+            <div id="delivery">
+                <table id="promo-code-delivery-band-table">
+                    <tr>
+                        <td>
+                           @Html.DevExpress().Label(settings => { settings.Name = "PromoDeliveryBandPriceExLbl"; settings.Text = "Price Ex"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml() 
+                        </td>
+                        <td>
+                            @Html.DevExpress().SpinEditFor(m => Model.DeliveryBandPriceEx, settings =>
+                            {
+                                settings.Properties.MinValue = 0;
+                                settings.Properties.MaxValue = 99999;
+                                settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                                settings.Properties.DisplayFormatString = "F2";
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DecimalPlaces = 2;
+                            }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().Label(settings => { settings.Name = "PromoDeliveryBandPriceIncLbl"; settings.Text = "Price Inc"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().SpinEditFor(m => Model.DeliveryBandPriceInc, settings =>
+                            {
+                                settings.Properties.MinValue = 0;
+                                settings.Properties.MaxValue = 99999;
+                                settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                                settings.Properties.DisplayFormatString = "F2";
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DecimalPlaces = 2;
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top; width: 107px;">
+                            @Html.DevExpress().Label(settings => { settings.Name = "PromoDeliveryBandsLbl"; settings.Text = "Delivery Bands"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                        </td>
+                        <td id="delivery-band-cell" colspan="3">
+                            @Html.Action("PromoCodeDeliveryBandPartial", "Promotions", new { promotionCodeID = Model.PromotionCodeID, priceListID = Model.PriceListID })
+                        </td>
+                    </tr>
+                </table>
+                <div style="clear: both;"></div>
+            </div>
+            <div id="free-gift">
+                <table id="free-gift-table">
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings => { settings.Name = "PromoFreeGiftLbl"; settings.Text = "Free Gift Product ID"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.Partial("Codes/PromoCodeFreeGiftProductIDComboBoxPartial", Model)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings => { settings.Name = "PromoFreeGiftQtyLbl"; settings.Text = "Free Gift Quantity"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().SpinEditFor(m => Model.FreeGiftQuantity, settings =>
+                            {
+                                settings.Properties.NumberType = SpinEditNumberType.Integer;
+                                settings.Properties.MinValue = 1;
+                                settings.Properties.MaxValue = System.Int32.MaxValue;
+                                settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                                settings.ShowModelErrors = true;
+                                
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+                <div style="clear: both;"></div>
+            </div>
+            <div id="gift-box">
+                <table id="gift-box-table">
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings => { settings.Name = "GiftBoxPriceIncLbl"; settings.Text = "Gift Box Price Inc"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().SpinEditFor(m => Model.GiftBoxPriceInc, settings =>
+                            {
+                                settings.Properties.MinValue = 0;
+                                settings.Properties.MaxValue = 99999;
+                                settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                                settings.Properties.DisplayFormatString = "F2";
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DecimalPlaces = 2;
+                                settings.ShowModelErrors = true;
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DevExpress().Label(settings => { settings.Name = "GiftBoxPriceExLbl"; settings.Text = "Gift Box Price Ex"; settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                        </td>
+                        <td>
+                            @Html.DevExpress().SpinEditFor(m => Model.GiftBoxPriceEx, settings =>
+                            {
+                                settings.Properties.MinValue = 0;
+                                settings.Properties.MaxValue = 99999;
+                                settings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                                settings.Properties.DisplayFormatString = "F2";
+                                settings.Properties.DisplayFormatInEditMode = true;
+                                settings.Properties.DecimalPlaces = 2;
+                                settings.ShowModelErrors = true;
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="member-restrictions-tab">
+            <table id="promo-code-member-segment-table">
+                <tr>
+                    <td style="vertical-align: top; width: 69px;">
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoMemberSegmentsLbl"; settings.Text = "Member Segments"; }).GetHtml()
+                    
+                        @if (((List<Flock.Models.MemberSegment>)Flock.ViewModels.LargeDatabaseDataProvider.GetMemberSegments()).Count == 0)
+                        {
+                            <div style="width: 100%; height: 100%; border: 1px solid #c0c0c0; padding: 7px 5px 6px 11px;">
+                                <p style="font-style: italic;">There are currently no member segments.</p>
+                            </div>
+                        }
+                        else
+                        {
+                            @Html.DevExpress().CheckBoxList(settings =>
+                    {
+                        settings.Name = "PromoCodeMemberSegmentsUnbound";
+                        settings.Properties.RepeatLayout = System.Web.UI.WebControls.RepeatLayout.Table;
+                        settings.Properties.RepeatDirection = System.Web.UI.WebControls.RepeatDirection.Horizontal;
+                        settings.Properties.RepeatColumns = 5;
+                        settings.Height = 250;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Properties.TextField = "Name";
+                        settings.Properties.ValueField = "MemberSegmentID";
+                        settings.Properties.ValueType = typeof(byte);
+                        settings.PreRender = (sender, e) =>
+                        {
+                            ASPxCheckBoxList cbl = (ASPxCheckBoxList)sender;
+                            foreach (ListEditItem item in cbl.Items)
+                            {
+                                item.Selected = Model.PromoCode_MemberSegments.Select(p => p.MemberSegmentID).Contains((byte)item.Value);
+                            }
+                        };
+                    }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetMemberSegments()).GetHtml()
+                        }   
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(settings => { settings.Name = "PromoMembersLbl"; settings.Text = "Member Restrictions"; }).GetHtml()
+                        <div id="member-restrictions" style="padding: 1em;">
+                            @Html.Partial("Codes/PromoCodeMemberRestrictionsPartial", Model.PromoCode_Members)
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            @Html.Partial("~/Views/Shared/MemberSearch.cshtml")
+
+            <div style="clear: both;"></div>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+
+<script type="text/javascript" id="dxss_1">
+    $("#primary-tab-container").tabs({});
+    $("#promotion-types").tabs({});
+
+    if ($('#product-panel-start-marker').children().length > 0) {
+        var d = $('#product-panel').detach();
+        $('#product-panel-target').append(d);
+        //$('#product-panel-target').show();
+    }
+
+    $("#primary-tab-container").css("opacity", "1.0");
+    $("#loading-text").remove();
+    $("#primary-tab-container-wrapper").css("height", "auto");
+</script>

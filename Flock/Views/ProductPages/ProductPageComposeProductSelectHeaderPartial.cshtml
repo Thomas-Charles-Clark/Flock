@@ -1,0 +1,18 @@
+﻿@model Flock.ViewModels.ProductSearchHeader
+<div class="content-panel-container">
+    <fieldset id="product-select-header">
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#product-select-header-inner').slideToggle('fast');">Product Page Selector (click to expand / contract)</legend>
+        <div id="product-select-header-inner" style="">
+            @Html.Action("ComposeProductPageHeaderProductTypeDropDownPartial", "ProductPages", Model)
+            @Html.Action("ComposeProductPageHeaderBrandDropDownPartial", "ProductPages", Model)
+            @Html.Action("ComposeProductPageHeaderLaunchDropDownPartial", "ProductPages", Model)
+            @Html.Action("ComposeProductPageHeaderWebStatusDropDownPartial", "ProductPages", Model)
+            @Html.Action("ComposeProductPageHeaderTemplateDropDownPartial", "ProductPages", Model)
+            <div id="product-page-header-product-page-drop-down-container">
+                @Html.Action("ComposeProductPageHeaderProductPageDropDownPartial", "ProductPages", Model)
+            </div>
+            <img id="product-page-header-searching-icon" class="searching-icon" src="~/Images/SystemIcons/searching-icon.gif" />
+            <div style="clear: both"></div>
+        </div>
+    </fieldset>
+</div>

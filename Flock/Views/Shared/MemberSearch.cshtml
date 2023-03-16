@@ -1,0 +1,110 @@
+﻿<div class="resource-panel-container" style="width: 555px; margin-bottom: 0; float: right;">
+    <fieldset id="member-search-fieldset">
+        <legend onclick="$('.hideable-dataview').slideUp('fast'); $('#member-dataview').slideToggle('fast'); " style="font-size: 1em;">Member Search (click to expand / contract)</legend>
+        <div id="member-dataview" class="hideable-dataview" style="">
+            <div style="padding: 1em 1em 0; background-color: white;">
+                @Html.DevExpress().TextBox(settings =>
+                {
+                    settings.Name = "SearchBox";
+                    settings.Properties.NullDisplayText = "Search";
+                    settings.Properties.NullText = "Search";
+                    settings.Width = 180;
+                    settings.Style.Add("margin-bottom", "20px");
+                    settings.Style.Add("margin-right", "1em");
+                    settings.Style.Add("float", "left");
+                    settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) {
+                        if(e.htmlEvent.keyCode == 13) {
+                            LoadingPanel.Show();
+                            $.ajax({
+                                url: '" + Url.Action("Search", "Members") + @"',
+                                type: 'GET',
+                                traditional: true,
+                                data: {
+                                    SearchString: s.GetValue(),
+                                    MemberSegmentID: MemberSegmentBox.GetValue()
+                                },
+                                success: function(data) {
+                                    LoadingPanel.Hide();
+                                    $('#member-search-data-view-container').html(data);
+                                },
+                                timeout: 20000
+                            });
+                        }
+                    }";
+                }).GetHtml()
+
+                @Html.DevExpress().ComboBox(settings =>
+               {
+                   settings.Name = "MemberSegmentBox";
+                   settings.Properties.NullDisplayText = "Member Segment";
+                   settings.Properties.NullText = "Member Segment";
+                   settings.Properties.ValueType = typeof(byte);
+                   settings.Properties.ValueField = "MemberSegmentID";
+                   settings.Properties.TextField = "Name";
+                   settings.Width = 180;
+                   settings.Style.Add("margin-bottom", "20px");
+                   settings.Style.Add("margin-right", "1em");
+                   settings.Style.Add("float", "left");
+               }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetMemberSegments()).GetHtml()
+
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "SearchBtn";
+                    settings.Text = "Search";
+                    settings.Width = 30;
+                    
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        if(SearchBox.GetValue() != null)
+                        {
+                            LoadingPanel.Show();
+                            $.ajax({
+                                url: '" + Url.Action("Search", "Members") + @"',
+                                type: 'GET',
+                                traditional: true,
+                                data: {
+                                    SearchString: SearchBox.GetValue(),
+                                    MemberSegmentID: MemberSegmentBox.GetValue()
+                                },
+                                success: function(data) {
+                                    LoadingPanel.Hide();
+                                    $('#member-search-data-view-container').html(data);
+                                },
+                                timeout: 20000
+                            });
+                        }
+                    }";
+                }).GetHtml()
+
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "ResetBtn";
+                    settings.Text = "Reset";
+                    settings.Width = 30;
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        SearchBox.SetValue(null)
+                        MemberSegmentBox.SetSelectedIndex(-1);
+                        LoadingPanel.Show();
+                        $.ajax({
+                            url: '" + Url.Action("Search", "Members") + @"',
+                            type: 'GET',
+                            traditional: true,
+                            data: {
+                                SearchString: SearchBox.GetValue(),
+                                MemberSegmentID: MemberSegmentBox.GetValue()
+                            },
+                            success: function(data) {
+                                $('#member-search-data-view-container').html(data);
+                                LoadingPanel.Hide();
+                            },
+                            timeout: 20000
+                        });
+                    }";
+                }).GetHtml()
+                <div style="clear: both;"></div>
+            </div>
+            <div id="member-search-data-view-container" style="background-color: white;">
+                @Html.Action("Search", "Members")
+            </div>
+        </div>
+    </fieldset>
+</div>

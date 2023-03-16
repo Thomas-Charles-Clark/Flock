@@ -1,0 +1,14 @@
+
+<!-- Google Analytics: eCommerce -->
+<script type="text/javascript">
+    ga('require', 'ecommerce');
+
+    ga('ecommerce:addTransaction', {
+        'id': '',
+        'affiliation': '',
+        'revenue': '@Html.Raw(basketTotalExVat)',
+        'shipping': '',
+        'tax': ''
+    });
+</script>
+<!-- End Google Analytics: eCommerce -->

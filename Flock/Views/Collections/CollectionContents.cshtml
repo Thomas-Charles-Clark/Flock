@@ -1,0 +1,97 @@
+﻿@model Flock.ViewModels.CollectionProductAssociationContentsViewModel
+
+@*
+
+    What do we have to do here...
+
+        We have to permit loading of suggestions from sproc
+        We have to permit editing of the loaded suggestions
+
+        A, B, C are assigned and also appear in suggestions
+
+        A, B, C, D, E, F, G appear when hitting 'suggest'.
+
+        We wish to remove G and E, without causing any errors
+
+*@
+<div class="content-panel-container">
+    <fieldset id="product-page-attributes-fieldset">
+        <legend onclick="" style="cursor: default;">
+            Collection Products
+            <span style="float: right; cursor: pointer; margin-right: 8px;" onclick="ClearCollectionProducts(); return false;">Clear</span>
+            <span style="float: right; cursor: pointer; margin-right: 8px;" onclick="ReloadCollectionProducts(); return false;">Reset</span>
+            <span style="float: right; cursor: pointer; margin-right: 8px;" onclick="LoadSuggestions(); return false;">Suggest</span>
+            @*<img style="float: right; width: 24px; margin-top: 4px; margin-right: 8px;" src="/images/systemicons/streamline/32/sync.png" onclick="AutoPopulate(); return false;" />*@
+            <img id="save-attribute-button" class="button" style="float: right; width: 24px; margin-top: 4px; margin-right: 8px; cursor: pointer;" src="/images/icons/32/save.png" onclick="SaveCollectionProducts(); return false" />
+            <img id="attribute-header-busy-icon" class="button" style="float: right; width: 24px; margin-top: 4px; display: none; margin-right: 8px; " src="/images/systemicons/busy-icon-grey.gif">
+        </legend>
+        <div style="background-color: white; padding: 1em; height: 1108px; overflow-y: scroll;" id="collection-contents-sortable" class="multisortable-container">
+            @if (Model.Products.Count() == 0)
+            {
+                <span id="collection-contents-placeholder" style="padding: 0; margin: 0; font-size: 12px; font-weight: 400;">Either there are no products to display, or you have not selected a collection yet using the grid above.</span>
+            }
+            else
+            {
+                for (int i = 0; i < Model.Products.Count(); i++)
+                {
+                    var statusColour = "black";
+                    switch (Model.Products[i].Status)
+                    {
+                        case 'C':
+                            statusColour = "green";
+                            break;
+                        case 'Y':
+                            statusColour = "#DEC400";
+                            break;
+                        case 'L':
+                            statusColour = "#DEC400";
+                            break;
+                        case 'D':
+                            statusColour = "red";
+                            break;
+                        default: break;
+                    }
+                    //if (i % 5 == 1)
+                    //{
+                    //    ViewContext.Writer.Write("<div style='display: table;'>");
+                    //}
+                    <div class="collection collection-content" data-product-id="@Model.Products[i].ProductID" data-i="@(i)">
+                        <div style="position: relative;" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                            @if (Model.Products[i].ImageID != null)
+                            {
+                                <img title="ImageID: @(Model.Products[i].ImageID)" style="width: 100%;" src="https://flock.designersguild.com/imagelibrary/239/@(Model.Products[i].ImageID).jpeg" /><img src="/Images/SystemIcons/remove-icon.png" class="image-remove-icon" alt="Remove" title="Remove" onclick="RemoveProductFromCollection(@(Model.Products[i].ProductID))" />
+                            }
+                            else
+                            {
+                                <img title="ImageID: @(Model.Products[i].ImageID)" style="width: 100%;" src="/Images/admin/image-not-set.png" /><img src="/Images/SystemIcons/remove-icon.png" class="image-remove-icon" alt="Remove" title="Remove" onclick="RemoveProductFromCollection(@(Model.Products[i].ProductID))" />
+                            }
+                        </div>
+                        <label style="font-size: 0.9em; line-height: inherit; display: block; margin-top: 4px; height: 24px;">@Model.Products[i].Name</label>
+                        @if (Model.Products[i].ProductPageID != null)
+                        {
+                            <label style="font-size: 0.9em; line-height: inherit; display: block;"><a href="/admin/productpages/compose/@Model.Products[i].ProductPageID">Product Page ID: @(Model.Products[i].ProductPageID)</a></label>
+                        }
+                        else
+                        {
+                            <label style="font-size: 0.9em; line-height: inherit; display: block;">&nbsp;</label>
+                        }
+                        <label style="font-size: 0.9em; line-height: inherit; display: block; margin-bottom: 1em; padding-bottom: 4px; border-bottom: 2px solid @(statusColour)">@Model.Products[i].Code</label>
+                        <div class="clearfix"></div>
+                    </div>
+                    //if (i % 5 == 0)
+                    //{
+                    //    ViewContext.Writer.Write("</div>");
+                    //}
+                 }
+            }
+        
+            
+            <div id="collection-contents-placeholder" style="clear: both;"></div>
+        </div>
+    </fieldset>
+</div>
+
+
+<script type="text/javascript">
+    initDragDrop();
+</script>

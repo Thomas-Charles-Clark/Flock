@@ -1,0 +1,112 @@
+﻿@model byte
+@Html.DevExpress().GridView(settings =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    
+    settings.Name = "AttributeGridView";
+    settings.CallbackRouteValues = new { Controller = "Attributes", Action = "AttributeGridViewPartial" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Attributes", Action = "AttributeGridViewAddNew" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Attributes", Action = "AttributeGridViewUpdate" };
+    settings.CustomActionRouteValues = new { Controller = "Attributes", Action = "AttributeGridViewCustomCommand" };
+    settings.SettingsBehavior.AllowGroup = false;
+    settings.SettingsBehavior.AllowSort = false;
+
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    //settings.Width = 350;
+
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['AttributeGroupID'] = " + Model + @";
+    }";
+    
+    settings.CommandColumn.Visible = true;
+
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+    settings.CommandColumn.VisibleIndex = 100;
+
+    settings.KeyFieldName = "AttributeID";
+
+
+    MVCxGridViewColumn IDColumn = new MVCxGridViewColumn();
+    IDColumn.Name = "AttributeID";
+    IDColumn.FieldName = "AttributeID";
+    IDColumn.Caption = "ID";
+    IDColumn.Width = 40;
+    IDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    IDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    IDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    IDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    settings.Columns.Add(IDColumn);
+
+    if (dataContext.GetRepository<Flock.Models.AttributeGroup>().GetAll().Where(p => p.AttributeGroupID == Model).Select(p => p.UseIcons).Single())
+    {
+        MVCxGridViewColumn ImageColumn = new MVCxGridViewColumn();
+        ImageColumn.Name = "ImageColumn";
+        ImageColumn.FieldName = "ImageColumn";
+        ImageColumn.Caption = "Icon";
+        ImageColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+        ImageColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ImageColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        ImageColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        ImageColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        ImageColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        ImageColumn.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<img src='https://flock.designersguild.com/images/icons/attributes/" + c.KeyValue + ".png' />");
+        });
+        settings.Columns.Add(ImageColumn);
+    }
+    
+    
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Name";
+    NameColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    NameColumn.Width = 180;
+    settings.Columns.Add(NameColumn);
+
+    MVCxGridViewColumn ShuffleColumn = new MVCxGridViewColumn();
+    ShuffleColumn.Name = "ShuffleColumn";
+    ShuffleColumn.FieldName = "ShuffleColumn";
+    ShuffleColumn.Caption = "Reorder";
+    ShuffleColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+    ShuffleColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    ShuffleColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    ShuffleColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    ShuffleColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+    ShuffleColumn.Width = 55;
+    ShuffleColumn.SetDataItemTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div>"
+            + "<img src='/images/icons/dxrip/shuffle-up.png' style='cursor: pointer; display: inline-block; margin-right: 1em;' onclick='AttributeGridView.PerformCallback({CommandType:\"MoveUp\", AttributeGroupID: " + Model + ",AttributeID: " + Convert.ToInt16(c.KeyValue) + "});' />"
+            + "<img src='/images/icons/dxrip/shuffle-down.png' style='cursor: pointer; display: inline-block;' onclick='AttributeGridView.PerformCallback({CommandType:\"MoveDown\", AttributeGroupID: " + Model + ", AttributeID: " + Convert.ToInt16(c.KeyValue) + "});' />"
+            + "<div style='clear: both;'></div></div>");
+    });
+    settings.Columns.Add(ShuffleColumn);
+
+    MVCxGridViewColumn SortOrderColumn = new MVCxGridViewColumn();
+    SortOrderColumn.Name = "SortOrder";
+    SortOrderColumn.FieldName = "SortOrder";
+    SortOrderColumn.Caption = "Sort Order";
+    SortOrderColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    SortOrderColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    SortOrderColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    SortOrderColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    SortOrderColumn.Width = 40;
+    SortOrderColumn.SortAscending();
+    settings.Columns.Add(SortOrderColumn);
+
+}).BindToLINQ("", "", (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var source = dataContext.GetRepository<Flock.Models.Attribute>().GetAll().Where(p => p.AttributeGroupID == Model);
+    e.QueryableSource = source;
+
+    e.KeyExpression = "AttributeID";
+}).GetHtml()

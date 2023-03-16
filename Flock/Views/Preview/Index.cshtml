@@ -1,0 +1,109 @@
+﻿@{
+    Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewBag.Title = "Preview";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: 1366px;
+            padding: 0 !important;
+        }
+    </style>
+}
+<h4 class="page-heading">Preview</h4>
+<div class="page-subheading">
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "PreviewURL";
+    settings.Width = 600;
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) {
+        if (e.htmlEvent.keyCode == 13) {
+            var d = DateOverride.GetDate();
+            var dO = pad(d.getDate(), 2) + pad((d.getMonth() + 1), 2) + d.getFullYear();
+            var o = [];
+            o.push('url');
+            o.push(PreviewURL.GetValue().replace('www', 'flock-preview').split('?')[0]);
+            o.push(dO);// + '?dateOverride=' + dO.toString();
+            document.getElementById('previewFrame').contentWindow.postMessage(o, '*');
+        }
+    }";
+}).GetHtml()
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "PreviewGoBtn";
+    settings.Height = 32;
+    settings.Text = "Go";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+    var d = DateOverride.GetDate();
+    var dO = pad(d.getDate(), 2) + pad((d.getMonth() + 1), 2) + d.getFullYear();
+    var o = [];
+    o.push('url');
+    o.push(PreviewURL.GetValue().replace('www', 'flock-preview').split('?')[0]);
+    o.push(dO);// + '?dateOverride=' + dO.toString();
+    document.getElementById('previewFrame').contentWindow.postMessage(o, '*');
+}";
+}).GetHtml()
+
+    @Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ResComboBox";
+    settings.Style.Add("float", "right");
+    settings.Style.Add("margin", "0 0 7px 0");
+    settings.Width = 100;
+    var p = settings.Properties as ComboBoxProperties;
+    p.Items.Add("1024", (short)1024);
+    p.Items.Add("1280", (short)1280);
+    p.Items.Add("1600", (short)1600);
+    p.Items.Add("2048", (short)2048);
+    p.TextField = "Name";
+    p.ValueField = "Value";
+    p.ValueType = typeof(short);
+    settings.SelectedIndex = 1;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        $('#container').css('width', s.GetValue()+'px');
+    }";
+}).GetHtml()
+    @Html.DevExpress().Label(settings =>
+{
+    settings.Name = "ResolutionLbl";
+    settings.Text = "Resolution";
+    settings.Style.Add("float", "right");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Style.Add("line-height", "32px");
+}).GetHtml()
+    @Html.DevExpress().DateEdit(settings =>
+{
+    settings.Name = "DateOverride";
+    settings.Date = DateTime.Now;
+    settings.Properties.AllowNull = false;
+    settings.Width = 90;
+    settings.Style.Add("float", "right");
+    settings.Style.Add("margin", "0 25px 7px 0");
+    settings.Properties.ClientSideEvents.DateChanged = @"function(s, e) {
+        var d = s.GetDate();
+        var dO = pad(d.getDate(), 2) + pad((d.getMonth() + 1), 2) + d.getFullYear();
+
+        var o = [];
+        o.push('date');
+        o.push(dO);
+
+        document.getElementById('previewFrame').contentWindow.postMessage(o, '*');
+    }";
+}).GetHtml()
+    @Html.DevExpress().Label(settings =>
+{
+    settings.Name = "DateOverrideLbl";
+    settings.Text = "Date Override";
+    settings.Style.Add("float", "right");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Style.Add("line-height", "32px");
+}).GetHtml()
+
+
+    <div style="clear: both;"></div>
+</div>
+<iframe id="previewFrame" src="https://flock-preview.designersguild.com" style="width: 100%; min-height: 840px;"></iframe>

@@ -1,0 +1,105 @@
+﻿@model List<Flock.Models.AdvertisingImage>
+
+<table class="images-table table-condensed table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Thumbnail</th>
+            <th>Web Quality</th>
+            <th>Print Quality</th>
+            <th>On Date</th>
+            <th>Off Date</th>
+            <th>Visible</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="controls">
+        <tr>
+            <td colspan="10">
+                <button class="btn btn-primary" id="add-new-btn" onclick="AddNewImagePopup.Show();"><span class="glyphicon glyphicon-plus-sign"></span> Add Image</button>
+            </td>
+        </tr>
+    </tbody>
+    <tbody id="images">
+        @foreach (var i in Model.OrderBy(p => p.SortOrder).ToList())
+        {
+            <tr id="image-record-@(i.AdvertisingImageID)" data-advertising-image-id="@(i.AdvertisingImageID)">
+                <td class="delete" onclick="OpenImageDeleteConfirmation(@(i.AdvertisingImageID))">
+                    <span class="glyphicon glyphicon-remove-circle" title="Delete"></span>
+                </td>
+                <td>@i.Name</td>
+                <td class="description">@i.Description</td>
+                @{
+                    if (i.ThumbnailFilename != null)
+                    {
+                        <td class="yes"><span class="glyphicon glyphicon-check"></span></td>
+                    }
+                    else
+                    {
+                        <td class="no"><span class="glyphicon glyphicon-unchecked"></span></td>
+                    }
+                    if (i.WebQualityFilename != null)
+                    {
+                        <td class="yes"><span class="glyphicon glyphicon-check"></span></td>
+                    }
+                    else
+                    {
+                        <td class="no"><span class="glyphicon glyphicon-unchecked"></span></td>
+                    }
+                    if (i.PrintQualityFilename != null)
+                    {
+                        <td class="yes"><span class="glyphicon glyphicon-check"></span></td>
+                    }
+                    else
+                    {
+                        <td class="no"><span class="glyphicon glyphicon-unchecked"></span></td>
+                    }
+                        }
+                        <td>@(i.OnDate.HasValue ? i.OnDate.Value.ToString("dd/MM/yyyy") : "")</td>
+                        <td>@(i.OffDate.HasValue ? i.OffDate.Value.ToString("dd/MM/yyyy") : "")</td>
+                        @{
+                    if ((i.ThumbnailFilename != null) &&
+                        (i.WebQualityFilename != null) &&
+                        (i.PrintQualityFilename != null) &&
+                        (i.WebEnabled == true))
+                    {
+                        <td class="yes"><span class="glyphicon glyphicon-check"></span></td>
+                    }
+                    else
+                    {
+                        <td class="no"><span class="glyphicon glyphicon-unchecked"></span></td>
+                    }
+                }
+                <td class="edit" onclick="OpenImageEditor(@(i.AdvertisingImageID))">
+                    <span class="glyphicon glyphicon-edit" title="Edit"></span>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tbody class="controls">
+        <tr>
+            <td colspan="10">
+                <button class="btn btn-primary" id="add-new-btn" onclick="AddNewImagePopup.Show();"><span class="glyphicon glyphicon-plus-sign"></span> Add Image</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    var fixHelper = function (e, ui) {
+        ui.children().each(function () {
+            $(this).width($(this).width());
+        });
+        return ui;
+    };
+    $("#images").sortable({
+        forcePlaceholderSize: true,
+        helper: fixHelper,
+        placeholder: 'ui-sortable-placeholder',
+        update: function (ev, ui) {
+            UpdateSortOrders();
+        }
+    })
+</script>

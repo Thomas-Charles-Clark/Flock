@@ -1,0 +1,57 @@
+﻿@model Flock.ViewModels.ArticleComposeViewModel
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#slideshow-list').slideToggle('fast'); $('#article-text-inner').slideToggle('fast')">Image &amp; Content</legend>
+        <div id="article-text-inner" style="background-color: white; padding: 1em; position: relative; display: block;">
+            <div>
+                <div style="float: left; width: 35%;">
+                    @Html.DevExpress().LabelFor(m => Model.Contents, settings =>
+                    {
+                        settings.Style.Add("margin-top", "0em");
+                        settings.Style.Add("margin-bottom", "8px");
+                        settings.Style.Add("font", "inherit");
+                    }).GetHtml()
+                    <div id="article-contents-editor-container">
+                        @Html.DevExpress().MemoFor(m => Model.Contents, settings =>
+                        {
+                            settings.Name = "ArticleText";
+                            settings.Properties.ClientInstanceName = "ArticleText";
+                            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                            settings.Height = System.Web.UI.WebControls.Unit.Pixel(565);
+                            settings.Style.Add("margin-bottom", "35px");
+                        }).GetHtml()
+                    </div>
+                </div>
+                <div style="float: right; width: 64%;">
+                    <span style="margin-bottom: 8px; display: inline-block;">Image</span>
+                    <img id="article-slideshow-busy" style="float: right; width: 20px;" class="busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                    <div style="clear: both;"></div>
+                    <div id="article-slideshow-container" style="padding: 0; overflow: auto;" class="droppable" data-article-id="@(Model.ArticleID)">
+                        <div id="slideshow-list" class="sortable-list" style="width: 100%; height: 100%;">
+                            @if (Model.Images.Where(p => p.TemplateImageID == 3).Count() > 0)
+                            {
+                                var i = Model.Images.Where(p => p.TemplateImageID == 3 && p.SortOrder == 0).Single();
+                                <div class="article-slideshow-placeholder" data-image-id="@(i.ImageID)" style="position: relative;" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                    <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveSingleImage(@(i.ImageID))" />
+                                    <img style="width: 100%;" src="https://flock.designersguild.com/imagelibrary/1024/@(i.ImageID).jpeg" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="margin: 1em 0 0 1em" class="article-slideshow-placeholder">
+                                    Image not set.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+            <img id="article-text-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; left: 10px;" onclick="SaveArticleText();" />
+        </div>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    if(typeof(InitPodDragDrop) == 'function')
+        InitPodDragDrop();
+</script>

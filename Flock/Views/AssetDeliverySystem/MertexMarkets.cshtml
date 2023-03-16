@@ -1,0 +1,97 @@
+﻿@model Flock.ViewModels.MertexMarketViewModel
+@{
+    ViewBag.Title = "Mertex Market Map";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/MertexMarkets.css")
+}
+<script type="text/javascript">
+    function ClearMarket(code) {
+        $.ajax({
+            url: '/admin/assetdeliverysystem/clearMarket',
+            type: 'POST',
+            data: {
+                Code: code
+            },
+            success: function (data) {
+                window["MertexMarket" + code.trim()].SetValue(null);
+                GreenFade($('#market-' + code.trim()));
+            }
+        });
+    }
+</script>
+<h4 class="page-heading">Mertex Market Map</h4>
+
+<table id="mertex-market-table" class="table table-striped table-bordered table-condensed">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th style="width: 144px;">Name</th>
+            <th style="width: 200px;">Country</th>
+            <th>Display Prices</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var m in Model.MertexMarkets)
+        {
+            string displayClass = "";
+            if(m.CountryID == null)
+            {
+                displayClass = "not-mapped";
+            }
+
+            <tr id="market-@(m.Code.TrimEnd())" class="@(displayClass)">
+                <td>@(m.Code)</td>
+                <td>@(m.Name)</td>
+                <td>
+                    @Html.DevExpress().ComboBoxFor(c => m.CountryID, settings =>
+                    {
+                        settings.Name = "MertexMarket" + m.Code.TrimEnd();
+                        settings.Properties.ValueType = typeof(short);
+                        settings.Properties.ValueField = "CountryID";
+                        settings.Properties.TextField = "Name";
+                        settings.Properties.NullText = "Not Mapped";
+                        settings.Properties.NullTextStyle.Font.Italic = true;
+                        settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                             $.ajax({
+                                url: '/admin/assetdeliverysystem/updateMertexMarket',
+                                type: 'POST',
+                                data: {
+                                    Code: '" + m.Code + @"',
+                                    CountryID: s.GetValue()
+                                },
+                                success: function(data) {
+                                    GreenFade($('#market-" + m.Code.TrimEnd() + @"'));
+                                }
+                            });
+                        }";
+                   settings.Style.Add("float", "left");
+               }).BindList(Model.AvailableCountries).GetHtml()
+                    <span class="remove-glyph glyphicon glyphicon-remove-circle" onclick="ClearMarket('@(m.Code)')"></span>
+                </td>
+                <td>
+                    @Html.DevExpress().CheckBoxFor(c => m.DisplayPrices, settings =>
+                    {
+                        settings.Name = "MertexMarket" + m.Code + "DisplayPrices";
+                        settings.Properties.ValueChecked = true;
+                        settings.Properties.ValueUnchecked = false;
+                        settings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                            $.ajax({
+                                url: '/admin/assetdeliverysystem/UpdateMarketDisplayPrices',
+                                type: 'POST',
+                                data: {
+                                    Code: '" + m.Code + @"',
+                                    DisplayPrices: s.GetValue()
+                                },
+                                success: function(data) { 
+                                    GreenFade($('#market-" + m.Code.TrimEnd() + @"'));
+                                }
+                            });
+                        }";
+                    }).GetHtml()
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

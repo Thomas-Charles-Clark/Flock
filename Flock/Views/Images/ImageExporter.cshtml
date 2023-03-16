@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "Image Exporter";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles{
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+    </style>
+}
+
+<h4 class="page-heading">
+    Image Exporter
+</h4>
+
+<div class="page-subheading">
+    @Html.Action("ImageExporterLaunchDropDownPartial", "Images")
+    @Html.DevExpress().Button(settings =>
+    {
+        settings.Name = "ImageExporterGoBtn";
+        settings.Text = "Export";
+        settings.Height = 35;
+        settings.ClientSideEvents.Click = @"function(s, e) {
+            if(ImageExporterLaunchListBox.GetSelectedValues() == null) {
+                return;
+            }
+            else
+            {
+                LoadingPanel.Show();
+                $.ajax({ 
+                    url: '" + @Url.Action("CreateLaunchExport", "Images") + @"',
+                    type: 'POST',
+                    traditional: true,
+                    data: { 
+                        LaunchIDs: ImageExporterLaunchListBox.GetSelectedValues().toString()
+                    },
+                    success: function(data) { 
+                        $('#ajax-target').html(data);
+                        LoadingPanel.Hide();
+                    },
+                    error: function(e, s, a) { 
+                        $.showError(e, s, a);
+                    },
+                    timeout: 600000
+                });
+            }
+        }";
+    }).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div id="ajax-target">
+
+</div>

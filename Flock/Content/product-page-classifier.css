@@ -1,0 +1,133 @@
+﻿#container {
+    width: 1900px;
+}
+
+.product-page-cell {
+
+}
+
+#attribute-group-dd-ajax-target {
+
+}
+
+.result-cell {
+    position:relative;
+    margin-bottom: 16px;
+}
+
+.result-cell > img {
+    border: 1px solid #c0c0c0;
+}
+
+.edit-icon {
+    position: absolute;
+    opacity: 0.0;
+}
+
+    .remove-icon:hover {
+        cursor: pointer;
+    }
+
+.compose-icon {
+    top: 1px;
+    right: 9px;
+}
+ 
+.attributes-icon {
+    left: 9px;
+    top: 1px;
+}
+
+.image-inspect-icon {
+    left: 9px;
+    bottom: 1px;
+}
+
+.config-wrap {
+    display: inline-block;
+    padding: 8px;
+    top: 40px;
+    left: 40px;
+    background-color: white;
+    z-index: 90;
+    min-width: 150px;
+}
+
+.config-part {
+    /*width: 40%;*/
+    padding-right: 6px;
+    float: left;
+    opacity: 1.0;
+}
+
+.attribute-holder {
+    margin-bottom: 2px;
+}
+
+.attibute-holder label {
+    padding: 1px;
+    margin-bottom: 2px;
+}
+
+.attribute-holder label input[type=radio] {
+    margin: 0 5px 0 0;
+}
+
+.config-part > .attribute-holder > input {
+    margin: 1px 3px 0 0;
+}
+
+.attribute-holder > input[type=radio] {
+    margin: 0;
+    margin-top: 1px;
+    margin-right: 6px;
+}
+
+.attribute-save-icon {
+    bottom: 17px;
+    right: 17px;
+    cursor: pointer;
+    width: 28px;
+}
+
+#result-count {
+    font-size: 0.9em;
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.toggle-button {
+    background-color: #555555;
+    border: 1px solid white;
+    cursor: pointer;
+    line-height: normal;
+    left: 40px;
+    margin: 0 auto;
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    top: 40%;
+    width: 75%;
+    padding: 8px;
+}
+
+.toggle-button table {
+    width: 100%;
+    color: white;
+    font-family: 'Gill Sans';
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.toggle-button td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 { 
+min-height: 1px;
+padding-left: 8px;
+padding-right: 8px;
+position: relative;
+}

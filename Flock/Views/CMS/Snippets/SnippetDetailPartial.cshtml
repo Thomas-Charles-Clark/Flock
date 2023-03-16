@@ -1,0 +1,111 @@
+﻿@using Flock.Models
+@using Flock.DAL
+@using Flock.ViewModels
+@model SnippetViewModel
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    
+<div class="content-panel-container">
+    <fieldset id="snippet-detail">
+        <legend style="color: black; border-bottom-color: #929292; cursor: default;">Snippet Details</legend>
+        <div id="snippet-detail-inner" style="background-color: white; padding: 1em; position: relative;">
+            @Html.DevExpress().Label(lblSettings =>
+       {
+           lblSettings.Name = "NameLbl";
+           lblSettings.Text = "Name";
+           lblSettings.Width = 70;
+           lblSettings.Style.Add("float", "left");
+           lblSettings.Style.Add("line-height", "32px");
+       }).GetHtml()
+            @Html.DevExpress().TextBoxFor(m => Model.Name, tbSettings =>
+       {
+           tbSettings.ShowModelErrors = true;
+           tbSettings.Properties.MaxLength = 50;
+           tbSettings.Width = 280;
+           tbSettings.Style.Add("float", "left");
+       }).GetHtml()
+            <div style="clear: both; width: 100%; height: 1em;"></div>
+
+            @Html.DevExpress().Label(lblSettings =>
+       {
+           lblSettings.Name = "LocationLbl";
+           lblSettings.Text = "Location";
+           lblSettings.Width = 70;
+           lblSettings.Style.Add("float", "left");
+           lblSettings.Style.Add("line-height", "32px");
+       }).GetHtml()
+            @Html.DevExpress().ComboBoxFor(m => Model.SnippetLocationID, cbSettings =>
+        {
+            cbSettings.Name = "SnippetLocationID";
+            cbSettings.Width = 280;
+            cbSettings.Properties.ValueField = "SnippetLocationID";
+            cbSettings.Properties.ValueType = typeof(byte);
+            cbSettings.Properties.TextField = "Name";
+            cbSettings.Style.Add("float", "left");
+        }).BindList(args =>
+        {
+            return LargeDatabaseDataProvider.GetSnippetLocations(args);
+        }, args => { return LargeDatabaseDataProvider.GetSnippetLocationByID(args); }).GetHtml()
+            <div style="clear: both;"></div>
+
+            <div style="clear: both; width: 100%; height: 1em;"></div>
+            @Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Name = "HtmlLbl";
+                lblSettings.Text = "HTML";
+                lblSettings.Width = 70;
+                lblSettings.Style.Add("float", "left");
+                lblSettings.Style.Add("line-height", "32px");
+            }).GetHtml()
+
+            @Html.Partial("Snippets/SnippetHTMLEditorPartial", Model.HTMLContent)
+
+            <div style="clear: both; width: 100%; height: 2em;"></div>
+            <div style="width: 50%; float: left; text-align: center;">                
+                @Html.DevExpress().Label(lblSettings =>
+                   {
+                       lblSettings.Name = "OnLbl";
+                       lblSettings.Text = "On Date";
+                       lblSettings.Width = 70;
+                       lblSettings.Style.Add("float", "left");
+                       lblSettings.Style.Add("line-height", "32px");
+                   }).GetHtml()
+                @Html.DevExpress().CalendarFor(m => Model.OnDate, settings =>
+                {
+                    settings.ShowModelErrors = true;
+                    settings.SelectedDate = DateTime.Now;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    settings.Properties.DisplayFormatString = "d";
+                }).GetHtml()
+                <div style="clear: both;"></div>
+            </div>
+            <div style="width: 50%; float: left; text-align: center;">                
+               @Html.DevExpress().Label(lblSettings =>
+               {
+                   lblSettings.Name = "OffLbl";
+                   lblSettings.Text = "Off Date";
+                   lblSettings.Width = 70;
+                   lblSettings.Style.Add("float", "left");
+                   lblSettings.Style.Add("line-height", "32px");
+               }).GetHtml()
+                @Html.DevExpress().CalendarFor(m => Model.OffDate, settings =>
+                {
+                    settings.Style.Add("margin-right", "5px");
+                    settings.ShowModelErrors = true;
+                    settings.SelectedDate = DateTime.Now.AddMonths(1);
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    settings.Properties.DisplayFormatString = "d";
+                }).GetHtml()
+                <div style="clear: both;"></div>
+            </div>           
+            <div style="clear: both; margin-bottom: 2em;"></div>
+
+            <div id="country-restriction-container" style="margin-bottom: 32px;">
+                @Html.Partial("Snippets/SnippetCountryRestrictionsPartial", Model.CountryRestrictions)
+            </div>
+            <div style="clear: both;"></div>
+            <img id="snippet-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveSnippetDetails();" />
+        </div>
+    </fieldset>
+</div>
+}

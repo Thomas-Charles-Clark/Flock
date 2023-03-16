@@ -1,0 +1,22 @@
+﻿h5 {
+    font: normal normal 700 11px/20px Verdana;
+    float: left;
+    height: 35px;
+    line-height: 34px;
+    margin: 0px;
+}
+
+#bulk-action-panel h4 { 
+    background-color: #E5E5E5;
+    border-bottom: 1px solid #C0C0C0;
+    color: black;
+    font: 700 11px/20px "Verdana";
+    margin-top: 0px;
+    padding: 1em;
+    float: none;
+}
+
+#ProductPricesGridContainer { 
+float: left;
+width: 85%;
+}

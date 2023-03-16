@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Mailing List Import";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/content/mailing-list-import.css")
+}
+@section scripts {
+    <script type="text/javascript">
+        function PerformMerge() {
+
+            $.confirm(function () {
+                LoadingPanel.Show();
+                $.ajax({
+                    url: '@Url.Action("Merge", "MailingListImport")',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        FileName: $("#file-name").val(),
+                        CountryID: CountryComboBox.GetValue(),
+                        LanguageID: LanguageComboBox.GetValue(),
+                        DotDigitalAccountID: DotDigitalAccountComboBox.GetValue(),
+                        ThirdPartyID: ThirdPartyComboBox.GetValue(),
+                        SendWelcomeEmail: false
+                    },
+                    success: function (data) {
+                        LoadingPanel.Hide();
+                        $("#merge-results-container").html(data);
+                    },
+                    timeout: 20000
+                });
+
+            }, null, null, 'This will begin the merge, please double check your parameters before proceeding.')
+
+        }
+    </script>
+}
+
+<h4 class="page-heading">Mailing List Import</h4>
+
+<div class="page-subheading">
+    @using (Html.BeginForm("UploadControlForm", "UploadControl", FormMethod.Post, new { id = "upload-form" }))
+    {
+        @Html.DevExpress().UploadControl(settings =>
+   {
+       settings.Name = "UploadControl";
+       settings.CallbackRouteValues = new { Controller = "MailingListImport", Action = "UploadControlUpload" };
+       settings.Style.Add("float", "left");
+       settings.Style.Add("margin-right", "1em");
+       settings.ShowUploadButton = false;
+       settings.ClientSideEvents.FilesUploadStart = @"function(s, e) {
+
+            }";
+       settings.ClientSideEvents.FileUploadComplete = @"function(s, e) {
+                $('#results-panel').html(e.callbackData);
+                ConfirmPermissionCheckbox.SetValue(false);
+            }";
+       //settings.AddUploadButtonsHorizontalPosition = AddUploadButtonsHorizontalPosition.InputRightSide;
+       settings.ShowProgressPanel = true;
+       settings.ValidationSettings.Assign(Flock.Controllers.MailingListImportControllerUploadControlSettings.UploadControlValidationSettings);
+
+   }).GetHtml()
+
+        @Html.DevExpress().Button(settings =>
+   {
+       settings.Name = "UploadButton";
+       settings.Text = "Upload";
+       settings.Style.Add("float", "left");
+       settings.Style.Add("padding", "4px 5px 3px 5px");
+       settings.Style.Add("margin-right", "2em");
+       settings.ClientSideEvents.Click = @"function (s, e) {
+    if (UploadControl.GetFileNames().length == 0) {
+    alert('Please select a file to upload');
+}
+    if (ConfirmPermissionCheckbox.GetValue())
+        UploadControl.Upload();
+    else
+        alert('Please confirm that the users you are importing have given us permission to send them marketing emails.');
+}";
+   }).GetHtml()
+
+        @Html.Partial("CountryComboBoxPartial")
+
+        @Html.Partial("LanguageComboBoxPartial")
+        
+        @Html.Partial("DotDigitalAccountComboBoxPartial")
+
+        @Html.Partial("ThirdPartyComboBoxPartial")
+
+        Html.ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+        @Html.DevExpress().Label(settings =>
+   {
+       settings.Name = "SendWelcomeEmailLabel";
+       settings.ClientVisible = false;
+       settings.Text = "Send Welcome Email";
+   }).GetHtml()
+        @Html.DevExpress().CheckBox(settings =>
+        {
+            settings.Name = "SendWelcomeEmailCheckbox";
+            settings.Properties.ValueChecked = true;
+            settings.Properties.ValueUnchecked = false;
+            settings.Checked = false;
+            settings.ClientVisible = false;
+        }).GetHtml()
+
+        @Html.DevExpress().Label(settings =>
+   {
+       settings.Name = "ConfirmPermissionCheckboxLabel";
+       settings.ClientVisible = true;
+       settings.Style.Add("float", "left");
+       settings.Style.Add("margin-top", "8px");
+       settings.Style.Add("margin-right", "4px");
+       settings.Text = "I confirm that these users have given us permission to send marketing emails to them.";
+   }).GetHtml()
+        @Html.DevExpress().CheckBox(settings =>
+   {
+       settings.Name = "ConfirmPermissionCheckbox";
+       settings.Properties.ValueChecked = true;
+       settings.Properties.ValueUnchecked = false;
+       settings.Checked = false;
+       settings.ClientVisible = true;
+       settings.Properties.ValidationSettings.CausesValidation = true;
+       settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+   }).GetHtml()
+    }
+    @*
+        Need to add a checkbox - unsaved - which simply demands acknowledgement from the user that the members being imported have given permission to be emailed.
+        Is this SendWelcomeEmailCheckbox doing anything? Do we want to remove it?
+    *@
+    <div style="clear: both;"></div>
+</div>
+
+<div id="mailing-list-helper" style="width: 1100px; margin: 0 auto;">
+    <span id="mailing-list-no" class="mailing-list-hint">&#10008;</span><img class="mailing-list-hint-img" src="/images/mailing-list-import-no.jpg">
+    <div style="clear: both;"></div>
+    <span id="mailing-list-yes" class="mailing-list-hint">&#10004;</span><img src="/images/mailing-list-import-yes.jpg">
+    <div style="clear: both;"></div>
+    <i>Please ensure that your data resides on the first Worksheet and that that Worksheet is named "Sheet1". (To rename a worksheet, right-click on the Worksheet tab at the bottom of the Excel window).</i>
+    <p style="margin-top: 15px; font-size: 14px;">
+        This process can take a while, especially if you're importing more than a few dozen contacts at once. After hitting the "Merge" button, <span style="text-decoration: underline; font-weight: bold">do not refresh the page</span> until the process is complete.
+    </p>
+</div>
+
+<div id="results-panel" style="width: 1100px; margin: 2em auto;">
+
+</div>

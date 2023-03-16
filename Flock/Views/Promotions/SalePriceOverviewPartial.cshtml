@@ -1,0 +1,30 @@
+﻿<div id="overview-container">
+
+    <div id="SalePriceGridContainer" style="width: auto;">
+        <div id="sale-price-grid-real-container" style="max-width: 2135px; float: left;">
+            @Html.Partial("_SalePriceGridView")
+        </div>
+        <div id="bulk-action-panel" style="width: 175px;">
+            <h4>Bulk Action Panel</h4>
+            <ul>
+                @*<li>
+                        <a href="javascript:;" title="Assign Market" onclick="$('#selection-dialog').dialog('option', 'title', 'Select Markets for Assignment'); $('#market-selection-dialog').data('action', 'Assignment'); OpenMarketSelect();">Assign to Markets</a>
+                    </li>*@
+                <li>
+                    <a href="javascript:;" title="Bulk Set Discount" onclick="OpenBulkDialog();">Bulk Set Discount</a>
+                </li>
+                @*<li>
+                        <a href="javascript:;" title="Delete" onclick="SaveBulk();">Save Bulk Changes</a>
+                    </li>*@
+                <li>
+                    <a href="javascript:;" title="Cancel Bulk Discount" onclick="CancelBulk();">Cancel Bulk Discount</a>
+                </li>
+                <li>
+                    <a href="javascript:;" title="Delete Selected Sale Prices" onclick="DeleteSelectedSalePrices()">Delete</a>
+                </li>
+            </ul>
+        </div>
+        <div style="clear: both"></div>
+    </div>
+    <div style="clear: both"></div>
+</div>

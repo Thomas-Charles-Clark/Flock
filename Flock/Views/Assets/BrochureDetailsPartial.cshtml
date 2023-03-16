@@ -1,0 +1,57 @@
+﻿@model Flock.ViewModels.BrochureDetailsViewModel
+@if(Model == null)
+{
+    <div class="content-panel-container">
+        <fieldset id="brochure-details-fieldset">
+            <legend style="color: black; border-bottom-color: #929292;">
+                Brochure Details
+                <span style="float: right; margin: 0 4px;"></span>
+            </legend>
+            <div id="brochure-details-section" style="background-color: white; padding: 1em;">
+            </div>
+        </fieldset>
+    </div>
+}
+else
+{
+    <div class="content-panel-container">
+        <fieldset id="brochure-details-fieldset">
+            <legend style="color: black; border-bottom-color: #929292;">
+                Brochure Details
+                <span style="float: right; margin: 0 4px;">ID: @(Model.BrochureID)</span>
+                <img id="brochure-details-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+            </legend>
+            <div id="brochure-details-section" style="background-color: white; padding: 1em;">
+                @Html.DevExpress().LabelFor(m => Model.Name, settings => { settings.Text = "Name"; }).GetHtml()
+                @Html.DevExpress().TextBoxFor(m => Model.Name).GetHtml()
+            
+                @Html.DevExpress().LabelFor(m => Model.Description, settings => { settings.Text = "Description"; }).GetHtml()
+                @Html.DevExpress().TextBoxFor(m => Model.Description).GetHtml()
+
+                @Html.DevExpress().LabelFor(m => Model.Code, settings => { settings.Text = "Product Code"; }).GetHtml()
+                @Html.DevExpress().TextBoxFor(m => Model.Code).GetHtml()
+
+                @Html.DevExpress().LabelFor(m => Model.FilePath, settings => { settings.Text = "File Path"; }).GetHtml()
+                @Html.DevExpress().TextBoxFor(m => Model.FilePath, settings => { settings.ReadOnly = true; }).GetHtml()
+
+                @Html.DevExpress().LabelFor(m => Model.CoverImagePath, settings => { settings.Text = "Cover Image Path"; }).GetHtml()
+                @Html.DevExpress().TextBoxFor(m => Model.CoverImagePath).GetHtml()
+
+                @Html.DevExpress().LabelFor(m => Model.InteractiveBrochureURL, settings => { settings.Text = "Interactive Brochure URL"; }).GetHtml()
+                @Html.DevExpress().TextBoxFor(m => Model.InteractiveBrochureURL, settings => { settings.ReadOnly = false; }).GetHtml()
+
+                @Html.DevExpress().LabelFor(m => Model.PDFPath, settings => { settings.Text = "PDF Path"; }).GetHtml()
+                @Html.DevExpress().TextBoxFor(m => Model.PDFPath, settings => { settings.ReadOnly = true; }).GetHtml()
+
+                @Html.DevExpress().LabelFor(m => Model.FileSizeMB, settings => { settings.Text = "File Size (MB)"; }).GetHtml()
+                @Html.DevExpress().TextBoxFor(m => Model.FileSizeMB, settings => { settings.ReadOnly = true; }).GetHtml()
+
+                @Html.DevExpress().LabelFor(m => Model.BrandID, settings => { settings.Text = "Brand ID"; }).GetHtml()
+                @Html.Action("BrochureDetailsBrandDropDownPartial", new { SelectedBrandID = Model.BrandID })
+
+                @Html.DevExpress().LabelFor(m => Model.LaunchID, settings => { settings.Text = "Launch ID"; }).GetHtml()
+                @Html.Action("BrochureDetailsLaunchDropDownPartial", new { SelectedLaunchID = Model.LaunchID })
+            </div>
+        </fieldset>
+    </div>
+}

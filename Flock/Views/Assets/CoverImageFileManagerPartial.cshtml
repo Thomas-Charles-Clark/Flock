@@ -1,0 +1,22 @@
+﻿@Html.DevExpress().FileManager(settings =>
+{
+    settings.Name = "CoverImageFileManager";
+    settings.CallbackRouteValues = new { Controller = "Assets", Action = "CoverImageFileManagerPartial" };
+    settings.Settings.AllowedFileExtensions = new String[] { ".jpg", ".jpeg", ".gif", ".png" };
+    settings.Settings.InitialFolder = "\\";
+    settings.SettingsUpload.Enabled = false;
+    settings.ClientVisible = true;
+    settings.Settings.ThumbnailFolder = Url.Content("~/Brochures");
+    settings.SettingsFileList.View = FileListView.Thumbnails;
+    settings.ClientSideEvents.CurrentFolderChanged = @"function(s, e) { 
+        InteractiveBrochureFileManager.SetCurrentFolderPath(s.GetCurrentFolderPath('/', true));
+        PDFFileManager.SetCurrentFolderPath(s.GetCurrentFolderPath('/', true));
+    }";
+
+    settings.ClientSideEvents.SelectedFileChanged = @"function(s, e) {
+        var s = e.file.GetFullName();
+        s = s.replace(new RegExp(/\\/g),'/');
+        s = s.substring(10, s.length);
+        CoverImagePath.SetText('http://brochures.designersguild.com/'+s);
+    }";
+}).BindToFolder("~/Brochures").GetHtml()

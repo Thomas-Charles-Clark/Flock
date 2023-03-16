@@ -1,0 +1,337 @@
+﻿@using Flock.ViewModels
+@model List<BasePageSection>
+
+@foreach (BasePageSection sect in Model)
+{
+    switch (sect.PageSectionTypeID)
+    {
+        case 1:
+            HTML_PageSection hps = sect as HTML_PageSection;
+            @Html.Partial("PageSection_HtmlPartial", hps)
+            break;
+        case 2:
+            Slideshow_PageSection sps = sect as Slideshow_PageSection;
+            <div id="page-section-@(sps.PageSectionID)" class="content-panel-container" data-slideshow-id="@(sps.SlideshowID)" data-page-section-type="@(sps.PageSectionTypeID)" style="width: 986px;" data-page-section-id="@(sps.PageSectionID)">
+                @Html.Partial("PageSection_SlideshowPartial", sps)
+            </div>
+            break;
+        case 3:
+            @*Form*@
+            Form_PageSection fps = sect as Form_PageSection;
+            <div id="page-section-@(fps.PageSectionID)-update-target" class="content-panel-container" data-form-id="@(fps.FormID)" data-page-section-type="@(fps.PageSectionTypeID)" data-page-section-id="@(sect.PageSectionID)" style="position: relative;">
+                @Html.Partial("PageSection_FormPartial", fps)
+            </div>
+            break;
+        case 4:
+            @*Product Page Grid*@
+            <div class="content-panel-container" data-page-section-type="@(sect.PageSectionTypeID)" data-page-section-id="@(sect.PageSectionID)">
+                <fieldset>
+                    <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
+                        Product Page Grid @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+                        <span style="margin: 0 4px;">Page Section ID: @(sect.PageSectionID)</span>
+                        <img id="page-section-@(sect.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(sect.PageSectionID));" />
+                        <img id="page-section-@(sect.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="pagesection-@(sect.PageSectionID)-clone" src="~/Images/icons/32/o_collection/element_copy.png" class="pagesection-clone-icon" title="Clone Page Section" onclick="event.stopPropagation(); $('#clone-popup-page-section-id').val(@(sect.PageSectionID)); ClonePageSectionPopup.Show();" />
+                        <img id="pagesection-@(sect.PageSectionID)-merge" src="/images/icons/32/o_collection/copy.png" class="pagesection-copy-icon" alt="copyto" title="Copy Products To" onclick="event.stopPropagation(); $('#merge-productpages-page-section-id').val(@(sect.PageSectionID)); MergeGridPopup.Show();" />
+                        <img id="page-section-@(sect.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                    </legend>
+                    <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
+                        @Html.Partial("PageSectionHeaderDetails", sect)
+                    </div>
+                    <div data-page-section-id="@(sect.PageSectionID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
+                        @Html.Partial("CountryLanguageRestrictionPartial", sect.CountryLanguageRestrictions)
+                    </div>
+                    <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
+                        <div id="page-section-@(sect.PageSectionID)-grid" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)" style="padding-left: 0" class="product-page-grid-container multisortable-container">
+                            @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Action("LoadProductPageGrid", new { sect.PageSectionID }))
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+
+                <div id="page-section-@(sect.PageSectionID)-advanced-settings" class="page-section-advanced-container">
+                    @Html.DevExpress().Label(settings => { settings.Text = "Display Multiple Pod Images?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.MultiplePodImages, settings => { settings.Name = "PageSection" + sect.PageSectionID + "MultiplePodImages"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "MultiplePodImages"; }).GetHtml()
+                    <div style="clear: both;"></div>
+                    @Html.DevExpress().Label(settings => { settings.Text = "Display Filters?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.ShowFilters, settings => { settings.Name = "PageSection" + sect.PageSectionID + "DisplayFilters"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "DisplayFilters"; }).GetHtml()
+                    <div style="clear: both;"></div>
+                    @Html.DevExpress().Label(settings => { settings.Text = "Is this a Lifestyle Gallery?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.IsLifestyleGallery, settings => { settings.Name = "PageSection" + sect.PageSectionID + "IsLifestyle"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "IsLifestyle"; }).GetHtml()
+                    <div style="clear: both;"></div>
+                    @Html.DevExpress().Label(settings => { settings.Text = "Display Paging?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.Paging, settings => { settings.Name = "PageSection" + sect.PageSectionID + "Paging"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "Paging"; }).GetHtml()
+                    <div style="clear: both;"></div>
+                    @Html.DevExpress().Label(settings => { settings.Text = "Preview Colourways?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.PreviewColourways, settings => { settings.Name = "PageSection" + sect.PageSectionID + "PreviewColourways"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "PreviewColourways"; }).GetHtml()
+                    <div style="clear: both;"></div>
+                    @Html.DevExpress().Label(settings => { settings.Text = "Preview Colourways Circular Clip?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.PreviewColourwaysCircularClip, settings => { settings.Name = "PageSection" + sect.PageSectionID + "PreviewColourwaysCircularClip"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "PreviewColourwaysCircularClip"; }).GetHtml()
+                </div>
+            </div>
+            break;
+        case 5:
+            @*Collection Grid*@
+            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+                <fieldset>
+                    <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
+                        Collection Grid @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+                        <span style="margin: 0 4px;">Page Section ID: @(sect.PageSectionID)</span>
+
+                        <img id="page-section-@(sect.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(sect.PageSectionID));" />
+                        <img id="page-section-@(sect.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="pagesection-@(sect.PageSectionID)-clone" src="~/Images/icons/32/o_collection/element_copy.png" class="pagesection-clone-icon" title="Clone Page Section" onclick="event.stopPropagation(); $('#clone-popup-page-section-id').val(@(sect.PageSectionID)); ClonePageSectionPopup.Show();" />
+                        <img id="page-section-@(sect.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                    </legend>
+                    <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
+                        @Html.Partial("PageSectionHeaderDetails", sect)
+                    </div>
+                    <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
+                        <div id="page-section-@(sect.PageSectionID)-grid" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)" class="collection-grid-container">
+                            @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Action("LoadCollectionGrid", new { sect.PageSectionID }))
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+
+                <div id="page-section-@(sect.PageSectionID)-advanced-settings" class="page-section-advanced-container">
+                    @Html.DevExpress().Label(settings => { settings.Text = "Display Multiple Pod Images?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.MultiplePodImages, settings => { settings.Name = "PageSection" + sect.PageSectionID + "MultiplePodImages"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "MultiplePodImages"; }).GetHtml()
+                </div>
+            </div>
+            break;
+        case 6:
+            @*Page Grid*@
+            <div class="content-panel-container" data-page-section-type="@(sect.PageSectionTypeID)" data-page-section-id="@(sect.PageSectionID)">
+                <fieldset>
+                    <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
+                        Page Grid @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+                        <span style="margin: 0 4px;">Page Section ID: @(sect.PageSectionID)</span>
+
+                        <img id="page-section-@(sect.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(sect.PageSectionID));" />
+                        <img id="page-section-@(sect.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="pagesection-@(sect.PageSectionID)-clone" src="~/Images/icons/32/o_collection/element_copy.png" class="pagesection-clone-icon" title="Clone Page Section" onclick="event.stopPropagation(); $('#clone-popup-page-section-id').val(@(sect.PageSectionID)); ClonePageSectionPopup.Show();" />
+                        <img id="page-section-@(sect.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                    </legend>
+                    <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
+                        @Html.Partial("PageSectionHeaderDetails", sect)
+                    </div>
+                    <div data-page-section-id="@(sect.PageSectionID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
+                        @Html.Partial("CountryLanguageRestrictionPartial", sect.CountryLanguageRestrictions)
+                    </div>
+                    <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
+                        <div id="page-section-@(sect.PageSectionID)-grid" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)" class="page-grid-container">
+                            @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Action("LoadPageGrid", new { sect.PageSectionID }))
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+
+                <div id="page-section-@(sect.PageSectionID)-advanced-settings" class="page-section-advanced-container">
+                    @Html.DevExpress().Label(settings => { settings.Text = "Display Multiple Pod Images?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.MultiplePodImages, settings => { settings.Name = "PageSection" + sect.PageSectionID + "MultiplePodImages"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "MultiplePodImages"; }).GetHtml()
+                </div>
+            </div>
+            break;
+            case 7:
+            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+                <fieldset>
+                    <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
+                        Brochure @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+                        <span style="margin: 0 4px;">Page Section ID: @(sect.PageSectionID)</span>
+
+                        <img id="page-section-@(sect.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(sect.PageSectionID));" />
+                        <img id="page-section-@(sect.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                    </legend>
+                    <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
+                        @Html.Partial("PageSectionHeaderDetails", sect)
+                    </div>
+                    <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
+                        <div id="brochure-section-@(sect.PageSectionID)" style="position: relative;" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)">
+                            @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Action("PageSectionBrochure", new { sect.PageSectionID }))
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+            </div>
+            break;
+            case 8:
+            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+                <fieldset>
+                    <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
+                        Banner Location Group @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+                        <span style="margin: 0 4px;">Page Section ID: @(sect.PageSectionID)</span>
+
+                        <img id="page-section-@(sect.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(sect.PageSectionID));" />
+                        <img id="page-section-@(sect.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                    </legend>
+                    <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
+                        @Html.Partial("PageSectionHeaderDetails", sect)
+                    </div>
+                    <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
+                        <div id="brochure-section-@(sect.PageSectionID)" style="position: relative;" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)">
+                            @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Partial("PageSection_BannerLocationGroup", (BannerLocation_PageSection)sect))
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+            </div>
+            break;
+        case 9:
+            @*Article Grid*@
+            <div class="content-panel-container" data-page-section-type="@(sect.PageSectionTypeID)" data-page-section-id="@(sect.PageSectionID)">
+                <fieldset>
+                    <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
+                        Article Grid @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+                        <span style="margin: 0 4px;">Page Section ID: @(sect.PageSectionID)</span>
+
+                        <img id="page-section-@(sect.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(sect.PageSectionID));" />
+                        <img id="page-section-@(sect.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="pagesection-@(sect.PageSectionID)-clone" src="~/Images/icons/32/o_collection/element_copy.png" class="pagesection-clone-icon" title="Clone Page Section" onclick="event.stopPropagation(); $('#clone-popup-page-section-id').val(@(sect.PageSectionID)); ClonePageSectionPopup.Show();" />
+                        <img id="page-section-@(sect.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                    </legend>
+                    <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
+                        @Html.Partial("PageSectionHeaderDetails", sect)
+                    </div>
+                    <div data-page-section-id="@(sect.PageSectionID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
+                        @Html.Partial("CountryLanguageRestrictionPartial", sect.CountryLanguageRestrictions)
+                    </div>
+                    <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
+                        <div id="page-section-@(sect.PageSectionID)-grid" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)" class="article-grid-container">
+                            @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Action("LoadArticleGrid", new { sect.PageSectionID }))
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+
+                <div id="page-section-@(sect.PageSectionID)-advanced-settings" class="page-section-advanced-container">
+                    @Html.DevExpress().Label(settings => { settings.Text = "Display Multiple Pod Images?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.MultiplePodImages, settings => { settings.Name = "PageSection" + sect.PageSectionID + "MultiplePodImages"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "MultiplePodImages"; }).GetHtml()
+                    <div style="clear: both;"></div>
+                    @Html.DevExpress().Label(settings => { settings.Text = "Auto Populate?"; }).GetHtml()
+                    @Html.DevExpress().CheckBoxFor(m => sect.ArticleAutoPopulate, settings => { settings.Name = "PageSection" + sect.PageSectionID + "AutoPopulate"; settings.Properties.ClientInstanceName = "PageSection" + sect.PageSectionID + "AutoPopulate"; }).GetHtml()
+                </div>
+            </div>
+            break;
+        case 10:
+        <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+            <fieldset>
+                <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
+                    Video @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+                    <span style="margin: 0 4px;">Page Section ID: @(sect.PageSectionID)</span>
+
+                    <img id="page-section-@(sect.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(sect.PageSectionID));" />
+                    <img id="page-section-@(sect.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                    <img id="page-section-@(sect.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                    <img id="page-section-@(sect.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                </legend>
+                <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
+                    @Html.Partial("PageSectionHeaderDetails", sect)
+                </div>
+                <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
+                    <div id="video-section-@(sect.PageSectionID)" style="position: relative;" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)">
+                        @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Partial("PageSection_Video", sect))
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+            break;
+            
+        case 11:
+            @* Masonry not implemented. *@
+            break;
+
+        case 12:
+            Animation_PageSection aps = sect as Animation_PageSection;
+            <div id="page-section-@(aps.PageSectionID)" class="content-panel-container" data-animation-id="@(aps.Animation == null ? "" : aps.Animation.AnimationID.ToString())" data-page-section-type="@(aps.PageSectionTypeID)" style="width: 986px;" data-page-section-id="@(aps.PageSectionID)">
+                @Html.Partial("PageSection_Animation", aps)
+            </div>
+            break;
+        case 13:
+            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+                <fieldset>
+                    <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
+                        Bespoke Content @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+                        <span style="margin: 0 4px;">Page Section ID: @(sect.PageSectionID)</span>
+
+                        <img id="page-section-@(sect.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(sect.PageSectionID));" />
+                        <img id="page-section-@(sect.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(sect.PageSectionID), @(sect.PageSectionTypeID));" />
+                        <img id="page-section-@(sect.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                    </legend>
+                    <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
+                        @Html.Partial("PageSectionHeaderDetails", sect)
+                    </div>
+                    <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
+                        <div id="bespoke-content-section-@(sect.PageSectionID)" style="position: relative;" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)">
+                            [Bespoke Content]
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+            </div>
+            break;
+
+        default:
+            break;
+    }
+}
+@if(ViewBag.IsUserShuffling != null)
+{
+    if (ViewBag.IsUserShuffling)
+    {
+        <script type="text/javascript">
+            $("#page-sections-container").sortable({
+                helper: 'clone',
+                scroll: false,
+                placeholder: "ui-state-highlight-pagesection",
+                update: function (ev, ui) {
+                    UpdatePageSectionSortOrder();
+                }
+            });
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+            //if (typeof (InitPodDragDrop) == "function")
+            //    InitPodDragDrop();
+            if (typeof (InitCountryDragDrop) == "function")
+                InitCountryDragDrop();
+            if (typeof (InitSlideshowDragDrop) == "function")
+                InitSlideshowDragDrop();
+            if (typeof (InitProductPagesDragDrop) == "function")
+                InitProductPagesDragDrop();
+            if (typeof (InitCollectionDragDrop) == "function")
+                InitCollectionDragDrop();
+            if (typeof (InitPageDragDrop) == "function")
+                InitPageDragDrop();
+        </script>
+    }
+}
+else
+{
+    <script type="text/javascript">
+        if (typeof (InitPodDragDrop) == "function")
+            InitPodDragDrop();
+        if (typeof (InitCountryDragDrop) == "function")
+            InitCountryDragDrop();
+        if (typeof (InitSlideshowDragDrop) == "function")
+            InitSlideshowDragDrop();
+        if (typeof (InitProductPagesDragDrop) == "function")
+            InitProductPagesDragDrop();
+        if (typeof (InitCollectionDragDrop) == "function")
+            InitCollectionDragDrop();
+        if (typeof (InitPageDragDrop) == "function")
+            InitPageDragDrop();
+    </script>
+}

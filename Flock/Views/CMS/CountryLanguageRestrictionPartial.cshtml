@@ -1,0 +1,32 @@
+﻿@model List<Flock.Models.PageSection_Country_Language>
+@if (Model.Count == 0)
+{
+    <div class="country-restriction-section" style="padding: 1em; border: 1px solid #c0c0c0; min-height: 108px; position: relative;">
+        <div class="country-restriction-placeholder" style="font-size: 1.0em; background-color: white;">
+            By default, PageSections are available to all countries.<br /><br />Only add countries to this list if you want to restrict which countries can view this PageSection.
+        </div>
+    </div>
+}
+else
+{
+    <div class="country-restriction-section" style="padding: 1em; border: 1px solid #c0c0c0; min-height: 108px; position: relative;">
+        <span style="position: absolute; top: 6px; right: 6px; line-height: 130%; cursor: pointer;" onclick="var container = $(this).parent().parent(); var toEmpty = $(this).parent(); $.confirm(function () { toEmpty.empty(); UpdatePageSectionCountryRestrictions(container) }, function () { })">Remove All</span>
+
+        @foreach (var restriction in Model)
+        {
+            <div class="country-restriction-flag" style="width: 65px; height: 84px" data-country-id="@(restriction.Country.CountryID)" data-language-id="@(restriction.Language.LanguageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                <img class="flag" style="width: 30px; height: 30px;" src="~/Images/Icons/CountryFlags/30px/@(restriction.Country.CountryID).png" title="@(restriction.Country.LocalName)" />
+                <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="var container = $(this).parent().parent().parent(); $(this).parent().remove(); UpdatePageSectionCountryRestrictions(container)" />
+                <br />
+                <label style="margin-top: 5px">@(restriction.Country.LocalName) - @(restriction.Language.Name)</label>
+            </div>
+        }
+        <div class="country-restriction-placeholder" style="clear: both;"></div>
+    </div>
+}
+<div style='clear: both'></div>
+
+<script type="text/javascript">
+    if (typeof (InitCountryDragDrop) == "function")
+        InitCountryDragDrop();
+</script>

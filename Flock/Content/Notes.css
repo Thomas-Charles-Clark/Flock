@@ -1,0 +1,23 @@
+﻿
+        #container {
+            width: 100%;
+            max-width: 1440px;
+        }
+
+#ajax-target {
+
+}
+
+.notes-memo-container {
+    width: 50%;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#save-btn {
+    width: 200px;
+    margin-top: 1em;
+    float: right;
+}

@@ -1,0 +1,99 @@
+﻿@{
+    Layout = null;
+}
+@model List<Flock.Models.Style>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+        settings.Name = "StyleDD";
+        settings.Text = "Style";
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+        if (action == "ImageSearchStyleDropDownPartial")
+        {
+            settings.Name = "ImageSearchStyleDD";
+            settings.ClientEnabled = false;
+        }
+        
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='Style-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/StyleListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "ImageSearchStyleDropDownPartial")
+                    {
+                        buttonSettings.Name = "ImageSearchStyleButtonClear";
+                        buttonSettings.Text = "Clear";
+                        buttonSettings.Style.Add("float", "left");
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ImageSearchStyleListBox.UnselectAll();
+                            ImageSearchStyleDD.HideDropDown(); 
+                            ImageSearchStyleDD.SetText('Style');
+                            $('#image-searching-icon').fadeIn('fast');
+                            $.ajax({
+                                url: '" + Url.Action("ImageSearch", "Images") + @"',
+                                traditional: true,
+                                data: { 
+                                    ProductType: ImageSearchProductTypeListBox.GetValue(),
+                                    Brand: ImageSearchBrandListBox.GetValue(),
+                                    Launch: ImageSearchLaunchListBox.GetValue(),
+                                    Collection: ImageSearchCollectionListBox.GetValue(),
+                                    AspectRatio: ImageSearchAspectRatioListBox.GetValue(),
+                                    ImageType: ImageSearchImageTypeListBox.GetValue(),
+                                    Perspective: ImageSearchPerspectiveListBox.GetValue(),
+                                    HotspotStatus: ImageSearchHotspotStatusListBox.GetValue(),
+                                    Colour: ImageSearchColourListBox.GetValue(),
+                                    Room: ImageSearchRoomListBox.GetValue(),
+                                    Style: ImageSearchStyleListBox.GetValue(),
+                                    NameOrID: ImageSearchNameOrIDTextBox.GetValue(),
+                                    SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue(),
+                                    Resolution: ResolutionListBox.GetValue()
+                                },
+                                success: function(data) {
+                                    $('#image-data-view-container').html(data);
+                                    $('#image-searching-icon').fadeOut('slow');
+                                },
+                                error: function(e, s, a) {
+                                    $('#image-searching-icon').fadeOut('slow');
+                                    alert(e.responseText);
+                                },
+                                timeout: 60000
+                            });
+                        }";
+                    }
+                }
+            )
+            .Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "ImageSearchStyleDropDownPartial")
+                    {
+                        buttonSettings.Name = "ImageSearchStyleButtonClose";
+                        buttonSettings.Text = "Close";
+                        buttonSettings.Style.Add("float", "right");
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ImageSearchStyleDD.HideDropDown();
+                        }";
+                    }
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

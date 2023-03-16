@@ -1,0 +1,453 @@
+﻿@using Flock.Models
+@using Flock.DAL
+@model Flock.ViewModels.BrochureViewModel
+
+@{
+    using (var DAL = new UnitOfWork<FlockDataContext>())
+    {
+        <div>
+            <div class="content-panel-container">
+                <fieldset>
+                    <legend style="color: black; cursor: default; border-bottom-color: #929292;">Brochure Details</legend>
+                    <div id="brochure-select-header-inner" style="background-color: white; padding: 1em;">
+                        <div style='width: 100%; margin-top: 0.5em;'>
+                            <div style='width: 60%; float: left'>
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "NameLbl";
+                                    lbl.Text = "Name";
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Style.Add("text-align", "right");
+                                    lbl.Width = 60;
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.AssociatedControlName = "Name";
+                                }).GetHtml()
+                                @Html.DevExpress().TextBoxFor(m => Model.Name, txb =>
+                                {
+                                    txb.ControlStyle.CssClass = "editor";
+                                    txb.Width = 428;
+                                }).GetHtml()
+                                <div style='clear:both'></div>
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "DescLbl";
+                                    lbl.Text = "Description";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Width = 60;
+                                    lbl.Style.Add("text-align", "right");
+                                    lbl.AssociatedControlName = "Description";
+                                }).GetHtml()
+                                @Html.DevExpress().TextBoxFor(m => Model.Description, txb =>
+                                {
+                                    txb.ControlStyle.CssClass = "editor";
+                                    txb.Width = 428;
+                                }).GetHtml()
+                                <div style='clear:both'></div>
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "CodeLbl";
+                                    lbl.Text = "Code";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Width = 60;
+                                    lbl.Style.Add("text-align", "right");
+                                    lbl.AssociatedControlName = "Code";
+                                }).GetHtml()
+                                @Html.DevExpress().TextBoxFor(m => Model.Code, txb =>
+                                {
+                                    txb.ControlStyle.CssClass = "editor";
+                                    txb.Width = 214;
+                                    txb.ShowModelErrors = true;
+                                }).GetHtml()
+                                <div style='clear:both'></div>
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "CIPLbl";
+                                    lbl.Text = "Cover Image Path";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("display", "block");
+                                    lbl.Style.Add("margin-top", "1em");
+                                    lbl.Style.Add("margin-bottom", "0");
+                                    lbl.Style.Add("text-align", "left");
+                                    lbl.AssociatedControlName = "CoverImagePath";
+                                }).GetHtml()
+                                @Html.DevExpress().TextBoxFor(m => Model.CoverImagePath, tbSettings =>
+                                {
+                                    tbSettings.ReadOnly = true;
+                                    tbSettings.Style.Add("float", "left");
+                                    tbSettings.ControlStyle.CssClass = "editor";
+                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Pixel(413);
+                                }).GetHtml()
+                                @Html.DevExpress().Button(buttonSettings =>
+                                {
+                                    buttonSettings.Name = "CoverImageButton";
+                                    buttonSettings.Text = "Select";
+                                    buttonSettings.Height = 32;
+                                    buttonSettings.Style.Add("float", "left");
+                                    buttonSettings.Style.Add("margin", "0 0 0 12px");
+                                    buttonSettings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                                    buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                                        CoverImageFileManager.SetClientVisible(true);
+                                        $('#cover-image-dialog').dialog('open');
+                                    }";
+                                }).GetHtml()
+                                <div style='clear:both'></div>
+
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "PDFLbl";
+                                    lbl.Text = "PDF Path";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("margin-bottom", "0");
+                                    lbl.Style.Add("display", "block");
+                                    lbl.Style.Add("margin-top", "1em");
+                                    lbl.Style.Add("text-align", "left");
+                                    lbl.AssociatedControlName = "PDFPath";
+                                }).GetHtml()
+                                @Html.DevExpress().TextBoxFor(m => Model.PDFPath, tbSettings =>
+                                {
+                                    tbSettings.ReadOnly = true;
+                                    tbSettings.Style.Add("float", "left");
+                                    tbSettings.ControlStyle.CssClass = "editor";
+                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Pixel(413);
+                                }).GetHtml()
+                                @Html.DevExpress().Button(buttonSettings =>
+                                {
+                                    buttonSettings.Name = "PDFPathButton";
+                                    buttonSettings.Text = "Select";
+                                    buttonSettings.Height = 32;
+                                    buttonSettings.Style.Add("float", "left");
+                                    buttonSettings.Style.Add("margin", "0 0 0 12px");
+                                    buttonSettings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                                    buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                                        PDFFileManager.SetClientVisible(true);
+                                        $('#pdf-dialog').dialog('open');
+                                    }";
+                                }).GetHtml()
+                                <div style='clear:both'></div>
+
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "IBPLbl";
+                                    lbl.Text = "Interactive Brochure Path";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("margin-bottom", "0");
+                                    lbl.Style.Add("display", "block");
+                                    lbl.Style.Add("margin-top", "1em");
+                                    lbl.Style.Add("text-align", "left");
+                                    lbl.AssociatedControlName = "InteractiveBrochureURL";
+                                }).GetHtml()
+                                @Html.DevExpress().TextBoxFor(m => Model.InteractiveBrochureURL, tbSettings =>
+                                {
+                                    tbSettings.ReadOnly = false;
+                                    tbSettings.Style.Add("float", "left");
+                                    tbSettings.ControlStyle.CssClass = "editor";
+                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Pixel(413);
+                                }).GetHtml()
+                                @Html.DevExpress().Button(buttonSettings =>
+                                {
+                                    buttonSettings.Name = "InteractiveBrochureURLButton";
+                                    buttonSettings.Text = "Select";
+                                    buttonSettings.Height = 32;
+                                    buttonSettings.Style.Add("float", "left");
+                                    buttonSettings.Style.Add("margin", "0 0 0 12px");
+                                    buttonSettings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                                    buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                                        InteractiveBrochureFileManager.SetClientVisible(true);
+                                        $('#interactive-brochure-dialog').dialog('open');
+                                    }";
+                                }).GetHtml()
+                                <div style='clear:both'></div>
+                                <div style='width: 100%; height: 2em'></div>
+
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "PTLbl";
+                                    lbl.Text = "Product Types";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Width = 76;
+                                    lbl.Style.Add("text-align", "right");
+                                    lbl.AssociatedControlName = "ProductTypesDD";
+                                }).GetHtml()
+                                @Html.DevExpress().DropDownEdit(dd =>
+                                {
+                                    dd.Name = "ProductTypesDD";
+                                    dd.Style.Add("float", "left");
+                                    dd.Style.Add("margin", "0 7px 7px 0");
+                                    dd.Text = "Product Types";
+                                    dd.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+                                    dd.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                                    dd.SetDropDownWindowTemplateContent(s =>
+                                    {
+                                        ViewContext.Writer.Write("<div id='product-types-listbox'>");
+                                        Html.DevExpress().ListBox(lb =>
+                                        {
+                                            lb.Name = "ProductTypesListBox";
+                                            lb.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                            lb.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+                                            lb.Properties.ValueType = typeof(byte);
+                                            lb.Properties.ValueField = "ProductTypeID";
+                                            lb.Properties.TextField = "Name";
+                                            lb.PreRender = (sender, ev) =>
+                                            {
+                                                foreach (Brochure_ProductType BPT in DAL.GetRepository<Brochure_ProductType>
+                                                    ().GetAll().Where(p => p.BrochureID == Model.BrochureID))
+                                                {
+                                                    ((MVCxListBox)sender).Properties.Items.FindByValue(BPT.ProductTypeID).Selected = true;
+                                                }
+                                            };
+                                        }).BindList(DAL.GetRepository<ProductType>().GetAll().ToList()).Render();
+                                        ViewContext.Writer.Write("</div>");
+                                        ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+                                        Html.DevExpress().Button(
+                                        buttonSettings =>
+                                        {
+                                            buttonSettings.Name = "ProductTypesButtonClose";
+                                            buttonSettings.Text = "Close";
+                                            buttonSettings.Style.Add("float", "right");
+                                            buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                                                ProductTypesDD.HideDropDown();
+                                            }";
+                                        }).Render();
+                                        ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+                                    });
+                                }).GetHtml()
+
+                                <div style='clear:both'></div>
+
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "LaunchLbl";
+                                    lbl.Text = "Launch";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Width = 76;
+                                    lbl.Style.Add("text-align", "right");
+                                }).GetHtml()
+                                @Html.DevExpress().ComboBoxFor(m => Model.LaunchID,
+                                edtSettings =>
+                                {
+                                    edtSettings.ControlStyle.CssClass = "editor";
+                                    edtSettings.Properties.TextField = "Name";
+                                    edtSettings.Properties.ValueField = "LaunchID";
+                                    edtSettings.Properties.ValueType = typeof(short);
+                                    edtSettings.Style.Add("margin", "0 7px 7px 0");
+                                    edtSettings.ShowModelErrors = true;
+                                }).BindList(DAL.GetRepository<Launch>().GetAll().OrderByDescending(p => p.LaunchDate).ToList()).GetHtml()
+
+                                <div style='clear:both'></div>
+
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "BrandLbl";
+                                    lbl.Text = "Brand";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Width = 76;
+                                    lbl.Style.Add("text-align", "right");
+                                    lbl.AssociatedControlName = "Brand";
+                                }).GetHtml()
+                                @Html.DevExpress().ComboBoxFor(m => Model.BrandID,
+                                edtSettings =>
+                                {
+                                    edtSettings.Name = "BrandID";
+                                    edtSettings.ControlStyle.CssClass = "editor";
+                                    edtSettings.Properties.TextField = "Name";
+                                    edtSettings.Properties.ValueField = "BrandID";
+                                    edtSettings.Properties.ValueType = typeof(byte);
+                                    edtSettings.ShowModelErrors = true;
+                                }).BindList(DAL.GetRepository<Brand>().GetAll().ToList()).GetHtml()
+
+                                <div style='clear:both'></div>
+
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "LGLbl";
+                                    lbl.Text = "Languages";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Width = 76;
+                                    lbl.Style.Add("text-align", "right");
+                                    lbl.AssociatedControlName = "LanguagesDD";
+                                }).GetHtml()
+                                @Html.DevExpress().DropDownEdit(dd =>
+                                {
+                                    dd.Name = "LanguagesDD";
+                                    dd.Style.Add("float", "left");
+                                    dd.Style.Add("margin", "0 7px 7px 0");
+                                    dd.Text = "Languages";
+                                    dd.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+                                    dd.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                                    dd.SetDropDownWindowTemplateContent(s =>
+                                    {
+                                        ViewContext.Writer.Write("<div id='languages-listbox'>");
+                                        Html.DevExpress().ListBox(lb =>
+                                        {
+                                            lb.Name = "LanguagesListBox";
+                                            lb.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                            lb.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+                                            lb.Properties.ValueType = typeof(byte);
+                                            lb.Properties.ValueField = "LanguageID";
+                                            lb.Properties.TextField = "Name";
+                                            lb.PreRender = (sender, ev) =>
+                                            {
+                                                foreach (Brochure_Language BL in DAL.GetRepository<Brochure_Language>
+                                                    ().GetAll().Where(p => p.BrochureID == Model.BrochureID))
+                                                {
+                                                    ((MVCxListBox)sender).Properties.Items.FindByValue(BL.LanguageID).Selected = true;
+                                                }
+                                            };
+                                        }).BindList(DAL.GetRepository<Language>().GetAll().ToList()).Render();
+                                        ViewContext.Writer.Write("</div>");
+                                        ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+                                        Html.DevExpress().Button(
+                                        buttonSettings =>
+                                        {
+                                            buttonSettings.Name = "LanguagesButtonClose";
+                                            buttonSettings.Text = "Close";
+                                            buttonSettings.Style.Add("float", "right");
+                                            buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                                                LanguagesDD.HideDropDown();
+                                            }";
+                                        }).Render();
+                                        ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+                                    });
+                                }).GetHtml()
+
+                                <div style='clear:both'></div>
+
+                                @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "CountriesLbl";
+                                    lbl.Text = "Countries";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Style.Add("margin-top", "1em");
+                                    lbl.Style.Add("width", "150px");
+                                    lbl.Style.Add("text-align", "right");
+                                }).GetHtml()
+                                @Html.DevExpress().HyperLink(lnk =>
+                           {
+                               lnk.Style.Add("line-height", "32px");
+                               lnk.Style.Add("float", "left");
+                               lnk.Style.Add("margin-right", "1em");
+                               lnk.Style.Add("margin-top", "1em");
+                               lnk.Style.Add("width", "150px");
+                               lnk.Style.Add("text-align", "right");
+                               lnk.Name = "RemoveCountriesLnk";
+                               lnk.NavigateUrl = "javascript:;";
+                               lnk.Properties.Text = "Remove All";
+                               lnk.Properties.ClientSideEvents.Click = @"function(s, e) {
+                                        RemoveAllCountryRestrictions();
+                                    }";
+                           }).GetHtml()
+                                @{
+        var CountriesPreModel = DAL.GetRepository<Brochure_Country>().GetAll().Where(p => p.BrochureID == Model.BrochureID).Select(p => p.CountryID).ToList();
+        var CountriesModel = DAL.GetRepository<Country>().GetAll().Where(p => CountriesPreModel.Contains(p.CountryID)).ToList();
+        ViewContext.Writer.Write("<div id='country-restriction-container' style='border: 1px solid #cdcdcd; margin-top: 0px; float: left; width: 500px;'>");
+        ViewContext.Writer.Write(Html.Partial("BrochureCountryRestrictionsPartial", CountriesModel).ToHtmlString());
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</div>");
+                                }
+
+                                <div style='width: 40%; float: left; margin-bottom: 1em;'>
+
+                                    @Html.DevExpress().Label(lbl =>
+                                {
+                                    lbl.Name = "OnDateLbl";
+                                    lbl.Text = "On Date";
+                                    lbl.Style.Add("line-height", "32px");
+                                    lbl.Style.Add("float", "left");
+                                    lbl.Style.Add("margin-top", "110px");
+                                    lbl.Style.Add("margin-right", "1em");
+                                    lbl.Style.Add("width", "50px");
+                                    lbl.Style.Add("text-align", "right");
+                                    lbl.AssociatedControlName = "OnDate";
+                                }).GetHtml()
+                                    @Html.DevExpress().CalendarFor(m => Model.OnDate,
+                                edtSettings =>
+                                {
+                                    edtSettings.ControlStyle.CssClass = "editor";
+                                    edtSettings.ShowModelErrors = true;
+                                    edtSettings.Properties.DisplayFormatString = "d";
+                                    edtSettings.Properties.NullDisplayText = "Not Set";
+                                    edtSettings.Style.Add("margin", "1em auto");
+                                }).GetHtml()
+                                    <div style='clear:both'></div>
+                                    <div style='width: 100%; height: 20px;'></div>
+                                    @Html.DevExpress().Label(lbl =>
+                                    {
+                                        lbl.Name = "OffDateLbl";
+                                        lbl.Text = "Off Date";
+                                        lbl.Style.Add("line-height", "32px");
+                                        lbl.Style.Add("float", "left");
+                                        lbl.Style.Add("margin-top", "110px");
+                                        lbl.Style.Add("margin-right", "1em");
+                                        lbl.Style.Add("width", "50px");
+                                        lbl.Style.Add("text-align", "right");
+                                        lbl.AssociatedControlName = "OffDate";
+                                    }).GetHtml()
+                                    @Html.DevExpress().CalendarFor(m => Model.OffDate,
+                                    edtSettings =>
+                                    {
+                                        edtSettings.ControlStyle.CssClass = "editor";
+                                        edtSettings.ShowModelErrors = true;
+                                        edtSettings.Properties.DisplayFormatString = "d";
+                                        edtSettings.Properties.NullDisplayText = "Not Set";
+                                        edtSettings.Style.Add("margin", "1em auto");
+                                    }).GetHtml()
+                                    <div style='clear:both'></div>
+                                </div>
+                                @{
+        var i = Convert.ToByte(Model.StatusID);
+        string colour = "black";
+        string statusText = "unknown";
+        statusText = DAL.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+        switch (i)
+        {
+            case 0:
+                colour = "green";
+                break;
+            case 1:
+                colour = "orange";
+                break;
+            case 2:
+                colour = "orange";
+                break;
+            case 3:
+                colour = "green";
+                break;
+            case 4:
+                colour = "red";
+                break;
+            default: break;
+        }
+        string res = "<span style='font-size: 1.1em; margin-top: 2em; display: inline-block;'>Web Status: </span><span style='margin-left: 0.5em; margin-top: 2em; font-size: 1.1em; display: inline-block; color: " + colour + " '>" + statusText + "</span>";
+        ViewContext.Writer.Write(res);
+                                }
+                                <div style='clear:both'></div>
+                                <div style='position: relative;'>
+                                    <img id="brochure-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 0px; right: 0px;" onclick="SaveBrochureDetails();" />
+                                </div>
+                            </div>
+                            <div style="clear: both"></div>
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                    <div style="clear: both"></div>
+                </fieldset>
+
+            </div>
+        </div>
+    }
+}

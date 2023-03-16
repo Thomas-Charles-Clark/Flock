@@ -1,0 +1,20 @@
+﻿@using Flock.ViewModels
+@model Module_ModuleOptionsViewModel
+
+<input id="selected-module-id" type="hidden" value="@(Model.ModuleID)"/>
+
+<h5 class="page-heading">Module Options</h5>
+
+<div id="module-options-grid-container">
+    @Html.Action("ModuleOptionGridViewPartial", new { ModuleID = Model.ModuleID })
+</div>
+
+<div id="module-options-sorter">
+    @Html.Partial("Modules/_ModuleOptionSorterPartial", Model)
+</div>
+
+<h5 class="page-heading">Module Option Groups</h5>
+
+<div id="module-option-group-grid-container">
+    @Html.Action("ModuleOptionGroupGridViewPartial")
+</div>

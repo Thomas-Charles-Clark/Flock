@@ -1,0 +1,120 @@
+﻿@using Flock.Models
+@using Flock.DAL
+@model List<Product>
+<script type="text/javascript">
+    function ToggleAll(ele) {
+        $(':checkbox[name=associated-selector]').prop('checked', ele.checked);
+    }
+</script>
+<input id="associated-products-count" type="hidden" value="@(Model.Count)" />
+@if (Model.Count == 0)
+{
+    <h5>There are no Primary Products associated to this Product Page.</h5>
+}
+else 
+{
+    @*@Html.DevExpress().GridView(settings => { }).GetHtml()*@
+    
+    
+    <table id="attribute-sync-table">
+        <thead>
+            <tr>
+                @*<th id="select-all">
+                    <input type="checkbox" onchange="ToggleAll(this);" checked />
+                </th>*@
+                <th>
+                    ID
+                </th>
+                <th>
+                    Code
+                </th>
+                <th style ="width: 140px;">
+                    Name
+                </th>
+                <th>
+                    Launch
+                </th>
+                <th>
+                    Design
+                </th>
+                <th>
+                    Product Type
+                </th>
+                <th>
+                    Brand
+                </th>
+                <th>
+                    Colour(s)
+                </th>
+                <th>
+                    Pattern(s)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+    using (var UoW = new UnitOfWork<FlockDataContext>())
+    {
+        foreach (Product p in Model)
+        {
+            <tr>
+                @*<td>
+                        <input type="checkbox" data-product-id="@(p.ProductID)" name="associated-selector" checked/>
+                    </td>*@
+                <td>
+                    @p.ProductID
+                </td>
+                <td>
+                    @p.Code
+                </td>
+                <td>
+                    @p.Name
+                </td>
+                <td>
+                    @if (p.LaunchID != null && p.LaunchID != 0)
+                    {
+                        ViewContext.Writer.Write(UoW.GetRepository<Launch>().GetAll().Where(x => x.LaunchID == p.LaunchID).Select(x => x.Name).Single());
+                    }
+                </td>
+                <td>
+                    @if (p.DesignID != null && p.DesignID != 0)
+                    {
+                        ViewContext.Writer.Write(UoW.GetRepository<Design>().GetAll().Where(x => x.DesignID == p.DesignID).Select(x => x.Name).Single());
+                    }
+                </td>
+                <td>
+                    @(UoW.GetRepository<ProductType>().GetAll().Where(x => x.ProductTypeID == p.ProductTypeID).Select(x => x.Name).Single())
+                </td>
+                <td>
+                    @if (p.BrandID != null && p.BrandID != 0)
+                    {
+                        ViewContext.Writer.Write(UoW.GetRepository<Brand>().GetAll().Where(x => x.BrandID == p.BrandID).Select(x => x.Name).Single());
+                    }
+                </td>
+                <td>
+                    @{
+                        var ColourIDs = UoW.GetRepository<Product_Colour>().GetAll().Where(x => x.ProductID == p.ProductID).Select(x => x.ColourID).ToList();
+                        var Colours = UoW.GetRepository<Colour>().GetAll().Where(x => ColourIDs.Contains(x.ColourID)).Select(x => x.Name).ToList();
+                        foreach (string s in Colours)
+                        {
+                            ViewContext.Writer.Write(s + "<br/>");
+                        }
+                    }
+                </td>
+                <td>
+                    @{
+                        var PatternIDs = UoW.GetRepository<Product_Pattern>().GetAll().Where(x => x.ProductID == p.ProductID).Select(x => x.PatternID).ToList();
+                        var Patterns = UoW.GetRepository<Pattern>().GetAll().Where(x => PatternIDs.Contains(x.PatternID)).Select(x => x.Name).ToList();
+                        foreach (string s in Patterns)
+                        {
+                            ViewContext.Writer.Write(s + "<br/>");
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    }
+}
+        </tbody>
+    </table>
+}

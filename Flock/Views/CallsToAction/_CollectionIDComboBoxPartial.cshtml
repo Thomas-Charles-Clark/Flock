@@ -1,0 +1,24 @@
+﻿@model Flock.ViewModels.CallToActionEditModel
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "CollectionID";
+    settings.CallbackRouteValues = new { Controller = "CallsToAction", Action = "CollectionIDComboBoxPartial" };
+    settings.ShowModelErrors = true;
+    settings.Properties.Caption = "Collection ID";
+    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Name";
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "CollectionID";
+    settings.Properties.ValueType = typeof(short);
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.IncrementalFilteringDelay = 1000;
+    settings.Properties.NullText = "Type to search...";
+    settings.Width = 226;
+    settings.Properties.DropDownWidth = 350;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.Properties.Columns.Add("CollectionID", "Collection ID", 80);
+    settings.Properties.Columns.Add("Name", "Name", 270);
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetCollectionIDs, Flock.ViewModels.LargeDatabaseDataProvider.GetCollectionByID).Bind(Model == null ? null : Model.CollectionID).GetHtml()

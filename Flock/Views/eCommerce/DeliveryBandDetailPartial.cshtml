@@ -1,0 +1,352 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@model Flock.ViewModels.DeliveryBandViewModel
+
+    <div style="float: left; width: 100%;">
+    <div style="width: 100%;">
+        <div id="delivery-band-detail-container">
+            <div class="content-panel-container">
+                <fieldset id="delivery-band-detail">
+                    <legend style="color: black; border-bottom-color: #929292; cursor: default;">
+                        Delivery Band Details
+                        <span style="margin-right: 10px; float: right;">Delivery Band ID: @(Model.DeliveryBandID)</span>
+                    </legend>
+                    <div id="delivery-band-detail-inner" style="background-color: white;">
+                        <div id="delivery-band-detail-container">
+                            @{
+                                var UoW = new UnitOfWork<FlockDataContext>();
+
+                                Html.HiddenFor(m => Model.CourierID, new { id = "selected-courier-id" });
+                                Html.HiddenFor(m => Model.PriceListID, new { id = "selected-pricelist-id" });
+
+                                <table id='DeliveryBandGridView_DXEFT' class='dxgvEditFormTable_MetropolisBlue' style='width:100%;'>
+                                    <tbody>
+                                        <tr>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue'>
+                                                @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "NameLbl";
+                                                    lblSettings.Text = "Name";
+                                                }).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>
+                                                @Html.DevExpress().TextBox(tbSettings =>
+                                                {
+                                                    tbSettings.Name = "Name";
+                                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    tbSettings.Properties.MaxLength = 50;
+                                                    tbSettings.ShowModelErrors = true;
+                                                    tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                }).Bind(Model.Name).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue'>
+                                                @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "DisplayNameLbl";
+                                                    lblSettings.Text = "Display Name";
+                                                }).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>
+                                                @Html.DevExpress().TextBox(tbSettings =>
+                                                {
+                                                    tbSettings.Name = "DisplayName";
+                                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    tbSettings.Properties.MaxLength = 50;
+                                                    tbSettings.ShowModelErrors = true;
+                                                    tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                }).Bind(Model.DisplayName).GetHtml()
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue'>
+                                                @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "CarrCodeLbl";
+                                                    lblSettings.Text = "CARRCODE";
+                                                }).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>
+                                                @Html.DevExpress().TextBox(tbSettings =>
+                                           {
+                                               tbSettings.Name = "CARRCODE";
+                                               tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                               tbSettings.Properties.MaxLength = 10;
+                                               tbSettings.ShowModelErrors = true;
+                                               tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                           }).Bind(Model.CARRCODE).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue'>
+                                                @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "SortOrderLbl";
+                                                    lblSettings.Text = "Sort Order";
+                                                }).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>
+                                                @Html.DevExpress().TextBox(tbSettings =>
+                                                {
+                                                    tbSettings.Name = "SortOrder";
+                                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    tbSettings.Properties.MaxLength = 3;
+                                                    tbSettings.ShowModelErrors = true;
+                                                    tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                }).Bind(Model.SortOrder).GetHtml()
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4">
+                                                <table style="width: 100%;">
+                                                    <tr>
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue' style="padding-right: 6px;">
+                                                            @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "WeekdayStartLbl";
+                                                    lblSettings.Text = "Weekday Start";
+                                                }).GetHtml()
+                                                        </td>
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='25%;'>
+                                                            @Html.DevExpress().ComboBox(cbSettings =>
+                                                {
+                                                    cbSettings.Name = "WeekdayStart";
+                                                    cbSettings.Properties.Items.Add("Monday", (byte)2);
+                                                    cbSettings.Properties.Items.Add("Tuesday", (byte)3);
+                                                    cbSettings.Properties.Items.Add("Wednesday", (byte)4);
+                                                    cbSettings.Properties.Items.Add("Thursday", (byte)5);
+                                                    cbSettings.Properties.Items.Add("Friday", (byte)6);
+                                                    cbSettings.Properties.Items.Add("Saturday", (byte)7);
+                                                    cbSettings.Properties.Items.Add("Sunday", (byte)1);
+                                                    cbSettings.Properties.ValueType = typeof(byte);
+                                                    cbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                }).Bind(Model.WeekdayStart).GetHtml()
+                                                        </td>
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue'>
+                                                            @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "WeekdayEndLbl";
+                                                    lblSettings.Text = "Weekday End";
+                                                }).GetHtml()
+                                                        </td>
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='25%;'>
+                                                            @Html.DevExpress().ComboBox(cbSettings =>
+                                                {
+                                                    cbSettings.Name = "WeekdayEnd";
+                                                    cbSettings.Properties.Items.Add("Monday", (byte)2);
+                                                    cbSettings.Properties.Items.Add("Tuesday", (byte)3);
+                                                    cbSettings.Properties.Items.Add("Wednesday", (byte)4);
+                                                    cbSettings.Properties.Items.Add("Thursday", (byte)5);
+                                                    cbSettings.Properties.Items.Add("Friday", (byte)6);
+                                                    cbSettings.Properties.Items.Add("Saturday", (byte)7);
+                                                    cbSettings.Properties.Items.Add("Sunday", (byte)1);
+                                                    cbSettings.Properties.ValueType = typeof(byte);
+                                                    cbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                }).Bind(Model.WeekdayEnd).GetHtml()
+                                                        </td>
+
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue'>
+                                                            @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "DaysToDeliverMinLbl";
+                                                    lblSettings.Text = "Days To Deliver Min";
+                                                }).GetHtml()
+                                                        </td>
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='25%;'>
+                                                            @Html.DevExpress().TextBox(tbSettings =>
+                                                {
+                                                    tbSettings.Name = "DaysToDeliverMin";
+                                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    tbSettings.Properties.MaxLength = 2;
+                                                    tbSettings.ShowModelErrors = true;
+                                                    tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                }).Bind(Model.DaysToDeliverMin).GetHtml()
+                                                        </td>
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue'>
+                                                            @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "DaysToDeliverMaxLbl";
+                                                    lblSettings.Text = "Days To Deliver Max";
+                                                }).GetHtml()
+                                                        </td>
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='25%;'>
+                                                            @Html.DevExpress().TextBox(tbSettings =>
+                                                {
+                                                    tbSettings.Name = "DaysToDeliverMax";
+                                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    tbSettings.Properties.MaxLength = 2;
+                                                    tbSettings.ShowModelErrors = true;
+                                                    tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                }).Bind(Model.DaysToDeliverMax).GetHtml()
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4">
+                                                <table style="width: 100%;">
+                                                    <tr>
+                                                        <td class="dxgvEditFormCaption_MetropolisBlue" style="width: 91px;">
+                                                            @Html.DevExpress().Label(lblSettings =>
+                                                            {
+                                                                lblSettings.Name = "CutOffLbl";
+                                                                lblSettings.Text = "Cut Off";
+                                                            }).GetHtml()
+                                                        </td>
+                                                        <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='25%;'>
+                                                            @Html.DevExpress().TimeEdit(teSettings =>
+                                                            {
+                                                                teSettings.Name = "CutOff";
+                                                                teSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                                teSettings.ShowModelErrors = true;
+
+                                                                teSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                            }).Bind(Model.CutOff).GetHtml()
+                                                        </td>
+                                                        <td class="dxgvEditFormCaption_MetropolisBlue" colspan="6"></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' style='vertical-align: top;'>
+                                                @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "DeliveryZonesLbl";
+                                                    lblSettings.Text = "Delivery Zones";
+                                                }).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;' style='vertical-align: top;'>
+                                                <div>
+                                                    <table>
+                                                        @foreach (var dz in Model.AllowedDeliveryZones)
+                                                        {
+                                                            <tr>
+                                                                <td style='padding: 2px;'>
+                                                                    <input style='margin-top: 0;' value='@(dz.DeliveryZoneID)' type='checkbox' name='delivery-zones' @(Model.AssignedDeliveryZones.Contains(dz) ? "checked='checked'" : "") />
+                                                                </td>
+                                                                <td style='padding: 2px;'>
+                                                                    @(dz.Name)
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </div>
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' style='vertical-align: top;'>
+                                                @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "StockLocationTblLbl";
+                                                    lblSettings.Text = "Stock Locations";
+                                                }).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;' style='vertical-align: top;'>
+                                                <table>
+                                                    @foreach (var sl in Model.AllowedStockLocations)
+                                                    {
+                                                        <tr>
+                                                            <td style='padding: 2px;'>
+                                                                <input style='margin-top: 0;' value='@(sl.StockLocationID)' type='checkbox' name='stock-locations' @(Model.AssignedStockLocations.Contains(sl) ? "checked='checked'" : "") />
+                                                            </td>
+                                                            <td style='padding: 2px;'>
+                                                                @(sl.Name)
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' colspan='8' rowspan='1' width='100%;' style='text-align: right;'>
+                                                @Html.DevExpress().Button(
+                                                btnSettings =>
+                                                {
+                                                    btnSettings.Name = "btnUpdate";
+                                                    btnSettings.ControlStyle.CssClass = "button";
+                                                    btnSettings.Text = "Save";
+                                                    btnSettings.Style.Add("margin-right", "20px");
+                                                    btnSettings.ClientSideEvents.Click = @"function(s, e){
+                                                        LoadingPanel.Show();
+
+                                                        var deliveryZones = '';
+                                                        $('input[name=delivery-zones]:checked').each(function() {
+                                                            deliveryZones += $(this).val() + ',';
+                                                        });
+
+                                                        deliveryZones = deliveryZones.replace(/,+$/, '');
+
+                                                        var stockLocations = '';
+                                                        $('input[name=stock-locations]:checked').each(function() {
+                                                            stockLocations += $(this).val() + ',';
+                                                        });
+
+                                                        stockLocations = stockLocations.replace(/,+$/, '');
+                                                        var cutOff = CutOff.GetValue();
+                                                        if(cutOff != null)
+                                                            cutOff = cutOff.toGMTString();
+                                                        $.ajax({
+                                                            url: '" + @Url.Action("DeliveryBandGridViewPartialUpdate", "eCommerce") + @"',
+                                                            type: 'GET',
+                                                            traditional: true,
+                                                            data: {
+                                                                DeliveryBandID: $('#selected-delivery-band-id').val(),
+                                                                Name: Name.GetValue(),
+                                                                DisplayName: DisplayName.GetValue(),
+                                                                CourierID: $('#selected-courier-id').val(),
+                                                                PriceListID: $('#selected-pricelist-id').val(),
+                                                                CARRCODE: CARRCODE.GetValue(),
+                                                                SortOrder: SortOrder.GetValue(),
+                                                                WeekdayStart: WeekdayStart.GetValue(),
+                                                                WeekdayEnd: WeekdayEnd.GetValue(),
+                                                                DaysToDeliverMin: DaysToDeliverMin.GetValue(),
+                                                                DaysToDeliverMax: DaysToDeliverMax.GetValue(),
+                                                                DeliveryZones: deliveryZones,
+                                                                StockLocations: stockLocations,
+                                                                CutOff: cutOff
+                                                            },
+                                                            success: function(data) {
+                                                                $('#delivery-band-compose-container').html(data);
+                                                                LoadingPanel.Hide();
+                                                                DeliveryBandGridView.Refresh();
+                                                            },
+                                                            error: function(e, s, a) {
+                                                                $('#delivery-band-compose-container').html(e.responseText);
+                                                                LoadingPanel.Hide();
+                                                            },
+                                                            timeout: 20000
+                                                        });
+                                                    }";
+                                                }).GetHtml()
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            }
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+
+<div style="float: left; width: 100%;">
+    <div style="width: 100%;">
+        <div id="delivery-band-prices-detail-container">
+            <div class="content-panel-container">
+                <fieldset id="delivery-band-prices-detail">
+                    <legend style="color: black; border-bottom-color: #929292; cursor: default;">Delivery Band Prices</legend>
+                    <div id="delivery-band-prices-detail-inner" style="background-color: white; padding: 1em;">
+                        <div id="delivery-band-prices-detail-container">
+                            @Html.Action("DeliveryBandPricesGridViewPartial", new { DeliveryBandID = Model.DeliveryBandID })
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+</div>

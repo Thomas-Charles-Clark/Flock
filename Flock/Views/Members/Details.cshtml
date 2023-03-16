@@ -1,0 +1,255 @@
+﻿@model Flock.ViewModels.MemberViewModel
+@{
+    ViewBag.Title = "Members";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/members.css")
+    <style type="text/css">
+        #container {
+            width: 1220px !important;
+        }
+        #MemberSelectorGrid_DXFooterRow .dxgv {
+            border-top: 1px solid #CFCFCF !important;
+        }
+        #MemberSearchResultsGrid_DXFooterRow .dxgv {
+            border-top: 1px solid #CFCFCF !important;
+        }
+        div.dxb {
+            padding-top: 5px !important;
+            padding-bottom: 5px !important;
+        }
+    </style>
+}
+@section scripts {
+    @Scripts.Render("~/bundles/signalr")
+<script src="/signalr/hubs" type="text/javascript"></script>
+
+<script type="text/javascript">
+    function SaveMemberAddressDetails(MemberAddressID) {
+        $.ajax({ 
+            url: '@Url.Action("UpdateMemberAddress", "Members")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                MemberID: $("#selected-member-id").val(),
+                MemberAddressID: MemberAddressID,
+                PrimaryAddress: window["PrimaryAddress-" + MemberAddressID].GetValue(),
+                FullName: window["FullName-" + MemberAddressID].GetValue(),
+                AddressLine1: window["AddressLine1-" + MemberAddressID].GetValue(),
+                AddressLine2: window["AddressLine2-" + MemberAddressID].GetValue(),
+                Town: window["Town-" + MemberAddressID].GetValue(),
+                County: window["County-" + MemberAddressID].GetValue(),
+                Postcode: window["Postcode-" + MemberAddressID].GetValue(),
+                CountryID: window["CountryID-" + MemberAddressID].GetValue(),
+                PhoneNumber: window["PhoneNumber-" + MemberAddressID].GetValue()
+            },
+            success: function(data) {
+                $('#member-details-container').html(data);
+                LoadingPanel.Hide();
+            },
+            error: function(e, s, a) { 
+                $("#member-address-" + MemberAddressID + "-editor").html(e.responseText);
+                LoadingPanel.Hide();
+            },
+            timeout: 20000
+        });
+    }
+
+    function ForceVisitorLogout(VisitorID) {
+        $.confirm(function () {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("ForceVisitorLogout", "Members")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    MemberID: $('#selected-member-id').val(),
+                    VisitorID: VisitorID
+                },
+                success: function (data) {
+                    $('#member-details-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }, function () { })
+    }
+
+    function ReloadMembersList() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("MemberSelectorGridPartial", "Members")',
+            type: 'GET',
+            traditional: true,
+            data: {
+            },
+            success: function (data) {
+                $('#member-header-grid-container').html(data);
+                $('#container-label').text('Member List');
+                $('#return-to-list-link').hide();
+                LoadingPanel.Hide();
+            },
+            timeout: 20000
+        });
+    }
+
+    var bask = $.connection.MemberBasketHub;
+    bask.client.updateMemberBasket = function (memberID) {
+        //alert(memberID);
+        $.ajax({
+            url: '@Url.Action("CountrySpecificBasket", "Members")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                MemberID: $('#selected-member-id').val(),
+                CountryID: BasketCountrySelector.GetValue()
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $('#basket-area').html(data)
+                GreenFade($('#basket-history'));
+            },
+            timeout: 20000
+        });
+    }
+
+    var vist = $.connection.VisitorHub;
+    vist.client.updateVisitor = function (memberID) {
+        $.ajax({
+            url: '@Url.Action("MemberDetailsPartial", "Members")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                MemberID: $('#selected-member-id').val()
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $('#member-details-container').html(data);
+                GreenFade($('#visitor-instances'));
+            },
+            timeout: 20000
+        });
+    }
+
+    // Start the connection
+    $.connection.hub.start();
+
+</script>
+
+}
+
+<h4 class="page-heading">Members</h4>
+
+<input id="selected-member-id" type="hidden" value="@(Model.MemberID)" />
+
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "SearchBox";
+    settings.Properties.NullDisplayText = "Search";
+    settings.Properties.NullText = "Search";
+    settings.Height = 35;
+    settings.Width = 180;
+    settings.Style.Add("margin-bottom", "20px");
+    settings.Style.Add("margin-right", "1em");
+    settings.Style.Add("float", "left");
+    settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) {
+        if(e.htmlEvent.keyCode == 13) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("MemberSearchPartial", "Members") + @"',
+                type: 'GET',
+                traditional: true,
+                data: {
+                    SearchString: s.GetValue()
+                },
+                success: function(data) {
+                    $('#member-header-grid-container').html(data);
+                    $('#container-label').text('Search Results');
+                    $('#return-to-list-link').show();
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+    }";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings => {
+    settings.Name = "SearchBtn";
+    settings.Text = "Search";
+    settings.Height = 35;
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin-right", "1em");
+    settings.ClientSideEvents.Click = @"function(s, e) { 
+        if(SearchBox.GetValue() !== null)
+        {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("MemberSearchPartial", "Members") + @"',
+                type: 'GET',
+                traditional: true,
+                data: {
+                    SearchString: SearchBox.GetValue()
+                },
+                success: function(data) {
+                    $('#member-header-grid-container').html(data);
+                    $('#container-label').text('Search Results');
+                    $('#return-to-list-link').show();
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+    }";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "ResetBtn";
+    settings.Text = "Reset";
+    settings.Height = 35;
+    settings.Style.Add("float", "left");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        SearchBox.SetValue(null)
+        ReloadMembersList();
+    }";
+}).GetHtml()
+
+<div style="clear: both;"></div>
+
+<div id="member-select-header-container">
+    <div class="content-panel-container">
+        <fieldset id="collection-select-header">
+            <legend style="color: black; border-bottom-color: #929292; cursor: default;">
+                <span id="container-label">Members List</span>
+                <a id="return-to-list-link" href="javascript:;" style="float: right; color: #000000; margin-right: 1em; display: none;" onclick="ReloadMembersList();">&laquo; Return to List</a>
+            </legend>
+            <div id="member-select-header-inner" style="">
+                <div id="member-header-grid-container">                    
+                    @Html.Action("MemberSelectorGridPartial", "Members")
+                </div>
+                <div style="clear: both"></div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+
+<div id="member-details-container">
+    @if (ViewData["InvalidMemberIDError"] != null)
+    {
+        <h5>@(ViewData["InvalidMemberIDError"])</h5>
+    }
+    @if (Model.MemberID != null)
+    {
+        @Html.Action("MemberDetailsPartial", "Members", new { MemberID = Model.MemberID })
+        <script type="text/javascript">
+            MemberSelectorGrid.AutoFilterByColumn(0, '@(Model.MemberID)');
+        </script>
+    }
+</div>
+
+<div style="clear: both;"></div>
+
+

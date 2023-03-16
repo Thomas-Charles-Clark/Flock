@@ -1,0 +1,267 @@
+﻿@model Flock.ViewModels.TranslateEmailTextGridViewModel
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "TranslateGridView";
+        settings.CallbackRouteValues = new { Controller = "Translations", Action = "TranslateEmailTextGridView" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Translations", Action = "TranslateEmailTextGridViewUpdate" };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['languageId'] = TranslationTargetLanguageListBox.GetValue();
+        }";
+
+        settings.ClientSideEvents.CustomButtonClick = @"function (s, e) { 
+            $.confirm(function() {
+                var rowKey = s.GetRowKey(e.visibleIndex);
+                s.PerformCallback({ commandType: 'Clear', emailTextId: rowKey, languageId: TranslationTargetLanguageListBox.GetValue() });
+            }, function() { }, [], 'This will set this record\'s translation fields for ' + TranslationTargetLanguageDD.GetText() + ' to NULL.');
+        }";
+
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.ShowHeaderFilterButton = true;
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 10;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowCancelButton = true;
+        settings.CommandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton()
+        {
+            ID = "Clear",
+            Index = 0,
+            Text = "Clear",
+            Visibility = GridViewCustomButtonVisibility.AllDataRows
+        });
+
+        settings.SettingsPager.PageSize = 20;
+
+        settings.KeyFieldName = "EmailTextID";
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "EmailTextID";
+            column.FieldName = "EmailTextID";
+            column.Caption = "ID";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Width = 50;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<a href='/admin/EmailTexts/compose/" + c.KeyValue.ToString() + "'>" + c.KeyValue.ToString() + "</a>");
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<span style='float: left;'>" + c.KeyValue.ToString() + "</span>");
+            });
+        });
+
+        MVCxGridViewColumn EmailTemplateIDColumn = new MVCxGridViewColumn();
+        EmailTemplateIDColumn.Name = "EmailTemplateID";
+        EmailTemplateIDColumn.FieldName = "EmailTemplateID";
+        EmailTemplateIDColumn.Caption = "Email Template ID";
+        EmailTemplateIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        EmailTemplateIDColumn.EditCellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        EmailTemplateIDColumn.EditFormSettings.CaptionLocation = ASPxColumnCaptionLocation.Top;
+        EmailTemplateIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        EmailTemplateIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        EmailTemplateIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        EmailTemplateIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        EmailTemplateIDColumn.SetDataItemTemplateContent(c =>
+        {
+            var etID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "EmailTemplateID"));
+
+            var emailTemplate = Model.EmailTemplates.Where(p => p.EmailTemplateID == etID).Select(p => p.Name).SingleOrDefault();
+
+            if (emailTemplate != null)
+            {
+                ViewContext.Writer.Write(emailTemplate);
+            }
+        });
+        EmailTemplateIDColumn.SetEditItemTemplateContent(c =>
+        {
+            var etID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "EmailTemplateID"));
+
+            var emailTemplate = Model.EmailTemplates.Where(p => p.EmailTemplateID == etID).Select(p => p.Name).SingleOrDefault();
+
+            if (emailTemplate != null)
+            {
+                ViewContext.Writer.Write(emailTemplate);
+            }
+        });
+        settings.Columns.Add(EmailTemplateIDColumn);
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Text";
+            column.FieldName = "Text";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.Width = 220;
+            var tbProp = column.PropertiesEdit as TextBoxProperties;
+            tbProp.MaxLength = 500;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Translated Text";
+            column.FieldName = "TranslatedText";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = 220;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Stage";
+            column.FieldName = "Stage";
+            column.Caption = "Translation Stage";
+            column.Width = 180;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                bool? TranslationStatusID = null;
+                string TranslationStatus = "<i>Unknown</i>";
+
+                TranslationStatusID = (bool?)(DataBinder.Eval(c.DataItem, "Stage"));
+
+                switch (TranslationStatusID)
+                {
+                    case null:
+                        TranslationStatus = "Not Translated";
+                        break;
+                    case false:
+                        TranslationStatus = "Google Translated";
+                        break;
+                    case true:
+                        TranslationStatus = "Manually Translated";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                bool? TranslationStatusID = null;
+                string TranslationStatus = "<i>Unknown</i>";
+
+                TranslationStatusID = (bool?)(DataBinder.Eval(c.DataItem, "Stage"));
+
+                switch (TranslationStatusID)
+                {
+                    case null:
+                        TranslationStatus = "Not Translated";
+                        break;
+                    case false:
+                        TranslationStatus = "Google Translated";
+                        break;
+                    case true:
+                        TranslationStatus = "Manually Translated";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "FieldsToReview";
+            column.FieldName = "FieldsToReview";
+            column.Caption = "Status";
+            column.Width = 100;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                byte? Status = 0;
+                string TranslationStatus = "Complete";
+
+                Status = (Nullable<byte>)(DataBinder.Eval(c.DataItem, "FieldsToReview"));
+
+                switch (Status)
+                {
+                    case 0:
+                        break;
+                    default:
+                        TranslationStatus = "Review";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                byte? Status = 0;
+                string TranslationStatus = "Complete";
+
+                Status = (Nullable<byte>)(DataBinder.Eval(c.DataItem, "FieldsToReview"));
+
+                switch (Status)
+                {
+                    case 0:
+                        break;
+                    default:
+                        TranslationStatus = "Review";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "Stage":
+                    e.Values.Clear();
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(gridView.Columns["Stage"] as GridViewDataColumn, "Not Translated"));
+                    e.Values.Add(new FilterValue("Google Translated", "false"));
+                    e.Values.Add(new FilterValue("Manually Translated", "true"));
+                    e.AddShowAll();
+                    break;
+                case "FieldsToReview":
+                    e.Values.Clear();
+                    e.Values.Add(new FilterValue("Complete", null, string.Format("FieldsToReview = {0}", 0)));
+                    e.Values.Add(new FilterValue("Review", null, string.Format("FieldsToReview != {0}", 0)));
+                    e.AddShowAll();
+                    break;
+                case "EmailTemplateID":
+                    e.Values.Clear();
+                    foreach (var sfet in Model.EmailTemplates)
+                    {
+                        e.AddValue(sfet.Name, sfet.EmailTemplateID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+    });
+
+    if (ViewData["UpdateErrors"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["UpdateErrors"]);
+    }
+}
+@grid.Bind(Model.EmailTexts).GetHtml()

@@ -1,0 +1,20 @@
+﻿@model List<Flock.Models.Article_Image>
+<div id="slideshow-list" class="sortable-list" style="width: 100%; height: 100%;">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        <div class="article-slideshow-item" data-image-id="@(Model[i].ImageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromSlideshow(@(Model[i].ArticleID), @(Model[i].ImageID))"/>
+            <img style="width: 200px; height: auto;" src="https://flock.designersguild.com/ImageLibrary/322/@(Model[i].ImageID).jpeg" />
+        </div>
+    }
+    @if (Model.Count == 0)
+    {
+        <div class="article-slideshow-placeholder">
+            There are no images associated to this article's slideshow.
+        </div>
+    }
+</div>
+<script type="text/javascript">
+    if(typeof(InitSlideshowDragDrop) == 'function')
+        InitSlideshowDragDrop();
+</script>

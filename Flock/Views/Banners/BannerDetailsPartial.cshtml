@@ -1,0 +1,315 @@
+﻿@model Flock.ViewModels.BannerComposeViewModel
+@{ 
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+}
+
+<div class="content-panel-container">
+    <fieldset id="banner-details-fieldset">
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#banner-details-section').slideToggle('fast');">
+            Banner Details (click to expand / contract)
+            <span style="float: right; margin: 0 4px;">ID: @(Model.BannerID)</span>
+            <img id="banner-details-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="banner-details-section" style="background-color: white; padding: 1em; position: relative;">
+            <div style="width: 50%; float: left;">
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Name:</label>
+                @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+                {
+                    settings.Name = "Name";
+                    settings.Style.Add("float", "left");
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(220);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+                @Html.ValidationMessageFor(m => Model.Name)
+                <div style="clear: both;"></div>
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Overlay Text:</label>
+                @Html.DevExpress().TextBoxFor(m => Model.OverlayText, settings =>
+                {
+                    settings.Name = "OverlayText";
+                    settings.Style.Add("float", "left");
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(330);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+                @Html.ValidationMessageFor(m => Model.Name)
+                <div style="clear: both;"></div>
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">CSS Classes:</label>
+
+                @Html.DevExpress().DropDownEdit(dd =>
+           {
+               dd.Name = "CssClassesDropDown";
+
+               var ddPlurality = "es";
+
+               var x = 0;
+
+               if (Model.CssClasses != null)
+               {
+                   if (Model.CssClasses.Count() == 1)
+                   {
+                       ddPlurality = "";
+                   }
+                   x = Model.CssClasses.Count();
+               }
+
+               dd.Text = String.Format("{0} class{1} selected", x, ddPlurality);
+
+               dd.SetDropDownWindowTemplateContent(c =>
+               {
+                   Html.DevExpress().ListBox(listBoxSettings =>
+                   {
+                       listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+                       listBoxSettings.Properties.ValueField = "FontClassID";
+                       listBoxSettings.Properties.TextField = "Name";
+                       listBoxSettings.Properties.ValueType = typeof(short);
+
+
+                       listBoxSettings.Name = "ComposeBannerCssClassesListBox";
+                       listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+                       listBoxSettings.Style.Add("float", "left");
+                       listBoxSettings.Height = 200;
+                       listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+
+                       listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                                var items = s.GetSelectedItems();
+                                var text = '0 classes selected';
+                                if(items.length > 1)
+                                    text = items.length.toString() + ' classes selected';
+                                else if(items.length == 1)
+                                    text = items.length.toString() + ' class selected';
+                                CssClassesDropDown.SetText(text);
+                            }";
+
+                       if (Model.CssClasses != null)
+                       {
+                           if (Model.CssClasses.Count() > 0)
+                           {
+                               listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                                    var selectedCssClassesArray = '" + String.Join(",", Model.CssClasses.Select(p => p.FontClassID)) + @"';
+                                    selectedCssClassesArray = selectedCssClassesArray.split(',');
+                                    s.SelectValues(selectedCssClassesArray);
+                                }";
+                           }
+                       }
+                   }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetFontClasses("banner")).Render();
+               });
+           }).GetHtml()
+
+                @*@Html.DevExpress().ComboBoxFor(m => Model.FontClassID, cbSettings =>
+                    {
+                        cbSettings.Name = "FontClassID";
+                        cbSettings.Style.Add("float", "left");
+                        cbSettings.Style.Add("margin-right", "1em");
+                        cbSettings.ShowModelErrors = true;
+                        var cbProp = cbSettings.Properties as ComboBoxProperties;
+                        cbProp.ValueField = "FontClassID";
+                        cbProp.ValueType = typeof(short);
+                        cbProp.TextField = "Name";
+                        cbProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetFontClasses()).GetHtml()*@
+                <div style="clear: both;"></div>
+
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Text Colour:</label>
+                <input type="hidden" id="foreground" value="@(Model.ForegroundColour)" />
+                <div id="foreground-colour" style="background-color: @(Model.ForegroundColour)" onclick="toggleForegroundPicker()">
+                    <div id="foreground-colour-holder" onclick="event.stopPropagation()"></div>
+                </div>
+                <div class="clearfix"></div>
+
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Background Colour:</label>
+                <input type="hidden" id="background" value="@(Model.BackgroundColour)" />
+                <div id="background-colour" style="background-color: @(Model.BackgroundColour)" onclick="toggleBackgroundPicker()">
+                    <div id="background-colour-holder" onclick="event.stopPropagation()"></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div style="width: 50%; float: left;">
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Title Text:</label>
+                @Html.DevExpress().TextBoxFor(m => Model.TitleText, settings =>
+                {
+                    settings.Name = "TitleText";
+                    settings.Style.Add("float", "left");
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(330);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+                @Html.ValidationMessageFor(m => Model.TitleText)
+                <div style="clear: both;"></div>
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Alt Text:</label>
+                @Html.DevExpress().TextBoxFor(m => Model.AltText, settings =>
+                {
+                    settings.Name = "AltText";
+                    settings.Style.Add("float", "left");
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(330);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+                @Html.ValidationMessageFor(m => Model.AltText)
+                <div style="clear: both;"></div>
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Language:</label>
+                @{
+                    Html.DevExpress().ComboBox(edtSettings =>
+                    {
+                        edtSettings.Name = "LanguageID";
+                        edtSettings.ControlStyle.CssClass = "editor";
+                        edtSettings.Properties.TextField = "Name";
+                        edtSettings.Properties.ValueField = "LanguageID";
+                        edtSettings.Properties.ValueType = typeof(byte);
+                        edtSettings.Style.Add("margin", "0 7px 7px 0");
+                        edtSettings.ShowModelErrors = true;
+                        edtSettings.Width = 220;
+
+
+                    }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetNullableLanguages())
+                    .Bind(Model.LanguageID)
+                    .Render();
+                }
+                <div style="clear: both;"></div>
+                <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Trade / Retail:</label>
+                @{
+                    var tradeSource = new List<object> {
+                        new { name = "Both", value = (bool?)null },
+                        new { name = "Retail", value = (bool?)false },
+                        new { name = "Trade", value = (bool?)true } };
+
+                    var tradeSwitchIndex = 0;
+
+                    var tradeSwitchValue = Model.TradeSwitch;
+
+                    switch (tradeSwitchValue)
+                    {
+                        case true:
+                            tradeSwitchIndex = 2;
+                            break;
+                        case false:
+                            tradeSwitchIndex = 1;
+                            break;
+                        default:
+                            tradeSwitchIndex = 0;
+                            break;
+                    }
+
+                    Html.DevExpress().ComboBox(cbSettings =>
+                    {
+                        cbSettings.Name = "TradeSwitch";
+                        cbSettings.Style.Add("float", "left");
+                        cbSettings.Properties.TextField = "name";
+                        cbSettings.Properties.ValueField = "value";
+                        cbSettings.Properties.ValueType = typeof(bool?);
+                        cbSettings.SelectedIndex = tradeSwitchIndex;
+                        cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                        cbSettings.ShowModelErrors = true;
+                        cbSettings.Width = 167;
+                    }).BindList(tradeSource).Render();
+                }
+            </div>
+
+            <div style="clear: both; width: 100%; height: 1em;"></div>
+
+            <div style="width: 50%; float: left; text-align: center;">
+                <label style="float: left; line-height: 30px; margin-right: 5px; width: 80px;">On Date:</label>
+                @Html.DevExpress().CalendarFor(m => Model.OnDate, settings =>
+                {
+                    settings.Name = "OnDate";
+                    settings.ShowModelErrors = true;
+                    settings.SelectedDate = DateTime.Now;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    settings.Properties.DisplayFormatString = "d";
+                }).GetHtml()
+                <div style="clear: both;"></div>
+            </div>
+            <div style="width: 50%; float: left; text-align: center;">
+                <label style="float: left; line-height: 30px; margin-right: 5px; width: 80px;">Off Date:</label>
+                @Html.DevExpress().CalendarFor(m => Model.OffDate, settings =>
+                {
+                    settings.Name = "OffDate";
+                    settings.Style.Add("margin-right", "5px");
+                    settings.ShowModelErrors = true;
+                    settings.SelectedDate = DateTime.Now.AddMonths(1);
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    settings.Properties.DisplayFormatString = "d";
+                }).GetHtml()
+                <div style="clear: both;"></div>
+            </div>
+            <div style="clear: both;"></div>
+            @if (ViewData["EditError"] != null)
+            {
+                <span style="float: left; margin: 8px 0;" class="field-validation-error">@(ViewData["EditError"])</span>
+                <div style="clear: both;"></div>
+            }
+            <img id="banner-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveBannerDetails();" />
+        </div>
+    </fieldset>
+
+</div>
+
+<script type="text/javascript">
+    $('#foreground-colour-holder').ColorPicker({
+        color: '@(Model.ForegroundColour)',
+        flat: true,
+        onChange: function (hsb, hex, rgb) {
+            $('#foreground-colour').css('backgroundColor', '#' + hex);
+            $("#foreground").val('#' + hex);
+        },
+        onSubmit: function (hsb, hex, rgb) {
+            $('#foreground-colour').css('backgroundColor', '#' + hex);
+            $("#foreground").val('#' + hex);
+        }
+    });
+
+    $('#background-colour-holder').ColorPicker({
+        color: '@(Model.BackgroundColour)',
+        flat: true,
+        onChange: function (hsb, hex, rgb) {
+            $('#background-colour').css('backgroundColor', '#' + hex);
+            $("#background").val('#' + hex);
+        },
+        onSubmit: function (hsb, hex, rgb) {
+            $('#background-colour').css('backgroundColor', '#' + hex);
+            $("#background").val('#' + hex);
+        }
+    });
+
+    var showingForeground = false;
+
+    var showingBackground = false;
+
+    //$("#banner-details-section").on('click', function () {
+    //    $('#foreground-colour-holder > div').stop().animate({ height: 0 }, 300, "swing", function (ev, ui) {
+    //        showingForeground = false;
+    //    });
+    //    $('#background-colour-holder > div').stop().animate({ height: 0 }, 300, "swing", function (ev, ui) {
+    //        showingBackground = false;
+    //    });
+    //});
+
+    function toggleForegroundPicker() {
+        $('#foreground-colour-holder > div').stop().animate({ height: showingForeground ? 0 : 173 }, 300, "swing", function (ev, ui) {
+            showingForeground = !showingForeground;
+        });
+    }
+
+    function toggleBackgroundPicker() {
+        $('#background-colour-holder > div').stop().animate({ height: showingBackground ? 0 : 173 }, 300, "swing", function (ev, ui) {
+            showingBackground = !showingBackground;
+        });
+    }
+    /*
+    $('#colorSelector').ColorPicker({
+	color: '#0000ff',
+	onShow: function (colpkr) {
+		$(colpkr).fadeIn(500);
+		return false;
+	},
+	onHide: function (colpkr) {
+		$(colpkr).fadeOut(500);
+		return false;
+	},
+	onChange: function (hsb, hex, rgb) {
+		$('#colorSelector div').css('backgroundColor', '#' + hex);
+	}
+});
+    */
+</script>
+
+@{ 
+    UoW.Dispose();
+}

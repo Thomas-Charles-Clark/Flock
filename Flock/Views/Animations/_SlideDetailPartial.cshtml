@@ -1,0 +1,312 @@
+﻿@model Flock.ViewModels.SlideEditModel
+@{
+    var area1Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 1).OrderBy(p => p.SortOrder).ToList();
+    var area2Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 2).OrderBy(p => p.SortOrder).ToList();
+    var area3Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 3).OrderBy(p => p.SortOrder).ToList();
+    var area4Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 4).OrderBy(p => p.SortOrder).ToList();
+    var area5Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 5).OrderBy(p => p.SortOrder).ToList();
+    var area6Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 6).OrderBy(p => p.SortOrder).ToList();
+    var area7Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 7).OrderBy(p => p.SortOrder).ToList();
+    var area8Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 8).OrderBy(p => p.SortOrder).ToList();
+    var area9Calls = Model.AssignedCallsToAction.Where(p => p.SlideAreaID == 9).OrderBy(p => p.SortOrder).ToList();
+
+    string ImageString = "";
+    string HiddenImageInput = "";
+    string HiddenVideoInput = "";
+
+    if (Model.Image != null)
+    {
+        ImageString = "<img src='https://flock.designersguild.com/imagelibrary/1024/" + Model.Image.ImageID + ".jpeg' />";
+        HiddenImageInput = "<input type='hidden' id='SlideImageID' value='" + Model.Image.ImageID + "'/>";
+    }
+
+    string VideoString = "";
+
+    if (Model.Video != null)
+    {
+        VideoString = Model.Video.EmbedCode;
+        HiddenVideoInput = "<input type='hidden' id='SlideVideoID' value='" + Model.Video.VideoID + "'/>";
+    }
+}
+
+@Html.Raw(HiddenImageInput)
+@Html.Raw(HiddenVideoInput)
+
+<div class="slide-detail-wrapper">
+    @Html.Raw(ImageString)
+    @Html.Raw(VideoString)
+    <table class="area-table area-table-ar@(Model.Animation.AspectRatioID)">
+        <tbody data-slide-id="@(Model.SlideID)" data-aspect-ratio-id="@(Model.Animation.AspectRatioID)">
+            <tr>
+                <td id="area-1" class="area target" data-area-id="1" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area1Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>
+                @*<td id="area-2" class="area target" data-area-id="2" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area2Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>*@
+                <td id="area-3" class="area target" data-area-id="3" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area3Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>
+            </tr>
+            @*<tr>
+                <td id="area-4" class="area target" data-area-id="4" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area4Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>
+                <td id="area-5" class="area target" data-area-id="5" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area5Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>
+                <td id="area-6" class="area target" data-area-id="6" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area6Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>
+            </tr>*@
+            <tr>
+                <td id="area-7" class="area target" data-area-id="7" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area7Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>
+                @*<td id="area-8" class="area target" data-area-id="8" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area8Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>*@
+                <td id="area-9" class="area target" data-area-id="9" data-slide-id="@(Model.SlideID)">
+                    <div class="call-to-action-wrapper">
+                        @foreach (var a in area9Calls)
+                        {
+                            var styleString = Flock.Classes.Utilities.buildCallToActionStyleString(a.Style ?? a.CallToAction.Style);
+                            <div class="call-to-action width-mode-@a.CallToAction.CallToActionWidthModeID" data-call-to-action-id="@a.CallToActionID" style="@(styleString)">
+                                <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveCallToAction(@a.CallToActionID, @a.SlideID) }, function () { }, 'Are you sure?')"></span>
+                                @a.CallToActionID - @a.CallToAction.Text
+                            </div>
+                            <div class="clearfix"></div>
+                        }
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="clearfix"></div>
+</div>
+
+<div class="slide-link-wrapper">
+    <table class="slide-link-table">
+        <tbody>
+            <tr>
+                <td>
+                    <p style="font-size: 11px; font-style: italic;">
+                        These settings affect just this slide.
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.DevExpress().CheckBoxFor(m => Model.SlideNewWindow, settings =>
+                    {
+                        settings.Name = "SlideNewWindow";
+                        settings.Properties.ValueType = typeof(bool);
+                        settings.Properties.ValueChecked = true;
+                        settings.Properties.ValueUnchecked = false;
+                        settings.Properties.Caption = "New Window";
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ValidationSettings.Display = Display.Dynamic;
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Partial("_SlidePageIDComboBoxPartial", Model)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Partial("_SlideArticleIDComboBoxPartial", Model)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Partial("_SlideCollectionIDComboBoxPartial", Model)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Partial("_SlideProductPageIDComboBoxPartial", Model)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.DevExpress().TextBoxFor(m => Model.SlideExternalURL, settings =>
+                    {
+                        settings.Name = "SlideExternalURL";
+                        settings.Properties.MaxLength = 255;
+                        settings.Width = 156;
+                        settings.Properties.Caption = "External URL";
+                        settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                        settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ValidationSettings.Display = Display.Dynamic;
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button id="slide-save-btn" class="btn btn-success" onclick="SaveSlideDetails(@(Model.SlideID))">Save</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="clearfix"></div>
+
+<hr/>
+
+<table class="slide-edit-table">
+    <tbody>
+        <tr>
+            <td colspan="4">
+                <p style="font-size: 11px; font-style: italic;">These settings affect all slides.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => Model.DisplayCallsToAction, settings =>
+                    {
+                        settings.Name = "DisplayCallsToAction";
+                        settings.Properties.Caption = "Display Calls to Action";
+                        settings.Properties.ValueType = typeof(bool);
+                        settings.Properties.ValueChecked = true;
+                        settings.Properties.ValueUnchecked = false;
+                        settings.Checked = true;
+                        settings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                            SaveSlideDetails(" + Model.SlideID + @");
+                        }";
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => Model.AutoHideCallsToAction, settings =>
+                    {
+                        settings.Name = "AutoHideCallsToAction";
+                        settings.Properties.Caption = "Auto-Hide Calls to Action";
+                        settings.Properties.ValueType = typeof(bool);
+                        settings.Properties.ValueChecked = true;
+                        settings.Properties.ValueUnchecked = false;
+                        settings.Checked = true;
+                        settings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                            SaveSlideDetails(" + Model.SlideID + @");
+                        }";
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => Model.DisplayHotspots, settings =>
+                    {
+                        settings.Name = "DisplayHotspots";
+                        settings.Properties.Caption = "Display Hotspots";
+                        settings.Properties.ValueType = typeof(bool);
+                        settings.Properties.ValueChecked = true;
+                        settings.Properties.ValueUnchecked = false;
+                        settings.Checked = true;
+                        settings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                            SaveSlideDetails(" + Model.SlideID + @");
+                        }";
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => Model.AutoHideHotspots, settings =>
+                    {
+                        settings.Name = "AutoHideHotspots";
+                        settings.Properties.Caption = "Auto-Hide Hotspots";
+                        settings.Properties.ValueType = typeof(bool);
+                        settings.Properties.ValueChecked = true;
+                        settings.Properties.ValueUnchecked = false;
+                        settings.Checked = true;
+                        settings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                            SaveSlideDetails(" + Model.SlideID + @");
+                        }";
+                    }).GetHtml()
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    initCallToActionDragDrop();
+
+    initAreaSortables();
+</script>

@@ -1,0 +1,41 @@
+﻿@using Flock.ViewModels
+@model Form_PageSection
+<fieldset>
+    <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-"+Model.PageSectionID+"').slideToggle('fast');")">
+        @switch (Model.SourceID)
+        {
+            case 1: // Competition
+                ViewContext.Writer.Write("Form " +  Model.FormID + " [Competition] " + (ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)"));
+                break;
+            case 2: // Brochure
+                ViewContext.Writer.Write("Form " + Model.FormID + " [Brochure] " + (ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)"));
+                break;
+            case 71: // Interior Design
+                ViewContext.Writer.Write("Form " + Model.FormID + " [Interior Design] " + (ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)"));
+                break;
+            case 72: // Store Events
+                ViewContext.Writer.Write("Form " + Model.FormID + " [Store Event] " + (ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)"));
+                break;
+            default:
+                ViewContext.Writer.Write("Form " + Model.FormID + " " + (ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)"));
+                break;
+        }
+        <span style="margin: 0 4px;">Page Section ID: @(Model.PageSectionID)</span>
+
+        <img id="page-section-@(Model.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(Model.PageSectionID));" />
+        <img id="page-section-@(Model.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(Model.PageSectionID), @(Model.PageSectionTypeID));" />
+        <img id="page-section-@(Model.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(Model.PageSectionID), @(Model.PageSectionTypeID));" />
+        <img id="page-section-@(Model.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+    </legend>
+    <div id="page-section-@(Model.PageSectionID)-header-details" class="pagesection-header">
+        @Html.Partial("PageSectionHeaderDetails", Model)
+    </div>
+    <div id="page-section-@(Model.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none;" : "" )" class="fieldset-inner page-section-hideable">
+        <div id="page-section-@(Model.PageSectionID)-form" style="position: relative;">
+            @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Partial("PageSection_Form", Model))
+        </div>
+        <div id="page-section-@(Model.PageSectionID)-country-restriction-container" data-form-id="@(Model.FormID)" data-page-section-id="@(Model.PageSectionID)" style="padding-top: 1em;">
+            @Html.Partial("CountryLanguageRestrictionPartial", Model.CountryLanguageRestrictions)
+        </div>
+    </div>
+</fieldset>

@@ -1,0 +1,110 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "SelectionSelectorGridView";
+    settings.CallbackRouteValues = new { Controller = "Selections", Action = "ComposeSelectionGridSelectorPartial" };
+
+    settings.PreRender = (sender, e) =>
+    {
+        MVCxGridView gv = (MVCxGridView)sender;
+        gv.FocusedRowIndex = -1;
+    };
+
+    settings.ClientSideEvents.RowClick = @"function(s, e) {
+            var id = s.GetRowKey(e.visibleIndex);
+            $('#selected-selection-id').val(id);
+            LoadingPanel.Show();
+
+            $.ajax({
+                url: '" + @Url.Action("ChangeSelection", "Selections") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: id
+                },
+                success: function(data) {
+                    $('#selection-details-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a);
+                },
+                timeout: 20000
+            });
+        }";
+
+    settings.KeyFieldName = "SelectionID";
+    settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "SelectionID").DisplayFormat = "Total: {0:n0}";
+    settings.Settings.ShowFooter = true;
+
+    settings.SettingsBehavior.EnableRowHotTrack = true;
+    settings.Styles.Row.Cursor = "pointer";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.CommandColumn.Visible = false;
+    settings.CommandColumn.ShowClearFilterButton = false;
+    settings.Settings.ShowFilterRow = true;
+
+    settings.SettingsPager.Mode = GridViewPagerMode.EndlessPaging;
+    // property to EndlessPaging, and the Settings.VerticalScrollBarMode
+    settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+
+    settings.SettingsBehavior.ConfirmDelete = true;
+    settings.CommandColumn.ShowSelectCheckbox = false;
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SettingsPager.PageSizeItemSettings.Visible = false;
+    settings.SettingsPager.PageSize = 10;
+
+    settings.SettingsBehavior.AllowFocusedRow = true;
+
+    MVCxGridViewColumn IDColumn = new MVCxGridViewColumn();
+    IDColumn.Name = "SelectionID";
+    IDColumn.FieldName = "SelectionID";
+    IDColumn.Caption = "ID";
+    IDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    settings.Columns.Add(IDColumn);
+
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Name";
+    settings.Columns.Add(NameColumn);
+
+    MVCxGridViewColumn HeadingColumn = new MVCxGridViewColumn();
+    HeadingColumn.Name = "Heading";
+    HeadingColumn.FieldName = "Heading";
+    HeadingColumn.Caption = "Heading";
+    settings.Columns.Add(HeadingColumn);
+
+    MVCxGridViewColumn SubHeadingColumn = new MVCxGridViewColumn();
+    SubHeadingColumn.Name = "SubHeading";
+    SubHeadingColumn.FieldName = "SubHeading";
+    SubHeadingColumn.Caption = "Sub Heading";
+    settings.Columns.Add(SubHeadingColumn);
+
+    MVCxGridViewColumn URLKeywordsColumn = new MVCxGridViewColumn();
+    URLKeywordsColumn.Name = "URLKeywords";
+    URLKeywordsColumn.FieldName = "URLKeywords";
+    URLKeywordsColumn.Caption = "URL Keywords";
+    settings.Columns.Add(URLKeywordsColumn);
+
+    MVCxGridViewColumn OnDate = new MVCxGridViewColumn();
+    OnDate.Name = "OnDate";
+    OnDate.FieldName = "OnDate";
+    OnDate.Caption = "On Date";
+    OnDate.ColumnType = MVCxGridViewColumnType.DateEdit;
+    settings.Columns.Add(OnDate);
+
+    MVCxGridViewColumn OffDate = new MVCxGridViewColumn();
+    OffDate.Name = "OffDate";
+    OffDate.FieldName = "OffDate";
+    OffDate.Caption = "Off Date";
+    OffDate.ColumnType = MVCxGridViewColumnType.DateEdit;
+    settings.Columns.Add(OffDate);    
+    
+}).BindToLINQ("", "", (s, e) => {
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<Selection>().GetAll().Where(p => p.DeletedDT == null);
+
+    e.KeyExpression = "SelectionID";
+    e.QueryableSource = source;
+}).GetHtml()

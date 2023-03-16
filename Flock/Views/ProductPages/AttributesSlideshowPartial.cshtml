@@ -1,0 +1,105 @@
+﻿@using Flock.ViewModels
+@model AttributeAssignmentViewModel
+@Html.DevExpress().ImageSlider(settings =>
+{
+    settings.Name = "Slideshow" + Model.ID;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.EnableTheming = true;
+    settings.ShowNavigationBar = true;
+    settings.SettingsImageArea.ImageSizeMode = ImageSizeMode.FitProportional;
+    settings.SettingsImageArea.ItemTextVisibility = ElementVisibilityMode.OnMouseOver;
+    settings.SettingsImageArea.NavigationButtonVisibility = ElementVisibilityMode.None;
+    settings.SettingsImageArea.NavigationDirection = NavigationDirection.Horizontal;
+    settings.SettingsImageArea.AnimationDuration = 600;
+    settings.SettingsBehavior.AllowMouseWheel = true;
+    settings.SettingsBehavior.EnablePagingByClick = AutoBoolean.True;
+    settings.SettingsBehavior.EnablePagingGestures = true;
+    settings.SettingsBehavior.ExtremeItemClickMode = ExtremeItemClickMode.SelectAndSlide;
+    settings.SettingsBehavior.ImageLoadMode = ImageLoadMode.Auto;
+    settings.SettingsNavigationBar.ItemSpacing = 8;
+    settings.SettingsNavigationBar.Mode = NavigationBarMode.Dots;
+    settings.SettingsNavigationBar.PagingMode = NavigationBarPagingMode.Single;
+    settings.SettingsNavigationBar.Position = NavigationBarPosition.Bottom;
+    settings.SettingsNavigationBar.ThumbnailsModeNavigationButtonVisibility = ElementVisibilityMode.None;
+    settings.SettingsNavigationBar.VisibleItemsCount = 10;
+    settings.SettingsSlideShow.AutoPlay = true;
+    settings.SettingsSlideShow.Interval = 4000;
+    settings.SettingsSlideShow.PausePlayingWhenMouseOver = true;
+    settings.SettingsSlideShow.PlayPauseButtonVisibility = ElementVisibilityMode.OnMouseOver;
+    settings.SettingsSlideShow.StopPlayingWhenPaging = true;
+
+    //var operation = "*";
+    //if (Convert.ToDecimal(Model.AspectRatio) > 1)
+    //{
+    //    operation = "/";
+    //}
+
+//    if (Model.ShowHotspots)
+//    {
+//        settings.ClientSideEvents.Init = @"function(s, e) {
+//            var width = $('#attributes-slideshow').width();
+//            var desiredHeight = width / " + Model.AspectRatio + @";
+//            $('#attributes-slideshow').css('height', desiredHeight+'px');
+//            s.AdjustControl();
+//            window.setTimeout(function() { ConfigureHotspots(" + Model.ID + @"); }, 1000);
+//        }";
+//    }
+//    else
+//    {
+        settings.ClientSideEvents.Init = @"function(s, e) {
+            var width = $('#attributes-slideshow').width();
+            var desiredHeight = width / " + Model.AspectRatio + @";
+            $('#attributes-slideshow').css('height', desiredHeight+'px');
+            s.AdjustControl();
+        }";
+    //}
+
+    settings.ClientSideEvents.ActiveItemChanged = @"function(s, e) {
+//        $('.hotspot-reveal').stop(true).css('display', 'none');
+    }";
+    
+    for (int i = 0; i < Model.SlideshowImages.Count; i++)
+    {
+        settings.Items.Add(
+        item =>
+        {
+            item.ImageUrl = "https://flock.designersguild.com/imagelibrary/654/" + Model.SlideshowImages[i].Record.ImageID + ".jpeg";
+
+//            if (Model.ShowHotspots)
+//            {
+//                string hotspotString = "";
+
+//                if (Model.SlideshowImages[i].Hotspots != null)
+//                {
+//                    for (int j = 0; j < Model.SlideshowImages[i].Hotspots.Count; j++)
+//                    {
+//                        string revealString = "";
+//                        if (Model.SlideshowImages[i].Hotspots[j].ProductImageID != null)
+//                            revealString = @"
+//                            <div class='hotspot-reveal' data-id='" + Model.SlideshowImages[i].Hotspots[j].ProductID + @"' style='display: none;'>
+//                                <img src='https://flock.designersguild.com/imagelibrary/239/" + Model.SlideshowImages[i].Hotspots[j].ProductImageID + @".jpeg'/>
+//                                <a href='#'>" + Model.SlideshowImages[i].Hotspots[j].ProductName + "</a>" + @"
+//                            </div>";
+//                        else
+//                            revealString = @"
+//                            <div class='hotspot-reveal' data-id='" + Model.SlideshowImages[i].Hotspots[j].ProductID + @"' style='display: none;'>
+//                                <img src='/images/image-not-found.gif'/>
+//                                <a href='#'>" + Model.SlideshowImages[i].Hotspots[j].ProductName + "</a>" + @"
+//                            </div>";
+
+//                        hotspotString += @"
+//                            <div class='hotspot' data-id='" + Model.SlideshowImages[i].Hotspots[j].ProductID + "' style='position: absolute; left: " + Model.SlideshowImages[i].Hotspots[j].X + "%; top: " + Model.SlideshowImages[i].Hotspots[j].Y + @"%'>"
+//                                + revealString +
+//                            "</div>";
+//                    }
+//                }
+//                item.SetTextTemplateContent(
+//                    "<div class='slideshow-hotspot-container' onmouseover='ConfigureHotspots(" + Model.ID + ");' style='overflow: visible;'>" +
+//                    hotspotString +
+//                    "</div>"
+//                );
+//            }
+        });
+    }
+}).GetHtml()

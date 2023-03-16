@@ -1,0 +1,38 @@
+﻿@model List<Flock.Models.PageSection_Collection_SelectResult>
+@for (int i = 0; i < Model.Count; i++)
+{
+    if (Model[i].ImageID != null)
+    {
+        <div class="collection-cell" data-collection-id="@(Model[i].CollectionID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <img src="https://flock.designersguild.com/imagelibrary/239/@(Model[i].ImageID).jpeg" />
+            <span>Collection: @(Model[i].Name)</span>
+            <br />
+            <span><a href="/admin/collections/compose/@(Model[i].CollectionID)">Collection ID: @(Model[i].CollectionID)</a></span>
+            <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="RemoveCollectionFromGrid(@(Model[i].PageSectionID), @(Model[i].CollectionID))" />
+        </div>
+    }
+    else
+    {
+        <div class="collection-cell" data-collection-id="@(Model[i].CollectionID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <img src="/images/admin/image-not-set-thin.png" style="width: 156px;" />
+            <span>Collection: @(Model[i].Name)</span>
+            <br />
+            <span><a href="/admin/collections/compose/@(Model[i].CollectionID)">Collection ID: @(Model[i].CollectionID)</a></span>
+            <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="RemoveCollectionFromGrid(@(Model[i].PageSectionID), @(Model[i].CollectionID))" />
+        </div>
+    }
+}
+@if (Model.Count == 0)
+{
+    <div class="collection-cell collection-placeholder">
+        <h5>No Collections have been assigned.</h5>
+    </div>
+}
+
+<div style="clear: both" class="collection-placeholder"></div>
+
+<script type="text/javascript">
+    //$(".page-section-grid-container").sortable({
+    InitCollectionDragDrop();
+    //});
+</script>

@@ -1,0 +1,44 @@
+﻿label {
+    margin-bottom: 0;
+}
+
+textarea {
+width: auto; height: auto; margin: 0;
+resize: none;
+}
+
+table {
+}
+
+#form-building-table td {
+    padding: 5px;
+}
+#form-building-table tbody {
+    border: 1px dotted black;
+}
+
+#form-details-table td {
+    padding: 5px;
+}
+
+td.spacer {
+    padding-bottom: 2em !important;
+}
+
+input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] { 
+background-color: #EEEEEE;
+cursor: pointer;
+}
+
+input[type="radio"], input[type="checkbox"] { 
+line-height: normal;
+margin: 0px;
+}
+
+#element-bin {
+background-color: #D04343;
+border-radius: 5px;
+height: 100px;
+margin-top: 4em;
+width: 50%;
+}

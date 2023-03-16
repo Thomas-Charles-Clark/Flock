@@ -1,0 +1,414 @@
+﻿@using Flock.Models
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<FlockDataContext>();
+
+        settings.Name = "ProductPageAttributeGridSelector";
+        settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "ProductPageAttributeGridSelectorPartial" };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+
+        }";
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+
+        var id = s.GetRowKey(e.visibleIndex);
+        $('#selected-product-page-id').val(id);
+        LoadingPanel.Show();
+        $('#attribute-page-link').attr('href', '/admin/productpages/attributes/' + id.toString());
+            $.ajax({
+                url: '" + @Url.Action("AttributeMainPartial", "ProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: id
+                },
+                success: function(data) {
+                   
+                    $('#attribute-main-target').html(data);
+
+                    LoadingPanel.Hide();
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a);
+                },
+                timeout: 20000
+            });
+        }";
+
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "ProductPageID").DisplayFormat = "Total: {0:n0}";
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.Styles.Row.Cursor = "pointer";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.CommandColumn.Visible = false;
+        settings.CommandColumn.ShowClearFilterButton = false;
+        settings.Settings.ShowFilterRow = true;
+
+        settings.SettingsPager.Mode = GridViewPagerMode.EndlessPaging;
+        // property to EndlessPaging, and the Settings.VerticalScrollBarMode
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsPager.PageSizeItemSettings.Visible = false;
+        settings.SettingsPager.PageSize = 10;
+
+        settings.SettingsBehavior.AllowFocusedRow = true;
+
+        settings.KeyFieldName = "ProductPageID";
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ProductPageID";
+            column.FieldName = "ProductPageID";
+            column.Caption = "ID";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Width = 50;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "TemplateID";
+            column.FieldName = "TemplateID";
+            column.Caption = "Template";
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Width = 75;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int TemplateID = 0;
+                string Template = "<i>Unknown</i>";
+
+                if (DataBinder.Eval(c.DataItem, "TemplateID") != DBNull.Value && DataBinder.Eval(c.DataItem, "TemplateID") != null)
+                {
+                    TemplateID = Convert.ToByte(DataBinder.Eval(c.DataItem, "TemplateID"));
+                    Template = UoW.GetRepository<Flock.Models.Template>().GetAll().Where(p => p.TemplateID == TemplateID).Select(p => p.Name).Single();
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + Template + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Name";
+            column.FieldName = "Name";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.Width = 280;
+            column.SetEditItemTemplateContent(c =>
+            {
+                Html.DevExpress().TextBox(
+                    edtSettings =>
+                    {
+                        edtSettings.Name = "Name";
+                        edtSettings.Properties.NullDisplayText = "Product Page Name";
+                        edtSettings.ShowModelErrors = true;
+                        edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }
+                )
+                .Bind(DataBinder.Eval(c.DataItem, "Name"))
+                .Render();
+            });
+
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.EditCellStyle.CssClass = "editform-cell";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ProductTypeID";
+            column.FieldName = "ProductTypeID";
+            column.Caption = "Product Type";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.Width = 110;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int ProductTypeID = 0;
+                string ProductType = "<i>Unknown</i>";
+
+                if (DataBinder.Eval(c.DataItem, "ProductTypeID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ProductTypeID") != null)
+                {
+                    ProductTypeID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "ProductTypeID"));
+                    ProductType = UoW.GetRepository<Flock.Models.ProductType>().GetAll().Where(p => p.ProductTypeID == ProductTypeID).Select(p => p.Name).Single();
+                }
+
+                ViewContext.Writer.Write("<span>" + ProductType + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "BrandID";
+            column.FieldName = "BrandID";
+            column.Caption = "Brand";
+            column.Width = 130;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int BrandID = 0;
+                string Brand = "<i>Unknown</i>";
+
+                if (DataBinder.Eval(c.DataItem, "BrandID") != DBNull.Value && DataBinder.Eval(c.DataItem, "BrandID") != null)
+                {
+                    BrandID = Convert.ToByte(DataBinder.Eval(c.DataItem, "BrandID"));
+                    Brand = UoW.GetRepository<Flock.Models.Brand>().GetAll().Where(p => p.BrandID == BrandID).Select(p => p.Name).Single();
+                }
+
+                ViewContext.Writer.Write("<span>" + Brand + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "LaunchID";
+            column.FieldName = "LaunchID";
+            column.Caption = "Launch";
+            column.Width = 120;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int LaunchID = 0;
+                string Launch = "<i>Unknown</i>";
+
+                if (DataBinder.Eval(c.DataItem, "LaunchID") != DBNull.Value && DataBinder.Eval(c.DataItem, "LaunchID") != null)
+                {
+                    LaunchID = Convert.ToByte(DataBinder.Eval(c.DataItem, "LaunchID"));
+                    Launch = UoW.GetRepository<Flock.Models.Launch>().GetAll().Where(p => p.LaunchID == LaunchID).Select(p => p.Name).Single();
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + Launch + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ColourID";
+            column.FieldName = "ColourID";
+            column.Caption = "Primary Colour";
+            column.Width = 120;
+            column.HeaderStyle.Wrap = DefaultBoolean.False;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int ColourID = 0;
+                string Colour = "<i>BLANK</i>";
+
+                if (DataBinder.Eval(c.DataItem, "ColourID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ColourID") != null)
+                {
+                    ColourID = Convert.ToByte(DataBinder.Eval(c.DataItem, "ColourID"));
+                    Colour = UoW.GetRepository<Flock.Models.Colour>().GetAll().Where(p => p.ColourID == ColourID).Select(p => p.Name).Single();
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + Colour + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "PatternID";
+            column.FieldName = "PatternID";
+            column.Caption = "Primary Pattern";
+            column.Width = 120;
+            column.HeaderStyle.Wrap = DefaultBoolean.False;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int patternID = 0;
+                string Pattern = "";
+
+                if (DataBinder.Eval(c.DataItem, "PatternID") != DBNull.Value && DataBinder.Eval(c.DataItem, "PatternID") != null)
+                {
+                    patternID = Convert.ToByte(DataBinder.Eval(c.DataItem, "PatternID"));
+                    Pattern = UoW.GetRepository<Flock.Models.Pattern>().GetAll().Where(p => p.PatternID == patternID).Select(p => p.Name).Single();
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + Pattern + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "CreatedDT";
+            column.FieldName = "CreatedDT";
+            column.Caption = "Created DT";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = 70;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        });
+
+        MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+        WebStatusColumn.FieldName = "StatusID";
+        WebStatusColumn.Name = "StatusID";
+        WebStatusColumn.Caption = "Web Status";
+        WebStatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        WebStatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        WebStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        WebStatusColumn.Width = 80;
+        WebStatusColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        WebStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+            string colour = "black";
+            string statusText = "unknown";
+            statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+            switch (i)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+            ViewContext.Writer.Write(res);
+        });
+        settings.Columns.Add(WebStatusColumn);
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "LaunchID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Launch>().GetAll().OrderByDescending(p => p.LaunchDate))
+                    {
+                        e.AddValue(pt.Name, pt.LaunchID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "ColourID":
+                    e.Values.Clear();
+                    foreach (var c in UoW.GetRepository<Flock.Models.Colour>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(c.Name, c.ColourID.ToString());
+                    }
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(e.Column, "BLANK"));
+                    e.AddShowAll();
+                    break;
+
+                case "PatternID":
+                    e.Values.Clear();
+                    foreach (var c in UoW.GetRepository<Flock.Models.Pattern>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(c.Name, c.PatternID.ToString());
+                    }
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(e.Column, "BLANK"));
+                    e.AddShowAll();
+                    break;
+
+                case "TemplateID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Template>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.TemplateID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "ProductTypeID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.ProductType>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.ProductTypeID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "BrandID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Brand>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.BrandID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "StatusID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+            }
+        };
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ("", "", (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var source = dataContext.GetRepository<Flock.Models.vwProductPage>().GetAll().Where(p => p.DeletedDT == null);
+
+    e.QueryableSource = source;
+
+    e.KeyExpression = "ProductPageID";
+}).GetHtml()

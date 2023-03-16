@@ -1,0 +1,293 @@
+﻿@model Flock.ViewModels.DeliveryOptionViewModel
+@{
+    ViewBag.Title = "Delivery Options";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/attributes.css")
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #container {
+            width: 2050px !important;
+        }
+
+        #DeliveryOptionGridView_tcFC1 {
+            text-align: center;
+        }
+
+        #DeliveryOptionGridView_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Delivery Options</h4>
+
+<input id="selected-delivery-id" type="hidden" value="@(Model.DeliveryID)" />
+
+
+<div style="float: right; width: 986px;">
+    <div id="bulk-action-panel" style="width: 20% !important; margin-left: 0; float: left; margin-bottom: 454px;">
+        <h4>Bulk Action Panel</h4>
+        <ul>
+            <li>
+                <a href="javascript:;" title="Delete" onclick="$.confirm(DeleteSelectedDeliveryOptions, function () { });">Delete</a>
+            </li>
+        </ul>
+    </div>
+    <div style="clear:both;"></div>
+
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+
+
+    <div style="clear:both;"></div>
+</div>
+
+<div style="float: left; width: 986px; margin-left: 20px;">
+    <div style="width: 100%;">
+        <div id="delivery-select-header-container">
+            <div class="content-panel-container">
+                <fieldset id="delivery-select-header">
+                    <legend style="color: black; border-bottom-color: #929292; cursor: default;">Delivery Options Grid</legend>
+                    <div id="delivery-select-header-inner" style="">
+                        <div id="delivery-header-grid-container">
+                            @Html.Partial("DeliveryOptionGridViewPartial")
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="delivery-compose-container">
+            @if (ViewData["InvalidDeliveryIDError"] != null)
+            {
+                <h5>@(ViewData["InvalidDeliveryIDError"])</h5>
+            }
+            @if (Model.DeliveryID != null)
+            {
+                @Html.Partial("DeliveryOptionComposePartial", Model)
+                <script type="text/javascript">
+                    MessageGridView.AutoFilterByColumn(2, '@(Model.DeliveryID)');
+                </script>
+            }
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+
+<div style="clear: both;"></div>
+
+<div id="bad-selection-dialog">
+    <h5 style="display: none;">You must select at least one Delivery Option.</h5>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#bad-selection-dialog").dialog({
+            title: "Bad Selection",
+            width: 240,
+            height: "auto",
+            resizable: false,
+            modal: true,
+            autoOpen: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog('close');
+                }
+            }
+        })
+        $("#bad-selection-dialog > h5").css("display", "block");
+    });
+
+    function DeleteSelectedDeliveryOptions() {
+        var keys = null;
+
+        if (typeof (DeliveryOptionGridView) != "undefined" && DeliveryOptionGridView != false)
+            keys = DeliveryOptionGridView.GetSelectedKeysOnPage();
+
+        if (keys[$('#selected-delivery-id').val()]) {
+            $("#selected-delivery-id").val(null);
+            $("#delivery-compose-container").html("");
+        }
+
+        if (typeof (keys) != "undefined" && keys != false)
+            DeliveryOptionGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+        else
+            $("#bad-selection-dialog").dialog("open");
+    }
+
+    function ConfirmedDelete(args) {
+        if (DeliveryOptionGridView.GetRowKey(args[0]) == $("#selected-delivery-id").val()) {
+            $("#selected-delivery-id").val(null);
+            $("#delivery-compose-container").html("");
+        }
+        DeliveryOptionGridView.DeleteRow(args[0]);
+    }
+
+    function InitCountryDragDrop() {
+        $("#country-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".country-restriction-flag",
+            placeholder: ".ui-state-highlight-country-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('country-flag')) {
+                    $("#country-restriction-section").sortable("refresh");
+                    window.CountryRestrictions = new Array();
+                    if ($("#country-restriction-placeholder").length > 0)
+                        $("#country-restriction-placeholder").remove();
+                    $("#country-restriction-section").children("div").each(function (index) {
+                        window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                    });
+                    UpdateCountryRestrictions();
+                }
+            }
+        });
+        $(".country-flag").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#country-restriction-section"
+        });
+    }
+
+    function UpdateCountryRestrictions() {
+        LoadingPanel.Show();
+        $("#country-restriction-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("UpdateDeliveryOptionCountryRestrictions", "eCommerce")',
+            type: "POST",
+            traditional: true,
+            data: { DeliveryID: $('#selected-delivery-id').val(), Countries: JSON.stringify(window.CountryRestrictions) },
+            success: function (data) {
+                $("#country-restriction-busy").fadeOut("fast");
+                $("#country-restriction-container").html(data);
+                LoadingPanel.Hide();
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveCountryFromRestriction() {
+        $("#country-restriction-section").sortable("refresh");
+        window.CountryRestrictions = new Array();
+        if ($("#country-restriction-placeholder").length > 0)
+            $("#country-restriction-placeholder").remove();
+        $("#country-restriction-section").children("div").each(function (index) {
+            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+        });
+        UpdateCountryRestrictions();
+    }
+
+    function RemoveAllCountryRestrictions() {
+        $.confirm(function () {
+            window.CountryRestrictions = new Array();
+            UpdateCountryRestrictions();
+        }, function () { });
+    }
+
+    function SaveDeliveryOptionDetails() {
+        var onDate = null;
+        if (OnDate.GetValue() != null)
+            onDate = OnDate.GetValue().toGMTString();
+        var offDate = null;
+        if (OffDate.GetValue() != null)
+            offDate = OffDate.GetValue().toGMTString();
+
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("SaveDeliveryOptionDetails", "eCommerce")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                DeliveryID: $("#selected-delivery-id").val(),
+                DeliveryServiceID: DeliveryServiceID.GetValue(),
+                Name: Name.GetValue(),
+                HaulCode: HaulCode.GetValue(),
+                CarrCode: CarrCode.GetValue(),
+                PostCodeRestrictions: PostCodeRestrictions.GetValue(),
+                MinThreshold: MinThreshold.GetValue(),
+                MaxThreshold: MaxThreshold.GetValue(),
+                PricePerItem: PricePerItem.GetValue(),
+                PricePerDispatch: PricePerDispatch.GetValue(),
+                OnDate: onDate,
+                OffDate: offDate
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                SuccessFade($("#delivery-details-save"));
+                DeliveryOptionGridView.Refresh();
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                $("#delivery-compose-container").html(e.responseText);
+                FailureFade($("#delivery-details-save"));
+            },
+            timeout: 30000
+        });
+    }
+
+    function UpdateProductTypes() {
+        $.ajax({
+            url: '@(Url.Action("UpdateDeliveryOptionProductTypes", "eCommerce"))',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ProductTypeIDs: window.ProductTypes.toString(),
+                DeliveryID: $("#selected-delivery-id").val()
+            },
+            success: function (data) {
+                $("#delivery-compose-container").html(data);
+                GreenFade($("#product-types-assigned-droppable"));
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveProductType(ProductTypeID) {
+        $.ajax({
+            url: '@(Url.Action("RemoveProductTypeFromDeliveryOption", "eCommerce"))',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ProductTypeID: ProductTypeID,
+                DeliveryID: $("#selected-delivery-id").val()
+            },
+            success: function (data) { 
+                $("#delivery-compose-container").html(data);
+            },
+            timeout: 20000
+        });
+    }
+
+    function AddAllProductTypes(AttributeGroupID) {
+        $.ajax({
+            url: '@Url.Action("AddAllProductTypesToDeliveryOption", "eCommerce")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                DeliveryID: $('#selected-delivery-id').val()
+            },
+            success: function (data) {
+                $("#delivery-compose-container").html(data);
+            },
+            timeout: 20000
+        });
+    }
+
+    function ClearAllProductTypes() {
+        $.ajax({
+            url: '@Url.Action("RemoveAllProductTypesFromDeliveryOption", "eCommerce")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                DeliveryID: $('#selected-delivery-id').val()
+            },
+            success: function (data) {
+                $("#delivery-compose-container").html(data);
+            },
+            timeout: 20000
+        });
+    }
+</script>
+

@@ -1,0 +1,74 @@
+﻿@model QualityComposeViewModel
+@using Flock.ViewModels
+@{
+    ViewBag.Title = "Compose";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+    @Styles.Render("~/bundles/composer")
+    
+    @Styles.Render("~/Content/quality-compose.css")
+    <style type="text/css">
+        #container { 
+            width: 1260px;
+        }
+        #QualityComposeGridSelector_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        var mouseLeaveTimer;
+
+        function OnGetRowValue(value) {
+
+        }
+
+        function FetchQualityFurtherInfo(ele) {
+            var result = "failed to fetch info";
+            $.ajax({
+                url: '@Url.Action("GetQualityFurtherInformation", "Qualities")',
+                type: 'POST',
+                traditional: true,
+                asynch: true,
+                data: {
+                    QualityID: ele.data('quality-id')
+                },
+                success: function (data) {
+                    $(ele).tooltip('option', 'content', data);
+                    result = data;
+                },
+                error: function (e, s, a) {
+                    return result;
+                },
+                timeout: 20000
+            }).always(
+            function (data, textStatus, errorThrown) {
+                window.setTimeout(function () {
+                    $(ele).tooltip('close');
+                }, 2500);
+                $(ele).find(".ui-tooltip-content").html(data);
+
+            });
+        }
+    </script>
+}
+
+<input type="hidden" id="selected-quality-id" value="@(Model.QualityID)" />
+
+<h4 class="page-heading">Quality Compose</h4>
+
+<div id="quality-select-header-container">
+    <div class="content-panel-container">
+        <fieldset id="quality-select-header">
+            <legend style="color: black; border-bottom-color: #929292;" onclick="$('#quality-select-header-inner').slideToggle('fast');">Quality Selector (click to expand / contract)</legend>
+            <div id="quality-select-header-inner" style="">
+                <div id="quality-header-grid-container">
+                    @Html.Action("QualitySelectorGridPartial", "Qualities")
+                </div>
+                <div style="clear: both"></div>
+            </div>
+        </fieldset>
+    </div>
+</div>

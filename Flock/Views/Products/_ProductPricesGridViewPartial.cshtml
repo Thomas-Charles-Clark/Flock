@@ -1,0 +1,699 @@
+@model Flock.ViewModels.PriceOverviewSettings
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+        settings.Name = "ProductPricesGridView";
+        settings.CallbackRouteValues = new { Controller = "Products", Action = "ProductPricesGridViewPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { };// Controller = "Products", Action = "ProductPricesGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Products", Action = "ProductPricesGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { };// Controller = "Products", Action = "ProductPricesGridViewPartialDelete" };
+        settings.CustomActionRouteValues = new { Controller = "Products", Action = "ProductPricesGridViewCustomCommand" };
+
+        settings.ClientSideEvents.BeginCallback = @"function OnBeginCallback(s, e) {
+            e.customArgs['PriceListID'] = PricesOverviewPriceListListBox.GetValue();
+            e.customArgs['ColourIDs'] = PricesOverviewColourListBox.GetSelectedValues().toString();
+            e.customArgs['CollectionIDs'] = PricesOverviewCollectionListBox.GetSelectedValues().toString();
+        }";
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.CommandColumn.VisibleIndex = 21;
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowEditButton = false;
+        settings.CommandColumn.ShowUpdateButton = false;
+        settings.CommandColumn.ShowCancelButton = false;
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.Width = 70;
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("Select All");
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+        });
+
+        settings.KeyFieldName = "ProductID";
+
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowHeaderFilterButton = true;
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "10", "20", "50", "100", "200", "500" };
+        //settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        //settings.SettingsDetail.ShowDetailRow = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(Html.Action("ProductPricesGridDetailPartial", "Products", new { ProductID = c.KeyValue }));
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ProductID";
+            column.Name = "ProductID";
+            column.Caption = "Product ID";
+            column.ReadOnly = true;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.SetEditItemTemplateContent(c => {
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "ProductID").ToString());
+            });
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Enabled";
+            column.Name = "Enabled";
+            column.Caption = "Enabled";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                bool? enabledState = (bool?)DataBinder.Eval(c.DataItem, "Enabled");
+                if (enabledState != null)
+                {
+                    if (enabledState == true)
+                        ViewContext.Writer.Write("<span style='color: green'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                    else
+                        ViewContext.Writer.Write("<span style='color: red'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                }
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                bool? enabledState = (bool?)DataBinder.Eval(c.DataItem, "Enabled");
+                if (enabledState != null)
+                {
+                    if (enabledState == true)
+                        ViewContext.Writer.Write("<span style='color: green'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                    else
+                        ViewContext.Writer.Write("<span style='color: red'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                }
+            });
+        });
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.FieldName = "Status";
+        //    column.Name = "Status";
+        //    column.Caption = "Status";
+        //    column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        //    column.Settings.AllowAutoFilter = DefaultBoolean.False;
+        //    column.SetDataItemTemplateContent(c =>
+        //    {
+        //        char enabledState = '?';
+        //        if (DataBinder.Eval(c.DataItem, "Status") != DBNull.Value && DataBinder.Eval(c.DataItem, "Status") != null)
+        //            enabledState = (char)DataBinder.Eval(c.DataItem, "Status");
+        //        switch (enabledState)
+        //        {
+        //            case 'C':
+        //                ViewContext.Writer.Write("<span style='color: green'>" + enabledState + "</span>");
+        //                break;
+        //            case 'D':
+        //                ViewContext.Writer.Write("<span style='color: red'>" + enabledState + "</span>");
+        //                break;
+        //            case 'L':
+        //                ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+        //                break;
+        //            case 'Y':
+        //                ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+        //                break;
+        //            default:
+        //                ViewContext.Writer.Write("<span style='color: black'>" + enabledState + "</span>");
+        //                break;
+        //        }
+        //    });
+        //    column.SetEditItemTemplateContent(c =>
+        //    {
+        //        char enabledState = '?';
+        //        if (DataBinder.Eval(c.DataItem, "Status") != DBNull.Value && DataBinder.Eval(c.DataItem, "Status") != null)
+        //            enabledState = (char)DataBinder.Eval(c.DataItem, "Status");
+        //        switch (enabledState)
+        //        {
+        //            case 'C':
+        //                ViewContext.Writer.Write("<span style='color: green'>" + enabledState + "</span>");
+        //                break;
+        //            case 'D':
+        //                ViewContext.Writer.Write("<span style='color: red'>" + enabledState + "</span>");
+        //                break;
+        //            case 'L':
+        //                ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+        //                break;
+        //            case 'Y':
+        //                ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+        //                break;
+        //            default:
+        //                ViewContext.Writer.Write("<span style='color: black'>" + enabledState + "</span>");
+        //                break;
+        //        }
+        //    });
+        //});
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "StatusID";
+            column.Name = "WebStatus";
+            column.Caption = "Web Status";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+                string colour = "black";
+                string statusText = "unknown";
+                statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+                switch (i)
+                {
+                    case 0:
+                        colour = "green";
+                        break;
+                    case 1:
+                        colour = "orange";
+                        break;
+                    case 2:
+                        colour = "orange";
+                        break;
+                    case 3:
+                        colour = "green";
+                        break;
+                    case 4:
+                        colour = "red";
+                        break;
+                    default: break;
+                }
+                string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+                ViewContext.Writer.Write(res);
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "StatusID") != DBNull.Value)
+                {
+                    var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+                    string colour = "black";
+                    string statusText = "unknown";
+                    statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+                    switch (i)
+                    {
+                        case 0:
+                            colour = "green";
+                            break;
+                        case 1:
+                            colour = "orange";
+                            break;
+                        case 2:
+                            colour = "orange";
+                            break;
+                        case 3:
+                            colour = "green";
+                            break;
+                        case 4:
+                            colour = "red";
+                            break;
+                        default: break;
+                    }
+                    string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+                    ViewContext.Writer.Write(res);
+                }
+                else
+                    ViewContext.Writer.Write("Unknown");
+            });
+        });
+
+        MVCxGridViewColumn StockStatusColumn = new MVCxGridViewColumn();
+        StockStatusColumn.FieldName = "StockStatus";
+        StockStatusColumn.Name = "StockStatus";
+        StockStatusColumn.Caption = "Stock";
+        StockStatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        StockStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        StockStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            int StockStatusID = 0;
+            if (DataBinder.Eval(c.DataItem, "StockStatusID") != DBNull.Value && DataBinder.Eval(c.DataItem, "StockStatusID") != null)
+                StockStatusID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "StockStatusID"));
+            string stockStatus = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "StockStatus") != DBNull.Value && DataBinder.Eval(c.DataItem, "StockStatus") != null)
+                stockStatus = DataBinder.Eval(c.DataItem, "StockStatus").ToString();
+
+
+            switch (StockStatusID)
+            {
+                case 1:
+                    ViewContext.Writer.Write("<span style='color: green'>" + stockStatus + "</span>");
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    ViewContext.Writer.Write("<span style='color: orange'>" + stockStatus + "</span>");
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    ViewContext.Writer.Write("<span style='color: red'>" + stockStatus + "</span>");
+                    break;
+
+                default:
+                    ViewContext.Writer.Write("<span style='color: black'>" + stockStatus + "</span>");
+                    break;
+            }
+        });
+        StockStatusColumn.SetEditItemTemplateContent(c =>
+        {
+            int StockStatusID = 0;
+            if (DataBinder.Eval(c.DataItem, "StockStatusID") != DBNull.Value && DataBinder.Eval(c.DataItem, "StockStatusID") != null)
+                StockStatusID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "StockStatusID"));
+            string stockStatus = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "StockStatus") != DBNull.Value && DataBinder.Eval(c.DataItem, "StockStatus") != null)
+                stockStatus = DataBinder.Eval(c.DataItem, "StockStatus").ToString();
+
+
+            switch (StockStatusID)
+            {
+                case 1:
+                    ViewContext.Writer.Write("<span style='color: green'>" + stockStatus + "</span>");
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    ViewContext.Writer.Write("<span style='color: orange'>" + stockStatus + "</span>");
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    ViewContext.Writer.Write("<span style='color: red'>" + stockStatus + "</span>");
+                    break;
+
+                default:
+                    ViewContext.Writer.Write("<span style='color: black'>" + stockStatus + "</span>");
+                    break;
+            }
+        });
+        settings.Columns.Add(StockStatusColumn);
+
+        MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+        ProductTypeColumn.FieldName = "ProductType";
+        ProductTypeColumn.Name = "ProductType";
+        ProductTypeColumn.Caption = "Product Type";
+        ProductTypeColumn.SetDataItemTemplateContent(c => {
+            if (DataBinder.Eval(c.DataItem, "ProductType") != DBNull.Value)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "ProductType"));
+            else
+                ViewContext.Writer.Write("Unknown");
+        });
+        ProductTypeColumn.SetEditItemTemplateContent(c => {
+            if (DataBinder.Eval(c.DataItem, "ProductType") != DBNull.Value)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "ProductType"));
+            else
+                ViewContext.Writer.Write("Unknown");
+        });
+        settings.Columns.Add(ProductTypeColumn);
+
+        //ProductTypeColumn
+        MVCxGridViewColumn BrandColumn = new MVCxGridViewColumn();
+        BrandColumn.FieldName = "Brand";
+        BrandColumn.Name = "Brand";
+        BrandColumn.Caption = "Brand";
+        BrandColumn.SetDataItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "Brand") != DBNull.Value)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Brand"));
+            else
+                ViewContext.Writer.Write("Unknown");
+        });
+        BrandColumn.SetEditItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "Brand") != DBNull.Value)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Brand"));
+            else
+                ViewContext.Writer.Write("Unknown");
+        });
+        settings.Columns.Add(BrandColumn);
+        MVCxGridViewColumn LaunchColumn = new MVCxGridViewColumn();
+        LaunchColumn.FieldName = "Launch";
+        LaunchColumn.Name = "Launch";
+        LaunchColumn.Caption = "Launch";
+        LaunchColumn.SetDataItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "Launch") != DBNull.Value)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Launch"));
+            else
+                ViewContext.Writer.Write("Unknown");
+        });
+        LaunchColumn.SetEditItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "Launch") != DBNull.Value)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Launch"));
+            else
+                ViewContext.Writer.Write("Unknown");
+        });
+        settings.Columns.Add(LaunchColumn);
+        MVCxGridViewColumn DesignColumn = new MVCxGridViewColumn();
+        DesignColumn.FieldName = "Design";
+        DesignColumn.Name = "Design";
+        DesignColumn.Caption = "Design";
+        DesignColumn.SetDataItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "Design") != DBNull.Value)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Design"));
+            else
+                ViewContext.Writer.Write("Unknown");
+        });
+        DesignColumn.SetEditItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "Design") != DBNull.Value)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Design"));
+            else
+                ViewContext.Writer.Write("Unknown");
+        });
+        settings.Columns.Add(DesignColumn);
+
+        settings.Columns.Add(column => {
+            column.FieldName = "Code";
+            column.Name = "Code";
+            column.Caption = "Code";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.SetEditItemTemplateContent(c => {
+                if (DataBinder.Eval(c.DataItem, "Code") != DBNull.Value)
+                    ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Code"));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Name";
+            column.Name = "Name";
+            column.Caption = "Name";
+            column.Width = 260;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "Name") != DBNull.Value)
+                    ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Name"));
+                else
+                    ViewContext.Writer.Write("Not set");
+            });
+        });
+
+        //settings.Columns.Add(column =>
+        //{
+        //    column.FieldName = "Description";
+        //    column.Name = "Description";
+        //    column.Caption = "Name";
+        //    column.Width = 260;
+        //    column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        //    column.SetEditItemTemplateContent(c =>
+        //    {
+        //        if (DataBinder.Eval(c.DataItem, "Description") != DBNull.Value)
+        //            ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Description"));
+        //        else
+        //            ViewContext.Writer.Write("Description field is NULL");
+        //    });
+        //    column.SetDataItemTemplateContent(c =>
+        //    {
+        //        if (DataBinder.Eval(c.DataItem, "Description") != DBNull.Value)
+        //            ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Description"));
+        //        else
+        //            ViewContext.Writer.Write("Description field is NULL");
+        //    });
+        //});
+
+
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.SettingsBehavior.AllowSelectSingleRowOnly = false;
+
+        //settings.SettingsDetail.ShowDetailButtons = true;
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "MertexPriceInc";
+            column.Name = "MertexPriceInc";
+            column.Caption = "MertexPriceInc";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "MertexPriceInc") != DBNull.Value && DataBinder.Eval(c.DataItem, "MertexPriceInc") != null)
+                    ViewContext.Writer.Write(String.Format("{0:F2}", (decimal)DataBinder.Eval(c.DataItem, "MertexPriceInc")));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "MertexPriceEx";
+            column.Name = "MertexPriceEx";
+            column.Caption = "MertexPriceEx";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "MertexPriceEx") != DBNull.Value && DataBinder.Eval(c.DataItem, "MertexPriceEx") != null)
+                    ViewContext.Writer.Write(String.Format("{0:F2}", (decimal)DataBinder.Eval(c.DataItem, "MertexPriceEx")));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Discrepancy";
+            column.Name = "Discrepancy";
+            column.Caption = "Discrepancy";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "Discrepancy") != DBNull.Value)
+                    ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Discrepancy").ToString());
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "PriceInc";
+            column.Caption = "PriceInc";
+            //column.Name = "PriceInc";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+            column.SetEditItemTemplateContent(c =>
+            {
+                Html.DevExpress().TextBox(tb =>
+                {
+                    tb.Name = "PriceInc";
+                    tb.Properties.DisplayFormatString = "F2";
+                    tb.Properties.DisplayFormatInEditMode = true;
+                    tb.Properties.MaskSettings.Mask = "<0..999999>.<00..99>";
+                    tb.Width = 50;
+                }).Bind(c.DataItem, "PriceInc").Render();
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "PriceEx";
+            column.Caption = "PriceEx";
+            //column.Name = "PriceEx";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+            column.SetEditItemTemplateContent(c =>
+            {
+                Html.DevExpress().TextBox(tb =>
+                {
+                    tb.Name = "PriceEx";
+                    tb.Properties.DisplayFormatString = "F2";
+                    tb.Properties.DisplayFormatInEditMode = true;
+                    tb.Properties.MaskSettings.Mask = "<0..999999>.<00..99>";
+                    tb.Width = 50;
+                }).Bind(c.DataItem, "PriceEx").Render();
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "TaxPercentage";
+            column.Name = "TaxPercentage";
+            column.Caption = "Tax %";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.PropertiesEdit.DisplayFormatString = "F1";
+
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? TXP = (decimal?)DataBinder.Eval(c.DataItem, "TaxPercentage");
+
+                if (TXP != null)
+                {
+                    ViewContext.Writer.Write(String.Format("{0:F1}%", TXP));
+                }
+                else
+                {
+                    ViewContext.Writer.Write("0.0%");
+                }
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "TaxPercentage") != DBNull.Value && DataBinder.Eval(c.DataItem, "TaxPercentage") != null)
+                    ViewContext.Writer.Write(String.Format("{0:F1}%", (decimal)DataBinder.Eval(c.DataItem, "TaxPercentage")));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "TaxValue";
+            column.Name = "TaxValue";
+            column.Caption = "Tax";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "TaxValue") != DBNull.Value && DataBinder.Eval(c.DataItem, "TaxValue") != null)
+                    ViewContext.Writer.Write(String.Format("{0:F2}", (decimal)DataBinder.Eval(c.DataItem, "TaxValue")));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "CostSterling";
+            column.Name = "CostSterling";
+            column.Caption = "Cost Sterling";
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "CostSterling") != DBNull.Value)
+                    ViewContext.Writer.Write(String.Format("{0:C2}", (decimal)DataBinder.Eval(c.DataItem, "CostSterling")));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "GMPercentage";
+            column.Name = "GMPercentage";
+            column.Caption = "GM%";
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? GMP = (decimal?)DataBinder.Eval(c.DataItem, "GMPercentage");
+
+                if (GMP != null)
+                {
+                    ViewContext.Writer.Write(String.Format("{0:F1}%", GMP));
+                }
+                else
+                {
+                    ViewContext.Writer.Write("0.0%");
+                }
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "GMPercentage") != DBNull.Value)
+                    ViewContext.Writer.Write(String.Format("{0:F1}%", (decimal)DataBinder.Eval(c.DataItem, "GMPercentage")));
+                else
+                    ViewContext.Writer.Write("0.0%");
+            });
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "Enabled":
+                    e.AddShowAll();
+                    break;
+                case "Discrepancy":
+                    e.Values.Clear();
+                    e.AddValue("Yes", "Yes");
+                    e.AddValue("No", "No");
+                    e.AddShowAll();
+                    break;
+                case "WebStatus":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+
+        settings.HtmlRowPrepared = (s, e) =>
+        {
+            if (e.RowType != GridViewRowType.Data) return;
+
+            if (e.GetValue("Discrepancy") != null)
+            {
+                var x = e.GetValue("Discrepancy").ToString();
+                if (x == "Yes")
+                {
+                    e.Row.BackColor = System.Drawing.Color.FromArgb(255, 241, 241);
+                }
+            }
+        };
+        //settings.Columns.Add("GM");
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ(string.Empty, string.Empty, (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    var source = dataContext.GetRepository<Flock.Models.vwProductPrice>().GetAll();
+
+    if (Model.PriceListID != null)
+    {
+        source = source.Where(p => p.PriceListID == Model.PriceListID);
+    }
+    else
+    {
+        source = source.Where(p => p.PriceListID == 1);
+    }
+    
+    var x = new List<int>(); // Collection linker
+    var y = new List<int>();
+    
+    if (Model.CollectionIDs != null)
+    {
+        foreach (short c in Model.CollectionIDs)
+        {
+            x = x.Concat(dataContext.GetRepository<Flock.Models.Product_Collection>().GetAll().Where(q => q.CollectionID == c).Select(q => q.ProductID)).ToList();
+        }
+        source = source.Where(p => x.Contains(p.ProductID));
+    }
+    if (Model.ColourIDs != null)
+    {
+        foreach (byte c in Model.ColourIDs)
+        {
+            y = y.Concat(dataContext.GetRepository<Flock.Models.Product_Colour>().GetAll().Where(q => q.ColourID == c).Select(q => q.ProductID)).ToList();
+        }
+        source = source.Where(p => y.Contains(p.ProductID));
+    }
+    e.KeyExpression = "ProductID";
+    e.QueryableSource = source;
+}).GetHtml()

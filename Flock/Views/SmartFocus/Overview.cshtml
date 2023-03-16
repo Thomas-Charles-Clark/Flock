@@ -1,0 +1,303 @@
+﻿@{
+    ViewBag.Title = "SmartFocus Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/smartfocus.css")
+}
+
+<h4 class="page-heading">
+    SmartFocus Overview
+</h4>
+
+<div id="test-group-container">
+    @Html.Action("SmartFocusTestGroupPartial")
+</div>
+@*CreateSegment(string segmentName, string _connectionToken = null)*@
+
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "NewSegmentName";
+    settings.Properties.NullDisplayText = "New Segment Name...";
+    settings.Properties.NullText = "New Segment Name";
+    settings.Height = 28;
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "NewSegmentButton";
+    settings.Text = "Create Segment";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        if(NewSegmentName.GetValue() != null) {
+            CreateSegment(NewSegmentName.GetValue());
+        }
+        else {
+            alert('Provide a name for this new Segment');
+        }
+    }";
+}).GetHtml()
+
+<div style="clear: both;"></div>
+
+
+@Html.DevExpress().TextBox(settings => {
+    settings.Name = "NewTestGroupName";
+    settings.Properties.NullDisplayText = "New Test Group Name...";
+    settings.Properties.NullText = "New Test Group Name";
+    settings.Height = 28;
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+@Html.DevExpress().Button(settings => {
+    settings.Name = "NewTestGroupButton";
+    settings.Text = "Create Test Group";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.ClientSideEvents.Click = @"function(s, e) { 
+        if(NewTestGroupName.GetValue() != null) {
+            CreateTestGroup(NewTestGroupName.GetValue());
+        }
+        else {
+            alert('Provide a name for this new Test Group');
+        }
+    }";
+}).GetHtml()
+
+<div style="clear: both;"></div>
+
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "NewTestMemberEmail";
+    settings.Properties.NullDisplayText = "New Test Member Email...";
+    settings.Properties.NullText = "New Test Member Email";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "NewTestMemberButton";
+    settings.Text = "Create Test Member";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        if(NewTestMemberEmail.GetValue() != null) {
+            CreateTestMember(NewTestMemberEmail.GetValue());
+        }
+        else {
+            alert('Provide an email for this new Test Member');
+        }
+    }";
+}).GetHtml()
+
+<div style="clear: both;"></div>
+
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "ExtantTestMemberEmail";
+    settings.Properties.NullDisplayText = "Extant Test Member Email...";
+    settings.Properties.NullText = "Extant Test Member Email";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "ExtantTestMemberNewEmail";
+    settings.Properties.NullDisplayText = "Extant Test New Member Email...";
+    settings.Properties.NullText = "Extant Test Member New Email";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "ExtantTestMemberNewEmailButton";
+    settings.Text = "Update Test Member Email";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        if(ExtantTestMemberEmail.GetValue() != null && ExtantTestMemberNewEmail.GetValue() != null) {
+            UpdateTestMemberEmail(ExtantTestMemberEmail.GetValue(), ExtantTestMemberNewEmail.GetValue());
+        }
+        else {
+            alert('Provide an email to identify the Test Member, and a replacement email for this Test Member.');
+        }
+    }";
+}).GetHtml()
+
+<div style="clear: both;"></div>
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "UploadButton";
+    settings.Text = "Upload CSV";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        UploadCSV();
+    }";
+}).GetHtml()
+
+
+
+@section scripts {
+    <script type="text/javascript">
+        function UpdateTestMemberEmail(ExtantEmail, NewEmail) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("UpdateTestMemberEmail", "SmartFocus")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ExtantEmail: ExtantEmail,
+                    NewEmail: NewEmail
+                },
+                success: function (data) {
+                    $("#test-group-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                },
+                timeout: 2000000
+            });
+        }
+
+        function GetDistinctMemberCountForSegment(ele) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("GetDistinctMemberCountForSegment", "SmartFocus")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    SegmentID: $(ele).data('segment-id')
+                },
+                success: function (data) {
+                    $(ele).html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                },
+                timeout: 2000000
+            });
+        }
+
+        function UploadCSV() {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("UploadCSV", "SmartFocus")',
+                type: 'POST',
+                traditional: true,
+                data: {
+
+                },
+                success: function (data) {
+                    $("#test-group-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                },
+                timeout: 2000000
+            });
+        }
+
+        function CreateSegment(Name) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("CreateSegment", "SmartFocus")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    Name: Name,
+                },
+                success: function (data) {
+                    $("#test-group-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                },
+                timeout: 2000000
+            });
+        }
+
+        function CreateTestGroup(Name) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("CreateTestGroup", "SmartFocus")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    Name: Name,
+                },
+                success: function (data) {
+                    $("#test-group-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                },
+                timeout: 2000000
+            });
+        }
+
+        function CreateTestMember(Email) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("CreateTestMember", "SmartFocus")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    Email: Email,
+                },
+                success: function (data) {
+                    $("#test-group-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                },
+                timeout: 2000000
+            });
+        }
+
+        function AddTestMemberToGroup(MemberID) {
+            LoadingPanel.Show();
+
+            var GroupID = prompt("GroupID", "");
+
+            $.ajax({
+                url: '@Url.Action("AddTestMemberToTestGroup", "SmartFocus")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    TestMemberID: MemberID,
+                    TestGroupID: GroupID
+                },
+                success: function (data) {
+                    $("#test-group-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                },
+                timeout: 2000000
+            });
+        }
+    </script>
+}

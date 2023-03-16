@@ -1,0 +1,82 @@
+﻿@model List<Flock.Models.InvalidEmail_SelectResult>
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "GridView";
+    settings.CallbackRouteValues = new { Controller = "Members", Action = "BadEmailGridViewPartial" };
+    settings.CallbackRouteValues = new { Controller = "Members", Action = "BadEmailGridViewPartial" };
+
+    settings.SettingsPager.PageSizeItemSettings.Visible = true;
+    settings.SettingsPager.PageSize = 20;
+    settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+
+    settings.SettingsBehavior.EnableRowHotTrack = true;
+    settings.Styles.RowHotTrack.Cursor = "pointer";
+
+    settings.KeyFieldName = "MemberID";
+
+    settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+
+    settings.ClientSideEvents.RowClick = @"function(s, e) { 
+        s.StartEditRow(e.visibleIndex);
+    }";
+
+    settings.SetEditFormTemplateContent(c => {
+        
+    });
+
+    MVCxGridViewColumn MarketColumn = new MVCxGridViewColumn();
+    MarketColumn.Name = "Market";
+    MarketColumn.FieldName = "Market";
+    MarketColumn.Caption = "Market";
+    MarketColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    MarketColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    MarketColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    MarketColumn.SettingsHeaderFilter.Mode = GridHeaderFilterMode.CheckedList;
+
+    MVCxGridViewColumn CountryColumn = new MVCxGridViewColumn();
+    CountryColumn.Name = "Country";
+    CountryColumn.FieldName = "Country";
+    CountryColumn.Caption = "Country";
+    CountryColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    CountryColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    CountryColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    CountryColumn.SettingsHeaderFilter.Mode = GridHeaderFilterMode.CheckedList;
+
+    MVCxGridViewColumn MemberIDColumn = new MVCxGridViewColumn();
+    MemberIDColumn.Name = "MemberID";
+    MemberIDColumn.FieldName = "MemberID";
+    MemberIDColumn.Caption = "Member ID";
+    MemberIDColumn.Width = 100;
+    MemberIDColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    MVCxGridViewColumn EmailColumn = new MVCxGridViewColumn();
+    EmailColumn.Name = "Email";
+    EmailColumn.FieldName = "Email";
+    EmailColumn.Caption = "Email";
+    EmailColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+    CreatedDTColumn.Name = "CreatedDT";
+    CreatedDTColumn.FieldName = "CreatedDT";
+    CreatedDTColumn.Caption = "Created";
+    CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+    MVCxGridViewColumn StatusColumn = new MVCxGridViewColumn();
+    StatusColumn.Name = "Status";
+    StatusColumn.FieldName = "Status";
+    StatusColumn.Caption = "Status";
+    StatusColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    StatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    StatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    StatusColumn.SettingsHeaderFilter.Mode = GridHeaderFilterMode.CheckedList;
+
+    settings.Columns.Add(MarketColumn);
+    settings.Columns.Add(CountryColumn);
+    settings.Columns.Add(MemberIDColumn);
+    settings.Columns.Add(EmailColumn);
+    settings.Columns.Add(CreatedDTColumn);
+    settings.Columns.Add(StatusColumn);
+
+}).Bind(Model).GetHtml()

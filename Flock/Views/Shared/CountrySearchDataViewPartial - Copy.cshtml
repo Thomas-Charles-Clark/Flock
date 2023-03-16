@@ -1,0 +1,50 @@
+﻿@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "CountrySearch_DataView";
+    
+    settings.CallbackRouteValues = new { Controller = "CountrySearch", Action = "Search" };
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['MarketID'] =  CountrySearchMarketListBox.GetValue();
+        e.customArgs['ContinentID'] = CountrySearchContinentListBox.GetValue();
+        e.customArgs['RegionID'] = CountrySearchRegionListBox.GetValue();
+        e.customArgs['LanguageID'] = CountrySearchLanguageListBox.GetValue();
+        e.customArgs['SearchString'] = CountrySearchNameTextBox.GetValue();
+        e.customArgs['TableLock'] = CountrySearchCLTableLock.GetValue();
+        e.customArgs['ColumnCount'] = '" + @ViewBag.ColumnCount + @"';
+    }";
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) {
+        if (typeof (InitCountryDragDrop) == 'function')
+            InitCountryDragDrop();
+    }";
+    
+    settings.Style.Add("background-color", "white");
+    settings.Style.Add("width", "100%");
+    
+
+    settings.CustomActionRouteValues = new { Controller = "CountrySearch", Action = "Search" };
+    settings.AllowPaging = true;
+    settings.AlwaysShowPager = true;
+    settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    settings.PagerSettings.PageSizeItemSettings.Visible = true;
+    settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+    settings.SettingsTableLayout.RowsPerPage = 2;
+    settings.SettingsTableLayout.ColumnCount = ViewBag.ColumnCount ?? 7;
+    settings.Styles.Item.Height = 60;
+    settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(8);
+    settings.EmptyDataText = "<h4>No results</h4>";
+    settings.SetItemTemplateContent(
+    c =>
+    {
+        ViewContext.Writer.Write(
+            "<div id='country-box-" + DataBinder.Eval(c.DataItem, "CountryID") + "' class='draggable country-flag' data-country-id='" + DataBinder.Eval(c.DataItem, "CountryID") + "' data-language-id='" + DataBinder.Eval(c.DataItem, "LanguageID") + "'>" +
+            "<div style=\"height: 50px;\">" +
+                "<img style='width: 30px; height: 30px;' title=\"Country ID: " + DataBinder.Eval(c.DataItem, "CountryID") + ", LanguageID: " + DataBinder.Eval(c.DataItem, "LanguageID") + "\" src=\"" + Url.Content("~/images/icons/countryflags/30px/" + DataBinder.Eval(c.DataItem, "CountryID") + ".png") + "\" />" +
+            "</div>" +
+            "<div class=\"DataViewItemTitle\">" + DataBinder.Eval(c.DataItem, "Name").ToString() + "</div>" +
+            "</div>"
+        );
+    }
+
+); 
+}).Bind(Model).GetHtml()

@@ -1,0 +1,198 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "SnippetGridView";
+
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "SnippetGridViewPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "CMS", Action = "SnippetGridViewPartialAddNew" };
+        settings.CustomActionRouteValues = new { Controller = "CMS", Action = "SnippetGridViewPartialCustomCommand" };
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+            var id = s.GetRowKey(e.visibleIndex);
+            $('#selected-snippet-id').val(id);
+
+            LoadingPanel.Show();
+            $.ajax({ 
+                url: '" + Url.Action("ChangeSnippet", "CMS") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    SnippetID: id
+                },
+                success: function(data) {
+                    $('#snippet-compose-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }";
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.KeyFieldName = "SnippetID";
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowFocusedRow = true;
+        settings.Styles.Row.Cursor = "pointer";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        MVCxGridViewColumn SnippetIDColumn = new MVCxGridViewColumn();
+        SnippetIDColumn.Name = "SnippetID";
+        SnippetIDColumn.FieldName = "SnippetID";
+        SnippetIDColumn.Caption = "ID";
+        SnippetIDColumn.Width = 55;
+        SnippetIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        SnippetIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        SnippetIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        SnippetIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(SnippetIDColumn);
+
+        MVCxGridViewColumn SnippetLocationIDColumn = new MVCxGridViewColumn();
+        SnippetLocationIDColumn.Name = "SnippetLocationID";
+        SnippetLocationIDColumn.FieldName = "SnippetLocationID";
+        SnippetLocationIDColumn.Caption = "Snippet Location";
+        SnippetLocationIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var slProp = SnippetLocationIDColumn.PropertiesEdit as ComboBoxProperties;
+        slProp.DataSource = Flock.ViewModels.LargeDatabaseDataProvider.GetSnippetLocations(null);// UoW.GetRepository<SnippetLocation>().GetAll().OrderBy(p => p.Name).ToList();
+        slProp.ValueField = "SnippetLocationID";
+        slProp.ValueType = typeof(byte);
+        slProp.TextField = "Name";
+        SnippetLocationIDColumn.EditFormSettings.VisibleIndex = 2;
+        SnippetLocationIDColumn.Width = 300;
+        SnippetLocationIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        SnippetLocationIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        SnippetLocationIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        SnippetLocationIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        //SnippetLocationIDColumn.SetDataItemTemplateContent(c => {
+        //    var locID = (byte?)DataBinder.Eval(c.DataItem, "SnippetLocationID");
+        //    var loc = "<i>Not Set</i>";
+        //    if(locID != null)
+        //    {
+        //        loc = UoW.GetRepository<SnippetLocation>().GetAll().Where(p => p.SnippetLocationID == locID).Select(p => p.Name).Single();
+        //    }
+        //    ViewContext.Writer.Write(loc);
+        //});
+        settings.Columns.Add(SnippetLocationIDColumn);
+        
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        NameColumn.Width = 300;
+        NameColumn.EditFormSettings.VisibleIndex = 1;
+        var nProp = NameColumn.PropertiesEdit as TextBoxProperties;
+        nProp.MaxLength = 50;
+        NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        NameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        settings.Columns.Add(NameColumn);
+
+        //MVCxGridViewColumn ModifiedDTColumn = new MVCxGridViewColumn();
+        //ModifiedDTColumn.Name = "ModifiedDT";
+        //ModifiedDTColumn.FieldName = "ModifiedDT";
+        //ModifiedDTColumn.Caption = "Modified";
+        //ModifiedDTColumn.Width = 140;
+        //ModifiedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        //ModifiedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        //ModifiedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        //ModifiedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        //ModifiedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        //settings.Columns.Add(ModifiedDTColumn);
+        
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        OnDateColumn.Name = "OnDate";
+        OnDateColumn.FieldName = "OnDate";
+        OnDateColumn.Caption = "On Date";
+        OnDateColumn.Width = 140;
+        OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OnDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OnDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        OnDateColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        settings.Columns.Add(OnDateColumn);
+        
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+        OffDateColumn.Name = "OffDate";
+        OffDateColumn.FieldName = "OffDate";
+        OffDateColumn.Caption = "Off Date";
+        OffDateColumn.Width = 140;
+        OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OffDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OffDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        OffDateColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        settings.Columns.Add(OffDateColumn);
+
+        MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+        WebStatusColumn.Name = "WebStatus";
+        WebStatusColumn.FieldName = "WebStatus";
+        WebStatusColumn.Caption = "Web Status";
+        WebStatusColumn.Width = 160;
+        WebStatusColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        WebStatusColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        WebStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var WebStatusID = UoW.Context.fnc_Status((DateTime?)DataBinder.Eval(c.DataItem, "OnDate"), (DateTime?)DataBinder.Eval(c.DataItem, "OffDate"));
+            var WebStatus = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == WebStatusID).Select(p => p.Name).Single();
+            var colour = "black";
+            switch (WebStatusID)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            ViewContext.Writer.Write("<span style='color: " + colour + "'>" + WebStatus + "</span>");
+        });
+        settings.Columns.Add(WebStatusColumn);
+        
+        MVCxGridViewColumn CustomCommandColumn = new MVCxGridViewColumn();
+        CustomCommandColumn.Name = "CustomCommandColumn";
+        CustomCommandColumn.FieldName = "CustomCommandColumn";
+        CustomCommandColumn.Caption = " ";
+        CustomCommandColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        CustomCommandColumn.HeaderStyle.CssClass = "dxgvHeader_MetropolisBlue dx-ac";
+        CustomCommandColumn.SetHeaderTemplateContent(c => { 
+            ViewContext.Writer.Write("<a onclick='SnippetGridView.AddNewRow();' style='font-weight: 700;' href='javascript:;'>New</a>");
+        });
+        CustomCommandColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        CustomCommandColumn.SetDataItemTemplateContent(c => {
+            ViewContext.Writer.Write("<a href='javascript:;' onclick='$.confirm(function() { SnippetGridView.PerformCallback({command: \"delete\", key: \""+c.KeyValue.ToString()+"\" }); }, function() { })'>Delete</a>");
+        });
+        CustomCommandColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        CustomCommandColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        CustomCommandColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        CustomCommandColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(CustomCommandColumn);
+    });
+}
+@grid.BindToLINQ("", "", (s, e) => {
+    var source = UoW.GetRepository<Snippet>().GetAll().Where(p => p.DeletedDT == null);
+    e.KeyExpression = "SnippetID";
+    e.QueryableSource = source;
+}).GetHtml()

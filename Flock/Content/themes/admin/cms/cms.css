@@ -1,0 +1,228 @@
+﻿* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+#pages-tree-list-wrapper
+{
+    margin-top: 2em;
+    width: 100%;
+}
+
+#site-section-ddl-wrapper
+{
+}
+
+.dxgvDetailCell_MetropolisBlue {
+    padding: 16px 26px 16px 0px !important;
+}
+    .product-overview-detail-row h5 {
+        margin-top: 0;
+        color: #C8C8C8;
+    }
+
+.image-column-placeholder {
+    width: 32px;
+    height: 32px;
+    background-color: transparent;
+    border: 0; 
+    margin: 2px 4px;
+    display: block;
+    float: left;
+    text-align: center;
+}
+    .image-column-placeholder a {
+        line-height: 32px;
+    }
+
+.image-column-thumb {
+    border: 0; 
+    margin: 2px 4px;
+    float: left;
+}
+
+.image-holder {
+    float: left;
+    margin: 0px 8px 8px;
+}
+
+.image-row-placeholder {
+    width: 195px;
+    height: 195px; 
+}
+
+#front-image-holder {
+    background: url("/Images/admin/front-holder.png") 0 0 no-repeat;
+}
+#back-image-holder {
+    background: url("/Images/admin/back-holder.png") 0 0 no-repeat;
+}
+#closeup-image-holder {
+    background: url("/Images/admin/closeup-holder.png") 0 0 no-repeat;
+}
+#styled-image-holder {
+    background: url("/Images/admin/styled-holder.png") 0 0 no-repeat;
+}
+
+.available-images-segment {
+    height: 212px;
+    max-height: 212px;
+    background-color: #c0c0c0;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+#left-button {
+    float: left;
+}
+
+#right-button {
+    float: left;
+}
+
+.available-images-segment .image-holder {
+    display: inline-block;
+    white-space: normal;
+    vertical-align: top;
+}
+
+#bulk-action-panel {
+    width: 320px;
+    border: 1px solid #c0c0c0;
+    margin-bottom: 1em;
+}
+
+#bulk-action-panel h4 {
+    background-color: #E5E5E5;
+    border-bottom: 1px solid #C0C0C0;
+    font: normal normal 700 11px/20px Verdana;
+    color: black;
+    margin-top: 0;
+    padding: 1em;
+}
+
+    #bulk-action-panel ul {
+        list-style-type: none;
+    }
+
+        #bulk-action-panel ul li {
+            line-height: 2rem;
+        }
+
+        #contents {
+            width: 100%;
+            min-height: 203px;
+        }
+
+.dxgvHeader_MetropolisBlue td
+{
+    font-weight: bold;
+}
+
+#assigned-product-images ul {
+    list-style-type: none;
+    margin: 0;
+    padding-left: 0;
+}
+    #assigned-product-images ul li {
+        border: 1px solid #c0c0c0;
+        width: 195px;
+        height: 195px;
+    }
+
+    #assigned-product-images ul>:first-child {
+        border: 1px solid #ee8825 !important;
+        margin-bottom: 1em;
+    }
+.image-column {
+    float: left;
+    margin-right: 1em;
+    width: 195px;
+}
+
+#productpricesgridcontainer {
+float: left;
+width: 85%;
+}
+
+/*:root .dxeTextBox_MetropolisBlue td.dxic .dxeEditArea_MetropolisBlue, :root .dxeButtonEdit_MetropolisBlue td.dxic .dxeEditArea_MetropolisBlue { 
+height: 27px !important;
+font-size: 12px !important;
+}*/
+
+.two-zero {
+}
+
+.blank-item {
+}
+
+.dxisControl_MetropolisBlue .dxis-nbDotsBottom { 
+    margin-top: -25px;
+    padding: 0px !important;
+}
+
+#image-searching-icon {
+    float: left; 
+    margin-left: 1em;
+    margin-top: 2px;
+    display: none;
+}
+
+#video-searching-icon {
+    float: left;
+    margin-left: 1em;
+    margin-top: 2px;
+    display: none;
+}
+
+.image-remove-icon {
+    opacity: 0.0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+}
+
+#images-overview-busy {
+    display: none;
+}
+
+.busy {
+    display: none;
+    float: right;
+    width: 20px;
+}
+
+legend img.busy {
+    position: relative;
+    top: 6px;
+    right: 3px;
+}
+
+.hidden-input-field {
+    display: none;
+}
+
+/*.editform-label {
+    width: 200px;
+}
+
+.editform-cell {
+    width: 200px !important;
+}*/
+
+.fieldset-busy {
+    float: right;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    top: 4px;
+    right: 0px;
+    display: none;
+}
+
+.video {
+    background-color: #f2f2f2;
+    padding: 1em;
+}

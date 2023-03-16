@@ -1,0 +1,13 @@
+﻿.container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container { 
+animation-name: min-width-2050px;
+width: 2050px !important;
+}
+
+.grid-container {
+    width: 85%;
+    float: left;
+}
+
+.dxgvInlineEditCell_MetropolisBlue { 
+padding: 3px 6px 4px !important;
+}

@@ -1,0 +1,97 @@
+﻿@model List<Flock.Models.Country>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    listBoxSettings.Height = 200;
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+    if (action == "ProductPagesOverviewCountryRestrictionsDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductPagesOverviewCountryListBox";
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ProductPagesOverviewCountryDD.HideDropDown();
+            var items = s.GetSelectedItems();
+            var text = 'Country';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Countries Selected)';
+            else if(items.length == 1)
+                text = items[0].text;    
+            ProductPagesOverviewCountryDD.SetText(text);
+            ProductPagesOverviewGridView.Refresh();
+        }";
+    }
+    else if (action == "ProductPagesOverviewNewCountryRestrictionDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductPagesOverviewNewCountryRestrictionListBox";
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            var items = s.GetSelectedItems();
+            var text = 'Country';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Countries Selected)';
+            else if(items.length == 1)
+                text = items[0].text;    
+            ProductPagesOverviewNewCountryRestrictionDD.SetText(text);
+        }";
+    }
+    else if (action == "BannerOverviewCountryDropDownPartial")
+    {
+        listBoxSettings.Name = "BannerOverviewCountryListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            BannerOverviewCountryDD.SetText(s.GetSelectedItem().text);
+            BannerOverviewCountryDD.HideDropDown();
+            BannerOverviewGridView.Refresh();
+        }";
+    }
+    else if (action == "ComposeBannerHeaderCountryDropDownPartial")
+    {
+        listBoxSettings.Name = "ComposeBannerHeaderCountryListBox";
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ComposeBannerHeaderCountryDD.HideDropDown();
+            var items = s.GetSelectedItems();
+            var text = 'Country';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Countries Selected)';
+            else if(items.length == 1)
+                text = items[0].text;    
+            ComposeBannerHeaderCountryDD.SetText(text);
+            LoadingPanel.Show();
+            BannerSelectorGridView.Refresh();
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.BannerSelectHeaderSelectedCountryID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ComposeBannerHeaderCountryDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "DeliveryExceptionsCountryDropDownPartial")
+    {
+        listBoxSettings.Name = "DeliveryExceptionsCountryListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            DeliveryExceptionsCountryDD.SetText(s.GetSelectedItem().text);
+            DeliveryExceptionsCountryDD.HideDropDown();
+            $('#grid-container').show();
+            GridView.Refresh();
+        }";
+    }
+    else if (action == "PageComposePageSectionCountryDropDown")
+    {
+        listBoxSettings.Name = "PageSectionCountryListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function (s, e) {
+            filterPageSections();
+            PageSectionCountryDD.HideDropDown();
+            PageSectionCountryDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "CountryID";
+}
+).BindList(Model).GetHtml()

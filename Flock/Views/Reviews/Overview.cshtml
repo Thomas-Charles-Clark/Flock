@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Reviews";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    
+    <style type="text/css">
+        #container {
+            width: 100% !important;
+            max-width: 1280px;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Product Reviews</h4>
+
+<div id="ProductReviewGridContainer" style="float: left; width: 100%;">
+    @Html.Action("ProductReviewsGridViewPartial", new Flock.ViewModels.ReviewGridSettings())
+</div>
+
+<div style="clear: both;"></div>
+
+<div id="ajax-target">
+
+</div>
+
+@section scripts {
+    
+    @Scripts.Render("~/bundles/js/sparkline")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#test").on("click", function () { HideColumns(); });
+            $.fn.sparkline.defaults.common.width = "144px";
+            $.fn.sparkline.defaults.common.height = "30px";
+            $('.inlinesparkline').each(function () {
+                $(this).html($(this).data('sparkline'));
+                $(this).sparkline();
+            });
+        });
+
+
+        function capitaliseEachWord(str) {
+            var words = str.split(" ");
+            var arr = Array();
+            for (var i = 0; i < words.length; i++) {
+                temp = words[i].toLowerCase();
+                temp = temp.charAt(0).toUpperCase() + temp.substring(1);
+
+
+                if (temp.indexOf("/k") != -1)
+                    temp = temp.replace("/k", "/K");
+
+                arr.push(temp);
+            }
+
+            return arr.join(" ");
+        }
+    </script>
+}

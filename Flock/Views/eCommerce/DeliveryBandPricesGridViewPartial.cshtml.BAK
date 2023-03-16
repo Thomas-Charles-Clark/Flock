@@ -1,0 +1,42 @@
+@{
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "DeliveryPricesGridView";
+        settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartialDelete" };
+        settings.SettingsEditing.BatchUpdateRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartialUpdate" }; 
+        
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            e.customArgs['DeliveryBandID'] = $('#selected-delivery-band-id').val();
+        }";
+        
+		settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+		settings.KeyFieldName = "DeliveryPriceID";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Columns.Add("PriceInc");
+        settings.Columns.Add("PriceEx");
+		settings.Columns.Add("PerItem");
+		settings.Columns.Add("MinThreshold");
+		settings.Columns.Add("MaxThreshold");
+		settings.Columns.Add("OnDate");
+		settings.Columns.Add("OffDate");
+	});
+	if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

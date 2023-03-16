@@ -1,0 +1,12 @@
+﻿@model List<Flock.Models.Collection_Image>
+<div onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+    @if(Model == null || Model.Count == 0)
+    {
+        <img id="brochure-placeholder" src="/Images/admin/image-not-set.png" style="margin-top: 44px;" alt="Image not set." title="You must set an image for the brochure for this collection." /> 
+    } 
+    else 
+    {          
+        <img src="https://flock.designersguild.com/imagelibrary/239/@(Model[0].ImageID).jpeg" alt="@(Model[0].AltText)" title="@(Model[0].TitleText)"/> 
+        <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromCollectionArea(6, @(Model[0].ImageID))" />
+    }
+</div>

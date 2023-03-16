@@ -1,0 +1,72 @@
+﻿@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "PageSearch_DataView";
+
+    settings.CallbackRouteValues = new { Controller = "Pages", Action = "PageSearch" };
+    //(byte? ProductTypeID, byte? BrandID, short? LaunchID, short? CollectionID, byte? PatternID, byte? StatusID, byte? ColourID, string SearchString
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['SiteSectionID'] =  PageSearchSiteSectionListBox.GetValue();
+        e.customArgs['SearchString'] = PageSearchNameTextBox.GetValue();
+    }";
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) {
+        if (typeof (InitPagesDragDrop) == 'function')
+            InitPagesDragDrop();
+        if (typeof (InitPageDragDrop) == 'function')
+            InitPageDragDrop();
+    }";
+    
+    settings.Style.Add("background-color", "white");
+    settings.Style.Add("width", "100%");
+    settings.Style.Add("margin", "0");
+    
+    settings.AllowPaging = true;
+    settings.AlwaysShowPager = true;
+    settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    settings.PagerSettings.PageSizeItemSettings.Visible = true;
+    settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+    settings.SettingsTableLayout.RowsPerPage = 4;
+    settings.SettingsTableLayout.ColumnCount = 5;
+    settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(8);
+    settings.EmptyDataText = "<h4>No results</h4>";
+    settings.Styles.Item.Height = 110;
+    settings.SetItemTemplateContent(
+    c =>
+    {
+        var discID = "";
+        if (DataBinder.Eval(c.DataItem, "ImageID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ImageID") != null)
+            discID = DataBinder.Eval(c.DataItem, "ImageID").ToString();
+        if (discID != "")
+        {
+            ViewContext.Writer.Write(
+            "<div id='page-box-" + DataBinder.Eval(c.DataItem, "PageID") + "' class='draggable page' data-page-id='" + DataBinder.Eval(c.DataItem, "PageID") + "'>" +
+                "<div>" +
+                    "<img style='width: 156px;' title=\"Page ID: " + DataBinder.Eval(c.DataItem, "PageID") + "\" src=\"" + Url.Content("https://flock.designersguild.com/ImageLibrary/156/" + DataBinder.Eval(c.DataItem, "ImageID") + ".jpeg") + "\" alt=\"\" />" +
+                "</div>" +
+                "<div class=\"DataViewItemTitle\">" + DataBinder.Eval(c.DataItem, "Name").ToString() + "</div>" +
+            "</div>"
+        );
+        }
+        else
+        {
+            ViewContext.Writer.Write(
+                "<div id='page-box-" + DataBinder.Eval(c.DataItem, "PageID") + "' class='draggable page' data-page-id='" + DataBinder.Eval(c.DataItem, "PageID") + "'>" +
+                    "<div>" +
+                        "<img style='width: 156px;' title=\"Page ID: " + DataBinder.Eval(c.DataItem, "PageID") + "\" src='/images/admin/ar2-placeholder.png' alt='' />" +
+                    "</div>" +
+                "<div class=\"DataViewItemTitle\">" + DataBinder.Eval(c.DataItem, "Name").ToString() + "</div>" +
+            "</div>"
+            );
+        }
+        
+        
+    }
+
+); 
+}).Bind(Model).GetHtml()
+<script type="text/javascript">
+    if (typeof (InitPagesDragDrop) == "function")
+        InitPagesDragDrop();
+    if (typeof (InitPageDragDrop) == 'function')
+        InitPageDragDrop();
+</script>

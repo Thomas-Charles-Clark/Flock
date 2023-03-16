@@ -1,0 +1,226 @@
+﻿@model Flock.ViewModels.CareerListingViewModel
+
+<div style='width: 940px; margin: 0 auto;'>
+
+    <div style='width: 688px; float: left;'>
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "TitleLbl";
+            lblSettings.Text = "Title";
+            lblSettings.Width = 45;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "Title";
+        }).GetHtml()
+
+        @Html.DevExpress().TextBoxFor(m => Model.Title, tbSettings => {
+            tbSettings.Name = "Title";
+            tbSettings.Width = 605;
+            tbSettings.Properties.MaxLength = 140;
+            tbSettings.ShowModelErrors = true;
+            tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).GetHtml()
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "LocationLbl";
+            lblSettings.Text = "Location";
+            lblSettings.Width = 45;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "Location";
+        }).GetHtml()
+
+        @Html.DevExpress().TextBox(tbSettings =>
+        {
+            tbSettings.Name = "Location";
+            tbSettings.Width = 605;
+            tbSettings.Properties.MaxLength = 140;
+            tbSettings.ShowModelErrors = true;
+            tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(Model == null ? null : Model.Location).GetHtml()
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "PostalLbl";
+            lblSettings.Text = "Post To";
+            lblSettings.Width = 45;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "ContactPostal";
+        }).GetHtml()
+
+        @Html.DevExpress().TextBox(tbSettings =>
+        {
+            tbSettings.Name = "ContactPostal";
+            tbSettings.Width = 605;
+            tbSettings.Properties.MaxLength = 200;
+            tbSettings.ShowModelErrors = true;
+            tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(Model == null ? null : Model.ContactPostal).GetHtml()
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "EmailLbl";
+            lblSettings.Text = "Email";
+            lblSettings.Width = 45;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "ContactEmail";
+        }).GetHtml()
+
+        @Html.DevExpress().TextBox(tbSettings =>
+        {
+            tbSettings.Name = "ContactEmail";
+            tbSettings.Width = 350;
+            tbSettings.Properties.MaxLength = 256;
+            tbSettings.Style.Add("float", "left");
+            tbSettings.ShowModelErrors = true;
+            tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(Model == null ? null : Model.ContactEmail).GetHtml()
+
+
+        @Html.DevExpress().DateEdit(deSettings =>
+        {
+            deSettings.Name = "ApplyBeforeDT";
+            deSettings.Width = 145;
+            deSettings.Style.Add("float", "right");
+            deSettings.ShowModelErrors = true;
+            deSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(Model == null ? DateTime.Now.AddMonths(3) : Model.ApplyBeforeDT).GetHtml()
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "ApplyBeforeLbl";
+            lblSettings.Text = "Apply Before";
+            lblSettings.Width = 70;
+            lblSettings.Style.Add("float", "right");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "ApplyBeforeDT";
+        }).GetHtml()
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "ContentsLbl";
+            lblSettings.Text = "Listing";
+            lblSettings.Width = 45;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "Contents";
+        }).GetHtml()
+
+        @Html.DevExpress().Memo(mSettings => {
+            mSettings.Name = "Contents";
+            mSettings.Properties.Columns = 100;
+            mSettings.Properties.Rows = 20;
+            mSettings.Width = 605;
+            mSettings.ShowModelErrors = true;
+            mSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(Model == null ? null : Model.Contents).GetHtml()
+
+        <div style='clear: both'></div>
+
+        
+    </div>
+
+    <div style='float: left; width: 252px; padding-left: 2em;'>
+        
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "OnDateLbl";
+            lblSettings.Text = "On Date";
+            lblSettings.Width = 45;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "OnDate";
+        }).GetHtml()
+        @Html.DevExpress().DateEdit(deSettings => {
+            deSettings.Name = "OnDate";
+            deSettings.Width = 145;
+            deSettings.ShowModelErrors = true;
+            deSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(Model == null ? null : Model.OnDate).GetHtml()
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "OffDateLbl";
+            lblSettings.Text = "Off Date";
+            lblSettings.Width = 45;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "OffDate";
+        }).GetHtml()
+        @Html.DevExpress().DateEdit(deSettings => {
+            deSettings.Name = "OffDate";
+            deSettings.Width = 145;
+            deSettings.ShowModelErrors = true;
+            deSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(Model == null ? null : Model.OffDate).GetHtml()
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "SalariedLbl";
+            lblSettings.Text = "Salaried?";
+            lblSettings.Width = 45;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "Salaried";
+        }).GetHtml()
+        @Html.DevExpress().CheckBox(cbSettings =>
+        {
+            cbSettings.Name = "Salaried";
+            cbSettings.Width = 145;
+            cbSettings.Style.Add("line-height", "25px");
+            cbSettings.ShowModelErrors = true;
+            cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            cbSettings.Properties.ValueChecked = true;
+            cbSettings.Properties.ValueUnchecked = false;
+            if(Model == null)
+            {
+                cbSettings.Checked = true;
+            }
+        }).Bind(Model == null ? true : Model.Salaried).GetHtml()
+
+    </div>
+
+    <div style='clear: both'></div>
+
+    <div style='text-align: right; margin-top: 1em; padding-right: 25px;'>
+        @Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Update";
+            btnSettings.Style.Add("margin-right", "1em");
+            btnSettings.ClientSideEvents.Click = "function(s, e){ CareersSelectorGridView.UpdateEdit(); }";
+        }).GetHtml()
+        @Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Cancel";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ CareersSelectorGridView.CancelEdit(); }";
+        }).GetHtml()
+    </div>
+</div>

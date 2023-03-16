@@ -1,0 +1,302 @@
+﻿#container {
+    width: auto;
+}
+
+#composer-container {
+    padding: 12px;
+    display: inline-block;
+    border: 1px dashed #ccc;
+}
+
+#email-preview {
+    width: 800px;
+}
+
+#email-preview p, 
+#email-preview h1, 
+#email-preview h2, 
+#email-preview h3, 
+#email-preview h4, 
+#email-preview table, 
+#email-preview td, 
+#email-preview th, 
+#email-preview ul, 
+#email-preview ol, 
+#email-preview textarea, 
+#email-preview input {
+ font-family:Verdana, Geneva, Helvetica, Arial, sans-serif; text-align:left;
+}
+
+#email-preview body, 
+#email-preview p, 
+#email-preview h3, 
+#email-preview h4, 
+#email-preview table, 
+#email-preview td, 
+#email-preview th, 
+#email-preview ul, 
+#email-preview ol, 
+#email-preview textarea, 
+#email-preview input {
+ font-size:11px; color: #333333;
+}
+
+#email-preview h1 {
+ font-size:14px; margin-top:20px; margin-bottom:10px;
+}
+
+#email-preview h2 {
+ font-size:13px; margin-top:20px; margin-bottom:5px;
+}
+
+#email-preview h3 {
+ font-size:12px !important; margin-top:20px; margin-bottom:0px;
+}
+
+#email-preview .contact-table {
+border: 0;
+border-collapse: collapse;
+}
+
+#email-preview .content-block .contact-table td, 
+#email-preview .content-block .contact-table th {
+border: 0;
+vertical-align: top;
+}
+
+#email-preview .header-p {
+  width: 640px;
+  height: 50px;
+  overflow: hidden;
+}
+
+#email-preview .header_h1 {
+margin-top: 0;
+}
+
+#email-preview .header_h4 {
+  margin-bottom: 20px;
+}
+
+#email-preview .header_h4_u {
+  text-decoration: underline;
+margin-bottom: 20px;
+}
+
+#email-preview h4 {
+ font-size:11px; font-weight: 400; margin-top:20px; margin-bottom:0px; color:#585858;
+}
+
+#email-preview .content-block p {
+ display: block;
+ margin-top:5px; margin-bottom:5px;
+}
+
+#email-preview .content-block table {
+ border-collapse: collapse;
+}
+
+#email-preview .content-block th, 
+#email-preview .content-block td {
+ border: 1px solid #c0c0c0;
+ padding: 6px;
+}
+
+#email-preview .content-block th {
+ background-color: white; color: #585858;
+}
+
+#email-preview .content-block hr {
+margin: 8px 0;
+}
+
+#email-preview .header-logo {
+  display: block;
+  width: 800px;
+}
+
+#email-preview .footer-logo {
+  margin-top: 10px;
+  display: block;
+  width: 200px;
+}
+
+#email-preview p.footer {
+margin-top: 10px;
+margin-bottom: 16px;
+}
+
+#email-preview p.signoff {
+font-size: 11px;
+margin-bottom: 16px;
+margin-top: 24px;
+}
+
+#email-preview h2.signoff {
+margin-top: 6px;
+margin-bottom: 4px;
+font-weight: 400;
+font-size: 11px;
+}
+
+#email-preview #order-head-table,
+#email-preview .orderline-table {
+	border-collapse: collapse;
+	border: 1px solid #C0C0C0;
+}
+#email-preview #order-head-table th,
+#email-preview .orderline-table th {
+	padding: 6px;
+	border: solid #C0C0C0 1.0px;
+	text-align: left;
+}
+
+#email-preview #order-head-table td,
+#email-preview .orderline-table td {
+	padding: 6px;
+	border: solid #C0C0C0 1.0px;
+	text-align: right;
+}
+
+#email-preview .content-block .delivery-row {
+border:solid #565656 1.0px !important;
+background-color: #a1a1a1;
+}
+
+#email-preview .order-line-table {
+width: 800px;
+}
+
+#email-preview .order-line-table th {
+border:solid #C0C0C0 1.0px;
+background-color: #EFEFEF;
+color: #333333;
+padding:3.75px;
+font-weight: 400;
+}
+
+#email-preview .spacer {
+border: none !important;
+background: white;
+}
+
+#email-preview .order-line-table td {
+border:none;
+border-bottom:solid #C0C0C0 1.0px;
+padding:3.75px;
+}
+
+#email-preview .image-cell {
+width: 50px;
+border-top:none;
+border-left:solid #C0C0C0 1.0px !important;
+border-bottom: solid #C0C0C0 1.0px !important;
+border-right:none;
+padding:3.75px;
+}
+
+#email-preview .image-cell-2 {
+width: 50px;
+border-top:none;
+border-left:solid #565656 1.0px !important;
+border-bottom: solid #565656 1.0px !important;
+border-right:none;
+padding:3.75px;
+}
+
+#email-preview .code-cell {
+ border-right: none;
+ border-left: none;
+}
+
+#email-preview .name-cell {
+width: 45%;
+border-right: none;
+border-left: none;
+}
+
+#email-preview .quantity-cell {
+text-align: center;
+border-right: none;
+border-left: none;
+}
+
+#email-preview .money-cell {
+text-align: right;
+border-right: none;
+border-left: none;
+}
+
+#email-preview .cost-cell {
+text-align: right;
+border-left: none;
+border-right:solid #C0C0C0 1.0px !important;
+}
+
+#email-preview .cost-cell-2 {
+text-align: right;
+border-left: none;
+border-right:solid #565656 1.0px !important;
+}
+
+#email-preview .tracking-cell{
+text-align: center;
+border-left: none;
+border-right:solid #C0C0C0 1.0px !important;
+}
+
+#email-preview .sub-head {
+border-left:solid #565656 1.0px !important;
+}
+
+#email-preview .shipping-row {
+color:#333333;
+border:none;
+background-color:#D5D5D5;
+padding:3.75px;
+text-align: right;
+}
+
+#email-preview .tax-row {
+color:#333333;
+border:none;
+background-color: #d5d5d5;
+padding:3.75px;
+text-align: right;
+}
+
+#email-preview .total-row {
+border-top:none;
+border-bottom:solid #565656 1.0px;
+background-color: #565656;
+padding:3.75px;
+text-align: right;
+color: white;
+}
+
+#email-preview .sub-total-row {
+color:#333333;
+border:none;
+background-color:#D5D5D5;
+padding:3.75px;
+text-align: right;
+}
+
+#email-preview .order-wrapper {
+margin-top: 20px;
+width: 860px;
+}
+
+#email-preview .featured-stockist-cell {
+float: left; 
+margin-left: 10px;
+}
+
+#email-preview .featured-stockist-image-cell {
+float: left;
+width: 100px;
+}
+
+#email-preview .stockist-row {
+margin-bottom: 5px;
+}

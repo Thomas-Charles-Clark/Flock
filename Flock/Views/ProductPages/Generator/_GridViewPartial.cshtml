@@ -1,0 +1,195 @@
+﻿@using Flock.ViewModels
+@using Flock.DAL
+@using Flock.Models
+@model ProductPageGenerateGridViewModel
+@Html.DevExpress().GridView(settings => {
+
+    settings.Name = "GridView";
+    settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "GeneratorGridViewPartialBind" };
+
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.SettingsDetail.ShowDetailRow = true;
+    settings.SettingsDetail.ShowDetailButtons = false;
+    settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+
+    settings.Theme = "Aqua";
+    settings.Styles.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#d7e9ff");
+    
+    settings.ClientSideEvents.Init = @"function(s, e) {
+        s.ExpandAllDetailRows();
+    }";
+    
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['selectedIDs'] = selectedIDs;    
+        e.customArgs['launchID'] = ProductPageGenerateLaunchListBox.GetValue();
+    }";
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) {
+        if(shouldDisplay) {
+            LoadingPanel.Hide();
+            $('#gridview-go-button').show();
+            $('#gridview-container').show();
+            s.ExpandAllDetailRows();
+            shouldDisplay = false;
+        }
+
+        $('[data-toggle=""tooltip""]').tooltip({
+            position: { my: ""left top"", at: ""left bottom"", collision: ""flipfit"" },
+            content: function () {
+                return $(this).prop('title');
+            }
+        });
+    }";
+
+    settings.ClientSideEvents.SelectionChanged = "OnSelectionChanged";
+    
+
+    settings.KeyFieldName = "MerchandiserID";
+
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.VisibleIndex = 12;
+    settings.CommandColumn.ShowSelectCheckbox = true;
+    settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+    settings.SettingsPager.AlwaysShowPager = true;
+    settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    settings.SettingsPager.PageSizeItemSettings.Visible = true;
+    settings.SettingsPager.PageSizeItemSettings.ShowAllItem = true;
+
+    settings.Styles.Header.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    settings.Styles.Row.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    
+    MVCxGridViewColumn MerchandiserColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ProductCountColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn HeadingColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ImageCountColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn NamingConventionColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn BrandColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn LaunchColumn = new MVCxGridViewColumn();
+
+    MerchandiserColumn.Caption = "Merchandiser ID";
+    MerchandiserColumn.FieldName = "MerchandiserID";
+    MerchandiserColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    MerchandiserColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    ProductCountColumn.Caption = "Product Count";
+    ProductCountColumn.FieldName = "ProductCount";
+    ProductCountColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    ProductCountColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    ImageCountColumn.Caption = "Image Count";
+    ImageCountColumn.FieldName = "ImageCount";
+    ImageCountColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    ImageCountColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    
+    HeadingColumn.Caption = "Heading";
+    HeadingColumn.FieldName = "Heading";
+    HeadingColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    NamingConventionColumn.Name = "NamingConventionID";
+    NamingConventionColumn.Caption = "Naming Convention";
+    NamingConventionColumn.FieldName = "NamingConventionID";
+    NamingConventionColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    NamingConventionColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    NamingConventionColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    NamingConventionColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+    NamingConventionColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+    NamingConventionColumn.SetDataItemTemplateContent(c =>
+    {
+        var thisNc = Model.NamingConventions.Where(p => p.NamingConventionID == (byte?)DataBinder.Eval(c.DataItem, "NamingConventionID")).SingleOrDefault();
+        if (thisNc != null)
+        {
+            ViewContext.Writer.Write("<span>" + thisNc.Name + "</span>");
+            ViewContext.Writer.Write("<span class='glyphicon glyphicon-info-sign' style='float: right;' data-toggle='tooltip' data-placement='left' title='<strong>Sources</strong><br/><br/>" + Html.Raw(thisNc.DataSource) + "<br/><br/><br/><br/><strong>Formulae</strong><br/><br/><strong>Heading:</strong> " + thisNc.HeadingFormula + "<br/><br/><strong>SubHeading:</strong> " + thisNc.SubHeadingFormula + "<br/><br/><strong>Title Tag:</strong> " + thisNc.TitleTagFormula + "<br/><br/><strong>URL Keywords:</strong> " + thisNc.URLKeywordsFormula + "<br/><br/><strong>Basket Name:</strong> " + thisNc.BasketNameFormula + "'></span>");
+        }
+    });
+    
+    BrandColumn.Name = "BrandID";
+    BrandColumn.Caption = "Brand";
+    BrandColumn.FieldName = "BrandID";
+    BrandColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    BrandColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    BrandColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+    BrandColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    BrandColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    BrandColumn.SetDataItemTemplateContent(c => {
+        var bID = Convert.ToByte(DataBinder.Eval(c.DataItem, "BrandID"));
+        var b = Model.Brands.Where(p => p.BrandID == bID).Select(p => p.Name).Single();
+        ViewContext.Writer.Write(b);
+    });
+
+    ProductTypeColumn.Name = "ProductTypeID";
+    ProductTypeColumn.Caption = "Product Type";
+    ProductTypeColumn.FieldName = "ProductTypeID";
+    ProductTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    ProductTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    ProductTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+    ProductTypeColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    ProductTypeColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    ProductTypeColumn.SetDataItemTemplateContent(c =>
+    {
+        var bID = Convert.ToByte(DataBinder.Eval(c.DataItem, "ProductTypeID"));
+        var b = Model.ProductTypes.Where(p => p.ProductTypeID == bID).Select(p => p.Name).SingleOrDefault();
+        ViewContext.Writer.Write(b);
+    });
+    
+
+    settings.SetDetailRowTemplateContent(c => {
+        ViewContext.Writer.Write(Html.Partial("Generator/_DetailGridViewPartial",
+            new ProductPageGenerateDetailGridViewModel()
+            { 
+                MerchandiserID = Convert.ToInt32(c.KeyValue),
+                Products = Model.Products.Where(p => p.MerchandiserID == Convert.ToInt32(c.KeyValue)).ToList(),
+                Brands = Model.Brands,
+                ProductTypes = Model.ProductTypes,
+                Launches = Model.Launches,
+                NamingConventions = Model.NamingConventions
+        }).ToHtmlString());
+    });
+
+    settings.Columns.Add(MerchandiserColumn);
+    settings.Columns.Add(ProductCountColumn);
+    settings.Columns.Add(HeadingColumn);
+    settings.Columns.Add(NamingConventionColumn);
+    settings.Columns.Add(ProductTypeColumn);
+    settings.Columns.Add(BrandColumn);
+    settings.Columns.Add(ImageCountColumn);
+
+    settings.HeaderFilterFillItems = (sender, e) => 
+    {
+        MVCxGridView gridView = (MVCxGridView)sender;
+        switch (e.Column.Name)
+        {
+            case "BrandID":
+                e.Values.Clear();
+                foreach (var b in Model.Brands.OrderBy(p => p.Name))
+                {
+                    e.AddValue(b.Name, b.BrandID.ToString());
+                }
+                e.AddShowAll();
+            break;
+            
+            case "ProductTypeID":
+                e.Values.Clear();
+                foreach (var b in Model.ProductTypes.OrderBy(p => p.ProductTypeID))
+                {
+                    e.AddValue(b.Name, b.ProductTypeID.ToString());
+                }
+                e.AddShowAll();
+                break;
+
+            case "NamingConventionID":
+                e.Values.Clear();
+                foreach (var v in Model.NamingConventions.OrderBy(p => p.NamingConventionID))
+                {
+                    e.AddValue(v.Name, v.NamingConventionID.ToString());
+                }
+                e.AddShowAll();
+            break;
+
+            default: break;
+        }
+    };
+    
+}).Bind(Model.Merchandisers).GetHtml()

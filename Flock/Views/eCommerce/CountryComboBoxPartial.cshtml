@@ -1,0 +1,32 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "CountrySelector";
+    settings.Properties.NullDisplayText = "Country...";
+    settings.Properties.NullText = "Country...";
+    settings.Style.Add("margin-right", "1em");
+    settings.Style.Add("float", "left");
+
+    settings.Height = 32;
+    
+    settings.Properties.CallbackPageSize = 15;
+    //settings.Properties.FilterMinLength = 2;
+    //settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "CountryComboBoxPartial" };
+    var prop = settings.Properties as ComboBoxProperties;
+    //prop.DataSource = ;
+    prop.TextField = "Name";
+    prop.ValueField = "CountryID";
+    prop.ValueType = typeof(short);
+
+    settings.Properties.Buttons.Add("Clear");
+    var b = settings.Properties.Buttons[0] as EditButton;
+    settings.Properties.ClientSideEvents.ButtonClick = @"function(s, e) {
+        if(e.buttonIndex == 0) {
+            s.SetSelectedIndex(-1);
+        }
+    }";
+    
+}).BindList(args =>
+{
+    return Flock.ViewModels.LargeDatabaseDataProvider.GetCountryWithPriceList(args);
+}, Flock.ViewModels.LargeDatabaseDataProvider.GetCountryWithPriceListByID).GetHtml()

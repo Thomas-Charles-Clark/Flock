@@ -1,0 +1,72 @@
+@{
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ModuleOptionGroupGridView";
+        settings.CallbackRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGroupGridViewPartial" };
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGroupGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGroupGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGroupGridViewPartialDelete" };
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+            LoadingPanel.Show();
+            $.ajax({
+                url: '"+Url.Action("ModuleOptionSorterPartial", "ModularProducts")+@"',
+                type: 'GET',
+                data: {
+                    ModuleID: $('#selected-module-id').val()
+                },
+                success: function(data) {
+                    LoadingPanel.Hide();
+                    $('#module-options-sorter').html(data);
+                },
+                timeout: 30000
+            });
+        }";
+        
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+		settings.KeyFieldName = "ModuleOptionGroupID";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.Columns.Add("ModuleOptionGroupID");
+		settings.Columns.Add("Name");
+		settings.Columns.Add("Description");
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        var moduleOptionGroupIDColumn = settings.Columns["ModuleOptionGroupID"] as MVCxGridViewColumn;
+        moduleOptionGroupIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        moduleOptionGroupIDColumn.Width = System.Web.UI.WebControls.Unit.Percentage(10);
+
+        var nameColumn = settings.Columns["Name"] as MVCxGridViewColumn;
+        nameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        nameColumn.Width = System.Web.UI.WebControls.Unit.Percentage(10);
+        var nProp = nameColumn.PropertiesEdit as TextBoxProperties;
+        nProp.MaxLength = 100;
+
+        var descriptionColumn = settings.Columns["Description"] as MVCxGridViewColumn;
+        descriptionColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        descriptionColumn.Width = System.Web.UI.WebControls.Unit.Percentage(70);
+        var dProp = descriptionColumn.PropertiesEdit as TextBoxProperties;
+        dProp.MaxLength = 1000;
+        
+	});
+	if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

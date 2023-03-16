@@ -1,0 +1,442 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@model Flock.ViewModels.GiftVoucherViewModel
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "GiftVoucherGridView";
+        settings.CallbackRouteValues = new { Controller = "ECommerce", Action = "GiftVoucherGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ECommerce", Action = "GiftVoucherGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ECommerce", Action = "GiftVoucherGridViewPartialUpdate" };
+        settings.CustomActionRouteValues = new { Controller = "ECommerce", Action = "GiftVoucherGridViewPartialCustomCommand" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.SettingsBehavior.ConfirmDelete = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.KeyFieldName = "GiftVoucherID";
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+            var id = s.GetRowKey(e.visibleIndex);
+//            if(id != $('#selected-gift-voucher-id').val()) {
+//                $('#selected-gift-voucher-id').val(id);
+//                LoadingPanel.Show();
+//                $.ajax({
+//                    url: '" + @Url.Action("ChangeGiftVoucher", "eCommerce") + @"',
+//                    type: 'POST',
+//                    traditional: true,
+//                    data: {
+//                        GiftVoucherID: id
+//                    },
+//                    success: function(data) {
+//                        $('#gift-voucher-compose-container').html(data);
+//                        LoadingPanel.Hide();
+//                    },
+//                    timeout: 20000
+//                });
+//            }
+        }";
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "GiftVoucherID").DisplayFormat = "Total: {0:n0}";
+        settings.Settings.ShowFooter = true;
+
+        //settings.SettingsBehavior.EnableRowHotTrack = true;
+        //settings.Styles.Row.Cursor = "pointer";
+        settings.CommandColumn.Visible = true;
+        //settings.CommandColumn.SetHeaderCaptionTemplateContent("&nbsp;");
+        settings.CommandColumn.Width = 25;
+        
+
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.Settings.ShowFilterRow = true;
+
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        // property to EndlessPaging, and the Settings.VerticalScrollBarMode
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 313;
+
+        settings.SettingsPager.PageSizeItemSettings.Visible = false;
+        settings.SettingsPager.PageSize = 20;
+
+        settings.SettingsBehavior.AllowFocusedRow = true;
+
+        MVCxGridViewColumn GiftVoucherIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn GiftVoucherTypeIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PriceListIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CodeColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn ValueIncColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn ValueExColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn UsedDTColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn SaleTransactionIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn RedeemTransactionIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CreditTransactionIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn ReasonColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CreatorUserIDColumn = new MVCxGridViewColumn();
+
+        GiftVoucherIDColumn.Name = "GiftVoucherID";
+        GiftVoucherIDColumn.FieldName = "GiftVoucherID";
+        GiftVoucherIDColumn.Caption = "Gift Voucher ID";
+        GiftVoucherIDColumn.SortDescending();
+        GiftVoucherIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        GiftVoucherIDColumn.Width = 40;
+        GiftVoucherIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        GiftVoucherIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        GiftVoucherIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        GiftVoucherIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        GiftVoucherIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        settings.Columns.Add(GiftVoucherIDColumn);
+
+        GiftVoucherTypeIDColumn.Name = "GiftVoucherTypeID";
+        GiftVoucherTypeIDColumn.FieldName = "GiftVoucherTypeID";
+        GiftVoucherTypeIDColumn.Caption = "Gift Voucher Type";
+        GiftVoucherTypeIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        GiftVoucherTypeIDColumn.Width = 55;
+        GiftVoucherTypeIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        GiftVoucherTypeIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        GiftVoucherTypeIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        GiftVoucherTypeIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        GiftVoucherTypeIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        GiftVoucherTypeIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var gvtProp = GiftVoucherTypeIDColumn.PropertiesEdit as ComboBoxProperties;
+        gvtProp.TextField = "Name";
+        gvtProp.ValueField = "GiftVoucherTypeID";
+        gvtProp.ValueType = typeof(byte);
+        gvtProp.DataSource = UoW.GetRepository<GiftVoucherType>().GetAll().ToList();
+        settings.Columns.Add(GiftVoucherTypeIDColumn);
+
+        CreditTransactionIDColumn.Name = "CreditTransactionID";
+        CreditTransactionIDColumn.FieldName = "CreditTransactionID";
+        CreditTransactionIDColumn.Caption = "Credit Transaction ID";
+        CreditTransactionIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        CreditTransactionIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CreditTransactionIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CreditTransactionIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        CreditTransactionIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        CreditTransactionIDColumn.Width = 60;
+        CreditTransactionIDColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        var ctIdProp = CreditTransactionIDColumn.PropertiesEdit as TextBoxProperties;
+        settings.Columns.Add(CreditTransactionIDColumn);
+        
+        ReasonColumn.Name = "Reason";
+        ReasonColumn.FieldName = "Reason";
+        ReasonColumn.Caption = "Reason";
+        ReasonColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        ReasonColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ReasonColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        ReasonColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        ReasonColumn.Width = 130;
+        var crProp = ReasonColumn.PropertiesEdit as TextBoxProperties;
+        settings.Columns.Add(ReasonColumn);
+        
+        PriceListIDColumn.Name = "PriceListID";
+        PriceListIDColumn.FieldName = "PriceListID";
+        PriceListIDColumn.Caption = "Price List";
+        PriceListIDColumn.Width = 55;
+        PriceListIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        PriceListIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        PriceListIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        PriceListIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        PriceListIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        PriceListIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var plProp = PriceListIDColumn.PropertiesEdit as ComboBoxProperties;
+        plProp.TextField = "Name";
+        plProp.ValueField = "PriceListID";
+        plProp.ValueType = typeof(byte);
+        plProp.DataSource = UoW.GetRepository<PriceList>().GetAll().ToList();
+        settings.Columns.Add(PriceListIDColumn);
+        
+        CodeColumn.Name = "Code";
+        CodeColumn.FieldName = "Code";
+        CodeColumn.Caption = "Code";
+        CodeColumn.Width = 100;
+        CodeColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        CodeColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CodeColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        CodeColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(CodeColumn);
+
+        ValueIncColumn.Name = "Value Inc";
+        ValueIncColumn.FieldName = "ValueInc";
+        ValueIncColumn.Caption = "Value Inc";
+        ValueIncColumn.Width = 65;
+        ValueIncColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var valueIncProp = ValueIncColumn.PropertiesEdit as SpinEditProperties;
+        valueIncProp.NumberFormat = SpinEditNumberFormat.Number;
+        valueIncProp.DisplayFormatInEditMode = true;
+        valueIncProp.DisplayFormatString = "F2";
+        valueIncProp.LargeIncrement = 10;
+        valueIncProp.Increment = 1;
+        valueIncProp.MinValue = 0.01M;
+        valueIncProp.MaxValue = Decimal.MaxValue;
+        ValueIncColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ValueIncColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        ValueIncColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        
+        settings.Columns.Add(ValueIncColumn);
+
+
+        //ValueExColumn.Name = "Value Ex";
+        //ValueExColumn.FieldName = "ValueEx";
+        //ValueExColumn.Caption = "Value Ex";
+        //ValueExColumn.Width = 65;
+        //ValueExColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        //var valueExProp = ValueExColumn.PropertiesEdit as SpinEditProperties;
+        //valueExProp.NumberFormat = SpinEditNumberFormat.Number;
+        //valueExProp.DisplayFormatInEditMode = true;
+        //valueExProp.DisplayFormatString = "F2";
+        //valueExProp.LargeIncrement = 10;
+        //valueExProp.Increment = 1;
+        //valueExProp.MinValue = 0.01M;
+        //valueExProp.MaxValue = Decimal.MaxValue;
+        //ValueExColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        //ValueExColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        //ValueExColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        //settings.Columns.Add(ValueExColumn);
+
+
+        CreatedDTColumn.Name = "CreatedDTColumn";
+        CreatedDTColumn.FieldName = "CreatedDT";
+        CreatedDTColumn.Caption = "Created";
+        CreatedDTColumn.Width = 55;
+        CreatedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        CreatedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CreatedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CreatedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(CreatedDTColumn);
+
+        UsedDTColumn.Name = "UsedDTColumn";
+        UsedDTColumn.FieldName = "UsedDT";
+        UsedDTColumn.Caption = "Used";
+        UsedDTColumn.Width = 55;
+        UsedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        UsedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        UsedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        UsedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        UsedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(UsedDTColumn);
+
+
+        SaleTransactionIDColumn.Name = "SaleTransactionIDColumn";
+        SaleTransactionIDColumn.FieldName = "SaleTransactionID";
+        SaleTransactionIDColumn.Caption = "Sale Transaction ID";
+        SaleTransactionIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        SaleTransactionIDColumn.Width = 55;
+        SaleTransactionIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        SaleTransactionIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        SaleTransactionIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        SaleTransactionIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        SaleTransactionIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        settings.Columns.Add(SaleTransactionIDColumn);
+
+        
+        RedeemTransactionIDColumn.Name = "RedeemTransactionID";
+        RedeemTransactionIDColumn.FieldName = "RedeemTransactionID";
+        RedeemTransactionIDColumn.Caption = "Redeem Transaction ID";
+        RedeemTransactionIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        RedeemTransactionIDColumn.Width = 55;
+        RedeemTransactionIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        RedeemTransactionIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        RedeemTransactionIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        RedeemTransactionIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        RedeemTransactionIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        settings.Columns.Add(RedeemTransactionIDColumn);
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "PriceListID":
+                    e.Values.Clear();
+                    foreach (var v in UoW.GetRepository<PriceList>().GetAll().OrderBy(p => p.PriceListID))
+                    {
+                        e.AddValue(v.Name, v.PriceListID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "GiftVoucherTypeID":
+                    e.Values.Clear();
+                    foreach (var v in UoW.GetRepository<GiftVoucherType>().GetAll().OrderBy(p => p.GiftVoucherTypeID))
+                    {
+                        e.AddValue(v.Name, v.GiftVoucherTypeID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+
+        settings.SetEditFormTemplateContent(c => {
+            ViewContext.Writer.Write("<div style='padding: 1em; width: 420px; margin: 0 auto;'>");
+
+            Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Text = "Price List";
+                lblSettings.Width = 112;
+                lblSettings.Style.Add("float", "left");
+                lblSettings.Style.Add("margin-right", "1em");
+            }).Render();
+            Html.DevExpress().ComboBox(cbSettings =>
+            {
+                cbSettings.Name = "PriceListID";
+                cbSettings.Style.Add("float", "left");
+                cbSettings.ShowModelErrors = true;
+                cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                cbSettings.Width = 226;
+                var cbProp = cbSettings.Properties as ComboBoxProperties;
+                cbProp.ValueField = "PriceListID";
+                cbProp.ValueType = typeof(byte);
+                cbProp.TextField = "Name";
+            }).BindList(UoW.GetRepository<PriceList>().GetAll().OrderBy(p => p.PriceListID)).Bind(Model == null ? null : Model.PriceListID).Render();
+            
+            ViewContext.Writer.Write("<div style='clear: both; margin-bottom: 1em;'></div>");
+
+            
+            Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Text = "Gift Voucher Type";
+                lblSettings.Width = 112;
+                lblSettings.Style.Add("float", "left");
+                lblSettings.Style.Add("margin-right", "1em");
+            }).Render();
+            Html.DevExpress().ComboBox(cbSettings =>
+            {
+                cbSettings.Name = "GiftVoucherTypeID";
+                cbSettings.Style.Add("float", "left");
+                cbSettings.ShowModelErrors = true;
+                cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                cbSettings.Width = 226;
+                cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+                    
+                    var gvtId = s.GetSelectedItem().value;
+                    //inspector(gvtId);
+                    switch(gvtId) {
+                        case 2:
+                            $('#goodwill-panel').hide();
+                            $('#credit-panel').show();
+                        break;
+                        case 3:
+                            $('#credit-panel').hide();
+                            $('#goodwill-panel').show();
+                        break;
+                        default: break;
+                    }
+                }";
+                var cbProp = cbSettings.Properties as ComboBoxProperties;
+                cbProp.ValueField = "GiftVoucherTypeID";
+                cbProp.ValueType = typeof(byte);
+                cbProp.TextField = "Name";
+
+                if (ViewBag.CreditGiftVoucher != null)
+                    cbSettings.SelectedIndex = 0;
+                if (ViewBag.GoodwillGiftVoucher != null)
+                    cbSettings.SelectedIndex = 1;
+            }).BindList(UoW.GetRepository<GiftVoucherType>().GetAll().Where(p => p.GiftVoucherTypeID != 1).OrderBy(p => p.GiftVoucherTypeID)).Render();
+
+            ViewContext.Writer.Write("<div style='clear: both; margin-bottom: 1em;'></div>");
+
+            ViewContext.Writer.Write("<div id='credit-panel' " + (ViewBag.CreditGiftVoucher != null ? " style=' margin-bottom: 1em;'>" : "style='margin-top: 1em; display: none;'>"));
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Text = "Credit Transaction ID";
+                    lblSettings.Width = 112;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("margin-right", "1em");
+                }).Render();
+            
+                ViewContext.Writer.Write(Html.Partial("GiftVoucherCreditTransactionIDComboBoxPartial", Model));
+
+                ViewContext.Writer.Write("<div style='clear: both;'></div>");
+
+            ViewContext.Writer.Write("</div>");
+            
+            ViewContext.Writer.Write("<div id='goodwill-panel'>");
+                
+            ViewContext.Writer.Write("</div>");
+
+            ViewContext.Writer.Write("<div style='clear: both; margin-bottom: 1em;'></div>");
+
+            
+            Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Text = "Value";
+                lblSettings.Width = 38;
+                lblSettings.Style.Add("float", "left");
+                lblSettings.Style.Add("margin-right", "1em");
+            }).Render();
+            Html.DevExpress().SpinEdit(seSettings => {
+                seSettings.Name = "ValueInc";
+                seSettings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+                seSettings.ShowModelErrors = true;
+                seSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                seSettings.Properties.DisplayFormatString = "F2";
+                seSettings.Properties.LargeIncrement = 10;
+                seSettings.Properties.Increment = 1;
+                seSettings.Properties.MinValue = 0;
+                seSettings.Properties.MaxValue = decimal.MaxValue;
+            }).Bind(Model == null ? 0.0M : (Model.ValueInc)).Render();
+            
+            ViewContext.Writer.Write("<div style='clear: both; margin-bottom: 1em;'></div>");
+
+            Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Text = "Reason";
+                lblSettings.Style.Add("float", "left");
+                lblSettings.Style.Add("line-height", "22px");
+                lblSettings.Style.Add("margin-right", "1em");
+            }).Render();
+
+            Html.DevExpress().Memo(mSettings =>
+            {
+                mSettings.Name = "Reason";
+                mSettings.Properties.MaxLength = 255;
+                mSettings.Width = 300;
+                mSettings.Properties.Rows = 4;
+                mSettings.Properties.Columns = 100;
+                mSettings.ShowModelErrors = true;
+                mSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            }).Bind(Model == null ? null : Model.Reason).Render();
+            
+            ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+            ViewContext.Writer.Write("<div style='text-align: right; padding: 1em;'>");
+            Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "btnUpdate";
+                btnSettings.ControlStyle.CssClass = "button";
+                btnSettings.Text = "Update";
+                btnSettings.Style.Add("margin-right", "1em");
+                btnSettings.ClientSideEvents.Click = "function(s, e){ GiftVoucherGridView.UpdateEdit(); }";
+            }).Render();
+            Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "btnCancel";
+                btnSettings.ControlStyle.CssClass = "button";
+                btnSettings.Text = "Cancel";
+                btnSettings.Style.Add("margin-right", "34px");
+                btnSettings.ClientSideEvents.Click = "function(s, e){ GiftVoucherGridView.CancelEdit(); }";
+            }).Render();
+
+            ViewContext.Writer.Write("</div>");
+        });
+    });
+}
+@grid.BindToLINQ("", "", (s, e) =>
+{
+    UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<GiftVoucher>().GetAll();
+
+    e.KeyExpression = "GiftVoucherID";
+    e.QueryableSource = source;
+}).GetHtml()

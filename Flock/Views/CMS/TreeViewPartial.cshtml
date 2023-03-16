@@ -1,0 +1,158 @@
+﻿@model List<Flock.ViewModels.PageTreeViewModel>
+@Html.DevExpress().TreeList(
+    settings => {
+        settings.Name = "CMSOverviewTreeView";
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "PageTreeListDataBindingPartial" };
+        settings.SettingsEditing.AddNewNodeRouteValues = new { Controller = "CMS", Action = "AddNewPage" };
+        settings.SettingsEditing.UpdateNodeRouteValues = new { Controller = "CMS", Action = "UpdatePage" };
+        settings.SettingsEditing.DeleteNodeRouteValues = new { Controller = "CMS", Action = "DeletePage" };
+        settings.SettingsEditing.NodeDragDropRouteValues = new { Controller = "CMS", Action = "MovePage" };
+        settings.SettingsEditing.ConfirmDelete = true;
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.SettingsBehavior.AllowDragDrop = true;
+        settings.Settings.ShowTreeLines = true;
+        settings.Settings.SuppressOuterGridLines = false;
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Height = 600;
+        settings.Settings.ScrollableHeight = 600;
+        settings.EnableTheming = true;
+        settings.Theme = "Aqua";
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            e.customArgs['SiteSectionID'] = CMSOverviewSiteSectionListBox.GetValue();
+        }";
+
+        settings.ClientSideEvents.CustomButtonClick = @"function(s,e) { 
+            OpenComposer(e.nodeKey);
+            return false;
+        }";
+
+        settings.ClientSideEvents.CallbackError = @"function(s, e) { 
+//            alert(e.message);
+//            e.handled = true;
+        }";
+
+        settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.KeyFieldName = "PageID";
+        settings.ParentFieldName = "ParentID";
+        settings.RootValue = 0;
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "PageID";
+                column.MinWidth = 60;
+                column.Width = 60;
+                column.ReadOnly = true;
+                column.EditFormSettings.Visible = DefaultBoolean.False;
+                column.SetEditCellTemplateContent(c => { });
+            });
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "Name";
+                column.Width = 200;
+                column.CellStyle.Wrap = DefaultBoolean.True;
+            }
+        );
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "TitleTag";
+                column.Width = 200;
+                column.CellStyle.Wrap = DefaultBoolean.True;
+                column.SetEditCellTemplateContent(c => { });
+            }
+        );
+
+        //settings.Columns.Add(
+        //    column =>
+        //    {
+        //        column.FieldName = "MetaDescription";
+        //        column.HeaderStyle.Wrap = DefaultBoolean.True;
+        //        column.SetEditCellTemplateContent(c => { });
+        //    }
+        //);
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "Heading";
+                column.Width = 200;
+                column.CellStyle.Wrap = DefaultBoolean.True;
+                column.SetEditCellTemplateContent(c => { });
+            }
+        );
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "SubHeading";
+                column.Width = 150;
+                column.CellStyle.Wrap = DefaultBoolean.True;
+                column.SetEditCellTemplateContent(c => { });
+            }
+        );
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "URLKeywords";
+                column.SetEditCellTemplateContent(c => { });
+
+                //ValidationSettings.ValidateOnLeave = true;
+                //                column.Properties.ValidationSettings.RegularExpression.ValidationExpression = "^([a-z]|[a-z]-|[a-z]/)+[a-z]$";
+                //                column.Properties.ValidationSettings.RegularExpression.ErrorText = @"Regular Expression Validation Failed.
+                //    URLs must not begin or end with a slash.
+                //    URL segments must not contain accented characters, such as é or ë.
+                //    URL segments may only contain the lower case letters 'a' through 'z', as well as hyphens.
+                //    URL segments must not begin or end with a hyphen.";
+                //                column.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            }
+        );
+
+        settings.EnableCallbackAnimation = false;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.NewButton.Visible = true;
+        settings.CommandColumn.DeleteButton.Visible = true;
+        settings.CommandColumn.EditButton.Visible = false;
+        //settings.CommandColumn.Width
+
+        TreeListCommandColumnCustomButton composebutton = new TreeListCommandColumnCustomButton();
+
+        composebutton.Text = "Compose";
+
+        settings.CommandColumn.CustomButtons.Add(composebutton);
+
+        settings.SettingsBehavior.AutoExpandAllNodes = true;
+
+        settings.SettingsBehavior.ExpandCollapseAction = TreeListExpandCollapseAction.NodeDblClick;
+
+        settings.SettingsCookies.StoreExpandedNodes = true;
+
+        settings.ClientLayout = (s, e) =>
+        {
+            if (e.LayoutMode == ClientLayoutMode.Loading)
+            {
+                if (Session["TreeListState"] != null)
+                    e.LayoutData = (string)Session["TreeListState"];
+            }
+            else
+                Session["TreeListState"] = e.LayoutData;
+        };
+
+        settings.PreRender = (sender, e) =>
+        {
+            if (Session["TreeListState"] == null)
+                ((MVCxTreeList)sender).ExpandToLevel(0);
+        };
+    }
+).Bind(Model).GetHtml()

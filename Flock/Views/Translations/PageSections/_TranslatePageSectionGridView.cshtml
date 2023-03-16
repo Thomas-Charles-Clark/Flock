@@ -1,0 +1,261 @@
+﻿@model Flock.ViewModels.TranslatePageSectionGridViewModel
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "TranslateGridView";
+        settings.CallbackRouteValues = new { Controller = "Translations", Action = "TranslatePageSectionGridView" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Translations", Action = "TranslatePageSectionGridViewUpdate" };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['languageId'] = TranslationTargetLanguageListBox.GetValue();
+        }";
+
+        settings.ClientSideEvents.CustomButtonClick = @"function (s, e) { 
+            $.confirm(function() {
+                var rowKey = s.GetRowKey(e.visibleIndex);
+                s.PerformCallback({ commandType: 'Clear', pageSectionId: rowKey, languageId: TranslationTargetLanguageListBox.GetValue() });
+            }, function() { }, [], 'This will set this record\'s translation fields for ' + TranslationTargetLanguageDD.GetText() + ' to NULL.');
+        }";
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 10;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowCancelButton = true;
+        settings.CommandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton()
+        {
+            ID = "Clear",
+            Index = 0,
+            Text = "Clear",
+            Visibility = GridViewCustomButtonVisibility.AllDataRows
+        });
+
+        settings.Settings.ShowFilterRow = true;
+
+        settings.SettingsPager.PageSize = 20;
+
+        settings.KeyFieldName = "PageSectionID";
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "PageSectionID";
+            column.FieldName = "PageSectionID";
+            column.Caption = "ID";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Width = 50;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<a href='/admin/PageSections/compose/" + c.KeyValue.ToString() + "'>" + c.KeyValue.ToString() + "</a>");
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<span style='float: left;'>" + c.KeyValue.ToString() + "</span>");
+            });
+        });
+        
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Audience";
+            column.FieldName = "TradeSwitch";
+            column.Caption = "Audience";
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Width = 60;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c => {
+                bool? tradeSwitch = (bool?)DataBinder.Eval(c.DataItem, "TradeSwitch");
+                var text = "Both";
+                switch (tradeSwitch)
+                {
+                    case true:
+                        text = "Trade Only";
+                        break;
+                    case false:
+                        text = "Retail Only";
+                        break;
+                    case null:
+                        break;
+                }
+                ViewContext.Writer.Write(text);
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Heading";
+            column.FieldName = "Heading";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.Width = 440;
+        });
+        
+        settings.Columns.Add(column =>
+        {
+            column.Name = "TranslatedHeading";
+            column.FieldName = "TranslatedHeading";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = 440;
+            var tbProp = column.PropertiesEdit as TextBoxProperties;
+            tbProp.MaxLength = 70;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Stage";
+            column.FieldName = "Stage";
+            column.Caption = "Translation Stage";
+            column.Width = 180;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                bool? TranslationStatusID = null;
+                string TranslationStatus = "<i>Unknown</i>";
+
+                TranslationStatusID = (bool?)(DataBinder.Eval(c.DataItem, "Stage"));
+
+                switch (TranslationStatusID)
+                {
+                    case null:
+                        TranslationStatus = "Not Translated";
+                        break;
+                    case false:
+                        TranslationStatus = "Google Translated";
+                        break;
+                    case true:
+                        TranslationStatus = "Manually Translated";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                bool? TranslationStatusID = null;
+                string TranslationStatus = "<i>Unknown</i>";
+
+                TranslationStatusID = (bool?)(DataBinder.Eval(c.DataItem, "Stage"));
+
+                switch (TranslationStatusID)
+                {
+                    case null:
+                        TranslationStatus = "Not Translated";
+                        break;
+                    case false:
+                        TranslationStatus = "Google Translated";
+                        break;
+                    case true:
+                        TranslationStatus = "Manually Translated";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "FieldsToReview";
+            column.FieldName = "FieldsToReview";
+            column.Caption = "Status";
+            column.Width = 100;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                byte? Status = 0;
+                string TranslationStatus = "Complete";
+
+                Status = (Nullable<byte>)(DataBinder.Eval(c.DataItem, "FieldsToReview"));
+
+                switch (Status)
+                {
+                    case 0:
+                        break;
+                    default:
+                        TranslationStatus = "Review";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                byte? Status = 0;
+                string TranslationStatus = "Complete";
+
+                Status = (Nullable<byte>)(DataBinder.Eval(c.DataItem, "FieldsToReview"));
+
+                switch (Status)
+                {
+                    case 0:
+                        break;
+                    default:
+                        TranslationStatus = "Review";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+        });
+
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "Audience":
+                    e.Values.Clear();
+
+                    e.Values.Add(new FilterValue("Retail Only", null, String.Format("TradeSwitch = {0}", false)));
+                    e.Values.Add(new FilterValue("Trade Only", null, String.Format("TradeSwitch = {0}", true)));
+                    
+                    e.AddShowAll();
+                    break;
+
+                case "Stage":
+                    e.Values.Clear();
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(gridView.Columns["Stage"] as GridViewDataColumn, "Not Translated"));
+                    e.Values.Add(new FilterValue("Google Translated", "false"));
+                    e.Values.Add(new FilterValue("Manually Translated", "true"));
+                    e.AddShowAll();
+                    break;
+                case "FieldsToReview":
+                    e.Values.Clear();
+                    e.Values.Add(new FilterValue("Complete", null, string.Format("FieldsToReview = {0}", 0)));
+                    e.Values.Add(new FilterValue("Review", null, string.Format("FieldsToReview != {0}", 0)));
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+    });
+
+    if (ViewData["UpdateErrors"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["UpdateErrors"]);
+    }
+}
+@grid.Bind(Model.PageSections).GetHtml()

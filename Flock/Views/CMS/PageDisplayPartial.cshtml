@@ -1,0 +1,78 @@
+﻿
+
+<script type="text/javascript">
+    var pageSections = new Array();
+            
+        @for (var i = 0; i < Model.Count; i++)
+        {  
+             
+            @: var thisSection = new Object();
+            @: thisSection.contents = "@Model[i].Contents"
+            @: thisSection.parentID = "@Model[i].ParentID"
+            @: thisSection.sortOrder = "@Model[i].SortOrder"
+
+            @: pageSections.push(thisSection);   
+        }
+            
+    pageSections.sort(function(a, b) { 
+        return a.sortOrder - b.sortOrder
+    });
+
+    if(pageSections.length > 0)
+    {
+        for(var i = 0; i < pageSections.length; i++)
+        {
+            var thisSection = $(htmlDecode(htmlDecode(pageSections[i].contents)));
+            
+            // cannot! must use attr type
+            var attr = thisSection.attr("type");
+            if(attr !== 'undefined' && attr !== false)
+            {
+                if(attr == "slideshow")
+                {
+                    $("#"+pageSections[i].parentID).append(thisSection);
+                    
+                    var ss = $("<div style='width: 100%; height: 350px;' class='removable'></div>");
+                    var element = thisSection.children(0);
+
+                    function LoadSlideshow(element) {
+                        ss.load('/admin/CMS/ImageSliderPartial', function() {
+                            element.css("height", "350px");
+                            element.append(ss);
+                        });
+                    }
+
+                    LoadSlideshow(element);
+                }
+                else
+                    $("#"+pageSections[i].parentID).append(thisSection);
+            }
+        }
+        SetSortable();
+    }
+
+
+
+
+    //$(document).ready(function() {
+    //    if(!$("#ShowNavigationBar").is(':checked')) {
+    //        $('#SettingsNavigationBar_Position, #SettingsNavigationBar_Mode, #SettingsNavigationBar_ThumbnailsModeNavigationButtonVisibility').attr('disabled', 'disabled');
+    //    }
+    //    $('form :input:checkbox, select').not('#PredefinedScenario').change(
+    //        function() {
+    //            $('#PredefinedScenario').val(null);
+    //        }
+    //    );
+    //    $('#PredefinedScenario').change(
+    //        function() {
+    //            if($(this).val())
+    //                $('form').submit();
+    //        }
+    //    );
+
+    //    //$("#settings-pane").hide();
+    //    //$("#settings-arrow").hide();
+    //});
+
+
+</script>

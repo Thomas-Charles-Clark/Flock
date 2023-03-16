@@ -1,0 +1,151 @@
+﻿@using Flock.ViewModels
+@using Flock.Models
+@model Animation_PageSection
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    
+    string animationAspectRatioString = "Animation (Not Assigned)";
+    string animationIDString = "Animation ID: (Not Assigned)";
+
+    if (Model.Animation != null)
+    {
+        animationAspectRatioString = "Animation - " + Model.Animation.AspectRatio.Name;
+        animationIDString = "Animation ID: " + Model.Animation.AnimationID;
+    }
+}
+<fieldset>
+    <legend style="color: black; border-bottom-color: #929292; width: 100%;" onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + Model.PageSectionID + "-contents').slideToggle('fast');")">
+        @(animationAspectRatioString) @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+        <span style="margin: 0 12px;">@(animationIDString)</span>
+        <span style="margin: 0 4px;">Page Section ID: @(Model.PageSectionID)</span>
+
+        <img id="page-section-@(Model.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(Model.PageSectionID));" />
+        <img id="page-section-@(Model.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(Model.PageSectionID), @(Model.PageSectionTypeID));" />
+        <img id="page-section-@(Model.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(Model.PageSectionID), @(Model.PageSectionTypeID));" />
+        <img id="pagesection-@(Model.PageSectionID)-clone" src="~/Images/icons/32/o_collection/element_copy.png" class="pagesection-clone-icon" title="Clone Page Section" onclick="event.stopPropagation(); $('#clone-popup-page-section-id').val(@(Model.PageSectionID)); ClonePageSectionPopup.Show();" />
+        <img id="page-section-@(Model.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+    </legend>
+    <div id="page-section-@(Model.PageSectionID)-header-details" class="pagesection-header">
+        @Html.Partial("PageSectionHeaderDetails", Model)
+    </div>
+    <div id="page-section-@(Model.PageSectionID)-contents" style="background-color: white; padding: 0; width: 980px; @(ViewBag.IsUserShuffling ? "display: none;" : "" )" class="page-section-hideable">
+        @if (Model.IsHeader)
+        {
+            <div id="page-section-@(Model.PageSectionID)-panel" class="header-text-panel">
+                <h4>
+                    Page Heading
+                </h4>
+                <p style="margin: 10px 0 20px 0;">
+                    Page Sub Heading
+                </p>
+                <p>
+                    Page Description...
+                </p>
+            </div>
+        }
+        <div id="page-section-@(Model.PageSectionID)-slideshow" style="height: 1px; width: @(Model.IsHeader ? "74%" : "100%"); display: inline-block; position: relative;">
+            @(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Partial("PageSectionAnimation", Model))
+        </div>
+        <div class="fieldset-inner">
+
+
+            @*@Html.DevExpress().LabelFor(m => Model.Animation, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.Style.Add("line-height", "22px");
+            }).GetHtml()
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "ComposePageAnimationComboBox" + Model.PageSectionID.ToString();
+                settings.Properties.ClientInstanceName = "ComposePageAnimationComboBox" + Model.PageSectionID.ToString();
+                settings.Properties.ValueType = typeof(short);
+                settings.Properties.ValueField = "AnimationID";
+                settings.Properties.TextField = "Name";
+
+                settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                    SaveAnimationSection(" + Model.PageSectionID + @")
+                }";
+
+                if (Model.Animation != null)
+                {
+                    settings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                        s.SetSelectedItem(s.FindItemByValue(" + Model.Animation.AnimationID + @"));
+                        s.SetText(s.GetSelectedItem().text);
+                    }";
+                }
+            }).BindList(UoW.GetRepository<Flock.Models.Animation>().GetAll().Where(p => p.DeletedDT == null).ToList()).GetHtml()*@
+            <button class="btn btn-primary" onclick="LoadAnimationEditor(@(Model.Animation.AnimationID))">Edit</button>
+        </div>
+        <div data-page-section-id="@(Model.PageSectionID)" style="padding: 1em; padding-top: 0;">
+            @Html.Partial("CountryLanguageRestrictionPartial", Model.CountryLanguageRestrictions)
+        </div>
+    </div>
+</fieldset>
+
+
+
+
+
+@*<div id="page-section-@(Model.PageSectionID)-advanced-settings" class="page-section-advanced-container">
+    @{
+        if (Model.Images.Count > 0)
+        {
+            <div id="slideshow-image-@(Model.PageSectionID)-overlay-container" style="width: 800px;">
+                <i style='display: block; text-align: center;'>Loading</i>
+            </div>
+        }
+        else
+        {
+            <h6>No images in Slideshow.</h6>
+        }
+    }
+</div>*@
+
+@*<script type="text/javascript">
+    if (typeof (InitSlideshowDragDrop) == "function")
+        InitSlideshowDragDrop();
+</script>
+@{
+    if (Model.Images.Count > 0)
+    {
+        <script type="text/javascript">
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                $.ajax({
+                    url: '@Url.Action("SlideshowImageOverlayPartial", "CMS")',
+                    type: 'GET',
+                    traditional: true,
+                    data: {
+                        slideShowID: '@(Model.Images[0].Record.SlideShowID)',
+                        pageSectionID: '@(Model.PageSectionID)',
+                        arID: '@(Model.ARID)',
+                        imageID: '@(Model.Images[0].Record.ImageID)'
+                    },
+                    success: function (data) {
+                        $('#slideshow-image-@(Model.PageSectionID)-overlay-container').html(data);
+                    },
+                    timeout: 20000
+                });
+            }
+            else {
+                $(window).bind("load", function () {
+                    $.ajax({
+                        url: '@Url.Action("SlideshowImageOverlayPartial", "CMS")',
+                        type: 'GET',
+                        traditional: true,
+                        data: {
+                            slideShowID: '@(Model.Images[0].Record.SlideShowID)',
+                            pageSectionID: '@(Model.PageSectionID)',
+                            arID: '@(Model.ARID)',
+                            imageID: '@(Model.Images[0].Record.ImageID)'
+                        },
+                        success: function (data) {
+                            $('#slideshow-image-@(Model.PageSectionID)-overlay-container').html(data);
+                        },
+                        timeout: 20000
+                    });
+                });
+            }
+        </script>
+    }
+}*@

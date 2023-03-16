@@ -1,0 +1,17 @@
+﻿@model Flock.ViewModels.PageTranslateViewModelHeader
+<div class="content-panel-container">
+    <fieldset id="page-select-header">
+        <legend>Translate CMS Page - Page Selector</legend>
+        <div class="select-header-inner" style="background-color: #e1e1e1;">
+            @Html.Action("TranslatePageHeaderSiteSectionDropDown", "Translations", new { Filters = Model })
+            <div id="translate-page-parent-page-drop-down-container">
+                @Html.Action("TranslatePageHeaderParentPageDropDown", "Translations", new { Filters = Model })
+            </div>
+            @Html.Action("TranslatePageHeaderTranslationStatusDropDown", "Translations", new { Filters = Model })
+            <div id="translate-page-page-drop-down-container">
+                @Html.Action("TranslatePageHeaderPageDropDown", "Translations", new { Filters = Model })
+            </div>
+            <div style="clear: both"></div>
+        </div>
+    </fieldset>
+</div>

@@ -1,0 +1,118 @@
+﻿@using Flock.Models
+@{ 
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+}
+@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "ProductPageSearch_DataView";
+
+    settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "ProductPageSearch" };
+    //(byte? ProductTypeID, byte? BrandID, short? LaunchID, short? CollectionID, byte? PatternID, byte? StatusID, byte? ColourID, string SearchString
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['ProductTypeID'] =  ProductPageSearchProductTypeListBox.GetValue();
+        e.customArgs['BrandID'] = ProductPageSearchBrandListBox.GetValue();
+        e.customArgs['LaunchID'] = ProductPageSearchLaunchListBox.GetValue();
+        e.customArgs['TemplateID'] = ProductPageSearchTemplateListBox.GetValue();
+        e.customArgs['CollectionID'] = ProductPageSearchCollectionListBox.GetValue();
+        e.customArgs['PatternID'] = ProductPageSearchPatternListBox.GetValue();
+        e.customArgs['ColourID'] = ProductPageSearchColourListBox.GetValue();
+        e.customArgs['StatusID'] = ProductPageSearchStatusListBox.GetValue();
+        e.customArgs['SearchString'] = ProductPageSearchNameTextBox.GetValue();
+        //e.customArgs['TemplateID'] = ProductPageSearchTemplateListBox.GetValue();
+    }";
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) {
+        if (typeof (InitRelatedProductPagesDragDrop) == 'function')
+            InitRelatedProductPagesDragDrop();
+        if (typeof (InitProductPagesDragDrop) == 'function')
+            InitProductPagesDragDrop();
+        if (typeof (InitLinkDragDrop) == 'function')
+            InitLinkDragDrop();
+    }";
+
+    settings.Style.Add("background-color", "white");
+    settings.Style.Add("width", "100%");
+    settings.Style.Add("margin", "0");
+
+    settings.Styles.CssPostfix = " multisortable-container";
+
+    //settings.Layout = DevExpress.Web.ASPxDataView.Layout.Flow; 
+
+    settings.AllowPaging = true;
+    settings.AlwaysShowPager = true;
+    settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    settings.PagerSettings.PageSizeItemSettings.Visible = true;
+    settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+    settings.PagerSettings.PageSizeItemSettings.ShowAllItem = true;
+    settings.SettingsTableLayout.RowsPerPage = 3;
+    settings.SettingsTableLayout.ColumnCount = 5;
+    settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(8);
+    settings.EmptyDataText = "<h4>No results</h4>";
+    settings.SetItemTemplateContent(
+    c =>
+    {
+        var statusColour = "#000000";
+
+        switch (Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID")))
+        {
+            case 0:
+                statusColour = "green";
+                break;
+            case 1:
+                statusColour = "orange";
+                break;
+            case 2:
+                statusColour = "orange";
+                break;
+            case 3:
+                statusColour = "green";
+                break;
+            case 4:
+                statusColour = "red";
+                break;
+            default: break;
+        }
+
+        var discID = "";
+        if (DataBinder.Eval(c.DataItem, "ImageID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ImageID") != null)
+            discID = DataBinder.Eval(c.DataItem, "ImageID").ToString();
+        if (discID != "")
+        {
+
+            ViewContext.Writer.Write(
+            "<div id='product-page-box-" + DataBinder.Eval(c.DataItem, "ProductPageID") + "' class='multidraggable productpage' data-my-index='"+c.ItemIndex+@"' data-product-page-id='" + DataBinder.Eval(c.DataItem, "ProductPageID") + "' data-name='"+DataBinder.Eval(c.DataItem, "Name")+@"' data-image-id='"+DataBinder.Eval(c.DataItem, "ImageID")+@"'>" +
+                "<div>" +
+                    "<img style='width: 156px; height: 156px;' title=\"Product Page ID: " + DataBinder.Eval(c.DataItem, "ProductPageID") + "\" src=\"" + Url.Content("https://flock.designersguild.com/ImageLibrary/156/" + DataBinder.Eval(c.DataItem, "ImageID") + ".jpeg") + "\" alt=\"\" />" +
+                "</div>" +
+                "<div class=\"DataViewItemTitle\">" + DataBinder.Eval(c.DataItem, "Name") + "</div>" +
+                "<div class=\"web-status\" >Status: <span style='color: " + statusColour + "'>" + UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == (byte)DataBinder.Eval(c.DataItem, "StatusID")).Select(p => p.Name).Single() + "</span></div>" +
+            "</div>"
+        );
+        }
+        else
+        {
+            ViewContext.Writer.Write(
+                "<div id='product-page-box-" + DataBinder.Eval(c.DataItem, "ProductPageID") + "' class='multidraggable productpage' data-my-index='" + c.ItemIndex + @"' data-product-page-id='" + DataBinder.Eval(c.DataItem, "ProductPageID") + "'>" +
+                    "<div>" +
+                        "<img style='width: 156px; height: 156px;' title=\"Product Page ID: " + DataBinder.Eval(c.DataItem, "ProductPageID") + "\"  src='/images/admin/image-not-set.png' alt='' />" +
+                    "</div>" +
+                "<div class=\"DataViewItemTitle\">" + DataBinder.Eval(c.DataItem, "Name") + "</div>" +
+                "<div class=\"web-status\" >Status: <span style='color: " + statusColour + "'>" + UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == (byte)DataBinder.Eval(c.DataItem, "StatusID")).Select(p => p.Name).Single() + "</span></div>" +
+            "</div>"
+            );
+        }
+
+
+    }
+
+);
+}).Bind(Model).GetHtml()
+
+<script type="text/javascript">
+    if (typeof (InitRelatedProductPagesDragDrop) == "function")
+        InitRelatedProductPagesDragDrop();
+    if (typeof (InitProductPagesDragDrop) == 'function')
+        InitProductPagesDragDrop();
+
+
+</script>

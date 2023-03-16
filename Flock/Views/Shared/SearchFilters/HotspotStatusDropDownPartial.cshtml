@@ -1,0 +1,92 @@
+﻿@{
+    Layout = null;
+}
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+        settings.Name = "ImageHotspotDD";
+        settings.Text = "Hotspot Status";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+        //if (action == "ImageSearchHotspotStatusDropDownPartial")
+            settings.Name = "ImageSearchHotspotStatusDD";
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='hotspot-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/HotspotStatusListBoxPartial.cshtml"));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "ImageSearchHotspotStatusDropDownPartial")
+                    {
+                        buttonSettings.Name = "ImageSearchHotspotButtonClear";
+                        buttonSettings.Text = "Clear";
+                        buttonSettings.Style.Add("float", "left");
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ImageSearchHotspotStatusListBox.UnselectAll();
+                            ImageSearchHotspotStatusDD.HideDropDown(); 
+                            ImageSearchHotspotStatusDD.SetText('Hotspot Status');
+                            $('#image-searching-icon').fadeIn('fast');
+                            $.ajax({
+                                url: '" + Url.Action("ImageSearch", "Images") + @"',
+                                traditional: true,
+                                data: { 
+                                    ProductType: ImageSearchProductTypeListBox.GetValue(),
+                                    Brand: ImageSearchBrandListBox.GetValue(),
+                                    Launch: ImageSearchLaunchListBox.GetValue(),
+                                    Collection: ImageSearchCollectionListBox.GetValue(),
+                                    AspectRatio: ImageSearchAspectRatioListBox.GetValue(),
+                                    ImageType: ImageSearchImageTypeListBox.GetValue(),
+                                    Perspective: ImageSearchPerspectiveListBox.GetValue(),
+                                    HotspotStatus: ImageSearchHotspotStatusListBox.GetValue(),
+                                    Colour: ImageSearchColourListBox.GetValue(),
+                                    Room: ImageSearchRoomListBox.GetValue(),
+                                    Style: ImageSearchStyleListBox.GetValue(),
+                                    NameOrID: ImageSearchNameOrIDTextBox.GetValue(),
+                                    SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue(),
+                                    Resolution: ResolutionListBox.GetValue()
+                                },
+                                success: function(data) {
+                                    $('#image-data-view-container').html(data);
+                                    $('#image-searching-icon').fadeOut('slow');
+                                },
+                                error: function(e, s, a) {
+                                    $.showError(e, s, a, function() { $('#image-searching-icon').fadeOut('slow'); });
+                                },
+                                timeout: 60000
+                            });
+                        }";
+                    }
+                }
+            )
+            .Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "ImageSearchHotspotStatusDropDownPartial")
+                    {
+                        buttonSettings.Name = "ImageSearchHotspotButtonClose";
+                        buttonSettings.Text = "Close";
+                        buttonSettings.Style.Add("float", "right");
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ImageSearchHotspotStatusDD.HideDropDown();
+                        }";
+                    }
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

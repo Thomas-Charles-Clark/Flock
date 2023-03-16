@@ -1,0 +1,82 @@
+﻿@model Flock.ViewModels.DeliveryExceptionsViewModel
+@{ 
+    Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewBag.Title = "Delivery Exceptions";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: auto;
+        }
+    </style>
+}
+
+<div class="page-heading">
+    <h4>Delivery Exceptions</h4>
+</div>
+
+<div id="row">
+    @foreach(var m in Model.DeliveryExceptions)
+    {
+
+    }
+</div>
+
+<div class="row">
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    Exceptions
+                </h4>
+            </div>
+            <div class="panel-body">
+                <div>
+                    @Html.Action("DeliveryExceptionsCountryDropDownPartial")
+                    <div class="clearfix"></div>
+                </div>
+                <div id="grid-container" style="display: none;">
+                    @Html.Action("DeliveryExceptionsGridView")
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    Global Delivery Delay
+                </h4>
+            </div>
+            <div class="panel-body">
+                <p>If for any reason you need all delivery estimates to be delayed, set that delay here.</p>
+                <div>
+                    @Html.DropDownListFor(m => Model.DispatchDelay, new SelectList(Model.DelayList, "Value", "Text"), new { id = "global-delivery-delay", onchange = "UpdateGlobalDeliveryDelay()" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var updateBusy = false;
+
+    function UpdateGlobalDeliveryDelay() {
+        updateBusy = true;
+        $.ajax({
+            url: '/admin/ecommerce/UpdateGlobalDeliveryDelay',
+            type: 'POST',
+            data: {
+                value: $("#global-delivery-delay").val()
+            },
+            success: function (data) {
+                updateBusy = false;
+                GreenFade($("#global-delivery-delay"));
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                updateBusy = false;
+                $.showError(xhr, textStatus, errorThrown);
+            }
+        });
+    }
+</script>

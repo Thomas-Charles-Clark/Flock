@@ -1,0 +1,22 @@
+﻿@model List<Flock.Models.OrderFormGroup>
+@Html.DevExpress().GridView(settings => 
+{
+    settings.Name = "OrderFormGroupManager";
+    settings.KeyFieldName = "OrderFormGroupID";
+    settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "OrderFormGroupManagerPartial" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ProductPages", Action = "AddNewOrderFormGroup" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ProductPages", Action = "UpdateOrderFormGroup" };
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(450);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(450);
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.Visible = true;
+    
+    settings.CommandColumn.SetHeaderTemplateContent(c => {
+        ViewContext.Writer.Write("<a href='#' style='width: 100%; display: block; text-align: center;' onclick='OrderFormGroupManager.AddNewRow(); return false;'>Create New</a>");
+    });
+    
+    settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+    settings.Columns.Add("Name");
+    
+}).Bind(Model).GetHtml()

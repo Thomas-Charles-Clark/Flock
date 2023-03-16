@@ -1,0 +1,56 @@
+﻿@model Flock.ViewModels.MailingListImportResultViewModel
+
+@if (Model.ErrorTexts != null)
+{
+    foreach (string s in Model.ErrorTexts)
+    {
+        <text>
+            <h5 class="error">@(s)</h5>
+        </text>
+    }
+}
+
+@if (Model.UploadedRows != null)
+{
+    <div id="uploaded-results-container" style="float: left;">
+        <h5>Uploaded</h5>
+        <table id="uploaded-rows-table" class="custom">
+            <tbody>
+                <tr>
+                    <th>
+                        Full Name
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                </tr>
+            </tbody>
+            <tbody>
+                @foreach (Flock.Controllers.MailingListExcelRow row in Model.UploadedRows)
+                {
+                    Flock.Util.RegexUtilities reg = new Flock.Util.RegexUtilities();
+                    <tr class="@(reg.IsValidEmail(row.EMAIL) ? "" : "invalid-email")">
+                        <td>
+                            @(row.FULLNAME)
+                        </td>
+                        <td>
+                            @(row.EMAIL)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<input id="file-name" type="hidden" value="@(Model.FileName)" /> 
+
+<div id="merge-button-container">
+    <input id="merge-button" type="button" value="&raquo; Merge &raquo;" onclick="PerformMerge();"/>
+</div>
+
+<div id="merge-results-container">
+
+</div>
+
+<div style="clear: both;"></div>

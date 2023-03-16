@@ -1,0 +1,224 @@
+﻿@model Flock.ViewModels.TranslateSnippetDetailViewModel
+
+<div id="translation-container" class="content-panel-container" style="width: 600px; float: right; margin-top: 2em;">
+    <fieldset style="padding-bottom: 0;">
+        <legend style="display: none;">
+
+        </legend>
+        <div class="fieldset-inner" style="height: 58px;">
+            <h4 style="float: left;">Translation (@(Model.TargetLanguage))</h4>
+
+            <img id="target-language-flag" style="float: right; margin-top: 3px; width: 32px;" src="/images/icons/languageicons/@(Model.TargetLanguageID).png" alt="@(Model.TargetLanguage) flag" title="@(Model.TargetLanguage)" />
+
+        </div>
+    </fieldset>
+    <fieldset id="translation-fieldset">
+        <legend style="display: none;">
+        </legend>
+        <div class="fieldset-inner">
+
+            <textarea id="translation-htmleditor">@(Model.Translation.HTMLContent)</textarea>
+
+            <script type="text/javascript">
+                window["translation-htmleditor"] = CodeMirror.fromTextArea(document.getElementById('translation-htmleditor'), {
+                    lineNumbers: true,
+                    autoCloseTags: true,
+                    mode: "htmlmixed"
+                });
+            </script>
+            @*@Html.DevExpress().HtmlEditor(settings =>
+            {
+                settings.Name = "TranslationHtmlEditor";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Height = System.Web.UI.WebControls.Unit.Pixel(650);
+
+                settings.SettingsHtmlEditing.AllowScripts = true;
+                settings.SettingsHtmlEditing.AllowIFrames = true;
+                settings.SettingsHtmlEditing.AllowFormElements = true;
+                settings.SettingsHtmlEditing.UpdateDeprecatedElements = true;
+                settings.SettingsHtmlEditing.UpdateBoldItalic = true;
+                settings.SettingsHtmlEditing.EnterMode = HtmlEditorEnterMode.BR;
+                settings.Settings.AllowContextMenu = DefaultBoolean.True;
+                settings.Settings.AllowDesignView = false;
+                settings.Settings.AllowHtmlView = true;
+                settings.Settings.AllowPreview = false;
+                settings.ActiveView = HtmlEditorView.Html;
+                
+                settings.Toolbars.CreateDefaultToolbars();
+
+                settings.Html = Model.Translation.HTMLContent;
+
+            }).GetHtml()*@
+        </div>
+        <div class="buttons-container fieldset-inner" style="padding-top: 0">
+            @*@Html.DevExpress().ValidationSummary(settings =>
+            {
+                settings.Name = "ValSum";
+                settings.ShowErrorsInEditors = true;
+                settings.ShowErrorAsLink = true;
+            }).GetHtml()*@
+            <table class="buttons-table">
+                <tr>
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "SaveNextBtn";
+                            settings.Text = "Save & Next";
+                            settings.TabIndex = 8;
+                            settings.Width = System.Web.UI.WebControls.Unit.Pixel(140);
+                            //settings.Style.Add("float", "left");
+                            settings.Style.Add("margin", "0 0 0 0");
+                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                var prop = TranslateGridView.cpColumnsProp;
+                                window.RowLoss = false;
+                                for (var name in prop) {
+                                    if((name == 'FieldsToReview' && prop[name].filterValue.indexOf('<>') > -1)
+                                        || (name == 'Stage' && prop[name].filterValue.indexOf('[Stage]') > -1 && prop[name].filterValue.indexOf('True') == -1)) {
+                                            // We're filtered such that the Save & Next button would skip one ahead undesirably because a successful save will disappear the row from the grid.
+                                        window.RowLoss = true;
+                                    }
+                                }
+
+                                SaveTranslation(function() {
+                                    if(TranslateGridView.IsDataRow(window.NextIndex)) {
+                                        if(!window.RowLoss) {
+                                            TranslateGridView.SetFocusedRowIndex(window.NextIndex);
+                                            TranslateGridView.MakeRowVisible(window.NextIndex);
+                                            LoadTranslator(TranslateGridView.GetRowKey(window.NextIndex), function() {
+                                                TranslateGridView.Refresh();
+                                            });
+                                            window.NextIndex++;
+                                        }
+                                        else {
+                                            LoadTranslator(TranslateGridView.GetRowKey(window.NextIndex), function() {
+                                                TranslateGridView.Refresh();
+                                            });
+                                        }
+                                    }
+                                    else {
+                                        if(!window.RowLoss) {
+                                            window.ForcedPaging = true;
+                                            TranslateGridView.NextHtmlSection();
+                                        }
+                                        else {
+                                            window.ForcedPaging = true;
+                                            TranslateGridView.Refresh();
+                                        }
+                                    }
+                                });
+                            }";
+                        }).GetHtml()
+                    </td>
+
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "SaveBtn";
+                            settings.Text = "Save";
+                            settings.TabIndex = 8;
+                            settings.Width = System.Web.UI.WebControls.Unit.Pixel(140);
+                            //settings.Style.Add("float", "left");
+                            settings.Style.Add("margin", "0 0 0 0");
+                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                SaveTranslation(function() {
+                                    LoadTranslator(TranslateGridView.GetRowKey(TranslateGridView.GetFocusedRowIndex()), function() { TranslateGridView.Refresh(); });
+                                });
+                            }";
+                        }).GetHtml()
+                    </td>
+
+                    <td>
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "UndoBtn";
+                            settings.Text = "Undo";
+                            settings.TabIndex = 9;
+                            settings.Width = System.Web.UI.WebControls.Unit.Pixel(140);
+                            settings.Style.Add("float", "right");
+                            settings.Style.Add("margin", "0 0 0 0");
+                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                if(DetectUnsavedChanges()) {
+                                    $.unsavedWarning(function() {
+                                        LoadTranslator(TranslateGridView.GetRowKey(TranslateGridView.GetFocusedRowIndex()));
+                                    }, function() {
+
+                                    }, null);
+                                }
+                                else {
+                                    LoadTranslator(TranslateGridView.GetRowKey(TranslateGridView.GetFocusedRowIndex()));
+                                }
+                            }";
+                        }).GetHtml()
+                    </td>
+
+                    <td>
+
+                    </td>
+                </tr>
+            </table>
+            <div class="clearfix"></div>
+        </div>
+    </fieldset>
+</div>
+
+<div id="default-container" class="content-panel-container" style="width: 600px; float: left; margin-top: 2em;">
+    <fieldset style="padding-bottom: 0;">
+        <legend style="display: none;">
+
+        </legend>
+        <div class="fieldset-inner" style="height: 58px; padding-bottom: 0;">
+            <h4 style="float: left;">Default (English - British)</h4>
+
+            <img id="default-language-flag" style="float: right; margin-top: 3px; width: 32px;" src="/images/icons/languageicons/1.png" alt="UK flag" title="Default: British English" />
+            
+        </div>
+    </fieldset>
+
+    <fieldset id="default-fieldset">
+        <legend style="display: none;">
+
+        </legend>
+        <div class="fieldset-inner">
+
+            <textarea id="original-htmleditor">@(Model.English.HTMLContent)</textarea>
+
+            <script type="text/javascript">
+                window["original-htmleditor"] = CodeMirror.fromTextArea(document.getElementById('original-htmleditor'), {
+                    lineNumbers: true,
+                    mode: "htmlmixed",
+                    autoCloseTags: true,
+                    readOnly: true
+                });
+            </script>
+            @*@Html.DevExpress().HtmlEditor(settings =>
+            {
+                settings.Name = "OriginalHtmlEditor";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Height = System.Web.UI.WebControls.Unit.Pixel(650);
+
+                settings.Enabled = false;
+                
+                settings.SettingsHtmlEditing.AllowScripts = true;
+                settings.SettingsHtmlEditing.AllowIFrames = true;
+                settings.SettingsHtmlEditing.AllowFormElements = true;
+                settings.SettingsHtmlEditing.UpdateDeprecatedElements = true;
+                settings.SettingsHtmlEditing.UpdateBoldItalic = true;
+                settings.SettingsHtmlEditing.EnterMode = HtmlEditorEnterMode.BR;
+                settings.Settings.AllowContextMenu = DefaultBoolean.True;
+                settings.Settings.AllowDesignView = false;
+                settings.Settings.AllowHtmlView = true;
+                settings.Settings.AllowPreview = false;
+                settings.ActiveView = HtmlEditorView.Html;
+
+                settings.Toolbars.CreateDefaultToolbars();
+
+                settings.Html = Model.English.HTMLContent;
+
+            }).GetHtml()*@
+        </div>
+    </fieldset>
+</div>
+
+<div style="clear: both;"></div>
+
+<input type="hidden" id="snippet-id-hidden" value="@(Model.SnippetID)"/>

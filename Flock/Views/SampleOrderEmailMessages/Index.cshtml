@@ -1,0 +1,52 @@
+﻿@model Flock.ViewModels.SampleOrderEmailMessageViewModel
+@{
+    ViewBag.Title = "Email Messages";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/content/email-messages.css")
+}
+
+<div class="page-heading">
+    <h4>Sample Ordering System - Confirmation Email Messages</h4>
+</div>
+
+<div class="page-subheading">
+    <p style="font-style: italic;">
+        Right... must offer the ability to create (HTML?) messages to be injected into the Sample Order Confirmation emails which will be sent worldwide by people downstairs, and to retail customers by Retail.<br /><br />
+        What about sort orders... keep it simple: you're only allowed one message top and one message bottom.<br /><br />
+        Do we give them a beautiful and easy to use but powerful too? Or a grid which is... not as great. Visually show them where the message is going to go? Do your best to replicate the very email which will be sent?
+        ... what about on and off dates?
+    </p>
+</div>
+
+<div class="page-subheading">
+    @Html.DevExpress().DateEdit(settings =>
+    {
+        settings.Name = "PreviewingDate";
+        settings.Properties.Caption = "Viewing as at date";
+        settings.Date = DateTime.Today;
+    }).GetHtml()
+
+    @Html.DevExpress().ComboBox(settings =>
+    {
+        settings.Name = "Market";
+        settings.Properties.Caption = "Market";
+    }).GetHtml()
+
+    @Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "Language";
+    settings.Properties.Caption = "Language";
+}).GetHtml()
+</div>
+
+<div id="composer-container">
+    <div id="email-preview">
+        <div><img alt="Designers Guild" src="http://hosting-source.bm23.com/37124/public/Transactional/header-logo.jpg" height="54" width="640" title="Designers Guild" /></div>
+        <p>Dear Customer,</p><p>Thank you for your sample order.</p><p>We will be dispatching your items as soon as possible.<br />Please keep this confirmation for your reference.</p><p>Any items listed as out of stock will be dispatched as soon as they become available.</p><p>We'd love to see your finished results, please do share images of your finished space or project with us and tag Designers Guild on our social channels.</p><div style="margin-bottom: 10px;margin-left: -6px;">           <a style="float: left;" href="https://twitter.com/designersguild" target="_blank"><img src="https://www.designersguild.com/_assets/flock_assets/twitter.gif" alt="Twitter" title="Twitter"></a>           <a style="float:left; margin-right: 0;" href="https://www.pinterest.com/designersguild/" target="_blank"><img style="float: left;" src="https://www.designersguild.com/_assets/flock_assets/pinterest.gif" alt="Pinterest" title="Pinterest"></a>           <a style="float: left; margin-right: 0;" href="https://www.facebook.com/designersguildgroup" target="_blank"><img style="float: left;" src="https://www.designersguild.com/_assets/flock_assets/facebook.gif" alt="Facebook" title="Facebook"></a>           <a style="float: left; margin-right: 0;" href="https://www.instagram.com/designersguild/" target="_blank"><img style="float: left;" src="https://www.designersguild.com/_assets/flock_assets/icon-instagram.gif" alt="Instagram" title="Instagram"></a>           <div style="clear: both"></div>          </div>
+        <h4 class="header_h4_u">Order Summary</h4>
+        <h4 class="header_h4_u">Order: 927213201</h4><div class="content-block"><table class="orderline-table"><tr><th colspan="7">Delivery To: MRS PORTER, 142 London Road, SEVENOAKS, Kent, TN13 1DJ, United Kingdom</th></tr><tr><th>&nbsp;</th><th>Product Code</th><th style="text-align: center;">Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th><th>Status</th></tr><tr><td class="image-cell"><img style="width: 50px;" src="http://www.designersguild.com/image/156/13155" /></td><td class="code-cell">F1190/21/C</td><td class="name-cell" style="text-align: center">Varese Denim - Cutting</td><td class="quantity-cell">1</td><td class="money-cell">£0.00</td><td class="money-cell">£0.00</td><td class="cost-cell" style="text-align: center">In Stock</td></tr><tr><td class="image-cell"><img style="width: 50px;" src="http://www.designersguild.com/image/156/2151" /></td><td class="code-cell">F2034/57/C</td><td class="name-cell" style="text-align: center">Cassia - Indigo Cutting</td><td class="quantity-cell">1</td><td class="money-cell">£0.00</td><td class="money-cell">£0.00</td><td class="cost-cell" style="text-align: center">In Stock</td></tr></table></div><p class="footer" style="margin-bottom: 10px;">If you have any questions, please contact your local Customer Services department.</p><p>Yours Sincerely,<br />Customer Services Team</p>
+        <div><img alt="Designers Guild" src="http://hosting-source.bm23.com/37124/public/Transactional/footer-logo.jpg" height="21" width="272" title="Designers Guild" /></div>
+    </div>
+</div>

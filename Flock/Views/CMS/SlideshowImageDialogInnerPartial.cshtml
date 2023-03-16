@@ -1,0 +1,220 @@
+﻿@model Flock.ViewModels.SlideshowImageViewModel
+@using Flock.DAL
+@using Flock.Models
+
+<img src='https://flock.designersguild.com/imagelibrary/1024/@(Model.ImageID).jpeg' style="width: 100%; margin: 0 auto;"/>
+
+<div style="clear: both;"></div>
+
+<div style="width: 100%; position: relative;">
+    <div style="width: 40%; float: left;">
+
+        @Html.DevExpress().Label(lblSettings =>
+{
+    lblSettings.Text = "Heading";
+    lblSettings.Style.Add("line-height", "32px");
+}).GetHtml()
+
+        <div style="clear: both;"></div>
+
+        @Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
+{
+    settings.Name = "SlideshowImageHeading";
+    settings.Width = 280;
+    settings.Properties.MaxLength = 70;
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin-right", "2em");
+}).GetHtml()
+
+        <div style="clear: both;"></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+    {
+        lblSettings.Name = "LinkLbl";
+        lblSettings.Text = "Links to: ";
+        lblSettings.Width = 44;
+        lblSettings.Style.Add("float", "left");
+        lblSettings.Style.Add("line-height", "32px");
+        lblSettings.Style.Add("margin-right", "1em");
+        lblSettings.Style.Add("margin-top", "20px");
+        lblSettings.AssociatedControlName = "Name";
+    }).GetHtml()
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+
+    var Linkage = "Nothing";
+    var LinkTypeID = 1;
+    var LinkID = 0;
+    char? TypeChar = 'x';
+
+    if (Model.PageID != null)
+    {
+        Linkage = UoW.GetRepository<Flock.Models.Page>().GetAll().Where(p => p.PageID == Model.PageID).Select(p => p.Name).Single();
+        TypeChar = 'l';
+        LinkID = Model.PageID.Value;
+        LinkTypeID = 2;
+    }
+    else if (Model.ProductPageID != null)
+    {
+        Linkage = UoW.GetRepository<ProductPage>().GetAll().Where(p => p.ProductPageID == Model.ProductPageID).Select(p => p.Name).Single();
+        TypeChar = 'p';
+        LinkID = Model.ProductPageID.Value;
+        LinkTypeID = 3;
+    }
+    else if (Model.CollectionID != null)
+    {
+        Linkage = UoW.GetRepository<Flock.Models.Collection>().GetAll().Where(p => p.CollectionID == Model.CollectionID).Select(p => p.Name).Single();
+        TypeChar = 'c';
+        LinkID = Model.CollectionID.Value;
+        LinkTypeID = 4;
+    }
+    else if (Model.ExternalURL != null)
+    {
+        Linkage = "External: " + Model.ExternalURL;
+        TypeChar = null;
+        LinkTypeID = 5;
+    }
+
+    var source = new List<object>
+            {
+            new { SName = "Nothing", SID = (byte)1 },
+            new { SName = "Page", SID = (byte)2 },
+            new { SName = "Product Page", SID = (byte)3 },
+            new { SName = "Collection", SID = (byte)4 },
+            new { SName = "External URL", SID = (byte)5 }
+            };
+
+            @Html.DevExpress().ComboBox(cbSettings =>
+{
+    cbSettings.Name = "LinkTypeComboBox";
+    cbSettings.Style.Add("float", "left");
+    cbSettings.Properties.TextField = "SName";
+    cbSettings.Properties.ValueField = "SID";
+    cbSettings.Style.Add("margin-top", "20px");
+    cbSettings.Style.Add("margin-right", "2em");
+    cbSettings.Properties.ValueType = typeof(byte);
+    cbSettings.SelectedIndex = (LinkTypeID - 1); // this (LinkTypeID-1) is an awkward fudge thanks to having to cater for pages whose ID is 0 - previously the source variable was 0 indexed, couldn't be
+    cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            RevealLinkSelector(s.GetSelectedItem().value);
+            if(s.GetSelectedItem().value == 0 || s.GetSelectedItem().value == 4)
+                $('#link-test').hide();
+            else
+                $('#link-test').show();
+        }";
+    cbSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            $('#link-selector-" + LinkTypeID + @"').show();
+            RevealLinkSelector('" + LinkTypeID + @"', '" + LinkID + @"');
+            if(s.GetSelectedItem().value != 0 && s.GetSelectedItem().value != 4)
+                $('#link-test').show();
+            else
+                $('#link-test').hide();
+        }";
+}).BindList(source).GetHtml()
+
+
+@Html.DevExpress().Label(lblSettings =>
+{
+    lblSettings.Text = "New Window";
+    lblSettings.Style.Add("float", "left");
+    lblSettings.Style.Add("margin-top", "20px");
+    lblSettings.Style.Add("line-height", "32px");
+}).GetHtml()
+@Html.DevExpress().CheckBox(cbSettings =>
+{
+    cbSettings.Name = "NewWindow";
+    cbSettings.Style.Add("padding-top", "6px");
+    cbSettings.Style.Add("margin-top", "21px");
+    cbSettings.Style.Add("float", "left");
+}).Bind(Model.NewWindow).GetHtml()
+    
+    <div style="clear: both;"></div>
+
+    if (LinkTypeID == 2 || LinkTypeID == 3 || LinkTypeID == 4)
+    {
+        <a id='link-test' style="font-size: 11px; line-height: 32px; height: 32px; margin-bottom: 7px; margin-left: 0px; color: blue;" target='_blank' href='http://flock-demo.designersguild.com/uk/@(TypeChar)@(LinkID)'>@(Linkage)</a>
+    }
+}
+</div>
+
+    <div style="clear: both; margin-bottom: 1em;"></div>
+
+    <div id='link-selector-2' class='link-selector'>
+        @Html.Partial("MenuBuilderPageSelectorGridPartial", "")
+    </div>
+
+    <div id='link-selector-3' class='link-selector'>
+        @Html.Partial("MenuBuilderProductPageSelectorGridPartial", "")
+    </div>
+
+    <div id='link-selector-4' class='link-selector'>
+        @Html.Partial("MenuBuilderCollectionSelectorGridPartial", "")
+    </div>
+
+    <div id='link-selector-5' class='link-selector'>
+        @Html.DevExpress().Label(lblSettings =>
+       {
+           lblSettings.Name = "ExternalURLLbl";
+           lblSettings.Text = "External URL";
+           lblSettings.Style.Add("line-height", "32px");
+       }).GetHtml()
+
+        @Html.DevExpress().TextBox(tbSettings =>
+       {
+           tbSettings.Name = "ExternalURL";
+           tbSettings.Width = 280;
+           tbSettings.Properties.MaxLength = 255;
+           tbSettings.Properties.ClientInstanceName = "ExternalURL";
+           tbSettings.Properties.NullDisplayText = "External URL";
+       }).Bind(Model.ExternalURL).GetHtml()
+    </div>
+
+    <div style="width: 60%; position: absolute; top: 0; right: 0;">
+       
+            <div style='clear: both'></div>
+
+            <div id='link-selector-1' class='link-selector'>
+                <input type='hidden' id='page-id-hidden' value='@(Model.PageID == null ? "nothing" : Model.PageID.ToString())' />
+                <input type='hidden' id='product-page-id-hidden' value='@(Model.ProductPageID == null ? "nothing" : Model.ProductPageID.ToString())' />
+                <input type='hidden' id='collection-id-hidden' value='@(Model.CollectionID == null ? "nothing" : Model.CollectionID.ToString())' />
+            </div>
+
+            @Html.DevExpress().Label(lblSettings =>
+{
+    lblSettings.Text = "Text";
+    lblSettings.Style.Add("line-height", "32px");
+}).GetHtml()
+
+        @Html.DevExpress().MemoFor(m => Model.Text, settings =>
+{
+    settings.Name = "SlideshowImageText";
+    settings.Properties.MaxLength = 500;
+    settings.Properties.Columns = 60;
+    settings.Properties.Rows = 6;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+}).GetHtml()
+            
+            <div style='clear: both'></div>
+
+            <div style='clear: both'></div>
+
+            @*<div style='text-align: right; margin-top: 1em;'>
+                    @Html.DevExpress().Button(btnSettings => {
+                        btnSettings.Name = "btnUpdate";
+                        btnSettings.ControlStyle.CssClass = "button";
+                        btnSettings.Text = "Update";
+                        btnSettings.Style.Add("margin-right", "1em");
+                        btnSettings.ClientSideEvents.Click = "function(s, e){  }";
+                    }).GetHtml()
+                    @Html.DevExpress().Button(btnSettings => {
+                        btnSettings.Name = "btnCancel";
+                        btnSettings.ControlStyle.CssClass = "button";
+                        btnSettings.Text = "Cancel";
+                        btnSettings.ClientSideEvents.Click = "function(s, e){  }";
+                    }).GetHtml()
+                </div>*@
+    </div>
+
+    <div style="margin-top: 8px;"></div>
+    <button type="button" value="Previous" onclick="SlideshowImageDialogPrev()">Previous</button>
+    <button type="button" value="Next" onclick="SlideshowImageDialogNext()">Next</button>
+</div>

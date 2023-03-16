@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "AlternateColourways";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/colourways.css")
+}
+@section scripts{
+    
+<script type="text/javascript">
+    function ConfigureSortables() {
+        $(".colourway-sortable").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-colourway",
+            update: function (ev, ui) {
+                var Colourways = new Array();
+                $(this).sortable("refresh");
+
+                $(this).children("img").each(function (index) {
+                    Colourways.push({ ID: $(this).data("product-page-id"), SortOrder: index });
+                });
+                $.ajax({
+                    url: '@Url.Action("UpdateColourwaysSortOrder", "ProductPages")',
+                    type: 'POST',
+                    traditional: true,
+                    data: { Colourways: JSON.stringify(Colourways) },
+                    success: function (data) { },
+                    error: function (e, s, a) {
+                        alert(s + ' error, e.responseText was: ' + e.responseText);
+                    },
+                    timeout: 20000
+                });
+            }
+        });
+    }
+</script>
+}
+
+<h4 class="page-heading">Colourways</h4>
+
+<div id="alternate-colourways-grid-container">
+    @Html.Action("AlternateColourwayGridPartial", "ProductPages")
+</div>

@@ -1,0 +1,41 @@
+﻿@{
+    ViewBag.Title = "Order Export";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("/content/radford.css")
+}
+
+<h4 class="page-heading">
+    Order Export
+</h4>
+
+<div class="page-subheading">
+    <button class="btn btn-primary" onclick="ExportClicked()">Export Orders</button>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        var selectedIDs = [];
+
+        function exportOrders() {
+            window.location.href = '/admin/@(ViewContext.RouteData.Values["controller"])/exportdownload?PriceListID=@(ViewBag.PriceListID)&OrderHeadIDs=' + selectedIDs.join('&OrderHeadIDs=');
+
+            OrderGridView.Refresh();
+        }
+        
+        function ExportClicked() {
+            OrderGridView.GetSelectedFieldValues("OrderHeadID", GetSelectedFieldValuesCallback);
+        }
+
+        function GetSelectedFieldValuesCallback(values) {
+            //Capture all selected keys
+            selectedIDs = values;
+            exportOrders();
+        }
+    </script>
+}
+
+<div id="order-grid-container">
+    @Html.Action("OrderGrid", ViewContext.RouteData.Values["controller"] as string)
+</div>

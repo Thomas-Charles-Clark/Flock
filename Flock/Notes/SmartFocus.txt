@@ -1,0 +1,13 @@
+
+	SmartFocus
+	
+		- Wait for full REST key to be granted
+		- Hit up http://developer.smartfocus.com/io-docs test out the demo REST calls and responses.
+		
+		- Consider integrating their 
+		'Rapid Deployment Kit'
+		into Flock... might be possible, might be pretty cool.
+		
+		SmartFocus seems to be about much more than just email management, so... what parts of it are we and are we not using?
+		
+		PINGPONG0

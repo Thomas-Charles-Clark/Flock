@@ -1,0 +1,341 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/bundles/css/prettify")
+    @Scripts.Render("~/bundles/js/prettify")
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/themes/base/jquery-ui.css")
+    @*@Styles.Render("~/Content/themes/base/css")*@
+    @*@Scripts.Render("~/bundles/modernizr")*@
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jqueryui")
+    @*@Scripts.Render("~/Scripts/knockout-3.2.0.js")*@
+    @Scripts.Render("~/Scripts/Globalize/Globalize.js")
+    @Styles.Render("~/bundles/css/grids")
+    @Styles.Render("~/bundles/css/ribbon")
+    @Styles.Render("~/bundles/css/cms")
+    @Scripts.Render("~/bundles/js/page-composition")
+    <script type="text/javascript">
+        $.extend({
+            unsavedWarning: function (yesCallback, noCallback, args) {
+                $("<div></div>").dialog({
+                    title: "Warning",
+                    width: 250,
+                    height: "auto",
+                    buttons: [{
+                        text: "Yes",
+                        click: function () {
+                            yesCallback(args);
+                            $(this).remove();
+                        }
+                    },
+                    {
+                        text: "No",
+                        click: function () {
+                            noCallback(args);
+                            $(this).remove();
+                        }
+                    }
+                    ],
+                    close: function (event, ui) { $(this).remove(); },
+                    resizable: false,
+                    modal: true
+                }).html("<p style='margin-top: 10px;'>You have unsaved changes.</p><p>Are you sure you wish to proceed?</p>").parent().addClass("alert");
+            }
+        });
+
+        $.extend({
+            showError: function (e, s, a, callback, args) {
+
+                if (LoadingPanel)
+                    LoadingPanel.Hide();
+
+                var message = $("<div></div>");
+                if (e) {
+                        $(message).html(
+                            "<dl style='margin-bottom: 0'><dt>Status</dt><dd>" + s + "</dd>"
+                            + "<dt>Description</dt><dd>" + a + "</dd>"
+                            + "</dl>");
+
+                    var $frame = $('<iframe style="width: 100%; min-height: 400px;">');
+                    $(message).append($frame);
+                    setTimeout(function () {
+                        var doc = $frame[0].contentWindow.document;
+                        var $body = $('body', doc);
+                        $body.html(e.responseText);
+                    }, 1);
+                }
+                else
+                    $(message).html("<p>When server side error logging is complete, this error will be logged.</p>"
+                        + "<dl style='margin-bottom: 0'><dt>Status</dt><dd>" + s + "</dd>"
+                        + "<dt>Description</dt><dd>" + a + "</dd>"
+                        + "<dt>Error</dt><dd>" + e + "</dd>"
+                        + "</dl></p><i>Even if all the above read 'undefined', and they might, a detailed server-side log entry has been generated.</i>");
+
+                if (typeof callback == "function")
+                    callback(args);
+                $("#error-dialog").html("");
+                $("#error-dialog").dialog('open').append($(message));
+            }
+        });
+
+        $.ajaxSetup({
+            error: function (e, s, a) {
+                $.showError(e, s, a);
+            }
+        });
+
+        $.extend({
+            confirm: function (yesCallback, noCallback, args, message) {
+                var text = "";
+                if (typeof message !== "undefined") {
+                    text = "<h6>" + message + "</h6>";
+                }
+
+                $("<div class='confirm-dialog' style='min-width: 200px;'></div>").dialog({
+                    title: "Confirm",
+                    width: "auto",
+                    height: "auto",
+                    buttons: [{
+                        text: "Yes",
+                        click: function () {
+                            if (typeof yesCallback === 'function') {
+                                yesCallback(args);
+                            }
+                            $(this).remove();
+                        }
+                    },
+                    {
+                        text: "No",
+                        click: function () {
+                            if (typeof noCallback === 'function') {
+                                noCallback(args);
+                            }
+                            $(this).remove();
+                        }
+                    }
+                    ],
+                    close: function (event, ui) { $(this).remove(); },
+                    resizable: false,
+                    modal: true
+                }).html(text + "<h6>Are you sure?</h6>").parent().addClass("alert");
+            }
+        });
+
+        $.extend({
+            info: function (title, message, onClose) {
+                var ttl = "Info";
+
+                if(typeof title !== "undefined") {
+                    ttl = title;
+                }
+
+                var text = "";
+                if (typeof message !== "undefined") {
+                    text = "<h6>" + message + "</h6>";
+                }
+
+                var result = $("<div></div>").dialog({
+                    title: ttl,
+                    width: 200,
+                    height: "auto",
+                    buttons: [{
+                        text: "OK",
+                        click: function () {
+                            if (typeof onClose === 'function')
+                                onClose();
+                            $(this).remove();
+                        }
+                    }],
+                    close: function (ev, ui) {
+                        if (typeof onClose === 'function')
+                            onClose();
+                        $(this).remove();
+                    },
+                    resizable: false,
+                    modal: true
+                });
+                
+                result.html(text);
+
+                return result;
+            }
+        });
+
+        $(document).ready(function () {
+            $("#error-dialog").dialog({
+                title: 'Whoops! Something went wrong there...',
+                width: 750,
+                height: 'auto',
+                autoOpen: false,
+                buttons: {
+                    Ok: function () {
+                        $(this).dialog('close');
+                    }
+                },
+                close: function (event, ui) { $(this).dialog("close"); }
+            });
+
+            $("#complete-dialog").dialog({
+                title: 'Notification',
+                width: 150,
+                height: "auto",
+                autoOpen: false,
+                buttons: {
+                    Close: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            })
+
+            $("#ok-dialog").dialog({
+                title: 'Notification',
+                width: "auto",
+                height: "auto",
+                autoOpen: false,
+                buttons: {
+                    Close: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $("#ok-dialog-inner").show();
+            $("#complete-dialog-inner").show();
+        });
+
+        window.parseBool = (str) => {
+            var _str$toLowerCase;
+            return (str === null || str === void 0 ? void 0 : (_str$toLowerCase = str.toLowerCase()) === null || _str$toLowerCase === void 0 ? void 0 : _str$toLowerCase.trim()) === "true";
+        }
+
+        window.parseString = str => {
+            return str === null || str === void 0 ? void 0 : str.trim();
+        };
+
+    </script>
+
+    @Html.Action("CacheBuster", "cms")
+
+    @RenderSection("scripts", required: false)
+    @RenderSection("styles", required: false)
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/common")
+    @{
+        Html.DevExpress().GetScripts(
+            new Script[] {
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.Editors
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.GridView
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.HtmlEditor
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.NavigationAndLayout
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.TreeList
+                }
+//                new Script()
+//                {
+//ExtensionSuite = ExtensionSuite.All
+//                }
+            }
+        );
+        Html.DevExpress().GetStyleSheets(
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.Editors },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.GridView },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.HtmlEditor },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.TreeList }
+
+        );
+        //Html.DevExpress().GetStyleSheets(
+        //    new StyleSheet() { ExtensionSuite = ExtensionSuite.All, Theme = "Metropolis" }
+        //);
+        Html.DevExpress().GetStyleSheets(
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.TreeList, Theme = "PlasticBlue" }
+        );
+        Html.DevExpress().GetStyleSheets(
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.TreeList, Theme = "Aqua" }
+        );
+        Html.DevExpress().GetStyleSheets(
+     new StyleSheet() { ExtensionSuite = ExtensionSuite.GridView, Theme = "Aqua" }
+ );
+
+        @RenderSection("lateStyles", required: false)
+        Html.EnableClientValidation();
+        Html.EnableUnobtrusiveJavaScript();
+    }
+    @RenderSection("afterDevExpressScripts", required: false)
+    @if (User.Identity.IsAuthenticated)
+    {
+        if (User.Identity.Name.ToLower() == "matt")
+        {
+            <style type="text/css">
+                #OfficeControls .ribbon .header {
+                    height: 80px;
+                    background: url('/images/admin/flocklogo_right.png') 100% 0 no-repeat #8bbfe5;
+                }
+
+                #OfficeControls .ribbon .ribbon_contents .tabs {
+                    top: 54px !important;
+                }
+            </style>
+        }
+    }
+</head>
+<body style="width: 100%; height: 100%;">
+
+    @RenderSection("outsideContainer", required: false)
+
+    @Html.Partial("~/Views/Admin/_NavigationPartial.cshtml")
+
+    <div class="container" id="container">
+        @RenderBody()
+        <hr />
+        @Html.AntiForgeryToken()
+        <div id="ajaxTarget">
+
+        </div>
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Designers Guild</p>
+        </footer>
+    </div>
+    <div id="error-dialog">
+
+    </div>
+
+    <div id="ok-dialog">
+        <div id="ok-dialog-inner" style="display: none;">
+            <h6>O.K.</h6>
+        </div>
+    </div>
+
+    <div id="complete-dialog">
+        <div id="complete-dialog-inner" style="display: none;">
+            <h6>Complete</h6>
+        </div>
+    </div>
+    @*@Scripts.Render("~/bundles/common")*@
+    @Scripts.Render("~/bundles/js/ribbon")
+
+    @Html.DevExpress().LoadingPanel(settings =>
+    {
+        settings.Name = "LoadingPanel";
+        settings.Modal = true;
+    }).GetHtml()
+</body>
+</html>

@@ -1,0 +1,66 @@
+﻿@model Flock.ViewModels.BannerComposeViewModel
+
+<div id="expand-all-button" style="float: left; margin-bottom: 2em;" class="expando-all-button" onclick="ExpandLHS();">
+    <fieldset>
+        <legend id="expand-label">
+            Expand All
+        </legend>
+    </fieldset>
+</div>
+
+<button class="btn expando-all-button" style="width: 150px; margin-left: 2em;" onclick="CloneBanner(@(Model.BannerID))">
+    <img src="/Images/icons/32/o_collection/element_copy.png" style="width: 21px;" class="pagesection-clone-icon">
+    Copy Banner
+</button>
+
+<div id="collapse-all-button" style="float: right; margin-bottom: 2em;" class="expando-all-button" onclick="CollapseLHS();">
+    <fieldset>
+        <legend id="collapse-label">
+            Collapse All
+        </legend>
+    </fieldset>
+</div>
+<div style="clear: both"></div>
+
+<div id="banner-details-container">
+    @Html.Partial("BannerDetailsPartial", Model)
+</div>
+<div id="banner-link-container">
+    @Html.Partial("BannerLinkPartial", Model)
+</div>
+<div id="banner-image-container">
+    @Html.Partial("BannerImageAreaPartial", Model)
+</div>
+<div id="banner-location-sitesection-container">
+    @Html.Partial("BannerLocationPartial", Model)
+</div>
+<div id="banner-menu-container">
+    @Html.Partial("BannerMenuPartial", Model)
+</div>
+<div id="banner-site-section-container">
+    @Html.Partial("BannerSiteSectionRestrictionsPartial", Model)
+</div>
+<div id="banner-page-container">
+    @Html.Partial("BannerPageRestrictionsPartial", Model.PageRestrictions)
+</div>
+<div id="banner-country-container">
+    @Html.Partial("BannerCountryRestrictionsPartial", Model.CountryRestrictions)
+</div>
+
+<div id="expand-all-button" style="float: left; margin-bottom: 2em;" class="expando-all-button" onclick="ExpandLHS();">
+    <fieldset>
+        <legend id="expand-label">
+            Expand All
+        </legend>
+    </fieldset>
+</div>
+
+<div id="collapse-all-button" style="float: right; margin-bottom: 2em;" class="expando-all-button" onclick="CollapseLHS();">
+    <fieldset>
+        <legend id="collapse-label">
+            Collapse All
+        </legend>
+    </fieldset>
+</div>
+<div style="clear: both"></div>
+

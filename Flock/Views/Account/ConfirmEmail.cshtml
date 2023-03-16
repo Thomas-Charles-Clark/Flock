@@ -1,0 +1,60 @@
+﻿@model Flock.Models.RegisterViewModel
+
+@{
+    ViewBag.Title = "Email Confirmed";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    @Styles.Render("~/Content/themes/admin/logon.css")
+    <style type="text/css">
+        ul {
+            margin: 0 !important;
+            margin-top: 1em;
+        }
+
+        label {
+            width: 130px;
+            text-align: right;
+        }
+    </style>
+}
+
+<h4 class="page-heading">@ViewBag.Title</h4>
+<div>
+    <p>
+        Thank you for confirming your email.
+    </p>
+    <p>
+        Please set your password using the fields beneath.
+    </p>
+</div>
+
+<div style="width: 400px; margin: 0 auto;">
+    <section id="loginForm" style="float: left; width: 400px; margin-right: 30px;">
+        @using (Html.BeginForm("setpassword", "account", FormMethod.Post, new { }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary()
+            <fieldset>
+                <legend style="border-bottom: 0;"></legend>
+                <ul>
+                    @Html.HiddenFor(m => Model.Email)
+                    <li>
+                        @Html.LabelFor(m => m.Password)
+                        @Html.PasswordFor(m => m.Password)
+                    </li>
+                    <li>
+                        @Html.LabelFor(m => m.ConfirmPassword)
+                        @Html.PasswordFor(m => m.ConfirmPassword)
+                    </li>
+                </ul>
+                <div style="text-align: right;">
+                    <input id="submit" type="submit" value="Submit" />
+                </div>
+            </fieldset>
+        }
+    </section>
+</div>
+
+@Scripts.Render("~/bundles/jqueryval")

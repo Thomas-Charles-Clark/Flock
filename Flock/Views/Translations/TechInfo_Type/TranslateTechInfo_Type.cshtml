@@ -1,0 +1,60 @@
+﻿@model Flock.ViewModels.TranslateTechInfo_TypeViewModel
+@{
+    ViewBag.Title = "Translate Tech Info - Types";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/translations.css")
+
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+        /*.dxgvFooter_MetropolisBlue .dxgv {
+            border-top: 1px solid #c0c0c0;
+        }*/
+        fieldset {
+            padding: 2px;
+        }
+        input {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        .buttons-table {
+            border: 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .buttons-table td {
+            width: 25%;
+            text-align: center;
+        }
+        .translation-subheading-label {
+            display: none;
+            line-height: 35px;
+            font-size: 12px;
+            font-weight: normal;
+            float: right;
+            margin-right: 2em;
+        }
+    </style>
+}
+
+<h4 class="page-heading">
+    Translate Tech Info - Types
+</h4>
+<div class="page-subheading">
+    @Html.ValidationSummary()
+    @Html.Action("TranslateTypeTargetLanguageDropDown", "Translations", new { TargetLanguageID = Model.TargetLanguageID })
+</div>
+
+<div id="grid-container">
+    @Html.Action("TranslateTypeGridView", "Translations", new { LanguageID = Model.TargetLanguageID, TypeID = Model.TypeID })
+</div>
+
+<div id="ajax-container">
+
+</div>

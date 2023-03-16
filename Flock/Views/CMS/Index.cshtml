@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "CMS";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: 1265px;
+        }
+    </style>
+}
+@section scripts {
+    @Scripts.Render("~/Scripts/jquery-ui-1.10.3.js")    
+}
+
+<h4 class="page-heading">
+    Pages Overview
+</h4>
+
+@Html.Action("CMSOverviewSiteSectionDropDownPartial")
+
+<div style="clear: both;"></div>
+
+<div id="pages-tree-list-wrapper" style="width: 100%;">
+    @Html.Action("TreeViewPartial")
+</div>
+
+<div style="clear: both"></div>
+
+<script type="text/javascript">
+    function OpenComposer(pageID) {
+        var url = '@Url.Action("compose", "cms", new { id = -1 })';
+        url = url.replace(-1, pageID);
+
+        window.open(url, '_blank');
+        //window.location.href = url;
+    }
+</script>

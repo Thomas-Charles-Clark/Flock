@@ -1,0 +1,30 @@
+﻿@model List<Flock.Models.vwBannerLocation>
+
+@Html.DevExpress().ComboBox(settings => {
+    settings.Name = "ComposeBannerHeaderLocationListBox";
+    settings.Width = 200;
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Style.Add("float", "left");
+    settings.Properties.DropDownWidth = 450;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.CallbackRouteValues = new { Controller = "Banners", Action = "ComposeBannerBannerLocationComboBox" };
+    settings.Properties.CallbackPageSize = 30;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "BannerLocationID";
+    settings.Properties.ValueType = typeof(byte);
+    settings.Properties.NullText = "Banner Locations";
+    settings.Properties.Columns.Add("BannerLocationTypeName", "Location Type ", 130);
+    settings.Properties.Columns.Add("BannerLocationGroupName", "Location Group", System.Web.UI.WebControls.Unit.Percentage(100));
+
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+        var items = s.GetSelectedItem();
+        var text = 'Banner Location';
+        if(items.length > 1)
+            text = '(' + items.length.toString() + ' Locations Selected)';
+        else if(items.length == 1)
+            text = items[0].text;
+        s.SetText(text);
+        BannerSelectorGridView.Refresh();
+    }";     
+}).BindList(Model).GetHtml()

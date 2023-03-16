@@ -1,0 +1,58 @@
+﻿@model List<Flock.Models.CheckoutLog_FailedPaymentInspectorSelectResult>
+
+<table class="checkout-basket-inspector table table-condensed table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Summary Message
+            </th>
+            <th>
+                Gateway Rejection Reason
+            </th>
+            <th>
+                3DS Status
+            </th>
+            <th>
+                3DS Enrolled
+            </th>
+            <th>
+                Liability Shifted
+            </th>
+            <th>
+                Liability Shift Possible
+            </th>
+            <th>
+                Auth Code
+            </th>
+            <th>
+                Response Code
+            </th>
+            <th>
+                Response Text
+            </th>
+            <th>
+                Additional Response
+            </th>
+            <th>
+                AVS Response
+            </th>
+        </tr>
+    </thead>
+    @foreach (var m in Model)
+    {
+        <tr>
+            <td>@m.SummaryMessage</td>
+            <td>@m.GatewayRejectionReason</td>
+            <td>@m.ThreeDSecureStatus</td>
+            <td>@m.ThreeDSecureEnrolled</td>
+            <td>@m.LiabilityShifted</td>
+            <td>@m.LiabilityShiftPossible</td>
+            <td>@m.ProcessorAuthCode</td>
+            <td>@m.ProcessorResponseCode</td>
+            <td>@m.ProcessorResponseText</td>
+            <td>@m.AdditionalProcessorResponse</td>
+            <td>@m.AVSPostalCodeResponseCode</td>
+            <td></td>
+        </tr>
+    }
+</table>

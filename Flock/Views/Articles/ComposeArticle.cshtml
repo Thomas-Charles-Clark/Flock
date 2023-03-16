@@ -1,0 +1,612 @@
+﻿@model Flock.ViewModels.ArticleComposeViewModel
+@{
+    ViewBag.Title = "Compose Article";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/content/articles.css")
+    @Styles.Render("~/content/composition-base.css")
+}
+@section scripts {
+    <script type="text/javascript">
+
+
+        function InitRelatedArticleDragDrop() {
+            $("#related-articles").sortable({
+                placeholder: 'related-article-placeholder',
+                helper: 'clone',
+                connectWith: '.article',
+                beforeStop: function (event, ui) {
+                    var articleid = ui.item.data("article-id");
+                    if (articleid == $("#selected-article-id").val()) {
+                        $(ui.helper).remove();
+                        $(ui.item).remove();
+                        window.cancelRelatedDrop = true;
+                    }
+                },
+                receive: function (event, ui) {
+                    if (window.cancelRelatedDrop) {
+                        window.cancelRelatedDrop = false;
+                        $(ui.sortable).sortable("cancel");
+                    }
+                },
+                update: function (ev, ui) {
+                    window.RelatedArticles = new Array();
+                    $("#related-article-placeholder").remove();
+                    $("#related-articles").sortable("refresh");
+                    $("#related-articles").children("div").each(function (index) {
+                        window.RelatedArticles.push({ ID: $(this).data("article-id"), SortOrder: index });
+                    });
+                    UpdateRelatedArticles();
+                }
+            });
+
+            $(".article").draggable({
+                helper: 'clone',
+                start: function (e, ui) {
+                    $(ui.helper).css("z-index", "300000");
+                },
+                connectToSortable: "#related-articles"
+            });
+        }
+    function InitPodDragDrop() {
+        
+        //$('.draggable').draggable({
+        //    helper: 'clone',
+        //    start: function (e, ui) {
+        //        $(ui.helper).css("z-index", "300000");
+        //    }
+        //});
+        //$('.draggable').draggable("destroy");
+
+
+        if($(".ui-draggable").length > 0)
+            $(".ui-draggable").draggable("destroy");
+
+        if ($("#selected-template-id").length > 0) {
+            if ($("#selected-template-id").val() == '1') { // single image template
+                $(".image").draggable({
+                    helper: 'clone',
+                    connectToSortable: '#slideshow-list',
+                    start: function (e, ui) {
+                        $(ui.helper).css("z-index", "300000");
+                    }
+                });
+                $(".ar2").draggable({
+                    helper: 'clone',
+                    connectToSortable: '#slideshow-list, #pod-list',
+                    start: function (e, ui) {
+                        $(ui.helper).css("z-index", "300000");
+                    }
+                });
+                
+                InitSingleImageDragDrop();
+            }
+            else if ($("#selected-template-id").val() == '4')
+            {
+                $('.ar2').draggable({
+                    helper: 'clone',
+                    connectToSortable: '#slideshow-list, #pod-list',
+                    start: function (e, ui) {
+                        $(ui.helper).css("z-index", "300000");
+                    }
+                });
+                InitMultipleImagesDragDrop();
+            }
+            else { // Video or Slideshow
+                $('.ar2').draggable({
+                    helper: 'clone',
+                    connectToSortable: '#pod-list',
+                    start: function (e, ui) {
+                        $(ui.helper).css("z-index", "300000");
+                    }
+                });
+                $(".ar7").draggable({
+                    helper: 'clone',
+                    connectToSortable: '#slideshow-list',
+                    start: function (e, ui) {
+                        $(ui.helper).css("z-index", "300000");
+                    }
+                });
+                InitMultipleImagesDragDrop();
+            }
+
+            $("#pod-list").sortable({
+                helper: 'clone',
+                placeholder: "ui-state-highlight-article-pod",
+                connectWith: '.ar2',
+                update: function (ev, ui) {
+                    //if ($(ui.item).hasClass("draggable")) {
+                    $("#pod-list").sortable("refresh");
+                    window.podImages = new Array();
+                    if ($("#article-pod-placeholder").length > 0)
+                        $("#article-pod-placeholder").remove();
+                    $("#pod-list").children("div").each(function (index) {
+                        window.podImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                    });
+                    UpdateArticleImageArea(1);
+                    //}
+                }
+            });
+        }
+    }
+
+    function InitMultipleImagesDragDrop() {
+        if ($('#slideshow-list').data('sortable')) {
+            $("#slideshow-list").sortable("destroy");
+        }
+        $("#slideshow-list").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-slideshow",
+            connectWith: '.ar7',
+            update: function (ev, ui) {
+                $("#slideshow-list").sortable("refresh");
+                window.articleImages = new Array();
+                $(".article-slideshow-placeholder").remove();
+                $("#slideshow-list").children("div").each(function (index) {
+                    window.articleImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                });
+                UpdateArticleImageArea(2); // Single Image
+            }
+        });
+    }
+
+    function InitSingleImageDragDrop() {
+        if ($('#slideshow-list').data('sortable')) {
+            $("#slideshow-list").sortable("destroy");
+        }
+        $("#slideshow-list").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-slideshow",
+            connectWith: '.image',
+            update: function (ev, ui) {
+                $("#slideshow-list").sortable("refresh");
+                window.articleImages = new Array();
+                $(".article-slideshow-placeholder").remove();
+                $("#slideshow-list").children("div").each(function (index) {
+                    window.articleImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                });
+                UpdateArticleImageArea(3); // Single Image
+            }
+        });
+    }
+
+    function UpdateArticleImageArea(TemplateImageID) {
+        switch (Number(TemplateImageID)) {
+            case 1:
+                $("#article-pod-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateArticleImageArea", "Articles")',
+                    traditional: true,
+                    type: "POST",
+                    data: { ArticleID: Number($("#selected-article-id").val()), Images: JSON.stringify(window.podImages), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#article-pod-busy").fadeOut("fast");
+                        $('#pod-list').html(data)
+                        return false;
+                    },
+                    error: function (e, s, a) {
+                        $("#article-pod-busy").fadeOut("fast");
+                        $.showError(e, s, a);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 2:
+            case 3:
+                $("#article-slideshow-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateArticleImageArea", "Articles")',
+                    traditional: true,
+                    type: "POST",
+                    data: { ArticleID: Number($("#selected-article-id").val()), Images: JSON.stringify(window.articleImages), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#article-contents-container").html(data);
+                    },
+                    error: function (e, s, a) {
+                        $("#article-slideshow-busy").fadeOut("fast");
+                        $.showError(e, s, a);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+                break;
+            default: break;
+        }
+    }
+
+    function CopyPodToSlideshow() {
+        $.confirm(function () { ConfirmedCopyPodToSlideshow(); }, function () { })
+    }
+
+    function ConfirmedCopyPodToSlideshow() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("CopyImages", "Articles")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ArticleID: $("#selected-article-id").val(),
+                Direction: "PodSlideshow"
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#article-slideshow-container").html(data);
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }
+
+    function CopySlideshowToPod() {
+        $.confirm(function () { ConfirmedCopySlideshowToPod(); }, function () { })
+    }
+
+    function ConfirmedCopySlideshowToPod() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("CopyImages", "Articles")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ArticleID: $("#selected-article-id").val(),
+                Direction: "SlideshowPod"
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#article-slideshow-container").html(data);
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }
+
+    function UpdatePodImages() {
+        $.ajax({
+            url: '@Url.Action("UpdateArticleImageArea", "Articles")',
+            traditional: true,
+            type: "POST",
+            data: {
+                ArticleID: Number($("#selected-article-id").val()),
+                Images: JSON.stringify(window.podImages),
+                TemplateImageID: 1
+            },
+            success: function (data) {
+                $("#pod-busy").fadeOut("fast");
+                $('#pod-list').html(data)
+                return false;
+            },
+            error: function (e, s, a) {
+                $("#pod-busy").fadeOut("fast");
+                $.showError(e, s, a);
+                return false;
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveImageFromArticlePods(ArticleID, ImageID) {
+        var count = $("div.pod-image").length;
+        if (count == 1) {
+            alert("You may not remove the final pod image from an article.");
+            return false;
+        }
+        else {
+            $.confirm(function () {
+                $("#pod-list").find('[data-image-id=' + ImageID + ']').remove();
+
+                $("#pod-list").sortable("refresh");
+                window.podImages = new Array();
+                if ($("#pod-image-placeholder").length > 0)
+                    $("#pod-image-placeholder").remove();
+                $("#pod-list").children("div").each(function (index) {
+                    window.podImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                });
+                UpdatePodImages();
+            }, function () { });
+        }
+    }
+
+    function UpdateArticleImages(TemplateImageID) {
+        window.articleImages = new Array();
+
+        $("#slideshow-list").children("div").each(function (index) {
+            window.articleImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+        });
+
+        UpdateArticleImageArea(TemplateImageID);
+    }
+
+    function RemoveImageFromSlideshow(ArticleID, ImageID) {
+        $.confirm(function () {
+            $("#slideshow-list").find('[data-image-id=' + ImageID + ']').remove();
+            UpdateArticleImages(2);
+        }, function () {
+
+        });
+    }
+
+    function SaveArticleDetails() {
+        URLKeywords.Validate();
+        if (URLKeywords.GetIsValid()) {
+            $.ajax({
+                url: '@Url.Action("SaveArticleDetails", "Articles")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ArticleID: Number($("#selected-article-id").val()),
+                    Heading: Heading.GetValue(),
+                    SubHeading: SubHeading.GetValue(),
+                    TitleTag: TitleTag.GetValue(),
+                    URLKeywords: URLKeywords.GetValue(),
+                    MetaDescription: MetaDescription.GetValue()
+                },
+                success: function (data) {
+                    $("#article-details-container").html(data);
+                    SuccessFade($("#article-details-save"));
+                },
+                error: function (e, s, a) {
+                    $("#article-details-container").html(e.responseText);
+                    FailureFade($("#article-details-save"));
+                },
+                timeout: 20000
+            });
+        }
+    }
+
+    function InitRelatedArticlesDragDrop() {
+
+        $(".article").draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#related-articles"
+        });
+
+        $("#related-articles").sortable({
+            placeholder: 'related-article-placeholder',
+            helper: 'clone',
+            connectWith: '.article',
+            beforeStop: function (event, ui) {
+                var pageid = ui.item.data("article-id");
+                if (pageid == $("#selected-article-id").val()) {
+                    $(ui.helper).remove();
+                    $(ui.item).remove();
+                    window.cancelRelatedDrop = true;
+                }
+            },
+            receive: function (event, ui) {
+                if (window.cancelRelatedDrop) {
+                    window.cancelRelatedDrop = false;
+                    $(ui.sortable).sortable("cancel");
+                }
+            },
+            update: function (ev, ui) {
+                window.RelatedArticles = new Array();
+                $("#related-article-placeholder").remove();
+                $("#related-articles").sortable("refresh");
+                $("#related-articles").children("div").each(function (index) {
+                    window.RelatedArticles.push({ ID: $(this).data("article-id"), SortOrder: index });
+                });
+                UpdateRelatedArticles();
+            }
+        });
+    }
+
+    function UpdateRelatedArticles() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("UpdateRelatedArticles", "Articles")',
+            type: 'POST',
+            traditional: true,
+            data: { BaseArticleID: Number($("#selected-article-id").val()), Articles: JSON.stringify(window.RelatedArticles) },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#related-articles-container").html(data);
+                InitRelatedArticleDragDrop();
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveRelatedArticle(ArticleID) {
+        LoadingPanel.Show();
+        $(".related-article-sortable[data-article-id='" + ArticleID + "']").remove();
+        $.ajax({
+            url: '@Url.Action("RemoveRelatedArticle", "Articles")',
+            type: 'POST',
+            traditional: true,
+            data: { BaseArticleID: Number($("#selected-article-id").val()), ArticleID: ArticleID },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#related-articles-container").html(data);
+            },
+            timeout: 20000
+        });
+    }
+
+    function OnGetRowValues(value) {
+        $("#selected-template-id").val(value);
+    }
+
+    function RemoveSingleImage(ImageID) {
+        $.confirm(function () {
+            $("#slideshow-list").find('[data-image-id=' + ImageID + ']').remove();
+            UpdateArticleImages(3);
+        }, function () {
+
+        });
+    }
+
+    function SaveArticleText() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("SaveArticleText", "Articles")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ArticleID: $("#selected-article-id").val(),
+                ArticleText: ArticleText.GetText()
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#article-compose-container").html(data);
+                SuccessFade($("#article-text-save"));
+            },
+            error: function(e, s, a) {
+                $.showError(e, s, a);
+                FailureFade($("#article-text-save"));
+            },
+            timeout: 20000
+        });
+    }
+
+    function SaveArticleVideo() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("SaveArticleVideo", "Articles")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ArticleID: $("#selected-article-id").val(),
+                VideoID: VideoID.GetValue()
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#article-contents-container").html(data);
+            },
+            timeout: 20000
+        });
+    }
+
+    function InitCountryDragDrop() {
+
+        $(".country-flag").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#country-restriction-section"
+        });
+
+        $("#country-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".country-restriction-flag",
+            placeholder: ".ui-state-highlight-country-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('country-flag')) {
+                    $("#country-restriction-section").sortable("refresh");
+                    window.CountryRestrictions = new Array();
+                    if ($("#country-restriction-placeholder").length > 0)
+                        $("#country-restriction-placeholder").remove();
+                    $("#country-restriction-section").children("div").each(function (index) {
+                        if($(this).data("country-id") != null)
+                            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                    });
+                    UpdateCountryRestrictions();
+                }
+            }
+        });
+    }
+
+    function UpdateCountryRestrictions() {
+        $("#country-restriction-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("UpdateArticleCountryRestrictions", "Articles")',
+            type: "POST",
+            traditional: true,
+            data: {
+                ArticleID: Number($("#selected-article-id").val()),
+                Countries: JSON.stringify(window.CountryRestrictions)
+            },
+            success: function (data) {
+                $("#country-restriction-busy").fadeOut("fast");
+                $("#country-restrictions-container").html(data);
+            },
+            error: function (e, s, a) {
+                $("#country-restriction-busy").fadeOut("fast");
+                alert(e.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveCountryFromRestriction() {
+        $("#country-restriction-section").sortable("refresh");
+        window.CountryRestrictions = new Array();
+        if ($("#country-restriction-placeholder").length > 0)
+            $("#country-restriction-placeholder").remove();
+        $("#country-restriction-section").children("div").each(function (index) {
+            if ($(this).data("country-id") != null)
+                window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+        });
+        UpdateCountryRestrictions();
+    }
+
+    function RemoveAllCountryRestrictions() {
+        var confirm = window.confirm("Are you sure?");
+        if (confirm) {
+            window.CountryRestrictions = new Array();
+            UpdateCountryRestrictions();
+        }
+    }
+
+    $(document).ready(function () {
+        InitPodDragDrop();
+        InitRelatedArticlesDragDrop();
+        InitCountryDragDrop();
+    });
+    </script>
+}
+
+<h4 class="page-heading">Compose Article</h4>
+
+<div id="resource-panels" style="float: right; width: 986px;">
+    @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+    @Html.Partial("ArticleSearchPartial")
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+</div>
+
+<div id="article-compose-section" data-article-id="@Model.ArticleID" style="float: left; width: 986px;">
+    <div id="article-select-header-container">
+        <div class="content-panel-container">
+            <fieldset id="article-select-header">
+                <legend onclick="$('#select-header-inner').slideToggle('fast');">
+                    Compose Article - Article Selector (click to expand / contract)
+                    <img id="article-select-header-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                </legend>
+                <div id="select-header-inner">
+                    <div id="article-header-page-drop-down-container">
+                        @Html.Action("ArticleComposeGridViewPartial", "Articles")
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div id="article-compose-container">
+        @if (ViewData["InvalidArticleIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidArticleIDError"])</h5>
+        }
+        @if (Model.ArticleID != null)
+        {
+            @Html.Partial("ArticleComposePartial", Model)
+        }
+    </div>
+</div>
+<div style="clear: both;"></div>
+
+<div id="slideshow-advanced-settings-dialog">
+    <div id="slideshow-advanced-settings">
+
+    </div>
+</div>

@@ -1,0 +1,189 @@
+﻿@model Flock.ViewModels.ProductPageComposeViewModel
+
+@{
+    ViewBag.Title = "Product Page Compose";
+    Layout = "~/Views/Admin/_Layout.cshtml"; 
+}
+
+@section Styles{
+    @Styles.Render("~/Content/product-page-composition.css")
+    @Styles.Render("~/Content/composition-base.css")
+    @Styles.Render("~/Content/jquery-fileupload-ui.css")
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #ComposeProductPageGridSelector_DXPagerBottom {
+            border-top: 1px solid #C0C0C0;
+        }
+        @@-moz-document url-prefix() {
+            .dxbButton_MetropolisBlue div.dxb {
+                padding: 0 !important;
+            }
+        }
+    </style>
+
+}
+
+@section Scripts{
+    
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+    @Scripts.Render("~/Scripts/jquery.iframe-transport.js")
+    @Scripts.Render("~/Scripts/jquery.fileupload.js")
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#dialog-orderformgroup-manage").dialog({
+                autoOpen: false,
+                height: "auto",
+                width: 550,
+                modal: true,
+                buttons: {
+                    Close: function () {
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    $.ajax({
+                        url: '@Url.Action("ProductPageSecondaryProductsPartial", "ProductPages")',
+                        type: 'POST',
+                        traditional: true,
+                        data: { ProductPageID: Number($("#selected-product-page-id").val()) },
+                        success: function (data) {
+                            $('#secondary-products-container').html(data);
+                        },
+                        error: function (e, s, a) {
+                            alert(e.responseText);
+                        },
+                        timout: 20000
+                    });
+                }
+            });
+        });
+        function RemoveDimensionImage(ProductPageID) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("RemoveDimensionImage", "ProductPages")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    productPageID: ProductPageID
+                },
+                success: function (data) {
+                    $("#text-and-cutout-image-container").html(data);
+                    $(".furniture-dimension-image-preview").attr("src", "/images/admin/image-not-set.png");
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+        function RemoveCutOutImage(ProductPageID) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("RemoveCutOutImage", "ProductPages")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    productPageID: ProductPageID
+                },
+                success: function (data) {
+                    $("#text-and-cutout-image-container").html(data);
+                    $(".furniture-cutout-image-preview").attr("src", "/images/admin/image-not-set.png");
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+    </script>
+}
+
+<input type="hidden" id="selected-product-page-id" value="@(Model.ProductPageID)" />
+
+<h4 class="page-heading">
+    Product Page Compose
+    <a id="attribute-page-link" class="link-img" title="Product Page Attributes" href="/admin/productpages/attributes/@(Model.ProductPageID)"></a>
+</h4>
+
+<div id="resource-panels" style="float: right; width: 986px;">
+    @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml") @* Not the Image Search, then... *@
+    @Html.Partial("~/Views/Products/ProductSearchPartial.cshtml") @* Product Search just killed it! *@
+    @Html.Partial("ProductPageSearchPartial")
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml") @* Not the country search either... *@
+</div>
+
+<div style="float: left; width: 986px;">
+    <div id="product-select-header-container">
+        <div class="content-panel-container">
+            <fieldset id="product-select-header">
+                <legend style="color: black; border-bottom-color: #929292;" onclick="$('#product-select-header-inner').slideToggle('fast');">Product Page Selector (click to expand / contract)</legend>
+                <div id="product-select-header-inner" style="">
+                    <div id="product-page-header-product-page-drop-down-container">
+                        @Html.Action("ComposeProductPageGridSelectorPartial", "ProductPages")
+                    </div>
+                    <img id="product-page-header-searching-icon" class="searching-icon" src="~/Images/SystemIcons/searching-icon.gif" />
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div id="product-page-compose-container">
+        @if (ViewData["InvalidProductPageIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidProductPageIDError"])</h5>
+        }
+        @if (Model.ProductPageID != null)
+        {
+            @Html.Partial("ProductPageComposePartial", Model)
+        }
+    </div>
+</div>
+
+<div style="clear: both"></div>
+
+<div id="dialog-orderformgroup-manage">
+    <div id="dialog-orderformgroup-inner">
+        
+    </div>
+</div>
+
+
+<div id="bad-selection-dialog">
+    <h5>
+        You must select a Product Page first.
+    </h5>
+</div>
+
+<div id="where-dialog">
+    <select id="add-where-select">
+        <option value="0" selected>Append</option>
+        <option value="1">Prepend</option>
+    </select>
+</div>
+
+<script type="text/javascript">
+    $("#bad-selection-dialog").dialog({
+        title: "Invalid Selection",
+        width: 350,
+        height: "auto",
+        autoOpen: false,
+        resizable: false,
+        buttons: {
+            Ok: function () { $(this).dialog("close"); }
+        }
+    });
+
+    $("#where-dialog").dialog({
+        title: 'Append or Prepend?',
+        width: 250,
+        height: 'auto',
+        autoOpen: false,
+        modal: true,
+        buttons: {
+            Ok: function (ev, ui) {
+                BulkAddProductPages();
+                $(this).dialog("close");
+            },
+            Cancel: function (ev, ui) {
+                $(this).dialog("close");
+            }
+        }
+    });
+</script>

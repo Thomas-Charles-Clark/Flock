@@ -1,0 +1,399 @@
+﻿@model Flock.ViewModels.TranslateArticleGridViewModel
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "TranslateGridView";
+        settings.CallbackRouteValues = new { Controller = "Translations", Action = "TranslateArticleGridView" };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['languageId'] = TranslationTargetLanguageListBox.GetValue();
+            if(e.command === 'PAGERONCLICK') 
+                window.ManualPaging = true;
+        }";
+
+        settings.ClientSideEvents.CustomButtonClick = @"function (s, e) { 
+            $.confirm(function() { 
+                var rowKey = s.GetRowKey(e.visibleIndex);
+                s.PerformCallback({ commandType: 'Clear', articleId: rowKey, languageId: TranslationTargetLanguageListBox.GetValue() });
+            }, function() { }, [], 'This will set this record\'s translation fields for ' + TranslationTargetLanguageDD.GetText() + ' to NULL.');
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+            if(window.ForcedPaging === true) {
+                if(window.RowLoss) {
+                    window.NextIndex--;
+                }
+                s.SetFocusedRowIndex(window.NextIndex);
+                s.MakeRowVisible(window.NextIndex);
+                LoadTranslator(s.GetRowKey(s.GetFocusedRowIndex()), function() { 
+                    s.Refresh();
+                });
+                window.NextIndex++;
+                window.ForcedPaging = false;
+            }
+            else if(window.ManualPaging === true) {
+                $('#ajax-container').html('');
+                window.ManualPaging = false;
+            }
+
+            window.RowLoss = false;
+        }";
+
+        string initFn = @"function(s, e) {
+            window.NextIndex = 1";
+
+        if (ViewBag.SelectedArticleID != null)
+        {
+            initFn += @"
+                s.AutoFilterByColumn(0, " + ViewBag.SelectedArticleID + @");
+                LoadTranslator(" + ViewBag.SelectedArticleID + @");
+            ";
+        }
+
+        initFn += "}";
+
+        settings.ClientSideEvents.Init = initFn;
+
+        settings.CustomJSProperties = (s, e) => {
+            MVCxGridView gv = (MVCxGridView)s;
+            var result = new System.Collections.Hashtable();
+            foreach (var col in gv.AllColumns)
+            {
+                var dataCol = col as GridViewDataColumn;
+                if(dataCol != null)
+                {
+                    result[dataCol.FieldName] = new Dictionary<string, object>() {
+
+                        {"filterValue", dataCol.FilterExpression}
+                    };
+                }
+            }
+            e.Properties["cpColumnsProp"] = result;
+        };
+
+
+        //settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "ArticleID").DisplayFormat = "Total: {0:n0}";
+        //settings.Settings.ShowFooter = true;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.SettingsDetail.ShowDetailButtons = false;
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        settings.SettingsBehavior.AllowFocusedRow = true;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.SettingsDetail.ShowDetailRow = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.CommandColumn.Width = 100;
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 10;
+        settings.CommandColumn.ShowEditButton = false;
+        settings.CommandColumn.ShowCancelButton = false;
+        settings.CommandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton()
+        {
+            ID = "Clear",
+            Index = 0,
+            Text = "Clear",
+            Visibility = GridViewCustomButtonVisibility.AllDataRows
+        });
+        settings.Styles.Row.Cursor = "pointer";
+        settings.SettingsPager.PageSize = 20;
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+
+            window.NextIndex = e.visibleIndex + 1;
+
+            if(typeof DetectUnsavedChanges === 'function') {
+                if(DetectUnsavedChanges()) {
+                    $.unsavedWarning(function() { 
+                        LoadingPanel.Show();
+                        LoadTranslator(s.GetRowKey(e.visibleIndex), function() {
+                            s.Refresh();
+                        });
+                    }, function() { 
+                    
+                    }, null);
+                }
+                else {
+                    LoadingPanel.Show();
+                    LoadTranslator(s.GetRowKey(e.visibleIndex), function() {
+                        s.Refresh();
+                    });
+                }
+                return;
+            }
+            else {
+                LoadingPanel.Show();
+                LoadTranslator(s.GetRowKey(e.visibleIndex), function() {
+                    s.Refresh();
+                });
+            }
+        }";
+
+
+        settings.KeyFieldName = "ArticleID";
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ArticleID";
+            column.FieldName = "ArticleID";
+            column.Caption = "ID";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Width = 50;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c => {
+                ViewContext.Writer.Write("<a href='/admin/collections/compose/" + c.KeyValue.ToString() + "'>" + c.KeyValue.ToString() + "</a>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Name";
+            column.FieldName = "Name";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.Width = 220;
+            column.SetEditItemTemplateContent(c =>
+            {
+                Html.DevExpress().TextBox(
+                    edtSettings =>
+                    {
+                        edtSettings.Name = "Name";
+                        edtSettings.Properties.NullDisplayText = "Product Page Name";
+                        edtSettings.ShowModelErrors = true;
+                        edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }
+                )
+                .Bind(DataBinder.Eval(c.DataItem, "Name"))
+                .Render();
+            });
+
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.EditCellStyle.CssClass = "editform-cell";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ArticleSubTypeID";
+            column.FieldName = "ArticleSubTypeID";
+            column.Caption = "Article Sub Type";
+            column.Width = 210;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int ArticleSubTypeID = 0;
+                string ArticleSubType = "<i>Unknown</i>";
+
+                if (DataBinder.Eval(c.DataItem, "ArticleSubTypeID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ArticleSubTypeID") != null)
+                {
+                    ArticleSubTypeID = Convert.ToByte(DataBinder.Eval(c.DataItem, "ArticleSubTypeID"));
+                    if (ArticleSubTypeID != 0)
+                        ArticleSubType = Model.ArticleSubTypes.Where(p => p.ArticleSubTypeID == ArticleSubTypeID).Select(p => p.Name).Single();
+                }
+
+                ViewContext.Writer.Write("<span>" + ArticleSubType + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "BrandID";
+            column.FieldName = "BrandID";
+            column.Caption = "Brand";
+            column.Width = 210;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int BrandID = 0;
+                string Brand = "<i>Unknown</i>";
+
+                if (DataBinder.Eval(c.DataItem, "BrandID") != DBNull.Value && DataBinder.Eval(c.DataItem, "BrandID") != null)
+                {
+                    BrandID = Convert.ToByte(DataBinder.Eval(c.DataItem, "BrandID"));
+                    if(BrandID != 0)
+                        Brand = Model.Brands.Where(p => p.BrandID == BrandID).Select(p => p.Name).Single();
+                }
+
+                ViewContext.Writer.Write("<span>" + Brand + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Stage";
+            column.FieldName = "Stage";
+            column.Caption = "Translation Stage";
+            column.Width = 180;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                bool? TranslationStatusID = null;
+                string TranslationStatus = "<i>Unknown</i>";
+
+                TranslationStatusID = (bool?)(DataBinder.Eval(c.DataItem, "Stage"));
+
+                switch(TranslationStatusID)
+                {
+                    case null:
+                        TranslationStatus = "Not Translated";
+                        break;
+                    case false:
+                        TranslationStatus = "Google Translated";
+                        break;
+                    case true:
+                        TranslationStatus = "Manually Translated";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "FieldsToReview";
+            column.FieldName = "FieldsToReview";
+            column.Caption = "Status";
+            column.Width = 100;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                byte Status = 0;
+                string TranslationStatus = "Complete";
+
+                Status = (byte)(DataBinder.Eval(c.DataItem, "FieldsToReview"));
+
+                switch (Status)
+                {
+                    case 0:
+                        break;
+                    default:
+                        TranslationStatus = "Review";
+                        break;
+                }
+
+                ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
+            });
+        });
+
+        MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+        WebStatusColumn.FieldName = "StatusID";
+        WebStatusColumn.Name = "StatusID";
+        WebStatusColumn.Caption = "Web Status";
+        WebStatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        WebStatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        WebStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        WebStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+            string colour = "black";
+            string statusText = "unknown";
+            statusText = Model.Statuses.Where(p => p.StatusID == i).Select(p => p.Name).Single();
+            switch (i)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+            ViewContext.Writer.Write(res);
+        });
+        settings.Columns.Add(WebStatusColumn);
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "Stage":
+                    e.Values.Clear();
+
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(gridView.Columns["Stage"] as GridViewDataColumn, "Not Translated"));
+                    e.Values.Add(new FilterValue("Google Translated", "false"));
+                    e.Values.Add(new FilterValue("Manually Translated", "true"));
+
+                    e.AddShowAll();
+                    break;
+                case "ArticleSubTypeID":
+                    e.Values.Clear();
+                    foreach (var ast in Model.ArticleSubTypes.OrderBy(p => p.Name))
+                    {
+                        e.AddValue(ast.Name, ast.ArticleSubTypeID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "BrandID":
+                    e.Values.Clear();
+                    foreach (var pt in Model.Brands.OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.BrandID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "StatusID":
+                    e.Values.Clear();
+                    foreach (var pt in Model.Statuses.OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "FieldsToReview":
+                    e.Values.Clear();
+                    e.Values.Add(new FilterValue("Complete", null, string.Format("FieldsToReview = {0}", 0)));
+                    e.Values.Add(new FilterValue("Review", null, string.Format("FieldsToReview != {0}", 0)));
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model.Articles).GetHtml()

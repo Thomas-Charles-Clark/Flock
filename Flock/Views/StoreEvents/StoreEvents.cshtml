@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "Store Events";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/store-events.css")
+}
+@section scripts {
+    <script type="text/javascript">
+        function removeEventLocationDate(storeEventId, storeEventLocationId, storeEvent_dateId) {
+            $.confirm(function (storeEvent_dateId) {
+                $("#date-times-container-" + storeEventLocationId).hide();
+                
+                $.ajax({
+                    url: '/admin/storeevents/RemoveDayFromStoreEventLocation',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        StoreEventID: storeEventId,
+                        StoreEventLocationID: storeEventLocationId,
+                        StoreEvent_DateID: storeEvent_dateId
+                    },
+                    success: function (data) {
+                        
+                        $("#store-events-detail-container").html(data);
+                    }
+                });
+            }, function (storeEvent_dateId) {
+
+            }, storeEvent_dateId);
+        }
+
+        function selectDate(storeEventId, storeEventLocationId, storeEvent_dateId, dateString) {
+            if (storeEvent_dateId != null) {
+                $(".date-btn").removeClass('date-btn-selected');
+                $("#date-btn-" + storeEvent_dateId).addClass('date-btn-selected');
+                $("#date-times-container").data("storeEvent_dateId", storeEvent_dateId);
+                $("#date-placeholder-" + storeEventLocationId).text(dateString);
+                $.ajax({
+                    url: '/admin/storeevents/EventDateTimePartial',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        StoreEventID: storeEventId,
+                        StoreEventLocationID: storeEventLocationId,
+                        StoreEvent_DateID: storeEvent_dateId
+                    },
+                    success: function (data) {
+                        $("#date-times-container-" + storeEventLocationId).html(data);
+
+                    },
+                    timeout: 30000
+                })
+
+                $("#date-times-container").show();
+            }
+        }
+
+        function copyTimesToSelectedDates(storeEvent_dateId, storeEventLocationId) {
+            if (storeEvent_dateId != null) {
+
+                var targetDateIDs = [];
+                $(window["Location" + storeEventLocationId + "Calendar"].GetMainElement()).find('.dxeCalendarSelected_MetropolisBlue').each(function() { 
+                    if($(this).data('date-id') != null) {
+                        targetDateIDs.push($(this).data('date-id'));
+                    }
+                });
+                
+                if (targetDateIDs.length == 0) {
+                    $.info('Could not copy', 'Found no selected dates to copy to')
+                } else {
+                    $.ajax({
+                        url: '/admin/storeevents/CopyTimeSlotsToSelectedDates',
+                        type: 'POST',
+                        traditional: true,
+                        contentType: 'application/json; charset=utf-8',
+                        data: JSON.stringify({
+                            StoreEvent_DateID: storeEvent_dateId,
+                            TargetDateIDs: targetDateIDs
+                        }),
+                        success: function (data) {
+                            if (data.Success) {
+                                $.info('Copy Time Slots Complete', data.Message);
+                            } else {
+                                $.info('Copy Time Slots Failure!', data.Message);
+                            }
+                        },
+                        timeout: 30000
+                    })
+                }
+            }
+        }
+    </script>
+}
+
+
+<h4 class="page-heading">
+    Store Events
+</h4>
+
+<div id="store-events-grid-container">
+    @Html.Action("StoreEventGridViewPartial")
+</div>
+
+<div id="store-events-detail-container">
+
+</div>

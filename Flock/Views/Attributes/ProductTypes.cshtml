@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewBag.Title = "Manage Product Types";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+    <style type="text/css">
+        #container {
+            width: 1275px !important;
+        }
+        label {
+            margin-bottom: 0;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Manage Product Types</h4>
+
+<div class="page-subheading" style="text-align: center; font-size: 1.2em;">
+    <i>Always inform IT of product type changes. You must create a Google Product Taxonomy record for any new Product Type.</i>
+</div>
+
+<div style="width: 650px; margin: 0 auto;">
+    @Html.Partial("ProductTypeGridViewPartial")
+</div>

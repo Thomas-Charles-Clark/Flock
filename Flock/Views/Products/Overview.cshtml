@@ -1,0 +1,269 @@
+﻿@{
+    ViewBag.Title = "Product Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@model Flock.ViewModels.ProductOverviewViewModel
+
+@section styles {
+    
+}
+
+<h4 class="page-heading">Product Overview</h4>
+
+<div class="page-subheading">
+    @Html.Action("ProductOverviewCollectionDropDownPartial", "Products")
+    @Html.Action("ProductOverviewPatternDropDownPartial", "Products")
+    @Html.Action("ProductOverviewColourDropDownPartial", "Products")
+    @Html.Action("ProductOverviewMarketDropDownPartial", "Products")
+    <div class="clearfix"></div>
+</div>
+
+<div id="bulk-action-panel" style="width: 280px; float: none; margin: 1em 0; position: static;">
+    <h4>Bulk Action Panel</h4>
+    <ul>
+        @*<li>
+                <a href="javascript:;" title="Enable" onclick="EnableSelectedProducts()">Enable</a>
+            </li>
+            <li>
+                <a href="javascript:;" title="Disable" onclick="DisableSelectedProducts()">Disable</a>
+            </li>*@
+        <li>
+            <a href="javascript:;" title="Assign Market" onclick="$('#market-selection-dialog').dialog('option', 'title', 'Select Markets for Assignment'); $('#market-selection-dialog').data('action', 'Assignment'); OpenMarketSelect();">Assign to Markets</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Delete Markets" onclick="$('#market-selection-dialog').dialog('option', 'title', 'Select Markets for Removal'); $('#market-selection-dialog').data('action', 'Removal'); OpenMarketSelect();">Remove from Markets</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Delete" onclick="DeleteSelectedProducts()">Delete</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Undelete" onclick="OpenUndelete()">Undelete by Code</a>
+        </li>
+    </ul>
+</div>
+
+<div id="ProductOverviewGridContainer" style="width: 100%;">
+    @Html.Action("ProductOverviewGridViewPartial")
+</div>
+<div style="clear: both"></div>
+
+<div id="market-selection-dialog">
+    @{
+        for(int i = 0; i < Model.PriceLists.Count; i++)
+        {
+            <div style="width: 96px; height: 80px; float: left; margin: 1em;">
+                <label>
+                    <img style="margin-right: 8px; margin-bottom: 8px;" src="/images/icons/32/pricelists/@(Model.PriceLists[i].PriceListID).png" title="@(Model.PriceLists[i].Name)" />
+                    <input style="position: relative; bottom: 5px;" value="@(Model.PriceLists[i].PriceListID)" type="checkbox" />
+                    <br/>
+                    @(Model.PriceLists[i].Name)
+                </label>
+            </div>
+        }
+    }
+</div>
+
+<div id="undelete-dialog">
+    <input type="text" id="undelete-product-code"/>
+    <label>Code</label>
+</div>
+
+@section scripts {
+    
+    @Scripts.Render("~/bundles/js/sparkline")
+    <script type="text/javascript">
+        function HideColumns() {
+
+            $(".hideable-column").hide();
+            //var column = 2;
+            //while (column <= 4) {
+            //    $('#ProductOverviewGridContainer tr td:nth-child(' + column + '),th:nth-child( ' + column + ')').hide();
+            //    column++;
+            //}
+            $("#test").unbind("click");
+            $("#test").html("Show Columns");
+            $("#test").on("click", function () { ShowColumns(); });
+        }
+
+        function ShowColumns() {
+            $(".hideable-column").show();
+            //var column = 4;
+            //while (column >= 2) {
+            //    $('#ProductOverviewGridContainer tr td:nth-child(' + column + '),th:nth-child( ' + column + ')').show();
+            //    column--;
+            //}
+            $("#test").unbind("click");
+            $("#test").html("Hide Columns");
+            $("#test").on("click", function () { HideColumns(); });
+        }
+
+        function OpenMarketSelect() {
+            $("#market-selection-dialog input").removeAttr("checked");
+
+            if (ProductOverviewGridView.GetSelectedKeysOnPage().length == 0)
+                alert("Select at least one Product.");
+            else
+                $("#market-selection-dialog").dialog("open");
+        }
+
+        function OpenUndelete() {
+            $("#undelete-dialog").dialog("open");
+        }
+
+        $(document).ready(function () {
+            $("#test").on("click", function () { HideColumns(); });
+            $.fn.sparkline.defaults.common.width = "144px";
+            $.fn.sparkline.defaults.common.height = "30px";
+            //$('.inlinesparkline').sparkline();
+            $('.inlinesparkline').each(function () {
+                $(this).html($(this).data('sparkline'));
+                $(this).sparkline();
+            });
+
+            $("#undelete-dialog").dialog({
+                title: "Undelete Product",
+                width: 400,
+                height: "auto",
+                autoOpen: false,
+                resizable: false,
+                buttons: {
+                    Ok: function () {
+                        Undelete();
+                    },
+                    Cancel: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $("#market-selection-dialog").dialog({
+                title: "Market Selection",
+                width: 400,
+                height: "auto",
+                autoOpen: false,
+                resizable: false,
+                buttons: {
+                    Ok: function () {
+                        if ($("#market-selection-dialog input:checked").length == 0) {
+                            alert("No Markets have been selected for " + $(this).data("action") + ".");
+                            return;
+                        }
+                        else {
+                            var action = $(this).data("action");
+                            var preposition = "for";
+                            if (action == "Assignment")
+                                action = "create";
+                            else if (action == "Removal") {
+                                action = "remove";
+                                preposition = "from";
+                            }
+                            var confirm = window.confirm("This action will " + action + " the selected PriceList entries " + preposition + " the selected Products.\r\n\r\nAre you sure?");
+                            if (confirm) {
+                                if (action == "create") {
+                                    AssignMarkets();
+                                    $(this).dialog("close");
+                                }
+                                else {
+                                    DeleteMarkets();
+                                    $(this).dialog("close");
+                                }
+                            }
+                            else {
+                                $(this).dialog("close");
+                            }
+                        }
+                    },
+                    Cancel: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        });
+
+        function Undelete() {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '/admin/products/undelete',
+                type: 'POST',
+                data: {
+                    Code: $("#undelete-product-code").val()
+                },
+                success: function (data) {
+                    $("#undelete-dialog").dialog("close");
+                    LoadingPanel.Hide();
+                    ProductOverviewGridView.Refresh();
+                },
+                timeout: 30000
+            });
+        }
+
+        function AssignMarkets() {
+            var keys = null;
+
+            if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                keys = ProductOverviewGridView.GetSelectedKeysOnPage();
+
+
+            if (typeof (keys) != "undefined" && keys != false) {
+                if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false) {
+                    ProductOverviewGridView.PerformCallback({ 
+                        commandType: 'AssignMarkets', 
+                        keyString: keys.toString(),
+                        CollectionIDs: ProductOverviewCollectionListBox.GetSelectedValues().toString(),
+                        PatternIDs: ProductOverviewPatternListBox.GetSelectedValues().toString(),
+                        ColourIDs: ProductOverviewColourListBox.GetSelectedValues().toString(),
+                        MarketIDs: ProductOverviewMarketListBox.GetSelectedValues().toString(),
+                        priceListKeyString: $("#market-selection-dialog input:checked").map(function () { 
+                            return this.value; 
+                        }).get().toString()
+                    });
+                }
+            }
+            else
+                alert("Select at least one product.");
+            return false;
+        }
+
+        function DeleteMarkets() {
+            var keys = null;
+
+            if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                keys = ProductOverviewGridView.GetSelectedKeysOnPage();
+
+
+            if (typeof (keys) != "undefined" && keys != false) {
+                if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false) {
+                    ProductOverviewGridView.PerformCallback({ 
+                        commandType: 'DeleteMarkets',
+                        keyString: keys.toString(),
+                        CollectionIDs: ProductOverviewCollectionListBox.GetSelectedValues().toString(),
+                        PatternIDs: ProductOverviewPatternListBox.GetSelectedValues().toString(),
+                        ColourIDs: ProductOverviewColourListBox.GetSelectedValues().toString(),
+                        MarketIDs: ProductOverviewMarketListBox.GetSelectedValues().toString(),
+                        priceListKeyString: $("#market-selection-dialog input:checked").map(function () { 
+                            return this.value; 
+                        }).get().toString() });
+                }
+            }
+            else
+                alert("Select at least one product.");
+            return false;
+        }
+
+
+        function DeleteSelectedProducts() {
+            var conf = confirm("Are you sure?");
+            if (conf) {
+                var keys = null;
+
+                if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                    keys = ProductOverviewGridView.GetSelectedKeysOnPage();
+
+                if (typeof (keys) != "undefined" && keys != false)
+                    if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                        ProductOverviewGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+            }
+        }
+
+    </script>
+}

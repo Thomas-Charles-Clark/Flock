@@ -1,0 +1,25 @@
+﻿@model Flock.ViewModels.PromoCodeViewModel
+@Html.DevExpress().ComboBox(settings =>
+    {
+        settings.Name = "FreeGiftProductID";
+        settings.CallbackRouteValues = new { Controller = "Promotions", Action = "PromoCodeFreeGiftProductIDComboBoxPartial" };
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        settings.Properties.CallbackPageSize = 15;
+        settings.Properties.TextField = "BasketName";
+        settings.Properties.TextFormatString = "{0}";
+        settings.Properties.ValueField = "ProductID";
+        settings.Properties.ValueType = typeof(int);
+        settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+        settings.Properties.FilterMinLength = 1;
+        settings.Properties.IncrementalFilteringDelay = 1000;
+        settings.Properties.NullText = "Type to search...";
+        settings.Width = 226;
+        settings.Properties.DropDownWidth = 650;
+        settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+        settings.Properties.Columns.Add("ProductID", "Product ID", 90);
+        settings.Properties.Columns.Add("BasketName", "Basket Name", 270);
+        settings.Properties.Columns.Add("CostSterling", "Cost Sterling", 45);
+        settings.Properties.Columns.Add("ProductPageID", "Product Page ID", 45);
+
+    }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetProductIDs, Flock.ViewModels.LargeDatabaseDataProvider.GetProductByID).Bind(Model == null ? null : Model.FreeGiftProductID).GetHtml()

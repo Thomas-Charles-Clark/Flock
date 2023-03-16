@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Scripts.Render("~/bundles/jquery")
+    @Styles.Render("~/Content/themes/base/jquery-ui.css")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jqueryui")
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu" rel="stylesheet">
+    <script type="text/javascript">
+        $.extend({
+            showError: function (e, s, a, callback, args) {
+
+                if (typeof LoadingPanel != 'undefined')
+                    LoadingPanel.Hide();
+
+                var message = $("<div></div>");
+                if (e)
+                    $(message).html(
+                        "<dl style='margin-bottom: 0'><dt>Status</dt><dd>" + s + "</dd>"
+                        + "<dt>Description</dt><dd>" + a + "</dd>"
+                        + "<dt>Error</dt><dd>" + e.responseText + "</dd>"
+                        + "</dl></p>");
+                else
+                    $(message).html("<p>When server side error logging is complete, this error will be logged.</p>"
+                        + "<dl style='margin-bottom: 0'><dt>Status</dt><dd>" + s + "</dd>"
+                        + "<dt>Description</dt><dd>" + a + "</dd>"
+                        + "<dt>Error</dt><dd>" + e + "</dd>"
+                        + "</dl></p><i>Even if all the above read 'undefined', and they might, a detailed server-side log entry has been generated.</i>");
+
+                if (typeof callback == "function")
+                    callback(args);
+                $("#error-dialog").html("");
+                $("#error-dialog").dialog('open').append($(message));
+            }
+        });
+
+        $.ajaxSetup({
+            error: function (e, s, a) {
+                $.showError(e, s, a);
+            }
+        });
+
+        $.extend({
+            confirm: function (yesCallback, noCallback, args) {
+                $("<div></div>").dialog({
+                    title: "Confirm",
+                    width: 100,
+                    height: "auto",
+                    buttons: [{
+                        text: "Yes",
+                        click: function () {
+                            yesCallback(args);
+                            $(this).remove();
+                        }
+                    },
+                    {
+                        text: "No",
+                        click: function () {
+                            noCallback(args);
+                            $(this).remove();
+                        }
+                    }
+                    ],
+                    close: function (event, ui) { $(this).remove(); },
+                    resizable: false,
+                    modal: true
+                }).html("<h6>Are you sure?</h6>").parent().addClass("alert");
+            }
+        });
+
+        $.extend({
+            info: function (title, message) {
+                var ttl = "Info";
+
+                if (typeof title !== "undefined") {
+                    ttl = title;
+                }
+
+                var text = "";
+                if (typeof message !== "undefined") {
+                    text = "<h6>" + message + "</h6>";
+                }
+
+                $("<div></div>").dialog({
+                    title: ttl,
+                    width: 200,
+                    height: "auto",
+                    buttons: [{
+                        text: "OK",
+                        click: function () {
+                            $(this).remove();
+                        }
+                    }],
+                    close: function (ev, ui) { $(this).remove(); },
+                    resizable: false,
+                    modal: true
+                }).html(text);
+            }
+        });
+
+        $(document).ready(function () {
+            $("#error-dialog").dialog({
+                title: 'Whoops! Something went wrong there...',
+                width: 750,
+                height: 'auto',
+                autoOpen: false,
+                buttons: {
+                    Ok: function () {
+                        $(this).dialog('close');
+                    }
+                },
+                close: function (event, ui) { $(this).dialog("close"); }
+            });
+
+            $("#complete-dialog").dialog({
+                title: 'Notification',
+                width: "auto",
+                height: "auto",
+                autoOpen: false,
+                buttons: {
+                    Close: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            })
+
+            $("#ok-dialog").dialog({
+                title: 'Notification',
+                width: "auto",
+                height: "auto",
+                autoOpen: false,
+                buttons: {
+                    Close: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $("#ok-dialog-inner").show();
+            $("#complete-dialog-inner").show();
+        });
+    </script>
+    @RenderSection("styles", required: false)
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/common")
+    @{
+        Html.DevExpress().GetScripts(
+            new Script[] {
+                //new Script()
+                //{
+                //    ExtensionSuite = ExtensionSuite.Editors
+                //},
+                //new Script()
+                //{
+                //    ExtensionSuite = ExtensionSuite.GridView
+                //},
+                //new Script()
+                //{
+                //    ExtensionSuite = ExtensionSuite.HtmlEditor
+                //},
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.NavigationAndLayout
+                },
+                //new Script()
+                //{
+                //    ExtensionSuite = ExtensionSuite.TreeList
+                //}
+            }
+        );
+        //Html.DevExpress().GetStyleSheets(
+        //    new StyleSheet() { ExtensionSuite = ExtensionSuite.All }
+        //);
+        //Html.DevExpress().GetStyleSheets(
+        //    new StyleSheet() { ExtensionSuite = ExtensionSuite.All, Theme = "Metropolis" }
+        //);
+        Html.DevExpress().GetStyleSheets(
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.All }
+        );
+        //Html.DevExpress().GetStyleSheets(
+        //     new StyleSheet() { ExtensionSuite = ExtensionSuite.All, Theme = "Aqua" }
+        // );
+
+        Html.EnableClientValidation();
+        Html.EnableUnobtrusiveJavaScript();
+    }
+</head>
+<body style="width: 100%; height: 100%;">
+
+    @RenderSection("outsideContainer", required: false)
+    @*@Html.Partial("~/Views/Admin/_NavigationPartial.cshtml")*@
+
+    <div class="container" id="container">
+        @RenderBody()
+        <hr />
+        @Html.AntiForgeryToken()
+        <div id="ajaxTarget">
+
+        </div>
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Designers Guild</p>
+        </footer>
+    </div>
+    <div id="error-dialog">
+
+    </div>
+
+    <div id="ok-dialog">
+        <div id="ok-dialog-inner" style="display: none;">
+            <h6>O.K.</h6>
+        </div>
+    </div>
+
+    <div id="complete-dialog">
+        <div id="complete-dialog-inner" style="display: none;">
+            <h6>Complete</h6>
+        </div>
+    </div>
+    
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,13 @@
+﻿@model Flock.ViewModels.BaseViewModel
+
+@{
+    ViewBag.Title = "Images";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<h2>Images</h2>
+
+
+@Html.Action("ImageOverviewDataViewPartial", "Images")
+
+

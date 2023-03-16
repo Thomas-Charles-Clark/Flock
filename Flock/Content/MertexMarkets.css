@@ -1,0 +1,28 @@
+﻿.container {
+    width: auto
+}
+
+#mertex-market-table {
+    width: 500px;
+    margin: 0 auto;
+}
+
+#mertex-market-table thead th {
+
+}
+
+#mertex-market-table tbody td {
+    vertical-align: middle;
+}
+
+.remove-glyph {
+    display: inline-block;
+    cursor: pointer;
+    float: left;
+    line-height: 21px;
+    margin-left: 6px;
+}
+
+.not-mapped {
+    background-color: #fb6868 !important;
+}

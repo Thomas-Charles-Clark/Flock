@@ -1,0 +1,95 @@
+﻿@model List<Flock.Models.Collection_SearchResult>
+@Html.DevExpress().DataView(settings =>
+{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    settings.Name = "CollectionSearchDataView";
+    settings.CallbackRouteValues = new { Controller = "Collections", Action = "CollectionSearch" };
+    settings.AllowPaging = true;
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+        if(typeof(initDragDrop) == 'function') 
+            initDragDrop();
+        if(typeof(InitCollectionDragDrop) == 'function')
+            InitCollectionDragDrop();
+    }";
+    
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        e.customArgs['ProductType'] = CollectionProductTypeListBox.GetValue();
+        e.customArgs['Brand'] = CollectionBrandListBox.GetValue();
+        e.customArgs['Launch'] = CollectionLaunchListBox.GetValue();
+        e.customArgs['NameOrID'] = CollectionNameOrIDTextBox.GetValue();
+    }";
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action.ToLower() != "compose")
+    {
+        settings.SettingsTableLayout.ColumnCount = 5;
+        settings.SettingsTableLayout.RowsPerPage = 3;
+        settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(4);
+
+        settings.PagerSettings.PageSizeItemSettings.Visible = true;
+        settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        
+        settings.PagerSettings.Visible = true;
+        settings.AlwaysShowPager = true;
+        settings.PagerSettings.EndlessPagingMode = DataViewEndlessPagingMode.Disabled;
+        settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    }
+    else
+    {
+        settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.SettingsTableLayout.ColumnCount = 3;
+        settings.PagerSettings.PageSizeItemSettings.ShowAllItem = false;
+        settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.PagerSettings.PageSizeItemSettings.Visible = true;
+        settings.PagerSettings.PageSizeItemSettings.ShowPopupShadow = true;
+        settings.PagerSettings.EndlessPagingMode = DataViewEndlessPagingMode.Disabled;
+        settings.PagerSettings.EllipsisMode = PagerEllipsisMode.InsideNumeric;
+        settings.PagerSettings.Visible = true;
+        settings.AlwaysShowPager = true;
+        settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.TopAndBottom;
+    }
+    
+    settings.Style.Add("width", "100%");
+    settings.Style.Add("margin", "0.5em 0 0");
+    settings.EmptyDataText = "<h4>No results.</h4>";
+    
+    settings.SettingsTableLayout.RowsPerPage = 3;
+    
+    settings.SetItemTemplateContent(
+        c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "ImageID") != null && Convert.ToInt64(DataBinder.Eval(c.DataItem, "ImageID")) != 0)
+            {
+                var discID = DataBinder.Eval(c.DataItem, "ImageID").ToString();
+                ViewContext.Writer.Write(
+                    "<div class='collection' data-collection-id='" + DataBinder.Eval(c.DataItem, "CollectionID") + "'>" +
+                        "<div>" +
+                            "<img id=\"" + "img" + discID + "\" src=\"" + Url.Content("https://flock.designersguild.com/ImageLibrary/156/" + discID + ".jpeg") + "\" title=\"Collection ID: " + DataBinder.Eval(c.DataItem, "CollectionID") + "\" alt=\"" + DataBinder.Eval(c.DataItem, "Name") + "\" />" +
+                        "</div>" +
+                        "<div class=\"DataViewItemTitle\">" + DataBinder.Eval(c.DataItem, "Name").ToString() + "</div>" +
+                        "<div class=\"web-status\" >Status: " + UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == (byte)DataBinder.Eval(c.DataItem, "StatusID")).Select(p => p.Name).Single() + "</div>" +
+                    "</div>"
+                );
+            }
+            else
+            {
+                ViewContext.Writer.Write(
+                    "<div class='collection' data-collection-id='" + DataBinder.Eval(c.DataItem, "CollectionID") + "'>" +
+                        "<div>" +
+                            "<img style='width: 156px;' src=\"" + Url.Content("https://flock.designersguild.com/Images/Admin/image-not-set-thin.png") + "\" title=\"Collection ID: " + DataBinder.Eval(c.DataItem, "CollectionID") + "\" alt=\"" + DataBinder.Eval(c.DataItem, "Name") + "\" />" +
+                        "</div>" +
+                        "<div class=\"DataViewItemTitle\">" + DataBinder.Eval(c.DataItem, "Name").ToString() + "</div>" +
+                        "<div class=\"web-status\" >Status: " + UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == (byte)DataBinder.Eval(c.DataItem, "StatusID")).Select(p => p.Name).Single() + "</div>" +
+                    "</div>"
+                );
+            }
+        }
+    );
+}).Bind(Model).GetHtml()
+<script type="text/javascript">
+    if (typeof (initDragDrop) == "function")
+        initDragDrop();
+</script>

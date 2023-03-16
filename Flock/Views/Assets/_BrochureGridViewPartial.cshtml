@@ -1,0 +1,341 @@
+@using Flock.Models
+@using Flock.DAL
+@{
+
+
+    Html.EnableClientValidation();
+    Html.EnableUnobtrusiveJavaScript();
+
+    var DAL = new UnitOfWork<FlockDataContext>();
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "BrochureGridView";
+        settings.CallbackRouteValues = new { Controller = "Assets", Action = "BrochureGridViewPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Assets", Action = "BrochureGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Assets", Action = "BrochureGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Assets", Action = "BrochureGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.SettingsPager.PageSize = 10;
+        settings.SettingsPager.PageSizeItemSettings.ShowAllItem = true;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.Settings.VerticalScrollableHeight = 380;
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 100;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.Styles.Row.Wrap = DefaultBoolean.True;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        //settings.CommandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton() { Text = "Download" });
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            if(typeof(ProductTypesListBox) == 'object')
+                e.customArgs['ProductTypeIDs'] = ProductTypesListBox.GetSelectedValues().toString();
+            if(s.IsEditing()) {
+                CoverImageFileManager.SetClientVisible(false);
+                InteractiveBrochureFileManager.SetClientVisible(false);
+            }
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) {
+            if(s.IsEditing()) {
+                $('#selected-brochure-id').val(s.GetRowKey(s.editingRowVisibleIndex));
+                InitCountryDragDrop();
+            }
+        }";
+
+        settings.ClientSideEvents.CustomButtonClick = @"function(s, e) {
+            var $idown;
+            downloadURL = function(url) {
+              if ($idown) {
+                $idown.attr('src',url);
+              } else {
+                $idown = $('<iframe>', { id:'idown', src:url }).hide().appendTo('body');
+              }
+            }
+            //... How to use it:
+            var url = '" + Url.Action("DownloadBrochure", "Assets", new { BrochureID = -1 }) + @"';
+            url = url.replace('-1', s.GetRowKey(e.visibleIndex));
+            downloadURL(url);
+        }";
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+            var id = s.GetRowKey(e.visibleIndex);
+            $('#selected-brochure-id').val(id);
+
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("ChangeBrochure", "Assets") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    BrochureID: id
+                },
+                success: function(data) {
+                    $('#brochure-compose-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a);
+                },
+                timeout: 30000
+            });
+        }";
+
+        settings.KeyFieldName = "BrochureID";
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.AllowFocusedRow = true;
+        settings.Styles.Row.Cursor = "pointer";
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        DevExpress.Web.Mvc.MVCxGridViewColumn BrochureIDColumn = new MVCxGridViewColumn();
+        BrochureIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        BrochureIDColumn.Name = "BrochureID";
+        BrochureIDColumn.FieldName = "BrochureID";
+        BrochureIDColumn.Caption = "ID";
+        settings.Columns.Add(BrochureIDColumn);
+
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        NameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        NameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        var nProp = NameColumn.PropertiesEdit as TextBoxProperties;
+        nProp.ConvertEmptyStringToNull = true;
+        nProp.ValidationSettings.RequiredField.IsRequired = true;
+        nProp.ValidationSettings.RequiredField.ErrorText = "You must provide a Name.";
+        settings.Columns.Add(NameColumn);
+        
+        MVCxGridViewColumn DescriptionColumn = new MVCxGridViewColumn();
+        DescriptionColumn.Name = "Description";
+        DescriptionColumn.FieldName = "Description";
+        DescriptionColumn.Caption = "Description";
+        DescriptionColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        DescriptionColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(DescriptionColumn);
+
+        MVCxGridViewColumn CoverImagePathColumn = new MVCxGridViewColumn();
+        CoverImagePathColumn.Name = "CoverImagePath";
+        CoverImagePathColumn.FieldName = "CoverImagePath";
+        CoverImagePathColumn.Caption = "Cover Image Path";
+        CoverImagePathColumn.ReadOnly = true;
+        CoverImagePathColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        CoverImagePathColumn.SetEditItemTemplateContent(c =>
+        {
+
+        });
+        //settings.Columns.Add(CoverImagePathColumn);
+
+        MVCxGridViewColumn InteractiveBrochureURLColumn = new MVCxGridViewColumn();
+        InteractiveBrochureURLColumn.Name = "InteractiveBrochureURL";
+        InteractiveBrochureURLColumn.FieldName = "InteractiveBrochureURL";
+        InteractiveBrochureURLColumn.Caption = "Interactive Brochure Path";
+        InteractiveBrochureURLColumn.ReadOnly = true;
+        InteractiveBrochureURLColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        //settings.Columns.Add(InteractiveBrochureURLColumn);
+
+
+        MVCxGridViewColumn CodeColumn = new MVCxGridViewColumn();
+        CodeColumn.Name = "Code";
+        CodeColumn.FieldName = "Code";
+        CodeColumn.Caption = "Code";
+        CodeColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        CodeColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        var cProp = CodeColumn.PropertiesEdit as TextBoxProperties;
+        cProp.ConvertEmptyStringToNull = true;
+        cProp.ValidationSettings.RequiredField.IsRequired = true;
+        cProp.ValidationSettings.RequiredField.ErrorText = "You must provide a Product Code.";
+        settings.Columns.Add(CodeColumn);
+
+        MVCxGridViewColumn BrandIDColumn = new MVCxGridViewColumn();
+        BrandIDColumn.Name = "BrandID";
+        BrandIDColumn.FieldName = "BrandID";
+        BrandIDColumn.Caption = "Brand";
+        BrandIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        BrandIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        BrandIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var comboBoxProperties = BrandIDColumn.PropertiesEdit as ComboBoxProperties;
+        comboBoxProperties.NullDisplayText = "Brand";
+        comboBoxProperties.NullText = "Brand";
+        comboBoxProperties.DataSource = DAL.GetRepository<Flock.Models.Brand>().GetAll().ToList();
+        comboBoxProperties.TextField = "Name";
+        comboBoxProperties.ValueField = "BrandID";
+        comboBoxProperties.ValueType = typeof(byte);
+        settings.Columns.Add(BrandIDColumn);
+
+        MVCxGridViewColumn LaunchIDColumn = new MVCxGridViewColumn();
+        LaunchIDColumn.Name = "LaunchID";
+        LaunchIDColumn.FieldName = "LaunchID";
+        LaunchIDColumn.Caption = "Launch";
+        LaunchIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        LaunchIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        LaunchIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var launchComboBoxProperties = LaunchIDColumn.PropertiesEdit as ComboBoxProperties;
+        launchComboBoxProperties.NullDisplayText = "Launch";
+        launchComboBoxProperties.NullText = "Launch";
+        launchComboBoxProperties.DataSource = DAL.GetRepository<Flock.Models.Launch>().GetAll().ToList();
+        launchComboBoxProperties.TextField = "Name";
+        launchComboBoxProperties.ValueField = "LaunchID";
+        launchComboBoxProperties.ValueType = typeof(short);
+        settings.Columns.Add(LaunchIDColumn);
+
+        MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+        ProductTypeColumn.Name = "ProductTypes";
+        ProductTypeColumn.FieldName = "ProductTypes";
+        ProductTypeColumn.Caption = "Product Types";
+        ProductTypeColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+        ProductTypeColumn.Visible = false;
+        ProductTypeColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        //ProductTypeColumn.SetEditItemTemplateContent(c => {
+        //    // we would like a checkbox list... Sooooo make one.
+
+        //});
+        settings.Columns.Add(ProductTypeColumn);
+
+        MVCxGridViewColumn CountriesColumn = new MVCxGridViewColumn();
+        CountriesColumn.Name = "Countries";
+        CountriesColumn.FieldName = "Countries";
+        CountriesColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+        CountriesColumn.Visible = false;
+        CountriesColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        //CountriesColumn.SetEditItemTemplateContent(c => {
+        //    var CountriesPreModel = DAL.GetRepository<Brochure_Country>().GetAll().Where(p => p.BrochureID == (short)c.KeyValue).Select(p => p.CountryID).ToList();
+        //    var CountriesModel = DAL.GetRepository<Country>().GetAll().Where(p => CountriesPreModel.Contains(p.CountryID)).ToList();
+        //    ViewContext.Writer.Write("<div id='country-restriction-container' style='border: 1px solid #cdcdcd; margin-top: 2em;'>");
+        //    ViewContext.Writer.Write(Html.Partial("BrochureCountryRestrictionsPartial", CountriesModel).ToHtmlString());
+        //    ViewContext.Writer.Write("</div>");
+        //});
+        //settings.Columns.Add(CountriesColumn);
+
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        OnDateColumn.Name = "OnDate";
+        OnDateColumn.FieldName = "OnDate";
+        OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OnDateColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OnDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        OnDateColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        OnDateColumn.Caption = "On Date";
+        //OnDateColumn.SetEditItemTemplateContent(c =>
+        //{
+        //    Html.DevExpress().Calendar(cSettings =>
+        //    {
+        //        cSettings.Name = "OnDate";
+        //        cSettings.Properties.DisplayFormatString = "d";
+        //        cSettings.Properties.NullDisplayText = "Not Set";
+        //        cSettings.Style.Add("margin", "1em auto");
+        //    }).Render();
+        //});
+        settings.Columns.Add(OnDateColumn);
+
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+        OffDateColumn.Name = "OffDate";
+        OffDateColumn.FieldName = "OffDate";
+        OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OffDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OffDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        OffDateColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        OffDateColumn.Caption = "Off Date";
+        //OffDateColumn.SetEditItemTemplateContent(c => {
+        //    Html.DevExpress().Calendar(cSettings =>
+        //    {
+        //        cSettings.Name = "OffDate";
+        //        cSettings.Properties.DisplayFormatString = "d";
+        //        cSettings.Properties.NullDisplayText = "Not Set";
+        //        cSettings.Style.Add("margin", "1em auto");
+        //    }).Render();
+        //});
+        settings.Columns.Add(OffDateColumn);
+
+        MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+        WebStatusColumn.FieldName = "StatusID";
+        WebStatusColumn.Name = "StatusID";
+        WebStatusColumn.Caption = "Web Status";
+        WebStatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        WebStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        WebStatusColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        WebStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+            string colour = "black";
+            string statusText = "unknown";
+            statusText = DAL.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+            switch (i)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+            ViewContext.Writer.Write(res);
+        });
+        settings.Columns.Add(WebStatusColumn);
+
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "StatusID":
+                    e.Values.Clear();
+                    foreach (var pt in DAL.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+            }
+        };
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+@*@grid.BindToLINQ("", "", (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    var source = dataContext.GetRepository<vwBrochureOverview>().GetAll().OrderByDescending(p => p.BrochureID);
+    e.QueryableSource = source;
+    e.KeyExpression = "BrochureID";
+}).GetHtml()*@

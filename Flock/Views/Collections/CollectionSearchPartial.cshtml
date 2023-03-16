@@ -1,0 +1,83 @@
+﻿<div class="resource-panel-container">
+    <fieldset id="collection-search-fieldset">
+        <legend onclick="$('.hideable-dataview').not('#collection-dataview').slideUp('fast'); $('#collection-dataview').slideToggle('fast');">Collection Search (click to expand / contract)</legend>
+        <div id="collection-dataview" class="hideable-dataview" style="display: none;">
+            <div style="width: 100%; background-color: white; padding: 1em; padding-bottom: 0;">
+                @Html.Action("CollectionSearchProductTypeDropDownPartial", "Collections")
+                @Html.Action("CollectionSearchBrandDropDownPartial", "Collections")
+                @Html.Action("CollectionSearchLaunchDropDownPartial", "Collections")
+                @Html.Action("CollectionSearchNameOrIDTextBoxPartial", "Collections")
+                @Html.DevExpress().Button(button =>
+                {
+                    button.Text = "Add All";
+                    button.Name = "CollectionAddAllButton";
+                    button.Style.Add("float", "left");
+                    button.Style.Add("margin-bottom", "7px");
+                    button.Style.Add("line-height", "32px");
+                    button.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    button.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    //settings.ControlStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0072C6");
+                    button.Style.Add("text-align", "center");
+
+                    button.ClientSideEvents.Click = @"function(s, e) {
+                            if(typeof(BulkAddCollections) == 'function') {
+                                BulkAddCollections();
+                            }
+                        }";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "CollectionClearFiltersButton";
+                    settings.Text = "Reset";
+                    settings.Style.Add("line-height", "32px");
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    //settings.ControlStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0072C6");
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        CollectionProductTypeListBox.UnselectAll();
+                        CollectionProductTypeDD.SetText('Product Type');
+                        CollectionBrandListBox.UnselectAll();
+                        CollectionBrandDD.SetText('Brand');
+                        CollectionLaunchListBox.UnselectAll();
+                        CollectionLaunchDD.SetText('Launch');
+                        CollectionNameOrIDTextBox.SetText('Name, Code or ID');
+
+                        $('#collection-searching-icon').fadeIn('fast');
+                        $.ajax({
+                            url: '" + Url.Action("CollectionSearch", "Collections") + @"',
+                            traditional: true,
+                            data: {
+                                ProductType: CollectionProductTypeListBox.GetValue(),
+                                Brand: CollectionBrandListBox.GetValue(),
+                                Launch: CollectionLaunchListBox.GetValue(),
+                                NameOrID: CollectionNameOrIDTextBox.GetValue()
+                            },
+                            success: function(data) {
+                                $('#collection-data-view-container').html(data);
+                                if(typeof(InitCollectionDragDrop) == 'function')
+                                            InitCollectionDragDrop();
+                                $('#collection-searching-icon').fadeOut('slow');
+                                
+                            },
+                            error: function(e, s, a) {
+                                $.showError(e, s, a, function() { $('#collection-searching-icon').fadeOut('slow'); });
+                            },
+                            timeout: 20000
+                        });
+                    }";
+                }).GetHtml()
+                <img id="collection-searching-icon" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both;"></div>
+            </div>
+            <div id="collection-data-view-container" style="width: 100%; overflow-y: auto;">
+                @Html.Action("CollectionSearch", "Collections")
+            </div>
+        </div>
+    </fieldset>
+    <div style="clear: both;"></div>
+</div>
+
+<script type="text/javascript">
+    if (typeof InitCollectionDragDrop == 'function')
+        InitCollectionDragDrop();
+</script>

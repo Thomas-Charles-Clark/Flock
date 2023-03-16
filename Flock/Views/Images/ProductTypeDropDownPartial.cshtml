@@ -1,0 +1,131 @@
+﻿@{
+    Layout = null;
+}
+@model List<Flock.Models.ProductType>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+        if (action == "ImageSearchProductTypeDropDownPartial")
+            settings.Name = "ProductTypeDD";
+        else
+            settings.Name = "CollectionProductTypeDD";
+        settings.Text = "Product Type";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='product-type-listbox'>"); 
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Images/ProductTypeListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Text = "Clear";
+                    buttonSettings.Style.Add("float", "left");
+                    if (action == "ImageSearchProductTypeDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductTypeButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ProductTypeListBox.UnselectAll();
+                            ProductTypeDD.HideDropDown(); 
+                            ProductTypeDD.SetText('Product Type');
+                            $('#searching-icon').fadeIn('fast');
+                            $.ajax({
+                                url: '" + Url.Action("ImageSearch", "Images") + @"',
+                                traditional: true,
+                                data: { 
+                                    ProductType: ProductTypeListBox.GetValue(),
+                                    Brand: BrandListBox.GetValue(),
+                                    Launch: LaunchListBox.GetValue(),
+                                    Collection: CollectionListBox.GetValue(),
+                                    AspectRatio: AspectRatioListBox.GetValue(),
+                                    ImageType: ImageTypeListBox.GetValue(),
+                                    Perspective: PerspectiveListBox.GetValue(),
+                                    HotspotStatus: HotspotStatusListBox.GetValue(),
+                                    Colour: ColourListBox.GetValue(),
+                                    Room: RoomListBox.GetValue(),
+                                    Style: StyleListBox.GetValue(),
+                                    NameOrID: NameOrIDTextBox.GetValue(),
+                                    SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue()
+                                },
+                                success: function(data) {
+                                    $('#image-data-view-container').html(data);
+                                    $('#searching-icon').fadeOut('slow');
+                                },
+                                error: function(e, s, a) {
+                                    $('#searching-icon').fadeOut('slow');
+                                    alert(e.responseText);
+                                },
+                                timeout: 20000
+                            });
+                        }";
+                    }
+                    else
+                    {
+                        buttonSettings.Name = "CollectionProductTypeButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            CollectionProductTypeListBox.UnselectAll();
+                            CollectionProductTypeDD.HideDropDown(); 
+                            CollectionProductTypeDD.SetText('Product Type');
+                            $('#collection-searching-icon').fadeIn('fast');
+                            $.ajax({
+                                url: '" + Url.Action("CollectionSearch", "Images") + @"',
+                                traditional: true,
+                                data: { 
+                                    ProductType: CollectionProductTypeListBox.GetValue(),
+                                    Brand: CollectionBrandListBox.GetValue(),
+                                    Launch: CollectionLaunchListBox.GetValue(),
+                                    NameOrID: CollectionNameOrIDTextBox.GetValue()
+                                },
+                                success: function(data) {
+                                    $('#collection-data-view-container').html(data);
+                                    $('#collection-searching-icon').fadeOut('slow');
+                                },
+                                error: function(e, s, a) {
+                                    $('#collection-searching-icon').fadeOut('slow');
+                                    alert(e.responseText);
+                                },
+                                timeout: 20000
+                            });
+                        }";
+                    }
+                }
+            )
+            .Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                    if (action == "ImageSearchProductTypeDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductTypeButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ProductTypeDD.HideDropDown();
+                        }";
+                    }
+                    else
+                    {
+                        buttonSettings.Name = "CollectionProductTypeButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            CollectionProductTypeDD.HideDropDown();
+                        }";
+                    }
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

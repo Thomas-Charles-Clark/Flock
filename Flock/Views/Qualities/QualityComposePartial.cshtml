@@ -1,0 +1,148 @@
+﻿@using Flock.ViewModels
+@model QualityComposeViewModel
+<div style="cursor: default;">
+    <div id="quality-product-header" class="content-panel-container" style="margin-bottom: 0;">
+        <fieldset>
+            <legend style="color: black; border-bottom-color: #929292;">Quality Details</legend>
+            <div id="quality-details-header-inner" style="background-color: white; padding: 1em; padding-top: 0;">
+                <div id="quality-details-grid-container">
+                    <input id="quality-id-hidden" type="hidden" value="@(Model.QualityID)" />
+                    <input id="product-type-id-hidden" type="hidden" value="@(Model.ProductTypeID)" />
+                    @*
+
+                    hmm.. we want the first where fields aren't empty, but do we want to merge?
+
+                    var metaDescription = "";
+                    var subHeading = "";
+                    var description = "";
+
+                    *@
+
+                    @{
+                        var metaDescription = "";
+                        var subHeading = "";
+                        var description = "";
+
+                        if (Model.ProductPages.Count > 0)
+                        {
+                            var mD = Model.ProductPages.Where(p => p.MetaDescription != null && p.MetaDescription != "").Select(p => p.MetaDescription).FirstOrDefault();
+
+                            if (mD == null)
+                            {
+
+                            }
+                            else
+                            {
+                                metaDescription = mD;
+                            }
+
+                            var sH = Model.ProductPages.Where(p => p.SubHeading != null && p.SubHeading != "").Select(p => p.SubHeading).FirstOrDefault();
+
+                            if (sH == null)
+                            {
+
+                            }
+                            else
+                            {
+                                subHeading = sH;
+                            }
+
+                            var d = Model.ProductPages.Where(p => p.Description != null && p.Description != "").Select(p => p.Description).FirstOrDefault();
+
+                            if (d == null)
+                            {
+
+                            }
+                            else
+                            {
+                                description = d;
+                            }
+                        }
+                    }
+
+                    @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Product Page Meta Description";
+                    settings.Style.Add("line-height", "30px");
+                }).GetHtml()
+
+                    @Html.DevExpress().Memo(
+                settings =>
+                {
+                    settings.Name = "ProductPageMetaDescription";
+                    settings.Style.Add("margin-bottom", "10px");
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(50);
+                    settings.Text = metaDescription;// Model.ProductPages.Count > 0 ? Model.ProductPages[0].MetaDescription : "";
+                    settings.Properties.MaxLength = 155;
+                }).GetHtml()
+
+                    <div style="clear: both"></div>
+
+                    @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Product Page Sub Heading";
+                    settings.Style.Add("line-height", "30px");
+                }).GetHtml()
+
+                    @Html.DevExpress().TextBox(settings =>
+                    {
+                        settings.Name = "ProductPageSubHeading";
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(50);
+                        settings.Style.Add("margin-bottom", "10px");
+                        settings.Properties.MaxLength = 70;
+                        settings.Text = subHeading; //Model.ProductPages.Count > 0 ? Model.ProductPages[0].SubHeading : "";
+                    }).GetHtml()
+
+                    <div style="clear: both;"></div>
+
+                    @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Text = "Product Page Description";
+                        settings.Style.Add("line-height", "30px");
+                    }).GetHtml()
+
+                    @Html.DevExpress().Memo(settings =>
+                    {
+                        settings.Name = "ProductPageDescription";
+                        settings.Style.Add("margin-bottom", "0px");
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Height = System.Web.UI.WebControls.Unit.Pixel(50);
+                        settings.Text = description; //Model.ProductPages.Count > 0 ? Model.ProductPages[0].Description : "";
+                        settings.Properties.MaxLength = 2000;
+                    }).GetHtml()
+                </div>
+            </div>
+        </fieldset>
+
+
+
+    </div>
+
+    <div style="clear: both;"></div>
+
+    @Html.DevExpress().Button(btnSettings =>
+{
+    btnSettings.Name = "btnCancel";
+    btnSettings.ControlStyle.CssClass = "button";
+    btnSettings.Text = "Cancel";
+    btnSettings.Style.Add("float", "right");
+    btnSettings.Style.Add("margin-top", "1em");
+    btnSettings.ClientSideEvents.Click = "function(s, e){ QualityOverviewGridView.CancelEdit(); }";
+}).GetHtml()
+    @Html.DevExpress().Button(btnSettings =>
+{
+    btnSettings.Name = "btnUpdate";
+    btnSettings.ControlStyle.CssClass = "button";
+    btnSettings.Text = "Update";
+    btnSettings.Style.Add("float", "right");
+    btnSettings.Style.Add("margin", "1em");
+    btnSettings.ClientSideEvents.Click = "function(s, e){ $.confirm(function() { QualityOverviewGridView.UpdateEdit() }, function() { }); }";
+}).GetHtml()
+
+    <div style="clear: both;"></div>
+
+    <div id="quality-product-list-container">
+        @Html.Partial("QualityProductsList", Model.ProductPages)
+    </div>
+</div>

@@ -1,0 +1,111 @@
+<!-- CONTENT GOES HERE -->
+                    <div class="row">
+                          <h1 class="header_h1" style="margin: 0 7px; margin-bottom: 20px;">Delivery &amp; Returns</h1>
+                       <h2 class="col-full pumpPanel"><a href="#">Delivery Options &amp; Charges</a></h2>
+                       <div id="delivery-options-body" class="standardtext panel multi-column" style="display:block">
+                           <div class="grid-2-col grid">
+                             <h3 class="header_h3">Charges</h3>
+                             <p>
+                                $0.00 – $100.00: $15 standard shipping<br />
+                                $101.00 – $250.00: $18 standard shipping<br />
+                                $250.00 and over free shipping    
+                             </p>
+                             <h3 class="header_h3">Delivery Service Information</h3>    
+                             <p>All shipping options will take approximately 7–10 working days to arrive. Orders to one address may be delivered in one or more deliveries. In the case of an order containing out of stock items, customers will be given the option at check-out of either part shipment or to wait for all goods to be in stock before shipping.</p>
+                             <p>Orders that are part shipped will be charged an additional, one off payment of $5.00, regardless of how many shipments are made.</p>
+                           </div>
+                           <div class="grid-2-col grid">
+                             <p>Any delivery timescales are indicative only. Please note that working days exclude Saturdays, Sundays and Bank Holidays.</p>
+                             <p>For security reasons all parcels must be signed for on receipt. If you will not be at home during normal office hours you can provide us with an alternative delivery address where someone will be available to sign for your parcel.</p>
+                             <p>If you would like any additional information about deliveries please contact our customer services team at: <a class="addendum-url" href="mailto:usonlinesales@designersguild.com">usonlinesales@designersguild.com</a></p>
+                           </div>
+                           <div class="clearfix panel-bottom col-full"></div>
+                       </div>
+                       <h2 id="returns-procedure" class="col-full pumpPanel"><a href="#">RETURNS</a></h2>
+                       <div id="returns-procedure-body" class="standardtext panel multi-column">
+                           <div class="grid-2-col grid">
+                              <p>We hope you will be delighted with your order. However, if for any reason you are not completely 
+                             satisfied we are happy to offer a refund on all goods returned to us within 30 days 
+                             of your receipt of goods provided they are in their original packaging, unopened and 
+                             in an unused condition.</p>
+                             <p>Items returned outside of this period will only be refunded if 
+                             the return has been authorised by our customer service team. We will not process refunds 
+                             on items that have been removed from their original packaging, unless they are faulty. </p>
+                             <p>If part of your order is faulty, you will be given the option of a replacement or refund.</p>
+                            <h3 class="header_h3">How to return your item</h3> 
+                            <ol class="ordered">
+                                 <li>To begin our automated returns procedure please login  
+                                   with the account details you used to place the order.
+                                   <a href="l1038" style="width: 200px; margin: 14px 0;" class="furnituretop margin">LOGIN</a>
+                                 </li>
+                                 <li>Locate the order that you wish to return and press the returns button. 
+                                 (Only qualifying orders will display the returns button, please refer 
+                                 to our returns policy above).</li>
+                                 <li>Select the product you wish to return and enter the quantity and reason for the return.</li>
+                                 <li>Once you have submitted your returns request you will be presented
+                                 with a returns note and returns label detailing the address that you
+                                 need to send your parcel(s) to.</li>
+                                 <li>Please print a copy of each for every parcel
+                                 you are returning.</li><li>Place the returns note inside the parcel and clearly
+                                 and securely attach the returns label to the outside of the parcel.
+                                 This paperwork is essential for us to identify your return.
+                                 PLEASE NOTE we cannot accept returns or process refunds 
+                                 if the paperwork is not attached to each parcel. </li>
+                             </ol>  
+                           </div>
+                           <div class="grid-2-col grid">
+                               <p>If returning a faulty item please indicate if you require a replacement or
+                               refund. Please remember that in order for the return to be processed without delay
+                               you must ensure that the goods are wrapped securely in the same outer packaging
+                               in which you received them.</p>
+                              <p>All returned goods will be examined upon receipt as for reasons of hygiene 
+                               we are unable to offer refunds on any opened or used goods. We will process your 
+                               return as quickly as possible and will notify you by e-mail once your refund or 
+                               replacement has been processed. </p>
+                               <p>During busy periods, please allow a maximum of 30 working days for your refund, replacement or exchange to be processed.</p>
+                               <p>Your payment for the goods will be refunded by Designers Guild as soon as
+                               possible by the original payment method, no later than 30 working days after 
+                               we have received the goods. Please note that delivery charges are not refunded. 
+                               In addition to our returns policy you have the legal right to cancel your 
+                               order within seven working days from the date of receipt of the goods if you 
+                               send us a notice of cancellation in writing and return the goods to us in their 
+                               original, unopened and unused condition.</p>
+                               <p>Where goods are delivered to a third party you may also exercise this right if you are able to return the 
+                               goods to us in their original, unopened and unused condition.</p>
+                               <p>Please see the cancellation right section in our terms and conditions. 
+                              Your statutory rights are not affected.</p>
+                           </div>
+                           <div class="clearfix panel-bottom col-full"></div>
+                       </div>
+                     </div><!-- end row -->
+
+            <!-- / CONTENT -->
+<script type="text/javascript">
+var QueryString = function () {
+  // This function is anonymous, is executed immediately and 
+  // the return value is assigned to QueryString!
+  var query_string = {};
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+    	// If first entry with this name
+    if (typeof query_string[pair[0]] === "undefined") {
+      query_string[pair[0]] = pair[1];
+    	// If second entry with this name
+    } else if (typeof query_string[pair[0]] === "string") {
+      var arr = [ query_string[pair[0]], pair[1] ];
+      query_string[pair[0]] = arr;
+    	// If third or later entry with this name
+    } else {
+      query_string[pair[0]].push(pair[1]);
+    }
+  } 
+    return query_string;
+} ();
+
+if(QueryString.r == "1") {
+$("#delivery-options-body").css("display", "none");
+$("#returns-procedure-body").css("display", "block");
+}
+</script>

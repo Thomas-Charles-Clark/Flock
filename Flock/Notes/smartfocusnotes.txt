@@ -1,0 +1,22 @@
+
+Requirements
+•	Trigger email - 	: STARTED, NOT YET
+	o	Welcome
+	o	More to come
+•	Bulk synchronisation (summarised profile data) - nightly 	: YES!
+•	Email change 	: YES
+•	Re-subscribe 	: YES
+•	Transactional emails 	: STARTED
+	o	Order confirmations
+	o	Despatch confirmations
+	o	Etc.
+•	Need to know of any synchronisation errors! This has to be watertight! 		: ROGER, WILCO
+
+Admin Requirements
+
+•	Search for (email, name, postcode etc) and validate a member (When did you register? Full name? Details of the last order? Address?) ~ KINDA - Needs furthering!
+•	Generate password reset email - YES but not through SmartFocus YET
+•	Change email address - YES
+•	Unsubscribe - YES
+•	Re-subscribe - YES
+•	Re-send order confirmation - NOT YET!

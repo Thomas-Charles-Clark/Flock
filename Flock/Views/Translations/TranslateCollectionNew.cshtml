@@ -1,0 +1,529 @@
+﻿@model Flock.ViewModels.CollectionTranslateViewModel
+
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/translations.css")
+    <style type="text/css">
+        #container {
+            padding: 0 !important;
+        }
+
+        #TranslateCollectionGridView_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+    </style>
+}
+
+@{
+    ViewBag.Title = "Translate Collection Page";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+
+
+@section scripts {
+    <script type="text/javascript">
+        function SaveTranslation() {
+            $.ajax({
+                url: '@Url.Action("SaveCollectionTranslation", "Translations")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: TranslateCollectionGridView.GetRowKey(TranslateCollectionGridView.GetFocusedRowIndex()),
+                    SelectedTargetLanguageID: TranslationTargetLanguageListBox.GetValue(),
+                    HeadingTranslation: HeadingTranslation.GetValue(),
+                    SubHeadingTranslation: SubHeadingTranslation.GetValue(),
+                    DescriptionTranslation: TranslationHTMLEditor.GetHtml(),
+                    TitleTagTranslation: TitleTagTranslation.GetValue(),
+                    URLKeywordsTranslation: URLKeywordsTranslation.GetValue(),
+                    MetaDescriptionTranslation: MetaDescriptionTranslation.GetValue()
+                },
+                success: function (data) {
+                    $(HeadingTranslation.GetInputElement()).css('background-color', 'white');
+                    $(HeadingTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(SubHeadingTranslation.GetInputElement()).css('background-color', 'white');
+                    $(SubHeadingTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    $('#translation-htmleditor-border').css('background-color', '#0072C6');
+
+                    $(TitleTagTranslation.GetInputElement()).css('background-color', 'white');
+                    $(TitleTagTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(URLKeywordsTranslation.GetInputElement()).css('background-color', 'white');
+                    $(URLKeywordsTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(MetaDescriptionTranslation.GetInputElement()).css('background-color', 'white');
+                    $(MetaDescriptionTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    window.TranslationUnsaved = false;
+
+                    TranslateCollectionGridView.PerformCallback();
+                    //$("#translation-container").html(data);
+                    $("#translation-save-button").animate({ opacity: '0.0'}, 300, 'linear', function () {
+                        $(this).attr('src', '/images/icons/64/save-success.png').bind('onreadystatechange load', function () {
+                            $(this).unbind('onreadystatechange load');
+                            if (this.complete)
+                                $(this).animate({ opacity: '1.0' }, 300, 'linear', function () {
+                                    window.setTimeout(function () {
+                                    $("#translation-save-button").animate({ opacity: '0.0' }, 1000, 'linear', function () {
+                                        $(this).attr('src', '/images/icons/64/save.png').bind('onreadystatechange load', function () {
+                                            $(this).unbind('onreadystatechange load');
+                                            $(this).animate({ opacity: '1.0' }, 300, 'linear');
+                                        });
+                                        var e = new ASPxClientProcessingModeEventArgs();
+                                        HeadingTranslation.Init.FireEvent(HeadingTranslation, e);
+                                        SubHeadingTranslation.Init.FireEvent(SubHeadingTranslation, e);
+                                        TitleTagTranslation.Init.FireEvent(TitleTagTranslation, e);
+                                        URLKeywordsTranslation.Init.FireEvent(URLKeywordsTranslation, e);
+                                        MetaDescriptionTranslation.Init.FireEvent(MetaDescriptionTranslation, e);
+                                        //PagerNext();
+                                        @*var TargetLanguageID = null;
+                                        if (typeof (TranslationTargetLanguageListBox) != 'undefined' && typeof (TranslationTargetLanguageListBox) != false)
+                                            TargetLanguageID = TranslationTargetLanguageListBox.GetValue();
+                                        $('#translate-product-page-header-searching-icon').fadeIn('fast');
+                                        window.WasSave = true;
+                                        $.ajax({
+                                            url: '@Url.Action("TranslateProductPageHeader", "Translations")',
+                                            type: 'POST',
+                                            traditional: true,
+                                            data: {
+                                                ProductTypeID: TranslateProductPageHeaderProductTypeListBox.GetValue(),
+                                                BrandID: TranslateProductPageHeaderBrandListBox.GetValue(),
+                                                LaunchID: TranslateProductPageHeaderLaunchListBox.GetValue(),
+                                                TemplateID: TranslateProductPageHeaderTemplateListBox.GetValue(),
+                                                WebStatusID: TranslateProductPageHeaderWebStatusListBox.GetValue(),
+                                                TranslationStatusID: TranslateProductPageHeaderTranslationStatusListBox.GetValue(),
+                                                TargetLanguageID: TargetLanguageID
+                                            },
+                                            success: function (data) {
+                                                $('#translate-product-page-header-searching-icon').fadeOut('fast');
+                                                $('#translate-product-page-header-container').html(data);
+
+                                                var e = new ASPxClientProcessingModeEventArgs();
+                                                HeadingTranslation.Init.FireEvent(HeadingTranslation, e);
+                                                SubHeadingTranslation.Init.FireEvent(SubHeadingTranslation, e);
+                                                TitleTagTranslation.Init.FireEvent(TitleTagTranslation, e);
+                                                URLKeywordsTranslation.Init.FireEvent(URLKeywordsTranslation, e);
+                                                MetaDescriptionTranslation.Init.FireEvent(MetaDescriptionTranslation, e);
+                                                PagerNext();
+                                            },
+                                            error: function (e, s, a) {
+                                                $('#translate-product-page-header-searching-icon').fadeOut('fast');
+                                                alert(e.responseText);
+                                            },
+                                            timeout: 20000
+                                        });*@
+                                        //    });
+                                        //})
+                                    }, 2000);
+                                });
+                            });
+                        });
+                    });
+                },
+                error: function (e, s, a) {
+                    $('#translation-container').html(e.responseText);
+                    $('#translation-fieldset').show();
+                    var i = 0;
+
+                    function flash(i) {
+                        $('#translation-save-button').animate({ opacity: '1.0' }, 250, 'linear', function () {
+                            $('#translation-save-button').animate({
+                                opacity: '0.0',
+                            }, 250, 'linear', function () {
+                                i++;
+                                if (i == 3) {
+                                    $(this).attr('src', '/images/icons/64/save.png').bind('onreadystatechange load', function () {
+                                        if (this.complete) {
+                                            $(this).unbind('onreadystatechange load');
+                                            $(this).animate({ opacity: '1.0' }, 450, 'linear', function () {
+                                                return false;
+                                            });
+                                        }
+                                    });
+                                    return false;
+                                }
+                                else
+                                    flash(i);
+                            });
+                        });
+                    }
+
+                    $("#translation-save-button").animate({ opacity: '0.0' }, 250, 'linear', function(){
+                        $(this).attr('src','/images/icons/64/save-failed.png').bind('onreadystatechange load', function(){
+                            if (this.complete) {
+                                $(this).unbind('onreadystatechange load');
+                                flash(i);
+                                return false;
+                            }
+                        });
+                    });
+                },
+                timeout: 20000
+            });
+        }
+
+        function ReloadTranslation(ID) {
+            window.TranslationUnsaved = false;
+            $.ajax({
+                url: '@Url.Action("ReloadCollectionTranslation", "Translations")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: ID,
+                    SelectedTargetLanguageID: TranslationTargetLanguageListBox.GetValue()
+                },
+                success: function (data) {
+                    //data is a json object containing the values we must reload into our various controls.
+
+                    //Heading.SetText(data.Heading);
+                    //SubHeading.SetText(data.SubHeading);
+                    //HTMLEditor.SetHtml(data.Description);
+                    //TitleTag.SetText(data.TitleTag);
+                    //URLKeywords.SetText(data.URLKeywords);
+                    //MetaDescription.SetText(data.MetaDescription);
+
+                    HeadingTranslation.SetText(data.HeadingTranslation);
+                    SubHeadingTranslation.SetText(data.SubHeadingTranslation);
+                    TranslationHTMLEditor.SetHtml(data.DescriptionTranslation);
+                    TitleTagTranslation.SetText(data.TitleTagTranslation);
+                    URLKeywordsTranslation.SetText(data.URLKeywordsTranslation);
+                    MetaDescriptionTranslation.SetText(data.MetaDescriptionTranslation);
+                    $("#translation-htmleditor-border").css("background-color", "#0072C6");
+
+
+                    //$(HeadingTranslation.GetInputElement()).keyup();
+                    //$(SubHeadingTranslation.GetInputElement()).keyup();
+                    //$(TitleTagTranslation.GetInputElement()).keyup();
+                    //$(URLKeywordsTranslation.GetInputElement()).keyup();
+                    //$(MetaDescriptionTranslation.GetInputElement()).keyup();
+
+                    $(HeadingTranslation.GetInputElement()).focusout();
+                    $(SubHeadingTranslation.GetInputElement()).focusout();
+                    $(TitleTagTranslation.GetInputElement()).focusout();
+                    $(URLKeywordsTranslation.GetInputElement()).focusout();
+                    $(MetaDescriptionTranslation.GetInputElement()).focusout();
+
+                    $(HeadingTranslation.GetInputElement()).css('background-color', 'white');
+                    $(SubHeadingTranslation.GetInputElement()).css('background-color', 'white');
+                    $("#translation-htmleditor-border").css('background-color', '#0072C6');
+                    $(TitleTagTranslation.GetInputElement()).css('background-color', 'white');
+                    $(URLKeywordsTranslation.GetInputElement()).css('background-color', 'white');
+                    $(MetaDescriptionTranslation.GetInputElement()).css('background-color', 'white');
+
+                    $(HeadingTranslation.GetInputElement()).parent().css('background-color', 'white');
+                    $(SubHeadingTranslation.GetInputElement()).parent().css('background-color', 'white');
+                    $(TitleTagTranslation.GetInputElement()).parent().css('background-color', 'white');
+                    $(URLKeywordsTranslation.GetInputElement()).parent().css('background-color', 'white');
+                    $(MetaDescriptionTranslation.GetInputElement()).parent().css('background-color', 'white');
+                    window.TranslationUnsaved = false;
+
+                    $("#content-name").html(data.Name);
+                    if (data.ImageID != null && data.ImageID != 0)
+                        $("#content-img").attr("src", "http://flock.designersguild.com/imagelibrary/654/" + data.ImageID + ".jpeg")
+                    else
+                        $("#content-img").attr("src", "/images/admin/image-not-set.png");
+                    $("#content-id-label").html(data.ID);
+
+                    //$('#translation-container').html(data);
+                },
+                error: function (e, s, a) {
+                    alert(e.responseText);
+                },
+                timeout: 20000
+            });
+        }
+
+        function SaveDefault() {
+            $.ajax({
+                url: '@Url.Action("SaveCollectionDefault", "Translations")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: TranslateCollectionGridView.GetRowKey(TranslateCollectionGridView.GetFocusedRowIndex()), // ContentListBox - need to fill in the header for the collection
+                    Heading: Heading.GetValue(),
+                    SubHeading: SubHeading.GetValue(),
+                    Description: HTMLEditor.GetHtml(),
+                    TitleTag: TitleTag.GetValue(),
+                    URLKeywords: URLKeywords.GetValue(),
+                    MetaDescription: MetaDescription.GetValue()
+                },
+                success: function (data) {
+                    $(Heading.GetInputElement()).css('background-color', 'white');
+                    $(Heading.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(SubHeading.GetInputElement()).css('background-color', 'white');
+                    $(SubHeading.GetInputElement()).parent().css('background-color', 'white');
+
+                    $('#default-htmleditor-border').css('background-color', '#0072C6');
+
+                    $(TitleTag.GetInputElement()).css('background-color', 'white');
+                    $(TitleTag.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(URLKeywords.GetInputElement()).css('background-color', 'white');
+                    $(URLKeywords.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(MetaDescription.GetInputElement()).css('background-color', 'white');
+                    $(MetaDescription.GetInputElement()).parent().css('background-color', 'white');
+
+                    window.DefaultUnsaved = false;
+                    TranslateCollectionGridView.PerformCallback();
+                    //$("#translation-container").html(data);
+                    $("#save-button").animate({ opacity: '0.0' }, 300, 'linear', function () {
+                        $(this).attr('src', '/images/icons/64/save-success.png').bind('onreadystatechange load', function () {
+                            $(this).unbind('onreadystatechange load');
+                            if (this.complete)
+                                $(this).animate({ opacity: '1.0' }, 300, 'linear', function () {
+                                    window.setTimeout(function () {
+                                        $("#save-button").animate({ opacity: '0.0' }, 1000, 'linear', function () {
+                                            $(this).attr('src', '/images/icons/64/save.png').bind('onreadystatechange load', function () {
+                                                $(this).unbind('onreadystatechange load');
+                                                $(this).animate({ opacity: '1.0' }, 300, 'linear');
+                                            });
+                                        })
+                                    }, 2000);
+                                });
+                        });
+                    });
+                },
+                error: function (e, s, a) {
+                    var i = 0;
+                    window.DefaultUnsaved = false;
+                    function flash(i) {
+                        $('#save-button').animate({ opacity: '1.0' }, 250, 'linear', function () {
+                            $('#save-button').animate({
+                                opacity: '0.0',
+                            }, 250, 'linear', function () {
+                                i++;
+                                if (i == 3) {
+                                    $(this).attr('src', '/images/icons/64/save.png').bind('onreadystatechange load', function () {
+                                        if (this.complete) {
+                                            $(this).unbind('onreadystatechange load');
+                                            $(this).animate({ opacity: '1.0' }, 450, 'linear', function () {
+                                                return false;
+                                            });
+                                        }
+                                    });
+                                    return false;
+                                }
+                                else
+                                    flash(i);
+                            });
+                        });
+                    }
+
+                    $("#save-button").animate({ opacity: '0.0' }, 250, 'linear', function () {
+                        $(this).attr('src', '/images/icons/64/save-failed.png').bind('onreadystatechange load', function () {
+                            if (this.complete) {
+                                $(this).unbind('onreadystatechange load');
+                                flash(i);
+                                return false;
+                            }
+                        });
+                    });
+                },
+                timeout: 20000
+            });
+        }
+        function ReloadDefault(ID) {
+            window.DefaultUnsaved = false;
+            $.ajax({
+                url: '@Url.Action("ReloadCollectionDefault", "Translations")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: ID
+                },
+                success: function (data) {
+
+                    Heading.SetText(data.Heading);
+                    SubHeading.SetText(data.SubHeading);
+                    HTMLEditor.SetHtml(data.Description);
+                    TitleTag.SetText(data.TitleTag);
+                    URLKeywords.SetText(data.URLKeywords);
+                    MetaDescription.SetText(data.MetaDescription);
+
+                    //$(Heading.GetInputElement()).keyup();
+                    //$(SubHeading.GetInputElement()).keyup();
+                    //$(TitleTag.GetInputElement()).keyup();
+                    //$(URLKeywords.GetInputElement()).keyup();
+                    //$(MetaDescription.GetInputElement()).keyup();
+
+                    $(Heading.GetInputElement()).focusout();
+                    $(SubHeading.GetInputElement()).focusout();
+                    $(TitleTag.GetInputElement()).focusout();
+                    $(URLKeywords.GetInputElement()).focusout();
+                    $(MetaDescription.GetInputElement()).focusout();
+
+                    $(Heading.GetInputElement()).css('background-color', 'white');
+                    $(SubHeading.GetInputElement()).css('background-color', 'white');
+                    $("#default-htmleditor-border").css('background-color', '#0072C6');
+                    $(TitleTag.GetInputElement()).css('background-color', 'white');
+                    $(URLKeywords.GetInputElement()).css('background-color', 'white');
+                    $(MetaDescription.GetInputElement()).css('background-color', 'white');
+
+                    $(Heading.GetInputElement()).parent().css('background-color', 'white');
+                    $(SubHeading.GetInputElement()).parent().css('background-color', 'white');
+                    $(TitleTag.GetInputElement()).parent().css('background-color', 'white');
+                    $(URLKeywords.GetInputElement()).parent().css('background-color', 'white');
+                    $(MetaDescription.GetInputElement()).parent().css('background-color', 'white');
+
+                    window.DefaultUnsaved = false;
+                    //$('#default-container').html(data);
+                },
+                error: function (e, s, a) {
+                    alert(e.responseText);
+                },
+                timeout: 20000
+            });
+        }
+        function PagerNext() {
+            if (window.DefaultUnsaved) {
+                alert("You have unsaved changes in the Default Language section. Please save or clear the changes before proceeding.");
+                return false;
+            }
+            if (window.TranslationUnsaved) {
+                alert("You have unsaved changes in the Translation section. Please save or clear the changes before proceeding.");
+                return false;
+            }
+            if (typeof (TranslateHeaderContentListBox) != "undefined" && typeof (TranslateHeaderContentListBox) != false) {
+                if (TranslateHeaderContentListBox.GetItemCount() > 0) {
+                    if (TranslateHeaderContentListBox.GetSelectedItem() != null) {
+                        if (TranslateHeaderContentListBox.GetSelectedItem().index != (TranslateHeaderContentListBox.GetItemCount() - 1)) {
+                            if (window.WasSave)
+                                TranslateHeaderContentListBox.SetSelectedIndex(0);
+                            else
+                                TranslateHeaderContentListBox.SetSelectedIndex(TranslateHeaderContentListBox.GetSelectedItem().index + 1);
+
+                            var e = new ASPxClientProcessingModeEventArgs();
+                            TranslateHeaderContentListBox.SelectedIndexChanged.FireEvent(TranslateHeaderContentListBox, e);
+                        }
+                        else {
+                            if ((parseInt($("#pager-current").html()) % 10) == 0) {
+
+                                $('#pager-current').html(TranslateHeaderContentListBox.GetSelectedItem().index + 1);
+
+                                var lb = aspxGetControlCollection().Get("TranslateHeaderContentListBox_DDD_L");
+
+                                lb.scrollHelper.isScrolledToBottom = true;
+                                lb.scrollHelper.isScrolledToTopSpacer = false;
+                                lb.scrollHelper.IsScrolledToBottomSpacer = false;
+
+                                var curr = $("#pager-current").html();
+                                var pageSize = lb.scrollHelper.defaultItemsRange.split(':')[1];
+                                lb.scrollHelper.itemsRange = curr + ":" + ((parseInt(curr) + parseInt(pageSize))).toString();
+
+                                // unless that next page has already been loaded by direct scrolling in the box.
+                                if (TranslateHeaderContentListBox.GetItemCount() <= (parseInt(curr) + parseInt(pageSize))) {
+                                    window.WasPagerNext = true;
+                                    lb.SendCallback();
+                                }
+                            }
+                            //$('#pager-current').html(TranslateHeaderContentListBox.GetSelectedItem().index + 1);
+                            //$('#pager-total').html(TranslateHeaderContentListBox.GetItemCount().toString());
+                        }
+                    }
+                    else {
+                        TranslateHeaderContentListBox.SetSelectedIndex(0);
+                        var e = new ASPxClientProcessingModeEventArgs();
+                        TranslateHeaderContentListBox.SelectedIndexChanged.FireEvent(TranslateHeaderContentListBox, e);
+                    }
+                }
+            }
+        }
+        function PagerPrevious() {
+            if (window.DefaultUnsaved) {
+                alert("You have unsaved changes in the Default Language section. Please save or clear the changes before proceeding.");
+                return false;
+            }
+            if (window.TranslationUnsaved) {
+                alert("You have unsaved changes in the Translation section. Please save or clear the changes before proceeding.");
+                return false;
+            }
+            if (typeof (TranslateHeaderContentListBox) != "undefined" && typeof (TranslateHeaderContentListBox) != false) {
+                if (TranslateHeaderContentListBox.GetItemCount() > 0) {
+                    if(TranslateHeaderContentListBox.GetSelectedItem() != null) {
+                        if (TranslateHeaderContentListBox.GetSelectedItem().index != 0) {
+                            TranslateHeaderContentListBox.SetSelectedIndex(TranslateHeaderContentListBox.GetSelectedItem().index - 1);
+                            var e = new ASPxClientProcessingModeEventArgs();
+                            TranslateHeaderContentListBox.SelectedIndexChanged.FireEvent(TranslateHeaderContentListBox, e);
+
+                            if ((parseInt($("#pager-current").html()) % 10) == 0) {
+
+                                $('#pager-current').html(TranslateHeaderContentListBox.GetSelectedItem().index + 1);
+
+                                var lb = aspxGetControlCollection().Get("TranslateHeaderContentListBox_DDD_L");
+
+                                lb.scrollHelper.isScrolledToBottom = true;
+                                lb.scrollHelper.isScrolledToTopSpacer = false;
+                                lb.scrollHelper.IsScrolledToBottomSpacer = false;
+
+                                var curr = $("#pager-current").html();
+                                var pageSize = lb.scrollHelper.defaultItemsRange.split(':')[1];
+                                lb.scrollHelper.itemsRange = curr + ":" + ((parseInt(curr) + parseInt(pageSize))).toString();
+
+                                // unless that next page has already been loaded by direct scrolling in the box.
+                                if (TranslateHeaderContentListBox.GetItemCount() < (parseInt(curr) + parseInt(pageSize))) {
+                                    lb.SendCallback();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function UnlockDefault() {
+            var c = window.confirm("Are you sure? (MUST ENFORCE USER ROLES HERE! - Ajax up to Server quickly, ask if user is auth'd to perform action, respond appropriately.)");
+            if (c) {
+                $("#unlock-default").animate({ opacity: '0.0' }, 300, 'linear', function () {
+                    $(this).attr('src', '/images/systemicons/unlock-icon.png').bind('onreadystatechange load', function () {
+                        $("#unlock-default").animate({ opacity: '1.0' }, 300, 'linear', function () { });
+
+                        Heading.SetEnabled(true);
+                        SubHeading.SetEnabled(true);
+                        HTMLEditor.SetEnabled(true);
+                        TitleTag.SetEnabled(true);
+                        URLKeywords.SetEnabled(true);
+                        MetaDescription.SetEnabled(true);
+
+                        $(this).unbind('onreadystatechange load');
+                    });
+                });
+                $("#save-button").fadeIn("fast");
+                $("#reload-button").fadeIn("fast");
+            }
+        }
+    </script>
+}
+
+<h4 class="page-heading">
+    Translate Collection
+    @Html.Action("TranslateCollectionTargetLanguageDropDown", "Translations")
+</h4>
+
+
+<div id="collection-translate-grid-container" style="display: none; margin-bottom: 2em;">
+    @Html.Partial("_TranslateCollectionGridView")
+</div>
+
+<input type="hidden" id="product-page-hidden" />
+
+
+<div id="translate-middle-container" style="display: none;">
+
+</div>
+
+<div id="pager-container" class="content-panel-container" style="display: none;">
+    <img id="pager-prev" src="~/images/icons/32/arrow-left.png" onclick="PagerPrevious();" /><span id="pager-current">-</span> / <span id="pager-total">-</span><img id="pager-next" src="~/images/icons/32/arrow-right.png" onclick="PagerNext();" />
+</div>
+
+@Html.DevExpress().LoadingPanel(settings =>
+{
+    settings.Name = "LoadingPanel";
+    settings.Modal = true;
+}).GetHtml()
+
+

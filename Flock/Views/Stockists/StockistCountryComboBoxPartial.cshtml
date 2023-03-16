@@ -1,0 +1,26 @@
+﻿@using Flock.ViewModels
+@Html.DevExpress().ComboBox(settings => {
+    settings.Name = "StockistCountryComboBox";
+    settings.Properties.ValueField = "CountryCode";
+    settings.Properties.ValueType = typeof(string);
+    settings.Properties.TextField = "CountryName";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+        LoadingPanel.Show();
+        $.ajax({
+            url: '"+@Url.Action("StockistGridViewPartial", "Stockists")+@"',
+            type: 'GET',
+            traditional: true,
+            data: {
+                CountryCode: s.GetSelectedItem().value
+            },
+            success: function(data) {
+                $('#stockist-grid-container').html(data);
+                LoadingPanel.Hide();
+            },
+            timeout: 20000
+        });
+    }";
+}).BindList(
+args => { return LargeDatabaseDataProvider.GetStockistCountries(args); }, 
+args => { return LargeDatabaseDataProvider.GetStockistCountryByID(args); 
+}).GetHtml()

@@ -1,0 +1,209 @@
+﻿@using Flock.ViewModels
+@model ModularProduct_ModuleOptionViewModel
+
+@* Need to display Selected Options | Available Options *@
+
+@* (Both grouped as appropriate by Module and then by ModuleOptionGroup) *@
+
+<input type="hidden" id="modular-product-id" value="@(Model.ModularProductID)"/>
+
+<p style="font-style: italic; margin: 1em 0">Right, drag and drop... and removal from selected.</p>
+
+<div class="modules-wrapper-container">
+    <div id="selected-module-options-container" class="modules-wrapper">
+        @Html.Partial("_SelectedModuleOptionsPartial", Model)
+    </div>
+
+    <div id="available-module-options-container" class="modules-wrapper">
+        <h3>Available</h3>
+        @{
+            var availableModules = Model.AvailableOptions.GroupBy(p => p.Module);
+            foreach (var m in availableModules)
+            {
+                <div data-module-id="@(m.Key.ModuleID)" class="module">
+                    <h4 class="module-name">@(m.Key.Name)</h4>
+                    @{
+                        var g = m.GroupBy(p => p.ModuleOptionGroup);
+
+                        foreach (var group in g)
+                        {
+                            if (group.Key != null)
+                            {
+                                <div data-module-option-group-id="@(group.Key.ModuleOptionGroupID)" class="module-option-group">
+                                    <h5 class="module-option-group-name">@(group.Key.Name)</h5>
+                                    <ul class="module-options module-list">
+                                        @foreach (var opt in group)
+                                        {
+                                            <li data-module-option-id="@(opt.ModuleOptionID)">@(opt.Name)</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            else
+                            {
+                                <ul class="module-options module-list">
+                                    @foreach (var opt in group)
+                                    {
+                                        <li data-module-option-id="@(opt.ModuleOptionID)">@(opt.Name)</li>
+                                    }
+                                </ul>
+                            }
+                        }
+                    }
+                </div>
+            }
+        }
+        <div style="clear: both;"></div>
+    </div>
+
+    <div style="clear: both;"></div>
+</div>
+
+<script type="text/javascript">
+
+    $(".module").draggable({
+        revert: "invalid",
+        helper: "clone"
+    });
+
+    $("#available-module-options-container div.module-option-group").draggable({
+        revert: "invalid",
+        helper: "clone"
+    });
+
+    $("#available-module-options-container ul li").draggable({
+        revert: "invalid",
+        helper: "clone"
+    });
+
+    $("#selected-module-options-container").droppable({
+        hoverClass: "drop-hover",
+        tolerance: "pointer",
+        over: function (event, ui) {
+            console.log('hovering');
+        },
+        drop: function (event, ui) {
+            if (ui.helper.attr("data-module-option-id")) {
+                addModuleOption(ui.helper.data("module-option-id"));
+            } else if (ui.helper.attr("data-module-option-group-id")) {
+                addModuleOptionGroup(ui.helper.data("module-option-group-id"));
+            } else if (ui.helper.attr("data-module-id")) {
+                addModule(ui.helper.data("module-id"))
+            }
+        }
+    });
+
+    function addModule(moduleID) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("addModulesOptionsToModularProduct", "ModularProducts")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ModularProductID: $("#modular-product-id").val(),
+                ModuleID: moduleID
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#selected-module-options-container").html(data);
+            },
+            timeout: 30000
+        });
+    }
+
+    function addModuleOptionGroup(moduleOptionGroupID) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("addModuleOptionGroupOptionsToModularProduct", "ModularProducts")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ModularProductID: $("#modular-product-id").val(),
+                ModuleOptionGroupID: moduleOptionGroupID
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#selected-module-options-container").html(data);
+            },
+            timeout: 30000
+        });
+    }
+
+    function addModuleOption(moduleOptionID) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("addModuleOptionToModularProduct", "ModularProducts")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ModularProductID: $("#modular-product-id").val(),
+                ModuleOptionID: moduleOptionID
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#selected-module-options-container").html(data);
+            },
+            timeout: 30000
+        });
+    }
+
+    function removeModule(moduleID) {
+        $.confirm(function () {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("removeModulesOptionsFromModularProduct", "ModularProducts")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ModularProductID: $("#modular-product-id").val(),
+                    ModuleID: moduleID
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#selected-module-options-container").html(data);
+                },
+                timeout: 30000
+            });
+        }, function () { });
+    }
+
+    function removeModuleOptionGroup(moduleOptionGroupID) {
+        $.confirm(function () {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("removeModuleOptionGroupOptionsFromModularProduct", "ModularProducts")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ModularProductID: $("#modular-product-id").val(),
+                    ModuleOptionGroupID: moduleOptionGroupID
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#selected-module-options-container").html(data);
+                },
+                timeout: 30000
+            });
+        }, function () { });
+    }
+
+    function removeModuleOption(moduleOptionID) {
+        $.confirm(function () {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("removeModuleOptionFromModularProduct", "ModularProducts")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ModularProductID: $("#modular-product-id").val(),
+                    ModuleOptionID: moduleOptionID
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#selected-module-options-container").html(data);
+                },
+                timeout: 30000
+            });
+        }, function () { });
+    }
+</script>

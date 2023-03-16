@@ -1,0 +1,358 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "ImageInfoGridView";
+        settings.CallbackRouteValues = new { Controller = "Assets", Action = "ImageInfoGridView" };
+        settings.SettingsEditing.BatchUpdateRouteValues = new { Controller = "Assets", Action = "ImageInfoGridViewBatchUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Assets", Action = "ImageInfoGridViewDelete" };
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.Settings.VerticalScrollableHeight = 400;
+        settings.SettingsPager.PageSize = 8;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        
+        //settings.SettingsBehavior.AllowFocusedRow = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+
+        settings.Styles.Row.Cursor = "pointer";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.KeyFieldName = "ImageID";
+
+        settings.ClientSideEvents.Init = @"function(s, e) {
+            s.SetFocusedRowIndex(-1);
+        }";
+
+        if (ViewData["DeleteError"] != null)
+        {
+            settings.SettingsText.Title = ViewData["DeleteError"].ToString();
+            settings.Styles.TitlePanel.ForeColor = System.Drawing.Color.Red;
+        }
+
+        settings.ClientSideEvents.CallbackError = @"function(s, e) {
+            e.responseText = e.message;
+            $.showError(e, 'Failure', 'Delete Disallowed');
+            e.cancel = true;
+            e.handled = true;
+        }";
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowClearFilterButton = false;
+
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Unbound";
+            column.FieldName = "Unbound";
+            column.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+            column.Caption = "&nbsp;";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+            column.HeaderStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+            column.SetFilterTemplateContent(d =>
+            {
+                ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' style='margin: 0px auto; text-align: center; display: block; width: 100%;' onclick=\"ImageInfoGridView.ClearFilter();\">Clear</a>");
+            });
+            column.SetDataItemTemplateContent(d =>
+            {
+                ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' style='margin: 0px 3px 0px 0px; width: 33px;' onclick=\"rowClick(ImageInfoGridView.GetRowKey(" + d.VisibleIndex + "))\">Select</a>");    
+            
+                ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' style='margin: 0px 3px 0px 0px; width: 33px;' onclick=\"var args = new Array(); args.push("+d.VisibleIndex+"); args.push(event); $.confirm(ConfirmedDelete, function() { }, args);\">Delete</a>");
+            });
+        });
+        
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+//        settings.ClientSideEvents.RowClick = @"
+//        function(s, e) {
+//            if(!$(e.htmlEvent.target).hasClass('dxgvBatchEditCell_MetropolisBlue')) {
+//                var id = s.GetRowKey(e.visibleIndex);
+//                
+//            }
+//        }";
+
+        var UoW = new UnitOfWork<FlockDataContext>();
+
+        MVCxGridViewColumn ImageIDColumn = new MVCxGridViewColumn();
+        ImageIDColumn.Name = "ImageID";
+        ImageIDColumn.FieldName = "ImageID";
+        ImageIDColumn.Caption = "Image ID";
+        ImageIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ImageIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        ImageIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(ImageIDColumn);
+        
+        MVCxGridViewColumn IntranetImageIDColumn = new MVCxGridViewColumn();
+        IntranetImageIDColumn.Name = "IntranetImageID";
+        IntranetImageIDColumn.FieldName = "IntranetImageID";
+        IntranetImageIDColumn.Caption = "Intranet Image ID";
+        IntranetImageIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        IntranetImageIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(IntranetImageIDColumn);
+
+        MVCxGridViewColumn ThumbnailColumn = new MVCxGridViewColumn();
+        ThumbnailColumn.Name = "ThumbnailColumn";
+        ThumbnailColumn.FieldName = "ThumbnailColumn";
+        ThumbnailColumn.Caption = "Thumbnail";
+        ThumbnailColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ThumbnailColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        ThumbnailColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        ThumbnailColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        ThumbnailColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+        ThumbnailColumn.SetDataItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "ImageID") != null)
+            {
+                ViewContext.Writer.Write("<img style='width: 52px;' src='https://flock.designersguild.com/imagelibrary/156/" + DataBinder.Eval(c.DataItem, "ImageID") + ".jpeg' />");
+            }
+        });
+        settings.Columns.Add(ThumbnailColumn);
+
+
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Image Name";
+        NameColumn.Width = 230;
+        NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        NameColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(NameColumn);
+
+        MVCxGridViewColumn TitleTextColumn = new MVCxGridViewColumn();
+        TitleTextColumn.Name = "TitleText";
+        TitleTextColumn.FieldName = "TitleText";
+        TitleTextColumn.Caption = "Title Text";
+        TitleTextColumn.Width = 230;
+        TitleTextColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        TitleTextColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        settings.Columns.Add(TitleTextColumn);
+
+        MVCxGridViewColumn AltTextColumn = new MVCxGridViewColumn();
+        AltTextColumn.Name = "AltText";
+        AltTextColumn.FieldName = "AltText";
+        AltTextColumn.Caption = "Alt Text";
+        AltTextColumn.Width = 230;
+        AltTextColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        AltTextColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        settings.Columns.Add(AltTextColumn);
+
+        MVCxGridViewColumn ImageTypeColumn = new MVCxGridViewColumn();
+        ImageTypeColumn.Name = "ImageTypeID";
+        ImageTypeColumn.FieldName = "ImageTypeID";
+        ImageTypeColumn.Caption = "Image Type";
+        ImageTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        ImageTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        ImageTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ImageTypeColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        ImageTypeColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        ImageTypeColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        ImageTypeColumn.Width = 60;
+        ImageTypeColumn.SetDataItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "ImageTypeID") != null)
+            {
+                var it = (byte)DataBinder.Eval(c.DataItem, "ImageTypeID");
+                var imgtype = UoW.GetRepository<ImageType>().GetAll().Where(p => p.ImageTypeID == it).Select(p => p.Name).Single();
+                ViewContext.Writer.Write(imgtype);
+            }
+        });
+        settings.Columns.Add(ImageTypeColumn);
+
+        MVCxGridViewColumn PerspectiveColumn = new MVCxGridViewColumn();
+        PerspectiveColumn.Name = "PerspectiveID";
+        PerspectiveColumn.FieldName = "PerspectiveID";
+        PerspectiveColumn.Caption = "Perspective";
+        PerspectiveColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        PerspectiveColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        PerspectiveColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        PerspectiveColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        PerspectiveColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        PerspectiveColumn.SetDataItemTemplateContent(c =>
+        {
+            var pid = (byte?)DataBinder.Eval(c.DataItem, "PerspectiveID");
+            if (pid != null && pid != 0)
+            {
+                var persp = UoW.GetRepository<Perspective>().GetAll().Where(p => p.PerspectiveID == pid).Select(p => p.Name).Single();
+                ViewContext.Writer.Write(persp);
+            }
+        });
+        settings.Columns.Add(PerspectiveColumn);
+
+        MVCxGridViewColumn AspectRatioColumn = new MVCxGridViewColumn();
+        AspectRatioColumn.Name = "AspectRatioID";
+        AspectRatioColumn.FieldName = "AspectRatioID";
+        AspectRatioColumn.Caption = "Aspect Ratio";
+        AspectRatioColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        AspectRatioColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        AspectRatioColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        AspectRatioColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        AspectRatioColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        AspectRatioColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        AspectRatioColumn.Width = 60;
+        AspectRatioColumn.SetDataItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "AspectRatioID") != null)
+            {
+                var arid = (byte)DataBinder.Eval(c.DataItem, "AspectRatioID");
+                var aspect = UoW.GetRepository<AspectRatio>().GetAll().Where(p => p.AspectRatioID == arid).Select(p => p.Name).Single();
+                ViewContext.Writer.Write(aspect);
+            }
+        });
+        settings.Columns.Add(AspectRatioColumn);
+
+        MVCxGridViewColumn WidthColumn = new MVCxGridViewColumn();
+        WidthColumn.Name = "Width";
+        WidthColumn.FieldName = "Width";
+        WidthColumn.Caption = "Width";
+        WidthColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        WidthColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        WidthColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(WidthColumn);
+
+        MVCxGridViewColumn HeightColumn = new MVCxGridViewColumn();
+        HeightColumn.Name = "Height";
+        HeightColumn.FieldName = "Height";
+        HeightColumn.Caption = "Height";
+        HeightColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        HeightColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        HeightColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(HeightColumn);
+
+//        MVCxGridViewColumn StarsColumn = new MVCxGridViewColumn();
+//        StarsColumn.Name = "Stars";
+//        StarsColumn.Caption = "Rating";
+//        StarsColumn.FieldName = "StarRating";
+//        StarsColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+//        StarsColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+//        StarsColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+//        StarsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+//        StarsColumn.SetDataItemTemplateContent(c =>
+//        {
+
+//            decimal avg = 0.0M;
+//            decimal pixelShift = 0;
+
+//            if (DataBinder.Eval(c.DataItem, "StarRating") != null)
+//                avg = Convert.ToDecimal(DataBinder.Eval(c.DataItem, "StarRating"));
+//            //that ^ is out of 4, need out of 110
+//            pixelShift = (avg * 110) / 5;
+//            //pixelShift = avg * 2;
+//            avg = (avg * 100) / 5; // to percentage
+//            avg /= 20;
+//            var niceAvg = Math.Round(avg * 100) / 100;
+
+//            ViewContext.Writer.Write(@"
+//                <div class='starRatingMaskWrapper'>
+//                    <div class='fiveStarRating'>
+//                        <div class='whiteOut' style='background-position: " + pixelShift + @"px 0px'>
+//                            <div class='starRatingMask'/> </div>
+//                        </div>
+//                    </div>
+//                </div>");
+//        });
+//        settings.Columns.Add(StarsColumn);
+
+        MVCxGridViewColumn HotspotColumn = new MVCxGridViewColumn();
+        HotspotColumn.Name = "HotspotCount";
+        HotspotColumn.FieldName = "HotspotCount";
+        HotspotColumn.Caption = "Hotspot Count";
+        HotspotColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        HotspotColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        HotspotColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        HotspotColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        HotspotColumn.Width = 60;
+        settings.Columns.Add(HotspotColumn);
+
+        MVCxGridViewColumn CreatedDT = new MVCxGridViewColumn();
+        CreatedDT.Name = "CreatedDT";
+        CreatedDT.FieldName = "CreatedDT";
+        CreatedDT.Caption = "Date Created";
+        CreatedDT.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CreatedDT.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CreatedDT.EditFormSettings.Visible = DefaultBoolean.False;
+        CreatedDT.HeaderStyle.Wrap = DefaultBoolean.True;
+        CreatedDT.Width = 60;
+        settings.Columns.Add(CreatedDT);
+
+        MVCxGridViewColumn ImportedDT = new MVCxGridViewColumn();
+        ImportedDT.Name = "MergedDT";
+        ImportedDT.FieldName = "MergedDT";
+        ImportedDT.Caption = "Date Imported";
+        ImportedDT.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ImportedDT.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        ImportedDT.EditFormSettings.Visible = DefaultBoolean.False;
+        ImportedDT.HeaderStyle.Wrap = DefaultBoolean.True;
+        ImportedDT.Width = 60;
+        settings.Columns.Add(ImportedDT);
+
+        MVCxGridViewColumn DeleteRecommended = new MVCxGridViewColumn();
+        DeleteRecommended.Name = "DeletedRecommended";
+        DeleteRecommended.FieldName = "DeleteRecommended";
+        DeleteRecommended.Caption = "Delete Recommended";
+        DeleteRecommended.HeaderStyle.Wrap = DefaultBoolean.True;
+        DeleteRecommended.Settings.AllowAutoFilter = DefaultBoolean.False;
+        DeleteRecommended.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        DeleteRecommended.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        DeleteRecommended.EditFormSettings.Visible = DefaultBoolean.False;
+        DeleteRecommended.SetDataItemTemplateContent(c =>
+        {
+            var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "DeleteRecommended"));
+            if (i == 0)
+                ViewContext.Writer.Write("No");
+            else if (i == 1)
+                ViewContext.Writer.Write("Yes");
+        });
+        settings.Columns.Add(DeleteRecommended);
+
+        settings.HeaderFilterFillItems = (s, e) =>
+        {
+            switch (e.Column.Name)
+            {
+                case "AspectRatioID":
+                    e.Values.Clear();
+                    foreach (var i in UoW.GetRepository<AspectRatio>().GetAll())
+                        e.AddValue(i.Name, i.AspectRatioID.ToString());
+                    e.AddShowAll();
+                    break;
+                case "PerspectiveID":
+                    e.Values.Clear();
+                    foreach (var i in UoW.GetRepository<Perspective>().GetAll())
+                        e.AddValue(i.Name, i.PerspectiveID.ToString());
+                    e.AddShowAll();
+                    break;
+                case "ImageTypeID":
+                    e.Values.Clear();
+                    foreach (var i in UoW.GetRepository<ImageType>().GetAll())
+                        e.AddValue(i.Name, i.ImageTypeID.ToString());
+                    e.AddShowAll();
+                    break;
+                case "DeletedRecommended":
+                    e.Values.Clear();
+                    e.AddValue("Yes", "true");
+                    e.AddValue("No", "false");
+                    e.AddShowAll();
+                    break;
+                default:
+                    break;
+            }
+        };
+    }).BindToLINQ("", "", (s, e) =>
+    {
+        var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+        var source = dataContext.GetRepository<Flock.Models.vwImage>().GetAll().Where(p => p.DeletedDT == null);
+
+        e.KeyExpression = "ImageID";
+        e.QueryableSource = source;
+    });
+}
+@grid.GetHtml()

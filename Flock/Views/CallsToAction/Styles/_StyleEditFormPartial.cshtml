@@ -1,0 +1,284 @@
+﻿@model Flock.ViewModels.StylesEditModel
+
+<div class="content-panel-container">
+    <fieldset>
+        <legend>
+            Edit Form: Style @(Model.StyleID)
+        </legend>
+        <div class="fieldset-inner" style="background-color: #f2f2f2;">
+            <div class="form-wrapper">
+                @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+                {
+                    settings.Name = "Name";
+                    settings.Properties.ClientInstanceName = "Name";
+                    settings.Properties.MaxLength = 100;
+                    settings.Properties.Caption = "Name";
+                    settings.Properties.CaptionCellStyle.Width = 122;
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                        InitPreview();
+                    }";
+                }).GetHtml()
+
+                @*@Html.DevExpress().ComboBox(settings =>
+                {
+                    settings.Name = "FontID";
+                    settings.Properties.EnableClientSideAPI = true;
+                    settings.ShowModelErrors = true;
+                    settings.Properties.Caption = "Font";
+                    settings.Properties.CaptionCellStyle.Width = 122;
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    settings.Properties.TextField = "Name";
+                    settings.Properties.TextFormatString = "{0}";
+                    settings.Properties.ValueField = "FontID";
+                    settings.Properties.ValueType = typeof(byte);
+                    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+                    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                        InitPreview();
+                    }";
+                }).BindList(Model.AvailableFonts).Bind(Model.FontID).GetHtml()*@
+                
+                <span class="font-size: 9px"><a href="https://developer.mozilla.org/en/docs/Web/CSS/margin" target="_blank">Margin Help</a></span>
+                @Html.DevExpress().TextBoxFor(m => Model.Margin, settings =>
+                {
+                    settings.Name = "Margin";
+                    settings.Properties.EnableClientSideAPI = true;
+                    settings.Properties.MaxLength = 100;
+                    settings.Properties.Caption = "Margin";
+                    settings.Properties.CaptionCellStyle.Width = 122;
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                        InitPreview();
+                    }";
+                }).GetHtml()
+
+                <span class="font-size: 9px"><a href="https://developer.mozilla.org/en/docs/Web/CSS/padding" target="_blank">Padding Help</a></span>
+                @Html.DevExpress().TextBoxFor(m => Model.Padding, settings =>
+                {
+                    settings.Name = "Padding";
+                    settings.Properties.EnableClientSideAPI = true;
+                    settings.Properties.MaxLength = 100;
+                    settings.Properties.Caption = "Padding";
+                    settings.Properties.CaptionCellStyle.Width = 122;
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                        InitPreview();
+                    }";
+                }).GetHtml()
+
+                <label class="colour-label">Background Colour:</label>
+                <input type="text" id="background-colour" value="@(Model.BackgroundColour)" />
+
+                <div class="clearfix"></div>
+
+                <label class="colour-label">Colour:</label>
+                <input type="text" id="colour" value="@(Model.Colour)" />
+
+                <div class="clearfix"></div>
+
+                <label class="colour-label">Border Colour:</label>
+                <input type="text" id="border-colour" value="@(Model.BorderColour)" />
+
+                <div class="clearfix"></div>
+
+                @*@Html.DevExpress().TextBoxFor(m => Model.BorderStyle, settings =>
+                {
+                    settings.Name = "BorderStyle";
+                    settings.Properties.EnableClientSideAPI = true;
+                    settings.Properties.MaxLength = 100;
+                    settings.Properties.Caption = "Border Style";
+                    settings.Properties.CaptionCellStyle.Width = 122;
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                        InitPreview();
+                    }";
+                }).GetHtml()*@
+
+                @Html.DevExpress().ComboBoxFor(m => Model.BorderStyle, settings =>
+                {
+                    settings.Name = "BorderStyle";
+                    settings.Properties.EnableClientSideAPI = true;
+                    settings.Properties.ValueType = typeof(string);
+                    settings.Properties.Items.Add("None", null);
+                    settings.Properties.Items.Add("Solid", "solid");
+                    settings.Properties.Items.Add("Dotted", "dotted");
+                    settings.Properties.Items.Add("Dashed", "dashed");
+                    settings.Properties.Caption = "Border Style";
+                    settings.Properties.CaptionCellStyle.Width = 122;
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                        InitPreview();
+                    }";
+                }).GetHtml()
+
+                @Html.DevExpress().SpinEditFor(m => Model.BorderWidth, settings =>
+                {
+                    settings.Name = "BorderWidth";
+                    settings.Properties.EnableClientSideAPI = true;
+                    settings.Properties.MinValue = 0.0M;
+                    settings.Properties.MaxValue = 5.0M;
+                    settings.Properties.Increment = 0.5M;
+                    settings.Properties.LargeIncrement = 0.5M;
+                    settings.Properties.DisplayFormatString = "N";
+                    settings.Properties.DisplayFormatInEditMode = true;
+                    settings.Properties.Caption = "Border Width";
+                    settings.Properties.CaptionCellStyle.Width = 122;
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                        InitPreview();
+                    }";
+                }).GetHtml()
+
+                @Html.DevExpress().SpinEditFor(m => Model.Opacity, settings =>
+                {
+                    settings.Name = "Opacity";
+                    settings.Properties.EnableClientSideAPI = true;
+                    settings.Properties.MinValue = 0.0M;
+                    settings.Properties.MaxValue = 1.0M;
+                    settings.Properties.Increment = 0.05M;
+                    settings.Properties.LargeIncrement = 0.05M;
+                    settings.Properties.DisplayFormatString = "N2";
+                    settings.Properties.DisplayFormatInEditMode = true;
+                    settings.Properties.Caption = "Opacity";
+                    settings.Properties.CaptionCellStyle.Width = 122;
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                        InitPreview();
+                    }";
+                    settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                        InitPreview();
+                    }";
+                }).GetHtml()
+
+            </div>
+
+            <div id="preview-container">
+                <div id="style-preview">
+                    Call to Action
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div id="button-holder">
+                <button class="btn btn-success" onclick="SaveStyle(@(Model.StyleID))">Save</button>
+                <button class="btn btn-primary" onclick="CancelStyleEdit()">Cancel</button>
+            </div>
+        </div>
+    </fieldset>
+
+
+
+</div>
+
+<script type="text/javascript">
+    $("#background-colour").spectrum({
+        preferredFormat: "rgb",
+        flat: false,
+        showInput: true,
+        allowEmpty: true,
+        showAlpha: true,
+        move: function(color) {
+            UpdatePreview(color, $("#colour").spectrum("get"), $("#border-colour").spectrum("get"));
+        },
+        change: function(color) {
+            UpdatePreview(color, $("#colour").spectrum("get"), $("#border-colour").spectrum("get"));
+        }
+    });
+
+    $("#colour").spectrum({
+        preferredFormat: "rgb",
+        flat: false,
+        showInput: true,
+        allowEmpty: true,
+        showAlpha: true,
+        move: function(color) {
+            UpdatePreview($("#background-colour").spectrum("get"), color, $("#border-colour").spectrum("get"));
+        },
+        change: function(color) {
+            UpdatePreview($("#background-colour").spectrum("get"), color, $("#border-colour").spectrum("get"));
+        }
+    });
+
+    $("#border-colour").spectrum({
+        preferredFormat: "rgb",
+        flat: false,
+        showInput: true,
+        allowEmpty: true,
+        showAlpha: true,
+        move: function(color) {
+            UpdatePreview($("#background-colour").spectrum("get"), $("#colour").spectrum("get"), color);
+        },
+        change: function(color) {
+            UpdatePreview($("#background-colour").spectrum("get"), $("#colour").spectrum("get"), color);
+        }
+    });
+
+    
+    function InitPreview() {
+
+        var bg = $("#background-colour").spectrum('get');
+        if (bg == null)
+            bg = "none";
+        else
+            bg = bg.toRgbString();
+
+        var c = $("#colour").spectrum('get');
+        if (c == null)
+            c = "black";
+        else
+            c = c.toRgbString();
+
+        var bc = $("#border-colour").spectrum('get');
+        if (bc == null) 
+            bc = "none";
+        else 
+            bc = bc.toRgbString();
+
+        $("#style-preview").css("margin", Margin.GetText())
+                           .css("padding", Padding.GetText())
+                           .css("background-color", bg)
+                           .css("color", c)
+                           .css("border-color", bc)
+                           .css("border-width", BorderWidth.GetValue())
+                           .css("border-style", BorderStyle.GetText())
+                           .css("opacity", Opacity.GetValue());
+    }
+
+    function UpdatePreview(backgroundColour, colour, borderColour) {
+
+        if (backgroundColour == null)
+            backgroundColour = "none";
+        else
+            backgroundColour = backgroundColour.toRgbString();
+
+        if (colour == null)
+            colour = "black";
+        else
+            colour = colour.toRgbString();
+
+        if (borderColour == null) 
+            borderColour = "none";
+        else 
+            borderColour = borderColour.toRgbString();
+
+
+        $("#style-preview").css("margin", Margin.GetText())
+                           .css("padding", Padding.GetText())
+                           .css("background-color", backgroundColour)
+                           .css("color", colour)
+                           .css("border-color", borderColour)
+                           .css("border-width", BorderWidth.GetValue())
+                           .css("border-style", BorderStyle.GetText())
+                           .css("opacity", Opacity.GetValue());
+    }
+</script>

@@ -1,0 +1,15 @@
+﻿@using System.Xml.Linq;
+@model string
+
+@if (Model != null)
+{
+    <pre class="prettyprint lang-xml">
+        @(Model)
+    </pre>
+}
+else
+{
+    <h6>
+        TestStockCheck Response was null.
+    </h6>
+}

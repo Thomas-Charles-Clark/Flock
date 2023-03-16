@@ -1,0 +1,640 @@
+@using Flock.ViewModels;
+@using Flock.Models;
+@model ProductOverviewSettings
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<FlockDataContext>();
+
+        settings.Name = "ProductOverviewGridView";
+        settings.CallbackRouteValues = new { Controller = "Products", Action = "ProductOverviewGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { };// Controller = "Products", Action = "ProductOverviewGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { };// Controller = "Products", Action = "ProductOverviewGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { };// Controller = "Products", Action = "ProductOverviewGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.ClientSideEvents.BeginCallback = @"function (s, e) {
+            e.customArgs['CollectionIDs'] = ProductOverviewCollectionListBox.GetSelectedValues().toString();
+            e.customArgs['PatternIDs'] = ProductOverviewPatternListBox.GetSelectedValues().toString();
+            e.customArgs['ColourIDs'] = ProductOverviewColourListBox.GetSelectedValues().toString();
+            e.customArgs['MarketIDs'] = ProductOverviewMarketListBox.GetSelectedValues().toString();
+        }";
+        settings.ClientSideEvents.CallbackError = @"function(s, e) {
+            alert(e.message);
+            e.handled = true;
+        }";
+        settings.ClientSideEvents.DetailRowExpanding = @"function(s, e) {
+                $('#selected-product-id').val(s.GetRowKey(e.visibleIndex));
+            }";
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CustomActionRouteValues = new { Controller = "Products", Action = "ProductOverviewGridViewCustomCommand" };
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            settings.CommandColumn.ShowSelectCheckbox = true;
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+        });
+
+        settings.KeyFieldName = "ProductID";
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.SettingsBehavior.AllowSelectSingleRowOnly = false;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ProductID";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Width = 80;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Enabled";
+            column.Name = "Enabled";
+            column.Caption = "Enabled";
+            column.CellStyle.CssClass = "hideable-column";
+            column.FilterCellStyle.CssClass = "hideable-column";
+            column.HeaderStyle.CssClass = "hideable-column";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                bool enabledState = (bool)DataBinder.Eval(c.DataItem, "Enabled");
+                if (enabledState)
+                    ViewContext.Writer.Write("<span style='color: green'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                else
+                    ViewContext.Writer.Write("<span style='color: red'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Status";
+            column.Name = "Status";
+            column.Caption = "Status";
+            column.CellStyle.CssClass = "hideable-column";
+            column.FilterCellStyle.CssClass = "hideable-column";
+            column.HeaderStyle.CssClass = "hideable-column";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                char enabledState = '?';
+                if (DataBinder.Eval(c.DataItem, "Status") != DBNull.Value && DataBinder.Eval(c.DataItem, "Status") != null)
+                    enabledState = (char)DataBinder.Eval(c.DataItem, "Status");
+                switch (enabledState)
+                {
+                    case 'C':
+                        ViewContext.Writer.Write("<span style='color: green'>" + enabledState + "</span>");
+                        break;
+                    case 'D':
+                        ViewContext.Writer.Write("<span style='color: red'>" + enabledState + "</span>");
+                        break;
+                    case 'L':
+                        ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+                        break;
+                    case 'Y':
+                        ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+                        break;
+                    default:
+                        ViewContext.Writer.Write("<span style='color: black'>" + enabledState + "</span>");
+                        break;
+                }
+            });
+        });
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "StatusID";
+            column.Name = "StatusID";
+            column.Caption = "Web Status";
+            column.CellStyle.CssClass = "hideable-column";
+            column.FilterCellStyle.CssClass = "hideable-column";
+            column.HeaderStyle.CssClass = "hideable-column";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Width = 50;
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+                string colour = "black";
+                string statusText = "unknown";
+                statusText = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+                switch (i)
+                {
+                    case 0:
+                        colour = "green";
+                        break;
+                    case 1:
+                        colour = "orange";
+                        break;
+                    case 2:
+                        colour = "orange";
+                        break;
+                    case 3:
+                        colour = "green";
+                        break;
+                    case 4:
+                        colour = "red";
+                        break;
+                    default: break;
+                }
+                string res = "<span style='float: left; color: " + colour + " '>" + statusText + "</span>";
+                ViewContext.Writer.Write(res);
+            });
+            //settings.Columns.Add(WebStatusColumn);
+        });
+
+        MVCxGridViewColumn ProductPageIDColumn = new MVCxGridViewColumn();
+
+        ProductPageIDColumn.FieldName = "ProductPageID";
+        ProductPageIDColumn.Name = "ProductPageID";
+        ProductPageIDColumn.Caption = "Product Page ID";
+        ProductPageIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        ProductPageIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        ProductPageIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        ProductPageIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        ProductPageIDColumn.Width = 80;
+        ProductPageIDColumn.SetDataItemTemplateContent(c =>
+        {
+            var ppid = DataBinder.Eval(c.DataItem, "ProductPageID");
+            if (ppid != null)
+                ViewContext.Writer.Write(Html.ActionLink(ppid.ToString(), "compose", "productpages", new { id = ppid }, new { }));
+        });
+        settings.Columns.Add(ProductPageIDColumn);
+
+        MVCxGridViewColumn StockStatusColumn = new MVCxGridViewColumn();
+        StockStatusColumn.FieldName = "StockStatusID";
+        StockStatusColumn.Name = "StockStatusID";
+        StockStatusColumn.Caption = "Stock";
+        StockStatusColumn.CellStyle.CssClass = "hideable-column";
+        StockStatusColumn.FilterCellStyle.CssClass = "hideable-column";
+        StockStatusColumn.HeaderStyle.CssClass = "hideable-column";
+        StockStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        StockStatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        StockStatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        StockStatusColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        StockStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            short StockStatusID = 0;
+            string StockStatus = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "StockStatusID") != DBNull.Value && DataBinder.Eval(c.DataItem, "StockStatusID") != null)
+            {
+                StockStatusID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "StockStatusID"));
+                StockStatus = UoW.GetRepository<Flock.Models.StockStatus>().GetAll().Where(p => p.StockStatusID == StockStatusID).Select(p => p.StockStatus1).Single();
+            }
+
+            switch (StockStatusID)
+            {
+                case 1:
+                    ViewContext.Writer.Write("<span style='color: green'>" + StockStatus + "</span>");
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    ViewContext.Writer.Write("<span style='color: orange'>" + StockStatus + "</span>");
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    ViewContext.Writer.Write("<span style='color: red'>" + StockStatus + "</span>");
+                    break;
+
+                default:
+                    ViewContext.Writer.Write("<span style='color: black'>" + StockStatus + "</span>");
+                    break;
+            }
+        });
+        settings.Columns.Add(StockStatusColumn);
+
+        MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+        ProductTypeColumn.FieldName = "ProductTypeID";
+        ProductTypeColumn.Name = "ProductTypeID";
+        ProductTypeColumn.Caption = "Product Type";
+        ProductTypeColumn.CellStyle.CssClass = "hideable-column";
+        ProductTypeColumn.FilterCellStyle.CssClass = "hideable-column";
+        ProductTypeColumn.HeaderStyle.CssClass = "hideable-column";
+        ProductTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ProductTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        ProductTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        ProductTypeColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        ProductTypeColumn.SetDataItemTemplateContent(c =>
+        {
+            int ProductTypeID = 0;
+            string ProductType = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "ProductTypeID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ProductTypeID") != null)
+            {
+                ProductTypeID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "ProductTypeID"));
+                ProductType = UoW.GetRepository<Flock.Models.ProductType>().GetAll().Where(p => p.ProductTypeID == ProductTypeID).Select(p => p.Name).Single();
+            }
+
+            ViewContext.Writer.Write("<span style='color: black'>" + ProductType + "</span>");
+        });
+        settings.Columns.Add(ProductTypeColumn);
+
+        MVCxGridViewColumn PatternColumn = new MVCxGridViewColumn();
+        PatternColumn.Name = "Patterns";
+        PatternColumn.Caption = "Pattern(s)";
+        PatternColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        PatternColumn.FieldName = "Patterns";
+        PatternColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        PatternColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(PatternColumn);
+
+        MVCxGridViewColumn ColourColumn = new MVCxGridViewColumn();
+        ColourColumn.Name = "Colour";
+        ColourColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        ColourColumn.Caption = "Colour(s)";
+        ColourColumn.FieldName = "Colours";
+        ColourColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ColourColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(ColourColumn);
+
+        MVCxGridViewColumn CollectionColumn = new MVCxGridViewColumn();
+        CollectionColumn.Name = "Collection";
+        CollectionColumn.FieldName = "Collections";
+        CollectionColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        CollectionColumn.Caption = "Collection(s)";
+        CollectionColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        CollectionColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(CollectionColumn);
+
+        settings.CustomUnboundColumnData = (s, e) =>
+        {
+            var gridView = s as MVCxGridView;
+            var row = gridView.GetRow(e.ListSourceRowIndex) as vwProductOverview;
+            var value = new System.Text.StringBuilder();
+
+            if (e.Column.FieldName == "Colours")
+            {
+                var ColourIDs = UoW.GetRepository<Product_Colour>().GetAll().Where(p => p.ProductID == row.ProductID).Select(p => p.ColourID).ToList();
+                if (ColourIDs.Count > 0)
+                {
+                    var Colours = UoW.GetRepository<Colour>().GetAll().Where(p => ColourIDs.Contains(p.ColourID)).Select(p => p.Name).ToList();
+                    for (var i = 0; i < Colours.Count; i++)
+                    {
+                        value.Append(Colours[i]);
+                        if (i < Colours.Count - 1)
+                            value.AppendLine();
+                    }
+                }
+            }
+            else if (e.Column.FieldName == "Patterns")
+            {
+                var PatternIDs = UoW.GetRepository<Product_Pattern>().GetAll().Where(p => p.ProductID == row.ProductID).Select(p => p.PatternID).ToList();
+                if (PatternIDs.Count > 0)
+                {
+                    var Patterns = UoW.GetRepository<Pattern>().GetAll().Where(p => PatternIDs.Contains(p.PatternID)).Select(p => p.Name).ToList();
+                    for (var i = 0; i < Patterns.Count; i++)
+                    {
+                        value.Append(Patterns[i]);
+                        if (i < Patterns.Count - 1)
+                            value.AppendLine();
+                    }
+                }
+            }
+            else if (e.Column.FieldName == "Collections")
+            {
+                var CollectionIDs = UoW.GetRepository<Product_Collection>().GetAll().Where(p => p.ProductID == row.ProductID).Select(p => p.CollectionID).ToList();
+                if (CollectionIDs.Count > 0)
+                {
+                    var Collections = UoW.GetRepository<Flock.Models.Collection>().GetAll().Where(p => CollectionIDs.Contains(p.CollectionID)).Select(p => p.Name).ToList();
+                    for (var i = 0; i < Collections.Count; i++)
+                    {
+                        value.Append(Collections[i]);
+                        if (i < Collections.Count - 1)
+                            value.AppendLine();
+                    }
+                }
+            }
+            e.Value = value.ToString();
+        };
+
+        //ProductTypeColumn
+        MVCxGridViewColumn BrandColumn = new MVCxGridViewColumn();
+        BrandColumn.FieldName = "BrandID";
+        BrandColumn.Name = "BrandID";
+        BrandColumn.Caption = "Brand";
+        BrandColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        BrandColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        BrandColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        BrandColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        BrandColumn.SetDataItemTemplateContent(c =>
+        {
+            int BrandID = 0;
+            string Brand = "<i>Not Set</i>";
+
+            if (DataBinder.Eval(c.DataItem, "BrandID") != DBNull.Value && DataBinder.Eval(c.DataItem, "BrandID") != null)
+            {
+                BrandID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "BrandID"));
+                Brand = UoW.GetRepository<Flock.Models.Brand>().GetAll().Where(p => p.BrandID == BrandID).Select(p => p.Name).Single();
+            }
+
+            ViewContext.Writer.Write("<span style='color: black'>" + Brand + "</span>");
+        });
+        settings.Columns.Add(BrandColumn);
+
+        MVCxGridViewColumn LaunchColumn = new MVCxGridViewColumn();
+        LaunchColumn.FieldName = "LaunchID";
+        LaunchColumn.Name = "LaunchID";
+        LaunchColumn.Caption = "Launch";
+        LaunchColumn.Width = 100;
+        LaunchColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        LaunchColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        LaunchColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        LaunchColumn.SetDataItemTemplateContent(c => { 
+            ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Launch").ToString());
+        });
+        settings.Columns.Add(LaunchColumn);
+        
+        
+        MVCxGridViewColumn DesignColumn = new MVCxGridViewColumn();
+        DesignColumn.FieldName = "Design";
+        DesignColumn.Name = "Design";
+        DesignColumn.Caption = "Design";
+        settings.Columns.Add(DesignColumn);
+
+        MVCxGridViewColumn frontColumn = new MVCxGridViewColumn();
+        frontColumn.FieldName = "Front";
+        frontColumn.Name = "Default";
+        frontColumn.Caption = "Default Image";
+        frontColumn.Width = (System.Web.UI.WebControls.Unit)40;
+        frontColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        frontColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        frontColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        frontColumn.SetDataItemTemplateContent(c =>
+        {
+            var ImageID = DataBinder.Eval(c.DataItem, "Front");
+
+            var Image = ImageID != null && ImageID != DBNull.Value ? "<img class='image-column-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/90/" + ImageID + ".jpeg'/>" : null;
+            if (ImageID != null)
+                ViewContext.Writer.Write(Image);
+            else
+                ViewContext.Writer.Write("<img style='height: 90px; width: 90px;' src='/Images/Admin/image-not-set.png' />");
+        });
+        settings.Columns.Add(frontColumn);
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Code";
+            column.Name = "Code";
+            column.Caption = "Code";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Width = 100;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Description";
+            column.Name = "Description";
+            column.Caption = "Name";
+            column.Width = 260;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "MarketRestrictionCode";
+            column.Name = "MarketRestrictionCode";
+            column.Caption = "Market Restriction Code";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            //column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Width = 100;
+        });
+        
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "PriceListRestrictions";
+            column.Name = "PriceListRestrictions";
+            column.Caption = "Sell To";
+            column.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Width = 160;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var PriceList = UoW.GetRepository<Price>().GetAll().Where(p => p.ProductID == (int)DataBinder.Eval(c.DataItem, "ProductID")).OrderBy(p => p.PriceListID).ToList();
+                foreach (Price price in PriceList)
+                {
+                    var pl = UoW.GetRepository<PriceList>().GetAll().Where(p => p.PriceListID == price.PriceListID).Single();
+                    
+                    ViewContext.Writer.Write("<img src='/images/icons/32/pricelists/" + price.PriceListID.ToString() + ".png' title='" + pl.Name + "' style='float: left; margin-right: 4px; width: 24px;' />");
+                }
+            });
+        });
+        
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "Default":
+                    e.Values.Clear();
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(frontColumn, "No Image"));
+                    e.Values.Add(FilterValue.CreateShowNonBlanksValue(frontColumn, "Has Image"));
+                    e.AddShowAll();
+                    break;
+
+                case "ProductPageID":
+                    e.Values.Clear();
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(ProductPageIDColumn, "Unassigned"));
+                    e.Values.Add(FilterValue.CreateShowNonBlanksValue(ProductPageIDColumn, "Assigned"));
+                    e.AddShowAll();
+                    break;
+
+                case "LaunchID":
+                    e.Values.Clear();
+                    foreach(var l in UoW.GetRepository<Launch>().GetAll().OrderByDescending(p => p.LaunchID))
+                    {
+                        e.AddValue(l.Name, l.LaunchID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                    
+                case "Stock":
+                    e.Values.Clear();
+                    e.AddValue("In Stock", "In Stock");
+                    e.AddValue("Out of Stock", "Out of Stock");
+                    e.AddValue("Due in 3-4 Weeks", "Due in 3-4 Weeks");
+                    e.AddShowAll();
+                    break;
+
+                case "Enabled":
+                    e.AddShowAll();
+                    break;
+
+                case "Pattern":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Pattern>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.Name);
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "Colour":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Colour>().GetAll().OrderBy(p => p.Name).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.Name);
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "Collection":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Collection>().GetAll().OrderBy(p => p.Name).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.Name);
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "StatusID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "StockStatusID":
+                    e.Values.Clear();
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(StockStatusColumn, "Unknown"));
+                    foreach (var pt in UoW.GetRepository<Flock.Models.StockStatus>().GetAll().OrderBy(p => p.StockStatusID))
+                    {
+                        e.AddValue(pt.StockStatus1, pt.StockStatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "ProductTypeID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.ProductType>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.ProductTypeID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "BrandID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Brand>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.BrandID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "MarketRestrictionCode":
+                    e.Values.Clear();
+                    foreach (var mrc in UoW.GetRepository<Mertex_MarketRestriction>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(mrc.Name, mrc.Code);
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+
+            }
+        };
+
+        settings.ClientSideEvents.DetailRowExpanding = @"function(s, e) {
+            window.DetailRowProductID = s.GetRowKey(e.visibleIndex);
+        }";
+
+        settings.Settings.ShowHeaderFilterButton = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(Html.Action("ProductOverviewGridDetailPartial", "Products", new { ProductID = c.KeyValue }));
+        });
+
+        settings.Style.Add("float", "left");
+
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ(string.Empty, string.Empty, (s, e) => {
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    var source = dataContext.GetRepository<Flock.Models.vwProductOverview>().GetAll();
+    
+    
+    
+    
+    var x = new List<int>(); // Collection Linker
+    
+    var y = new List<int>(); // Colour Linker
+
+    var z = new List<int>(); // Pattern Linker
+
+    var w = new List<int>(); // Price Linker
+    
+    if (Model.CollectionIDs != null)
+    {
+        foreach (short i in Model.CollectionIDs)
+        {
+            x = x.Concat(dataContext.GetRepository<Product_Collection>().GetAll().Where(p => i == p.CollectionID).Select(p => p.ProductID)).ToList();
+        }
+        source = source.InRange(a => a.ProductID, 2000, x).AsQueryable();
+    }
+    
+    if (Model.ColourIDs != null)
+    {
+        foreach (byte i in Model.ColourIDs)
+        {
+            y = y.Concat(dataContext.GetRepository<Product_Colour>().GetAll().Where(p => i == p.ColourID).Select(p => p.ProductID)).ToList();
+        }
+        source = source.InRange(a => a.ProductID, 2000, y).AsQueryable();
+    }
+    
+    if (Model.PatternIDs != null)
+    {
+        foreach (byte i in Model.PatternIDs)
+        {
+            z = z.Concat(dataContext.GetRepository<Product_Pattern>().GetAll().Where(p => i == p.PatternID).Select(p => p.ProductID)).ToList();
+        }
+        source = source.InRange(a => a.ProductID, 2000, z).AsQueryable();
+    }
+    
+    if (Model.MarketIDs != null)
+    {
+        foreach (byte i in Model.MarketIDs)
+        {
+            w = w.Concat(dataContext.GetRepository<Price>().GetAll().Where(p => i == p.PriceListID).Select(p => p.ProductID)).ToList();
+        }
+        source = source.InRange(a => a.ProductID, 2000, w).AsQueryable();
+    }
+
+    e.KeyExpression = "ProductID";
+    e.QueryableSource = source;
+}).GetHtml()

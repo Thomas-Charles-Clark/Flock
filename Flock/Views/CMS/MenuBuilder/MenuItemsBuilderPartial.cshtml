@@ -1,0 +1,10 @@
+﻿@model List<Flock.Models.MenuItem>
+@{
+    for (var i = 1; i <= 6; i++)
+    {
+        <div class="menu-column" @*style="@(i == 0 ? "" : "margin-left: 6px;")"*@>
+            @Html.Action("MenuItemsColumnGridViewPartial", new { MenuID = ViewBag.MenuID, Column = i })
+        </div>
+    }
+    <div style="clear: both;"></div>
+}

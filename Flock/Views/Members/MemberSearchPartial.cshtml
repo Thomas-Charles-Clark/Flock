@@ -1,0 +1,204 @@
+﻿@using Flock.Models
+@model List<Member_SearchResult>
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<FlockDataContext>();
+
+        settings.Name = "MemberSearchResultsGrid";
+        settings.CallbackRouteValues = new { Controller = "Members", Action = "MemberSearchPartial" };
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            e.customArgs['SearchString'] = '"+ViewData["SearchString"]+@"';
+        }";
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+//            var id = s.GetRowKey(e.visibleIndex);
+//            window.open('/admin/members/details/'+id,'_blank');
+            var id = s.GetRowKey(e.visibleIndex);
+            $('#selected-member-id').val(id);
+            LoadingPanel.Show();
+
+            $.ajax({
+                url: '" + @Url.Action("ChangeMember", "Members") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    MemberID: id
+                },
+                success: function(data) {
+                    $('#member-details-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }";
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "MemberID").DisplayFormat = "Total: {0:n0}";
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.Styles.Row.Cursor = "pointer";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.CommandColumn.Visible = false;
+        settings.CommandColumn.ShowClearFilterButton = false;
+        settings.Settings.ShowFilterRow = true;
+
+        settings.SettingsPager.Mode = GridViewPagerMode.EndlessPaging;
+        // property to EndlessPaging, and the Settings.VerticalScrollBarMode
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsPager.PageSizeItemSettings.Visible = false;
+        settings.SettingsPager.PageSize = 10;
+
+        settings.SettingsBehavior.AllowFocusedRow = true;
+
+        settings.KeyFieldName = "MemberID";
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "MemberID";
+            column.FieldName = "MemberID";
+            column.Caption = "Member ID";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Width = 80;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "FullName";
+            column.FieldName = "FullName";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Width = 280;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Email";
+            column.FieldName = "Email";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Width = 280;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "CountryID";
+            column.FieldName = "CountryID";
+            column.Caption = "Country";
+            column.Width = 130;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                int CountryID = 0;
+                string Country = "<i>Not Set</i>";
+
+                if (DataBinder.Eval(c.DataItem, "CountryID") != DBNull.Value && DataBinder.Eval(c.DataItem, "CountryID") != null)
+                {
+                    if (Convert.ToByte(DataBinder.Eval(c.DataItem, "CountryID")) != 0)
+                    {
+                        CountryID = Convert.ToByte(DataBinder.Eval(c.DataItem, "CountryID"));
+                        Country = UoW.GetRepository<Flock.Models.Country>().GetAll().Where(p => p.CountryID == CountryID).Select(p => p.Name).Single();
+                    }
+                }
+
+                ViewContext.Writer.Write("<span>" + Country + "</span>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "CreatedDT";
+            column.FieldName = "CreatedDT";
+            column.Caption = "Created";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = 70;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "LoginDT";
+            column.FieldName = "LoginDT";
+            column.Caption = "Last Login";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = 70;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        });
+        
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "CountryID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Country>().GetAll())
+                    {
+                        e.AddValue(pt.Name, pt.CountryID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "LanguageID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Language>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.LanguageID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+            }
+        };
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()
+
+@*"", "", (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var source = dataContext.Context.Member_Search(Model).AsQueryable();
+
+    e.QueryableSource = source;
+
+    e.KeyExpression = "MemberID";
+}).GetHtml()*@

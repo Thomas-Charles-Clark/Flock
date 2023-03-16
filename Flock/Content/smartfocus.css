@@ -1,0 +1,23 @@
+﻿#container {
+    width: 1274px !important;
+}
+
+h6.info {
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+table {
+    margin-bottom: 1em;
+}
+
+#top-panel table {
+    border-collapse: collapse;
+    border: 1px solid #c0c0c0;
+}
+
+    #top-panel table td, #top-panel > table th {
+        padding: 0.5em !important;
+        vertical-align: top;
+        border: 1px solid #c0c0c0;
+    }

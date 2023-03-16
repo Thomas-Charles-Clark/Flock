@@ -1,0 +1,36 @@
+﻿@using System.Data
+@using Flock.DAL
+@using Flock.Models
+@model DataSet
+<div style="padding: 1em;">
+    @Html.Partial("_ReviewGridPartial", Model)
+    <div style="clear: both;"></div>
+    @Html.DevExpress().Button(settings => {
+        settings.Name = "SaveButton";
+        settings.Text = "Save";
+        settings.Style.Add("float", "right");
+        settings.Style.Add("margin", "1em 7px 7px 0");
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(90);
+        
+        settings.ClientSideEvents.Click = @"function(s, e) { 
+            $('#confirm-dialog').data('action', 'save');
+            $('#confirm-dialog').dialog('open');
+        }";
+    }).GetHtml()
+
+    @Html.DevExpress().Button(settings => {
+        settings.Name = "SaveOverwriteButton";
+        settings.Text = "Save (Overwrite Conflicts)";
+        settings.Style.Add("float", "right");
+        settings.Style.Add("margin", "1em 7px 7px 0");
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(180);
+        settings.Text = "Save (Overwriting Conflicts)";
+        settings.ClientSideEvents.Click = @"function(s, e) { 
+            $('#confirm-dialog').data('action', 'overwrite');
+            $('#confirm-dialog').dialog('open');
+        }";
+    }).GetHtml()
+
+    <div style="clear: both;"></div>
+</div>

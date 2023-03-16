@@ -1,0 +1,46 @@
+﻿@model List<Flock.Models.AttributeGroup_ProductType>
+@Html.DevExpress().DropDownEdit(ddSettings => {
+    ddSettings.Name = "AttributeGroupDD";
+    ddSettings.Text = "Attribute Group";
+    ddSettings.SetDropDownWindowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div id='attribute-group-listbox'>");
+        Html.DevExpress().ListBox(lbSettings =>
+        {
+            lbSettings.Name = "AttributeGroupList";
+            lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            lbSettings.Properties.TextField = "AttributeGroup.Name";
+            lbSettings.Properties.ValueType = typeof(byte);
+            lbSettings.Properties.ValueField = "AttributeGroup.AttributeGroupID";
+            lbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+                LoadingPanel.Show();
+                $.ajax({
+                    url: '" + Url.Action("SelectAttributeGroup", "ProductPages") + @"',
+                    type: 'POST',
+                    traditional: true,
+                    data: { 
+                        ProductTypeID: ClassifierProductTypeListBox.GetValue(),
+                        AttributeGroupID: s.GetValue()
+                    },
+                    success: function(data) {
+                        $('#ajax-target-2').html(data);
+                        LoadingPanel.Hide();
+                    }
+                });
+            }";
+        }).BindList(Model).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+        @Html.DevExpress().Button(
+            buttonSettings =>
+            {
+                buttonSettings.Text = "Close";
+                buttonSettings.Style.Add("float", "right");
+                buttonSettings.Name = "ProductTypeButtonClose";
+                buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                        AttributeGroupDD.HideDropDown();
+                    }";
+            }).Render();
+        ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+    });
+}).GetHtml()

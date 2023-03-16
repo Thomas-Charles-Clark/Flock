@@ -1,0 +1,55 @@
+﻿@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Name = "BrandCheckComboBox";
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action.ToLower() != "compose")
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+    else
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = "";
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "BrandID";
+
+    if (action.ToLower() != "compose")
+    {
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            if($('#product-data-view-container').length > 0) {
+                    var textSearch = '';
+                    if(typeof(ProductCollectionFreeTextSearchBox) != 'undefined' && ProductCollectionFreeTextSearchBox != false)
+                        if(ProductCollectionFreeTextSearchBox.GetValue() != null)                
+                            textSearch = ProductCollectionFreeTextSearchBox.GetValue();
+                    $('#searching-icon').fadeIn('fast');
+                $.ajax({
+                    url: '" + @Url.Action("ProductToCollection_ProductDataViewFilter", "Products") + @"',
+                    data: { Brands: BrandCheckComboBox.GetSelectedValues().toString(), Launches: LaunchCheckComboBox.GetSelectedValues().toString(), ProductTypes: ProductTypeCheckComboBox.GetSelectedValues().toString(), TextSearch: textSearch.toString() },
+                    success: function(data) { 
+                        $('#searching-icon').fadeOut('fast');
+                        $('#product-data-view-container').html(data);
+                    },
+                    error: function(e, s, a) {
+                        $('#searching-icon').fadeOut('fast'); 
+                        alert(e.responseText); 
+                    }
+                });
+            }
+        }";
+    }
+    else
+    {
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+
+            $('#CollectionBrandID').val(s.GetItem(e.index).value);
+            BrandDD.SetText(s.GetItem(e.index).text);
+            BrandDD.HideDropDown(); 
+        }";
+    }
+}
+).BindList(Model).GetHtml()

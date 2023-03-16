@@ -1,0 +1,83 @@
+﻿@model List<Flock.Models.Continent>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        if (action == "CountrySearchContinentDropDownPartial")
+            settings.Name = "CountrySearchContinentDD";
+        
+        settings.Text = "Continent";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='continent-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/ContinentListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "CountrySearchContinentDropDownPartial")
+                    {
+                        buttonSettings.Name = "CountrySearchContinentButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            CountrySearchContinentListBox.UnselectAll();
+                            CountrySearchContinentDD.HideDropDown(); 
+                            CountrySearchContinentDD.SetText('Continent');
+                            $('#country-searching-icon').fadeIn('fast');
+                            $.ajax({
+                                url: '" + Url.Action("Search", "CountrySearch") + @"',
+                                traditional: true,
+                                data: { 
+                                    MarketID: CountrySearchMarketListBox.GetValue(),
+                                    ContinentID: CountrySearchContinentListBox.GetValue(),
+                                    RegionID: CountrySearchRegionListBox.GetValue(),
+                                    LanguageID: CountrySearchLanguageListBox.GetValue(),
+                                    SearchString: CountrySearchNameTextBox.GetText(),
+                                    TableLock: CountrySearchCLTableLock.GetValue()
+                                },
+                                success: function(data) {
+                                    $('#country-search-data-view-container').html(data);
+                                    $('#country-searching-icon').fadeOut('slow');
+                                    if (typeof (InitCountryDragDrop) == 'function')
+                                        InitCountryDragDrop();
+                                },
+                                error: function(e, s, a) {
+                                    $.showError(e, s, a, function() { $('#country-searching-icon').fadeOut('slow'); });
+                                },
+                                timeout: 60000
+                            });
+                        }";
+                    }
+                    buttonSettings.Text = "Clear";
+                    buttonSettings.Style.Add("float", "left");
+                }).Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "CountrySearchContinentDropDownPartial")
+                    {
+                        buttonSettings.Name = "CountrySearchContinentButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            CountrySearchContinentDD.HideDropDown();
+                        }";
+                    }
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }).Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

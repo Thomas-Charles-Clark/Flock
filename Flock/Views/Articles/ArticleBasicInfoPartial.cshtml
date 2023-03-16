@@ -1,0 +1,166 @@
+﻿@model Flock.ViewModels.ArticleComposeViewModel
+           @{
+               var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+<div class="content-panel-container">
+    <fieldset id="article-basic-details-fieldset">
+        <legend onclick="$('#article-basic-details-section').slideToggle('fast');">
+            Article Basic Information (click to expand / contract)
+            <span style="float: right; margin: 0 4px;">Article ID: @(Model.ArticleID)</span>
+            <img id="page-details-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="article-basic-details-section" style="position: relative;" class="fieldset-inner">
+            @Html.HiddenFor(m => Model.ArticleID)
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Article Name (100):</label>
+            @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+                {
+                    settings.Properties.ClientInstanceName = "ArticleName";
+                    settings.Style.Add("float", "left");
+                    settings.Style.Add("margin", "0 7px 7px 0");
+                    settings.Properties.MaxLength = 100;
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            @Html.ValidationMessageFor(m => Model.Name)
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Article Template:</label>
+            @Html.DevExpress().ComboBoxFor(m => Model.ArticleTemplateID, settings =>
+            {
+                settings.Properties.ClientInstanceName = "ArticleTemplate";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.Properties.MaxLength = 100;
+                settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+                settings.ShowModelErrors = true;
+                settings.Properties.DataSource = 
+                settings.Properties.ValueType = typeof(byte);
+                settings.Properties.ValueField = "ArticleTemplateID";
+                settings.Properties.TextField = "Name";
+            }).BindList(UoW.GetRepository<Flock.Models.ArticleTemplate>().GetAll().ToList()).GetHtml()
+            @Html.ValidationMessageFor(m => Model.Name)
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Article Type:</label>
+            @Html.DevExpress().ComboBoxFor(m => Model.ArticleTypeID, settings =>
+            {
+                settings.Properties.ClientInstanceName = "ArticleType";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.Properties.MaxLength = 100;
+                settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+                settings.ShowModelErrors = true;
+                settings.Properties.DataSource =
+                settings.Properties.ValueType = typeof(byte);
+                settings.Properties.ValueField = "ArticleTypeID";
+                settings.Properties.TextField = "Name";
+            }).BindList(UoW.GetRepository<Flock.Models.ArticleType>().GetAll().Where(p => p.ArticleTypeID != 0).ToList()).GetHtml()
+            @Html.ValidationMessageFor(m => Model.Name)
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 150px;">Article Sub Type:</label>
+            @Html.DevExpress().ComboBoxFor(m => Model.ArticleSubTypeID, settings =>
+            {
+                settings.Properties.ClientInstanceName = "ArticleSubType";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.Properties.MaxLength = 100;
+                settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+                settings.ShowModelErrors = true;
+                settings.Properties.DataSource =
+                settings.Properties.ValueType = typeof(byte);
+                settings.Properties.ValueField = "ArticleSubTypeID";
+                settings.Properties.TextField = "Name";
+            }).BindList(UoW.GetRepository<Flock.Models.ArticleSubType>().GetAll().Where(p => p.ArticleTypeID == Model.ArticleTypeID).ToList()).GetHtml()
+            @Html.ValidationMessageFor(m => Model.Name)
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">On Date:</label>
+            @Html.DevExpress().DateEditFor(m => Model.OnDate, settings =>
+            {
+                settings.Properties.DisplayFormatString = "d";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Off Date:</label>
+            @Html.DevExpress().DateEditFor(m => Model.OffDate, settings =>
+            {
+                settings.Properties.DisplayFormatString = "d";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            @Html.ValidationMessageFor(m => Model.OffDate)
+            <div style="clear: both;"></div>
+            
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Event Date (Optional):</label>
+            @Html.DevExpress().DateEditFor(m => Model.EventDT, settings =>
+            {
+                settings.Properties.DisplayFormatString = "d";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            
+            <div style="clear: both;"></div>
+           @if (ViewData["Warning"] != null)
+           {
+                <p style="margin: 8px 0;" class="field-validation-error">@(ViewData["Warning"])</p>
+                <div style="clear: both;"></div>
+           }
+           @*@if (ViewData["EditError"] != null)
+            {
+                <span style="float: left; margin: 8px 0;" class="field-validation-error">@(ViewData["EditError"])</span>
+                <div style="clear: both;"></div>
+            }*@
+            <img id="article-basic-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0;" onclick="SaveArticleBasicDetails();" />
+            <div style="clear: both;"></div>
+            @*<input type="submit" value="Save" style="height: 25px; float: left;" />*@
+            @*}*@
+        </div>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    function SaveArticleBasicDetails() {
+
+        if (typeof (ArticleSlideshow) == 'object')
+            ArticleSlideshow.Pause();
+
+        $("#article-basic-details-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("SaveArticleBasicInfo", "Articles")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ArticleID: $("#selected-article-id").val(),
+                ArticleTypeID: ArticleType.GetValue(),
+                ArticleSubTypeID: ArticleSubType.GetValue(),
+                ArticleTemplateID: ArticleTemplate.GetValue(),
+                Name: ArticleName.GetValue(),
+                OnDate: $("input[name='OnDate']").val(),
+                OffDate: $("input[name='OffDate']").val(),
+                EventDT: $("input[name='EventDT']").val()
+            },
+            success: function (data) {
+                //$('#article-compose-container').hide();
+                LoadingPanel.Hide();
+
+                $('#article-basic-details-container').html(data);
+
+                ArticleComposeGridView.Refresh();
+                //$('#article-compose-container').show();
+                if(typeof ArticleSlideshow == 'object')
+                    ArticleSlideshow.AdjustControl();
+                //$("#article-basic-details-container").html(data);
+                //$("#article-basic-details-busy").fadeOut("fast");
+                SuccessFade($("#article-basic-details-save"));
+            },
+            error: function(e, s, a) { 
+                FailureFade($("#article-basic-details-save"));
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }
+</script>
+    }

@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "BannersOverview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section Styles
+{
+    @Styles.Render("~/Content/themes/admin/cms/cms.css")
+}
+<script type="text/javascript">
+    function DeleteSelectedBanners() {
+        if (typeof (BannerOverviewGridView) != "undefined" && BannerOverviewGridView != false)
+            keys = BannerOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            var conf = confirm("Are you sure?");
+            if (conf) {
+                var keys = null;
+
+                if (typeof (BannerOverviewGridView) != "undefined" && BannerOverviewGridView != false)
+                    keys = BannerOverviewGridView.GetSelectedKeysOnPage();
+
+                if (typeof (keys) != "undefined" && keys != false)
+                    BannerOverviewGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+            }
+        }
+        else
+            alert("Select at least one banner.")
+    }
+</script>
+
+<h4 class="page-header">
+    Banner Overview
+</h4>
+
+<div class="page-subheading">
+    @Html.Action("BannerOverviewBannerLocationDropDownPartial", "Banners")
+    @Html.Action("BannerOverviewSiteSectionDropDownPartial", "Banners")
+    @Html.Action("BannerOverviewCountryDropDownPartial", "Banners")
+    @Html.Action("ComposeBannerHeaderTradeComboBoxPartial", "Banners")
+    <img id="banners-searching-icon" class="busy" src="/images/systemicons/searching-icon.gif" />
+    <div class="clearfix"></div>
+</div>
+
+<div id="banner-overview-grid-view-container">
+    @Html.Action("BannerOverviewGridViewPartial")
+</div>
+<div id="bulk-action-panel">
+    <h4>Bulk Action Panel</h4>
+    <ul>
+        <li>
+            <a href="javascript:;" title="Delete" onclick="DeleteSelectedBanners()">Delete</a>
+        </li>
+    </ul>
+</div>
+<div style="clear: both;"></div>

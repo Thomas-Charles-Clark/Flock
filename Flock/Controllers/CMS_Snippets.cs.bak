@@ -1,0 +1,220 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NLog;
+using System.Web;
+using System.Web.Mvc;
+using DevExpress.Web.ASPxClasses;
+using DevExpress.Web.ASPxImageSlider;
+using Flock.Models;
+using System.Web.Script.Serialization;
+using DevExpress.Web.Mvc;
+using Flock.DAL;
+using Flock.ViewModels;
+using System.Data.Linq;
+
+namespace Flock.Controllers
+{
+    public partial class CMSController : Controller
+    {
+        public ActionResult Snippets(short? id)
+        {
+            if (id != null)
+            {
+                SnippetViewModel SVM = null;
+                if (UnitOfWork.GetRepository<Snippet>().GetAll().Where(p => p.SnippetID == id && p.DeletedDT == null).SingleOrDefault() != null)
+                {
+                    SnippetViewModelBuilder Builder = new SnippetViewModelBuilder(UnitOfWork);
+                    SVM = Builder.Build(id);
+                }
+                else
+                {
+                    SVM = new SnippetViewModel();
+                    ViewData["InvalidSnippetIDError"] = "Invalid Snippet ID, or the snippet is marked as deleted. Deleted snippets can be retrieved."; 
+                }
+                return View("Snippets/Snippets", SVM);
+            }
+            else
+            {
+                SnippetViewModel SVM = new SnippetViewModel();
+                return View("Snippets/Snippets", SVM);
+            }
+        }
+
+        public ActionResult SnippetGridViewPartial()
+        {
+            return PartialView("Snippets/SnippetGridViewPartial");
+        }
+
+        public ActionResult SnippetGridViewPartialAddNew(SnippetViewModel item)
+        {
+            if (item.OffDate != null && item.OnDate == null)
+            {
+                ModelState.AddModelError("OnDate", "Please set an On Date for this form");
+            }
+            if (item.OnDate != null && item.OffDate != null)
+            {
+                if (item.OffDate <= item.OnDate)
+                {
+                    ModelState.AddModelError("OnDate", "On Date must precede Off Date.");
+                    ModelState.AddModelError("OffDate", "Off Date date must not precede On Date.");
+                }
+            }
+
+            if(ModelState.IsValid)
+            {
+                Snippet snippet = new Snippet();
+                snippet.Name = item.Name;
+                snippet.SnippetLocationID = item.SnippetLocationID;
+                snippet.OnDate = item.OnDate;
+                snippet.OffDate = item.OffDate;
+                snippet.CreatedDT = DateTime.Now;
+
+                UnitOfWork.GetRepository<Snippet>().Add(snippet);
+                UnitOfWork.Save();
+                UnitOfWork.Context.Snippet_Language_Initialise();
+            }
+            return PartialView("Snippets/SnippetGridViewPartial");
+        }
+
+        public ActionResult SnippetGridViewPartialCustomCommand(string command, string key)
+        {
+            switch(command.ToLower())
+            {
+                case "delete":
+                    Snippet s = UnitOfWork.GetRepository<Snippet>().GetAll().Where(p => p.SnippetID == Convert.ToInt16(key)).Single();
+                    s.DeletedDT = DateTime.Now;
+                    UnitOfWork.Save();
+                    break;
+
+                default: break;
+            }
+
+            return PartialView("Snippets/SnippetGridViewPartial");
+        }
+        
+        [HttpPost]
+        public ActionResult ChangeSnippet(short snippetID)
+        {
+            return PartialView("Snippets/SnippetDetailPartial", new SnippetViewModelBuilder(UnitOfWork).Build(snippetID));
+        }
+
+        public ActionResult SnippetHTMLEditorPartial()
+        {
+            return PartialView("Snippets/SnippetHTMLEditorPartial");
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult UpdateSnippetCountryRestrictions(short SnippetID, string Countries)
+        {
+            JavaScriptSerializer ser = new JavaScriptSerializer();
+            List<SortDatum> CountryRestrictions = ser.Deserialize<List<SortDatum>>(Countries);
+
+            List<Snippet_Country> Current = UnitOfWork.GetRepository<Snippet_Country>().GetAll().Where(p => p.SnippetID == SnippetID).ToList();
+            List<SortDatum> CurrentCountries = new List<SortDatum>();
+            foreach (Snippet_Country country in Current)
+            {
+                CurrentCountries.Add(new SortDatum() { ID = country.CountryID, SortOrder = 0 });
+            }
+            List<SortDatum> Removals = CurrentCountries.Except(CountryRestrictions).ToList();
+
+            foreach (SortDatum datum in Removals)
+            {
+                Snippet_Country remove = UnitOfWork.GetRepository<Snippet_Country>().GetAll().Where(p => p.SnippetID == SnippetID && p.CountryID == datum.ID).Single();
+                UnitOfWork.GetRepository<Snippet_Country>().Delete(remove);
+            }
+            UnitOfWork.Save();
+
+            //could probably do deletion from here too: if ProductPage_Country table holds record which isn't in Countries passed to this function, then delete those.
+
+            foreach (SortDatum datum in CountryRestrictions)
+            {
+                Snippet_Country bc = UnitOfWork.GetRepository<Snippet_Country>().GetAll().Where(p => p.SnippetID == SnippetID && p.CountryID == datum.ID).SingleOrDefault();
+
+                if (bc == null)
+                {
+                    bc = new Snippet_Country() { SnippetID = SnippetID, CountryID = (short)datum.ID };
+                    UnitOfWork.GetRepository<Snippet_Country>().Add(bc);
+                }
+            }
+
+            UnitOfWork.Save();
+
+            List<short> Linker = UnitOfWork.GetRepository<Snippet_Country>().GetAll().Where(p => p.SnippetID == SnippetID).Select(p => p.CountryID).ToList();
+            List<Country> Model = UnitOfWork.GetRepository<Country>().GetAll().Where(p => Linker.Contains(p.CountryID)).ToList();
+            return PartialView("Snippets/SnippetCountryRestrictionsPartial", Model);
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult SaveSnippetDetails(SnippetViewModel item)
+        {
+            if (item.HTMLContent == null)
+                item.HTMLContent = "";
+
+            if (item.OffDate != null && item.OnDate == null)
+            {
+                ModelState.AddModelError("OnDate", "Please set an On Date for this form");
+            }
+            if (item.OnDate != null && item.OffDate != null)
+            {
+                if (item.OffDate <= item.OnDate)
+                {
+                    ModelState.AddModelError("OnDate", "On Date must precede Off Date.");
+                    ModelState.AddModelError("OffDate", "Off Date date must not precede On Date.");
+                }
+            }
+
+            if(ModelState.IsValid)
+            {
+                Snippet s = UnitOfWork.GetRepository<Snippet>().GetAll().Where(p => p.SnippetID == item.SnippetID).Single();
+                s.Name = item.Name;
+                s.HTMLContent = item.HTMLContent;
+                s.OnDate = item.OnDate;
+                s.OffDate = item.OffDate;
+                s.SnippetLocationID = item.SnippetLocationID;
+                s.ModifiedDT = item.ModifiedDT;
+                UnitOfWork.Save();
+
+                var CountryLinker = UnitOfWork.GetRepository<Snippet_Country>().GetAll().Where(p => p.SnippetID == item.SnippetID).Select(p => p.CountryID).ToList();
+                item.CountryRestrictions = UnitOfWork.GetRepository<Country>().GetAll().Where(p => CountryLinker.Contains(p.CountryID)).ToList();
+
+                return PartialView("Snippets/SnippetDetailPartial", item);
+            }
+            else
+            {
+                Response.StatusCode = 400;
+
+                var CountryLinker = UnitOfWork.GetRepository<Snippet_Country>().GetAll().Where(p => p.SnippetID == item.SnippetID).Select(p => p.CountryID).ToList();
+                item.CountryRestrictions = UnitOfWork.GetRepository<Country>().GetAll().Where(p => CountryLinker.Contains(p.CountryID)).ToList();
+
+                return PartialView("Snippets/SnippetDetailPartial", item);
+            }
+        }
+
+        public ActionResult SnippetsImageUpload()
+        {
+            try
+            {
+                var v = new DevExpress.Web.ASPxUploadControl.ValidationSettings
+                {
+                    AllowedFileExtensions = new string[] { ".jpg", ".jpeg" },
+                    MaxFileSize = 4000000
+                };
+
+                if (!System.IO.Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\images\\snippetimages\\"))
+                    System.IO.Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "\\images\\snippetimages\\");
+
+                HtmlEditorExtension.SaveUploadedImage("HtmlEditor", v, "~\\images\\snippetimages\\");
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorException("HTMLEditor Image Upload Problem: ", e);
+            }
+
+            return null;
+        }
+    }
+}

@@ -1,0 +1,15 @@
+﻿@model List<Flock.Models.SalesOverviewTransaction>
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "SalesOverviewResultsGridView";
+    settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "SalesOverviewResultsGridView" };
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['From'] = FromDate.GetDate().toGMTString();
+        e.customArgs['To'] = ToDate.GetDate().toGMTString();
+        e.customArgs['PriceListID'] = SalesOverviewPriceListListBox.GetValue();
+    }";
+
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+
+    settings.SettingsPager.PageSize = 20;
+}).Bind(Model).GetHtml()

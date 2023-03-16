@@ -1,0 +1,86 @@
+@model Flock.ViewModels.CallToActionEditModel
+@{
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "GridView";
+        settings.CallbackRouteValues = new { Controller = "CallsToAction", Action = "CallToActionGridViewPartial" };
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "CallsToAction", Action = "CallToActionGridViewPartialAddNew" };
+        
+        settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsEditing.EditFormColumnCount = 1;
+        settings.SettingsPopup.EditForm.Width = 250;
+        settings.SettingsText.CommandUpdate = "Create";
+        
+        settings.SettingsText.PopupEditFormCaption = "Create Call to Action";
+
+		settings.KeyFieldName = "CallToActionID";
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) { 
+            $.ajax({
+                url: '/admin/callstoaction/CallToActionEditFormPartial',
+                type: 'GET',
+                data: {
+                    CallToActionID: s.GetRowKey(e.visibleIndex)
+                },
+                success: function(data) {
+                    $('#detail-panel').html(data);
+                }
+            });
+        }";
+        
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Styles.RowHotTrack.Cursor = "pointer";
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+		settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        MVCxGridViewColumn IDColumn = new MVCxGridViewColumn();
+        IDColumn.Name = "CallToActionID";
+        IDColumn.FieldName = "CallToActionID";
+        IDColumn.Caption = "ID";
+        IDColumn.Width = 90;
+        IDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        IDColumn.Settings.AllowDragDrop = DefaultBoolean.False;
+        settings.Columns.Add(IDColumn);
+
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        NameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        NameColumn.Settings.AllowDragDrop = DefaultBoolean.False;
+        var ncProp = NameColumn.PropertiesEdit as TextBoxProperties;
+        ncProp.MaxLength = 100;
+        settings.Columns.Add(NameColumn);
+
+        MVCxGridViewColumn TextColumn = new MVCxGridViewColumn();
+        TextColumn.Name = "Text";
+        TextColumn.FieldName = "Text";
+        TextColumn.Caption = "Text";
+        TextColumn.Settings.AllowDragDrop = DefaultBoolean.False;
+        var tProp = TextColumn.PropertiesEdit as TextBoxProperties;
+        tProp.MaxLength = 70;
+        settings.Columns.Add(TextColumn);
+	});
+    
+	if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+    
+}
+@grid.BindToLINQ("", "", (s, e) =>
+{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    e.KeyExpression = "CallToActionID";
+    e.QueryableSource = UoW.GetRepository<Flock.Models.CallToAction>().GetAll().Where(p => p.DeletedDT == null).OrderByDescending(p => p.CallToActionID);
+}).GetHtml()

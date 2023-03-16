@@ -1,0 +1,9 @@
+﻿@model Flock.Controllers.CMSController.BrochurePageSection
+<div style="width: 100%; height: 100px; padding-top: 18px; text-align: center; background-color: #76a797; ">
+    <div style="margin-top: 0px; margin-right: auto; margin-bottom: 0px; margin-left: auto; width: 286px; padding-top: 15px; ">
+        <img src="/images/icons/64/o_collection/book_open2.png" title="Brochure" style="float: left; position: relative; margin-right: 2em; top: -15px;" />
+        @Html.Action("PageSectionBrochureSelectPartial", new { PageSectionID = Model.PageSectionID, BrochureID = Model.BrochureID })
+        <div class="clearfix"></div>
+    </div>
+    <img id="brochure-section-@(Model.PageSectionID)-save" class=" pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 38px; right: 10px;" onclick="SaveBrochureSection(@(Model.PageSectionID));" />
+</div>

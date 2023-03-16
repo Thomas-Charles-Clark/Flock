@@ -1,0 +1,35 @@
+﻿@model string
+@Html.DevExpress().Memo(
+settings =>
+{
+    settings.Name = "QualityHtmlEditor";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(150);
+    settings.Text = Model;
+}).GetHtml()
+
+@Html.DevExpress().Button(settings => {
+    settings.Name = "SaveBtn";
+    settings.Text = "Save";
+    settings.Style.Add("float", "right");
+    settings.Style.Add("margin-top", "1em");
+    settings.ClientSideEvents.Click = @"function(s, e) { 
+        $.ajax({
+            url: '" + Url.Action("QualityHtmlEditorSavePartial", "Qualities") + @"',
+            type: 'POST',
+            traditional: true,
+            data: { 
+                QualityID: $('#selected-quality-id').val(),
+                Html: QualityHtmlEditor.GetValue()
+            },
+            success: function(data) {
+                GreenFade($(s.mainElement).find('.dxb'));
+            },
+            error: function(e, s, a) { 
+                $.showError(e, s, a, function() { RedFade($(s.mainElement).find('.dxb')); });
+            },
+            timeout: 20000
+        });
+    }";
+}).GetHtml()
+<div style="clear: both;"></div>

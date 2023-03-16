@@ -1,0 +1,107 @@
+﻿body {
+}
+
+.searching-icon {
+    display: none;
+}
+
+#banner-location-sitesection-container {
+    width: 100%;
+    background-color: #a03570;
+    border-radius: 5px;
+    margin-bottom: 2em;
+}
+
+.dxeListBoxItemSelected_MetropolisBlue { 
+background-color: #E0E0E0 !important;
+color: #333333 !important;
+}
+
+.dxeListBoxItemHover_MetropolisBlue { 
+background-color: #0072C6 !important;
+color: white !important;
+}
+
+.banner-link-table {
+    margin-top: 1em;
+}
+
+    .banner-link-table th {
+        padding: 0.4em;
+        font-size: 1.1em;
+    }
+
+    .banner-link-table td {
+        padding: 0.4em;
+        text-align: center;
+        min-width: 239px;
+        min-height: 239px;
+    }
+
+        .banner-link-table td div {
+            margin: 0 auto;
+            border: 1px solid #6d6d6d;
+            width: 100%;
+
+        }
+
+.link-img {
+    vertical-align: top;
+}
+
+.field-validation-error {
+    
+}
+
+.ui-state-highlight-library-target {
+    display: block;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    background-color: #f7dd88;
+    border: 1px solid #e96712;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+#foreground-colour {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    position: relative;
+    cursor: pointer;
+    float: left;
+    background: url(../images/select2.png) center;
+}
+
+#foreground-colour-holder {
+    position: relative;
+    top: 28px;
+    z-index: 100;
+}
+
+#foreground-colour-holder > div {
+    height: 0;
+}
+
+#background-colour {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    position: relative;
+    cursor: pointer;
+    float: left;
+    background: url(../images/select2.png) center;
+}
+
+#background-colour-holder {
+    position: relative;
+    top: 28px;
+    z-index: 100;
+}
+
+#background-colour-holder > div {
+    height: 0;
+}

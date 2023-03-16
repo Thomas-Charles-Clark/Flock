@@ -1,0 +1,90 @@
+@using Flock.ViewModels
+@using Flock.DAL;
+@using Flock.Models;
+@model ModuleOptionViewModel
+@{
+    var db = new UnitOfWork<FlockDataContext>();
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ModuleOptionGridView";
+        settings.CallbackRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGridViewPartial" };
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            e.customArgs['ModuleID'] = " + ViewData["ModuleID"] + @";
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("ModuleOptionSorterPartial", "ModularProducts") + @"',
+                type: 'GET',
+                data: {
+                    ModuleID: $('#selected-module-id').val()
+                },
+                success: function(data) {
+                    LoadingPanel.Hide();
+                    $('#module-options-sorter').html(data);
+                },
+                timeout: 30000
+            });
+        }";
+        
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+		settings.KeyFieldName = "ModuleOptionID";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+
+		settings.Columns.Add("ModuleOptionID");
+		settings.Columns.Add("ModuleID");
+		settings.Columns.Add("ModuleOptionGroupID");
+		settings.Columns.Add("Name");
+		settings.Columns.Add("ProductID");
+		settings.Columns.Add("ImageID");
+
+        settings.Settings.ShowFilterRowMenu = true;
+
+        var moduleOptionIDColumn = settings.Columns["ModuleOptionID"] as MVCxGridViewColumn;
+        
+        var moduleIDColumn = settings.Columns["ModuleOptionID"] as MVCxGridViewColumn;
+        
+        var moduleOptionGroupIDColumn = settings.Columns["ModuleOptionID"] as MVCxGridViewColumn;
+        
+        var nameColumn = settings.Columns["ModuleOptionID"] as MVCxGridViewColumn;
+        nameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        var nProp = nameColumn.PropertiesEdit as TextBoxProperties;
+        nProp.MaxLength = 100;
+        
+        var productIDColumn = settings.Columns["ModuleOptionID"] as MVCxGridViewColumn;
+        
+        var imageIDColumn = settings.Columns["ModuleOptionID"] as MVCxGridViewColumn;
+        
+        settings.SetEditFormTemplateContent(c => {
+            if (Model == null)
+            {
+                ViewContext.Writer.Write(Html.Action("ModuleOptionEditFormPartial", new { ModuleOptionID = c.KeyValue }).ToHtmlString());
+            }
+            else
+            {
+                ViewContext.Writer.Write(Html.Partial("Modules/_ModuleOptionEditFormPartial", Model).ToHtmlString());
+            }
+        });
+	});
+		if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ("", "", (s, e) => {
+    e.QueryableSource = db.GetRepository<ModuleOption>().GetAll().Where(p => p.ModuleID == (Int16)ViewData["ModuleID"]);
+    e.KeyExpression = "ModuleOptionID";
+}).GetHtml()

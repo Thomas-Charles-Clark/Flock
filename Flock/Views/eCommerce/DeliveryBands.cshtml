@@ -1,0 +1,98 @@
+﻿@model Flock.ViewModels.DeliveryBandViewModel
+@{
+    ViewBag.Title = "Delivery Bands";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/Content/delivery-bands.css")
+}
+@section scripts{
+    <script type="text/javascript">
+        function ConfirmedDelete(args) {
+            DeliveryBandGridView.DeleteRow(args[0]);
+        }
+
+        function FilterDeliveryZonesList() {
+            var pid = PriceListID.GetValue();
+            var cid = CourierID.GetValue();
+
+            $("#delivery-zones-filterable input").each(function () {
+                $(this).prop('checked', false);
+                $(this).hide();
+            });
+
+            if (pid != null) {
+                var Countries = new Array();
+                $("#country-pricelist-linker div[data-pricelist-id='" + pid + "']").each(function () {
+                    Countries.push($(this).data("country-id"));
+                });
+
+                // first run hides everything but UK, second run hides everything but Guernsey == wrong.
+                for (var i = 0; i < Countries.length; i++) {
+
+                    // what we need is foreach country in this list, somehow mark for hiding
+                    $("#delivery-zones-filterable input").each(function () {
+                        if($.inArray($(this).data("country-id"), Countries)) {
+                            $(this).prop('checked', false);
+                            $(this).show();
+                        }
+                    });
+
+                }
+            }
+
+
+            //fetch many Countries from one PriceListID
+            //restrict visible / selectable to Zones having this CountryID
+
+            //if (cid != null) {
+            //    $("#delivery-zones-filterable input[data-courier-id!='" + cid + "']").each(function () {
+            //        $(this).prop('checked', false);
+            //        $(this).hide();
+            //    });
+            //}
+        }
+    </script>
+}
+
+<input type="hidden" id="selected-delivery-band-id" value="@(Model.DeliveryBandID)" />
+
+<h4 class="page-heading">Delivery Bands</h4>
+
+<div style="float: left; width: 100%; ">
+    <div style="width: 100%;">
+        <div id="delivery-band-select-header-container">
+            <div class="content-panel-container">
+                <fieldset id="delivery-band-select-header">
+                    <legend style="color: black; border-bottom-color: #929292; cursor: default;">Delivery Band Grid</legend>
+                    <div id="delivery-band-select-header-inner" style="">
+                        <div id="delivery-band-header-grid-container">
+                            @Html.Partial("DeliveryBandGridViewPartial")
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="delivery-band-compose-container">
+            @if (ViewData["InvalidDeliveryBandIDError"] != null)
+            {
+                <h5>@(ViewData["InvalidDeliveryBandIDError"])</h5>
+            }
+            @if (Model.DeliveryBandID != null)
+            {
+                @Html.Partial("DeliveryBandDetailPartial", Model)
+                <script type="text/javascript">
+                    DeliveryBandGridView.AutoFilterByColumn(1, '@(Model.DeliveryBandID)');
+                    //DeliveryBandGridView.StartEditRowByKey('@(Model.DeliveryBandID)');
+                </script>
+            }
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+
+<div id="delivery-band-compose-container"></div>
+
+<div style="clear:both;"></div>

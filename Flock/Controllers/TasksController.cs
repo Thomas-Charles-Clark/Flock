@@ -1,0 +1,160 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NLog;
+using System.Web;
+using System.Web.Mvc;
+using DevExpress.Web;
+using Flock.Models;
+using System.Web.Script.Serialization;
+using DevExpress.Web.Mvc;
+using Flock.DAL;
+using Flock.ViewModels;
+using Flock.Classes.Auth;
+using Microsoft.AspNet.Identity;
+using System.Data.Linq;
+
+namespace Flock.Controllers.Admin
+{
+    public partial class TasksController : Controller
+    {
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
+        private UnitOfWork<FlockDataContext> UnitOfWork = new UnitOfWork<FlockDataContext>();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!UnitOfWork.Disposed)
+                UnitOfWork.Dispose();
+            base.Dispose(disposing);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult Index()
+        {
+            return RedirectToAction("overview");
+        }
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult Overview()
+        {
+            return View();
+        }
+
+        public ActionResult TaskGeneratePartial()
+        {
+            string searchTerm = null;
+            bool active = true;
+            bool queued = true;
+            bool closed = false;
+
+            var Model = new TaskGenerateViewModel();
+
+            var results = UnitOfWork.Context.Task_Generate(searchTerm, active, queued, closed);
+
+            Model.SearchTerm = searchTerm;
+            Model.Active = active;
+            Model.Queued = queued;
+            Model.Closed = closed;
+
+            Model.TasksInStatus = results.GetResult<TaskGenerate_StatusCountResult>().ToList();
+            Model.PerformanceNew = results.GetResult<TaskGenerate_Perf_New_Count_Result>().ToList();
+            Model.PerformanceCompleted = results.GetResult<TaskGenerate_Perf_Completed_Count_Result>().ToList();
+            Model.Tasks = results.GetResult<TaskRender_TaskResult>().ToList();
+            Model.TaskNotes = results.GetResult<TaskGenerate_TaskNoteResult>().ToList();
+            Model.TaskTypes = results.GetResult<TaskGenerate_TaskTypeResult>().ToList();
+            Model.Priorities = results.GetResult<TaskGenerate_PriorityResult>().ToList();
+            Model.Statuses = results.GetResult<TaskGenerate_TaskStatusResult>().ToList();
+            
+            return PartialView("_TaskGeneratePartial", Model);
+        }
+
+        public ActionResult TaskSearchPartial(string SearchTerm, string Status, byte? TaskTypeID, byte? SiteID)
+        {
+            var Model = UnitOfWork.Context.Task_Search(SearchTerm, Status, TaskTypeID, SiteID);
+
+            return PartialView("_TaskSearchResultPartial", Model);
+        }
+
+        [HttpPost]
+        public ActionResult TaskShuffle(TaskShuffleViewModel shuffleVM)
+        {
+            UnitOfWork.Context.Task_Hierarchy_Update(shuffleVM);
+
+            var Model = UnitOfWork.Context.Task_Search(shuffleVM.SearchTerm, shuffleVM.TaskStatusIDs, shuffleVM.TaskTypeID, shuffleVM.SiteID);
+
+            return PartialView("_TaskSearchResultPartial", Model);
+        }
+
+        [HttpPost]
+        public ActionResult AddNoteToTask(Int16 taskID, string note, string searchTerm, string status, byte? taskTypeID, byte? siteID)
+        {
+            UnitOfWork.Context.TaskNote_Insert(taskID, note, Guid.Parse(User.Identity.GetUserId()));
+
+            var Model =  UnitOfWork.Context.Task_Search(searchTerm, status, taskTypeID, siteID);
+
+            return PartialView("_TaskSearchPartial", Model);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteNote(Int32 taskNoteID, string SearchTerm, bool Active, bool Queued, bool Closed)
+        {
+            var note = UnitOfWork.GetRepository<TaskNote>().GetAll().Where(p => p.TaskNoteID == taskNoteID).Single();
+            note.DeletedDT = DateTime.Now;
+            UnitOfWork.Save();
+
+
+            var Model = new TaskGenerateViewModel();
+
+            var results = UnitOfWork.Context.Task_Generate(SearchTerm, Active, Queued, Closed);
+
+            Model.SearchTerm = SearchTerm;
+            Model.Active = Active;
+            Model.Queued = Queued;
+            Model.Closed = Closed;
+
+            Model.TasksInStatus = results.GetResult<TaskGenerate_StatusCountResult>().ToList();
+            Model.PerformanceNew = results.GetResult<TaskGenerate_Perf_New_Count_Result>().ToList();
+            Model.PerformanceCompleted = results.GetResult<TaskGenerate_Perf_Completed_Count_Result>().ToList();
+            Model.Tasks = results.GetResult<TaskRender_TaskResult>().ToList();
+            Model.TaskNotes = results.GetResult<TaskGenerate_TaskNoteResult>().ToList();
+            Model.TaskTypes = results.GetResult<TaskGenerate_TaskTypeResult>().ToList();
+            Model.Priorities = results.GetResult<TaskGenerate_PriorityResult>().ToList();
+            Model.Statuses = results.GetResult<TaskGenerate_TaskStatusResult>().ToList();
+
+            return PartialView("_TaskSearchPartial", Model);
+        }
+
+        [HttpPost]
+        public ActionResult TaskDescriptionEditorPartial(Int16 taskID)
+        {
+            var Model = UnitOfWork.GetRepository<Flock.Models.Task>().GetAll().Where(p => p.TaskID == taskID).Select(p => p.Description).Single();
+
+            return PartialView("_TaskDescriptionEditorPartial", Model);
+        }
+	}
+}
+
+namespace Flock.ViewModels 
+{
+    public class TaskShuffleViewModel
+    {
+        public List<TaskShuffleItem> Tasks { get; set; }
+
+        public String SearchTerm { get; set; }
+        public String TaskStatusIDs { get; set; }
+        public Byte? TaskTypeID { get; set; }
+        public Byte? SiteID { get; set; }
+    }
+
+    [SerializableAttribute]
+    public class TaskShuffleItem
+    {
+        public String item_id { get; set; }
+        public String parent_id { get; set; }
+        public Int32 depth { get; set; }
+        public Int32 left { get; set; }
+        public Int32 right { get; set; }
+        public Int16 sortOrder { get; set; }
+    }
+}

@@ -1,0 +1,317 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "MessageGridView";
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+        
+        settings.CallbackRouteValues = new { Controller = "Assets", Action = "MessagesGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Assets", Action = "MessagesGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Assets", Action = "MessagesGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Assets", Action = "MessagesGridViewPartialDelete" };
+
+        settings.CustomActionRouteValues = new { Controller = "Assets", Action = "MessagesGridViewPartialCustomCommand" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.SettingsBehavior.ConfirmDelete = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        
+        settings.KeyFieldName = "MessageID";
+        
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(80);
+        
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            if(s.callbackCustomArgs.commandType == 'Delete') {
+                if(s.callbackCustomArgs.keyString == $('#selected-message-id').val()) {
+                    $('#selected-message-id').val(null);
+                    $('#message-compose-container').html('');
+                }
+            }
+        }";
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+            var id = s.GetRowKey(e.visibleIndex);
+            //if(id != $('#selected-message-id').val()) {
+                $('#selected-message-id').val(id);
+                LoadingPanel.Show();
+                $.ajax({
+                    url: '" + @Url.Action("ChangeMessage", "Assets") + @"',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        MessageID: id
+                    },
+                    success: function(data) {
+                        $('#message-compose-container').html(data);
+                        LoadingPanel.Hide();
+                    },
+                    timeout: 20000
+                });
+            //}
+        }";
+        
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "MessageID").DisplayFormat = "Total: {0:n0}";
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.Styles.Row.Cursor = "pointer";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = 50;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+            ViewContext.Writer.Write("<a class=\"dxgvCommandColumnItem_MetropolisBlue dxgv__cci\" onclick=\"MessageGridView.AddNewRow();\" href=\"javascript:;\">New</a>");
+        });
+        
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.Settings.ShowFilterRow = true;
+
+        settings.SettingsPager.Mode = GridViewPagerMode.EndlessPaging;
+        // property to EndlessPaging, and the Settings.VerticalScrollBarMode
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 380;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsPager.PageSizeItemSettings.Visible = false;
+        settings.SettingsPager.PageSize = 10;
+
+        settings.SettingsBehavior.AllowFocusedRow = true;
+
+        
+        MVCxGridViewColumn MessageIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PriceListIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn LanguageIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn ThresholdColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn AboveMessageColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn BelowMessageColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn NoThresholdMessageColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+
+        MessageIDColumn.Name = "MessageID";
+        MessageIDColumn.FieldName = "MessageID";
+        MessageIDColumn.Caption = "Message ID";
+        MessageIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        MessageIDColumn.Width = 65;
+        MessageIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        MessageIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        MessageIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        MessageIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(MessageIDColumn);
+
+        PriceListIDColumn.Name = "PriceListID";
+        PriceListIDColumn.FieldName = "PriceListID";
+        PriceListIDColumn.Caption = "Price List";
+        PriceListIDColumn.Width = 55;
+        PriceListIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        PriceListIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        PriceListIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        PriceListIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        PriceListIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var plProp = PriceListIDColumn.PropertiesEdit as ComboBoxProperties;
+        plProp.TextField = "Name";
+        plProp.ValueField = "PriceListID";
+        plProp.ValueType = typeof(byte);
+        plProp.DataSource = UoW.GetRepository<PriceList>().GetAll().ToList();
+        settings.Columns.Add(PriceListIDColumn);
+
+        LanguageIDColumn.Name = "LanguageID";
+        LanguageIDColumn.FieldName = "LanguageID";
+        LanguageIDColumn.Caption = "Language";
+        LanguageIDColumn.Width = 65;
+        LanguageIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        LanguageIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        LanguageIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        LanguageIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        LanguageIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var lProp = LanguageIDColumn.PropertiesEdit as ComboBoxProperties;
+        lProp.TextField = "Name";
+        lProp.ValueField = "LanguageID";
+        lProp.ValueType = typeof(byte);
+        lProp.DataSource = UoW.GetRepository<Language>().GetAll().ToList();
+        settings.Columns.Add(LanguageIDColumn);
+
+        ThresholdColumn.Name = "Threshold";
+        ThresholdColumn.FieldName = "Threshold";
+        ThresholdColumn.Caption = "Threshold";
+        ThresholdColumn.Width = 65;
+        ThresholdColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var thresProp = ThresholdColumn.PropertiesEdit as SpinEditProperties;
+        thresProp.NumberFormat = SpinEditNumberFormat.Number;
+        thresProp.DisplayFormatString = "F2";
+        thresProp.LargeIncrement = 10;
+        thresProp.Increment = 1;
+        ThresholdColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ThresholdColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        ThresholdColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(ThresholdColumn);
+
+        AboveMessageColumn.Name = "AboveThresholdMessage";
+        AboveMessageColumn.FieldName = "AboveThresholdMessage";
+        AboveMessageColumn.Caption = "Above Threshold Message";
+        AboveMessageColumn.Width = 65;
+        var aboveProp = AboveMessageColumn.PropertiesEdit as TextBoxProperties;
+        aboveProp.MaxLength = 255;
+        AboveMessageColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        AboveMessageColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        AboveMessageColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(AboveMessageColumn);
+
+        BelowMessageColumn.Name = "BelowThresholdMessage";
+        BelowMessageColumn.FieldName = "BelowThresholdMessage";
+        BelowMessageColumn.Caption = "Below Threshold Message";
+        BelowMessageColumn.Width = 65;
+        var belowProp = AboveMessageColumn.PropertiesEdit as TextBoxProperties;
+        belowProp.MaxLength = 255;
+        BelowMessageColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        BelowMessageColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        BelowMessageColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(BelowMessageColumn);
+
+        NoThresholdMessageColumn.Name = "NoThresholdMessage";
+        NoThresholdMessageColumn.FieldName = "NoThresholdMessage";
+        NoThresholdMessageColumn.Caption = "No Threshold Message";
+        NoThresholdMessageColumn.Width = 65;
+        var noProp = AboveMessageColumn.PropertiesEdit as TextBoxProperties;
+        noProp.MaxLength = 255;
+        NoThresholdMessageColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        NoThresholdMessageColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        NoThresholdMessageColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(NoThresholdMessageColumn);
+
+        OnDateColumn.Name = "OnDateColumn";
+        OnDateColumn.FieldName = "OnDate";
+        OnDateColumn.Caption = "On Date";
+        OnDateColumn.Width = 75;
+        OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OnDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OnDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        //var onProp = OnDateColumn.PropertiesEdit as DateEditProperties;
+        //onProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        settings.Columns.Add(OnDateColumn);
+
+        OffDateColumn.Name = "OffDateColumn";
+        OffDateColumn.FieldName = "OffDate";
+        OffDateColumn.Caption = "Off Date";
+        OffDateColumn.Width = 75;
+        OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OffDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OffDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        //var offProp = OffDateColumn.PropertiesEdit as DateEditProperties;
+        //offProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        settings.Columns.Add(OffDateColumn);
+
+        CreatedDTColumn.Name = "CreatedDTColumn";
+        CreatedDTColumn.FieldName = "CreatedDT";
+        CreatedDTColumn.Caption = "Created";
+        CreatedDTColumn.Width = 75;
+        CreatedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        CreatedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CreatedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CreatedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(CreatedDTColumn);
+
+        MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+        WebStatusColumn.Name = "StatusID";
+        WebStatusColumn.FieldName = "StatusID";
+        WebStatusColumn.Caption = "Web Status";
+        WebStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        WebStatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        WebStatusColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        WebStatusColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        WebStatusColumn.Width = 50;
+        WebStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+            string colour = "black";
+            string statusText = "unknown";
+            statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+            switch (i)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+            ViewContext.Writer.Write(res);
+        });
+        settings.Columns.Add(WebStatusColumn);
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "StatusID":
+                    e.Values.Clear();
+                    e.AddValue("On", "0");
+                    e.AddValue("Pending Off (On)", "1");
+                    e.AddValue("Pending On (Off)", "2");
+                    e.AddValue("Pre-Launch", "3");
+                    e.AddValue("Off", "4");
+                    e.AddShowAll();
+                    break;
+                case "LanguageID":
+                    e.Values.Clear();
+                    foreach (var v in UoW.GetRepository<Language>().GetAll().OrderBy(p => p.LanguageID))
+                    {
+                        e.AddValue(v.Name, v.LanguageID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "PriceListID":
+                    e.Values.Clear();
+                    foreach (var v in UoW.GetRepository<PriceList>().GetAll().OrderBy(p => p.PriceListID))
+                    {
+                        e.AddValue(v.Name, v.PriceListID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+    });
+
+}
+@grid.BindToLINQ("", "", (s, e) => { 
+    //var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<vwMessage>().GetAll();
+
+    e.KeyExpression = "MessageID";
+    e.QueryableSource = source;
+}).GetHtml()

@@ -1,0 +1,178 @@
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ArticleGridView";
+        settings.CallbackRouteValues = new { Controller = "Articles", Action = "ArticleGridViewPartial" };
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Articles", Action = "ArticleGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Articles", Action = "ArticleGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Articles", Action = "ArticleGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = false;
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "ProductPageID").DisplayFormat = "Total: {0:n0}";
+        settings.Settings.ShowFooter = true;
+        
+		settings.KeyFieldName = "ArticleID";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        MVCxGridViewColumn ArticleIDColumn = new MVCxGridViewColumn();
+        ArticleIDColumn.Name = "ArticleID";
+        ArticleIDColumn.FieldName = "ArticleID";
+        ArticleIDColumn.Caption = "ID";
+        ArticleIDColumn.Width = 40;
+        ArticleIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        settings.Columns.Add(ArticleIDColumn);
+
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(NameColumn);
+
+        MVCxGridViewColumn ArticleTypeIDColumn = new MVCxGridViewColumn();
+        ArticleTypeIDColumn.Name = "ArticleTypeID";
+        ArticleTypeIDColumn.FieldName = "ArticleType.Name";
+        ArticleTypeIDColumn.Caption = "Article Type";
+        ArticleTypeIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ArticleTypeIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        settings.Columns.Add(ArticleTypeIDColumn);
+
+        MVCxGridViewColumn ArticleSubTypeIDColumn = new MVCxGridViewColumn();
+        ArticleSubTypeIDColumn.Name = "ArticleSubTypeID";
+        ArticleSubTypeIDColumn.FieldName = "ArticleSubType.Name";
+        ArticleSubTypeIDColumn.Caption = "Article Sub Type";
+        ArticleSubTypeIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ArticleSubTypeIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        settings.Columns.Add(ArticleSubTypeIDColumn);
+        
+        MVCxGridViewColumn ArticleTemplateIDColumn = new MVCxGridViewColumn();
+        ArticleTemplateIDColumn.Name = "ArticleTemplateID";
+        ArticleTemplateIDColumn.FieldName = "ArticleTemplate.Name";
+        ArticleTemplateIDColumn.Caption = "Template";
+        ArticleTemplateIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ArticleTemplateIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        settings.Columns.Add(ArticleTemplateIDColumn);
+        
+        MVCxGridViewColumn TitleTagColumn = new MVCxGridViewColumn();
+        TitleTagColumn.Name = "TitleTag";
+        TitleTagColumn.FieldName = "TitleTag";
+        TitleTagColumn.Caption = "Title";
+        TitleTagColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        TitleTagColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(TitleTagColumn);
+        
+        MVCxGridViewColumn URLKeywordsColumn = new MVCxGridViewColumn();
+        URLKeywordsColumn.Name = "URLKeywords";
+        URLKeywordsColumn.FieldName = "URLKeywords";
+        URLKeywordsColumn.Caption = "URL Keywords";
+        URLKeywordsColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        URLKeywordsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(URLKeywordsColumn);
+
+        MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+        CreatedDTColumn.Name = "CreatedDT";
+        CreatedDTColumn.FieldName = "CreatedDT";
+        CreatedDTColumn.Caption = "Created";
+        CreatedDTColumn.Width = 80;
+        CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        CreatedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CreatedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(CreatedDTColumn);
+
+        MVCxGridViewColumn ModifiedDTColumn = new MVCxGridViewColumn();
+        ModifiedDTColumn.Name = "ModifiedDT";
+        ModifiedDTColumn.FieldName = "ModifiedDT";
+        ModifiedDTColumn.Caption = "Modified";
+        ModifiedDTColumn.Width = 80;
+        ModifiedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        ModifiedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ModifiedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(ModifiedDTColumn);
+
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        OnDateColumn.Name = "OnDate";
+        OnDateColumn.FieldName = "OnDate";
+        OnDateColumn.Caption = "OnDate";
+        OnDateColumn.Width = 80;
+        OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OnDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(OnDateColumn);
+
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+        OffDateColumn.Name = "OffDate";
+        OffDateColumn.FieldName = "OffDate";
+        OffDateColumn.Caption = "OffDate";
+        OffDateColumn.Width = 80;
+        OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OffDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(OffDateColumn);
+
+        MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+        WebStatusColumn.Name = "WebStatus";
+        WebStatusColumn.FieldName = "WebStatus";
+        WebStatusColumn.Caption = "Web Status";
+        WebStatusColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        WebStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        WebStatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        WebStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var on = DataBinder.Eval(c.DataItem, "OnDate") == null ? null : (DateTime?)Convert.ToDateTime(DataBinder.Eval(c.DataItem, "OnDate"));
+            var off = DataBinder.Eval(c.DataItem, "OffDate") == null ? null : (DateTime?)Convert.ToDateTime(DataBinder.Eval(c.DataItem, "OffDate"));
+            
+            var i = UoW.Context.fnc_Status(on, off);
+            string colour = "black";
+            string statusText = "unknown";
+            statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+            switch (i)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+            ViewContext.Writer.Write(res);
+        });
+        settings.Columns.Add(WebStatusColumn);
+
+        MVCxGridViewColumn CustomCommandColumn = new MVCxGridViewColumn();
+        CustomCommandColumn.Name = "CustomCommandColumn";
+        CustomCommandColumn.FieldName = "CustomCommandColumn";
+        CustomCommandColumn.Caption = "&nbsp;";
+        CustomCommandColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        CustomCommandColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        CustomCommandColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        CustomCommandColumn.SetDataItemTemplateContent(c => {
+            ViewContext.Writer.Write("<a class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' href='/admin/articles/compose/" + c.KeyValue.ToString() + "' target='_blank'>Compose</a>");
+        });
+        settings.Columns.Add(CustomCommandColumn);
+        
+    });
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

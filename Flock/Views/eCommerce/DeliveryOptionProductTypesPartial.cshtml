@@ -1,0 +1,92 @@
+﻿@using Flock.Models
+@using Flock.DAL
+@model List<ProductType>
+@{
+    using(var UoW = new UnitOfWork<FlockDataContext>())
+    {
+        <h5>
+            Product Types
+        </h5>
+        <div class="attribute-group-inner" style="padding-top: 0;">
+            <div id="product-types-assigned-droppable" style="width: 49%; float: left; padding: 0.5em;">
+                <h6 style="margin-top: 0;">
+                    Assigned
+                    <a href="javascript:;" style="float: right; font-size: 10px; line-height: 20px;" onclick="ClearAllProductTypes()">Clear All</a>
+                </h6>
+                <ul id="assigned-list" style="min-height: 20px;">
+                    @if (Model.Count() > 0)
+                    {
+                        foreach (var ProductType in Model)
+                        {
+                            <li data-product-type-id="@(ProductType.ProductTypeID)" onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                <label>@(ProductType.ProductTypeID): @(ProductType.Name)</label>
+                                <img src="/images/systemicons/remove-icon.png" onclick="RemoveProductType(@(ProductType.ProductTypeID))" class="remove-icon" style="cursor: pointer; opacity: 0.0; float: right; width: 18px;" />
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="placeholder">
+                            <i style="font-size: 10px;">No Product Types Selected</i>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div id="product-types-available" style="width: 50%; float: left; padding: 0.5em; border-left: 1px solid #cdcdcd;">
+                <h6 style="margin-top: 0;">
+                    Available
+                    <a href="javascript:;" style="float: right; font-size: 10px; line-height: 20px;" onclick="AddAllProductTypes()">Add All</a>
+                </h6>
+                <ul id="full-list" class="attribute-group-full-list">
+                    @{
+                        var remaining = UoW.GetRepository<ProductType>().GetAll().Where(p => !(Model.Select(x => x.ProductTypeID).Contains(p.ProductTypeID))).ToList();
+                        if (remaining.Count() > 0)
+                        {
+                            foreach (var ProductType in remaining)
+                            {
+                                <li data-product-type-id="@(ProductType.ProductTypeID)" class="product-type-draggable">
+                                    <label>@(ProductType.ProductTypeID): @(ProductType.Name)</label>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li>
+                                <i style="font-size: 10px;">All Product Types Utilised</i>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+
+            <div style="clear: both;"></div>
+        </div>
+    }
+}
+<script type="text/javascript">
+    if ($("#product-types-available").height() > $("#product-types-assigned-droppable").height()) {
+        $("#product-types-assigned-droppable").css("height", $("#product-types-available").height() + 10 + 'px');
+    }
+
+    $("#product-types-assigned-droppable").droppable({
+        //helper: 'clone',
+        activeClass: "ui-state-highlight-attribute",
+        accept: '.product-type-draggable',
+        drop: function (ev, ui) {
+            $(this).find(".placeholder").remove();
+            window.ProductTypes = new Array();
+            ui.draggable.detach().appendTo($(this).find("ul"));
+            $(this).find("li").each(function(index) {
+                ProductTypes.push($(this).data("product-type-id"));
+            });
+            UpdateProductTypes();
+        }
+    });
+
+    $(".product-type-draggable").draggable({
+        helper: 'clone',
+        revert: 'invalid'
+    });
+
+
+</script>

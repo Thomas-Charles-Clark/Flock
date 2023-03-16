@@ -1,0 +1,17 @@
+﻿@{
+    Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewBag.Title = "Image Information Hub";
+}
+<h4 class="page-heading">
+    Image Information Hub
+</h4>
+
+<div class="page-subheading">
+    This page should provide a centralised location to find an image and all information about its use.
+</div>
+
+@Html.Partial("ImageInfoHubGridPartial")
+
+<div id="image-hub-target">
+    <h5>Please select an image from the grid above to inspect it.</h5>
+</div>

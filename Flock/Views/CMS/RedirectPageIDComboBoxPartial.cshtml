@@ -1,0 +1,22 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "Form" + ViewBag.FormID + "RedirectPageID";
+    settings.CallbackRouteValues = new { Controller = "CMS", Action = "RedirectPageIDComboBoxPartial" };
+    settings.Properties.ClientSideEvents.BeginCallback = @"function (s, e) { 
+        e.customArgs['formId'] = "+ViewBag.FormID+@";
+    }";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.ValueField = "PageID";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.TextField = "Name";
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.IncrementalFilteringDelay = 1000;
+    settings.Height = 35;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    //settings.Properties.DropDownWidth = 350;
+    //settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    //settings.Properties.Columns.Add("PageID", "Page ID", 60);
+    //settings.Properties.Columns.Add("Name", "Name", 270);
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetPageIDs, Flock.ViewModels.LargeDatabaseDataProvider.GetPageByID).Bind((int?)ViewBag.PageID).GetHtml()

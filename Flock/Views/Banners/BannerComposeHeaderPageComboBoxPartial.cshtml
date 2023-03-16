@@ -1,0 +1,33 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ComposeBannerHeaderPageListBox";
+    settings.CallbackRouteValues = new { Controller = "Banners", Action = "ComposeBannerHeaderPageComboBoxPartial" };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Name";
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "PageID";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.IncrementalFilteringDelay = 1000;
+    settings.Properties.NullText = "Page";
+    settings.Width = 200;
+    settings.Height = 35;
+    settings.Properties.DropDownWidth = 350;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.Properties.Columns.Add("PageID", "Page ID", 60);
+    settings.Properties.Columns.Add("Name", "Name", 270);
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+
+        if (s.GetValue()) {
+            s.SetText(s.GetSelectedItem().texts[1]);
+        } else {
+
+        }
+        if (typeof BannerSelectorGridView !== 'undefined')
+            BannerSelectorGridView.Refresh();
+        else
+            BannerOverviewGridView.Refresh();
+    }";
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetPageIDs, Flock.ViewModels.LargeDatabaseDataProvider.GetPageByID).GetHtml()

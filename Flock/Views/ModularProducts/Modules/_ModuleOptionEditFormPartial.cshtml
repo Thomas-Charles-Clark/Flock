@@ -1,0 +1,124 @@
+﻿@using Flock.ViewModels
+@model ModuleOptionViewModel
+
+<div style='width: 940px; margin: 0 auto;'>
+
+    <div style='width: 688px; float: left;'>
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "NameLbl";
+            lblSettings.Text = "Name";
+            lblSettings.Width = 90;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "Name";
+        }).GetHtml()
+
+        @Html.DevExpress().TextBoxFor(m => Model.Name, tbSettings =>
+       {
+           tbSettings.Name = "Name";
+           tbSettings.Width = 200;
+           tbSettings.Properties.MaxLength = 100;
+           tbSettings.ShowModelErrors = true;
+           tbSettings.Properties.ConvertEmptyStringToNull = true;
+           tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+       }).GetHtml()
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "ModuleOptionGroupLbl";
+            lblSettings.Text = "Option Group";
+            lblSettings.Width = 90;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "ModuleOptionGroupID";
+        }).GetHtml()
+
+        @Html.Action("ModuleOptionGroupComboBoxPartial", new { ModuleOptionGroupID = Model == null ? null : Model.ModuleOptionGroupID })
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "ProductIDLbl";
+            lblSettings.Text = "Product";
+            lblSettings.Width = 90;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+            lblSettings.AssociatedControlName = "ProductID";
+        }).GetHtml()
+
+        @Html.Action("ModuleOptionProductIDComboBoxPartial", new { ProductID = Model == null ? null : Model.ProductID })
+
+        <div style='clear: both'></div>
+
+        @Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "ImageIDLbl";
+            lblSettings.Text = "Image";
+            lblSettings.Width = 90;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "32px");
+            lblSettings.Style.Add("margin-right", "1em");
+        }).GetHtml()
+
+        <div id="image-droppable" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({ opacity: 0.0 }, 300);">
+            <img src="/images/systemicons/remove-icon.png" title="Remove" class="image-remove-icon" onclick="$('#image').remove();$('#ImageID').val(null)" style="opacity: 0; width: 24px; height: 24px;" >
+            <input type="hidden" id="ImageID" name="ImageID" value="@(Model == null ? "" : Model.ImageID.ToString())" />
+            @if (Model != null)
+            {
+                if (Model.ImageID != null)
+                {
+                    <img id="image" src="https://flock.designersguild.com/ImageLibrary/156/@(Model.ImageID).jpeg" title="ImageID: @(Model.ImageID)" />
+                }
+            }
+        </div>
+
+        <div style='clear: both'></div>
+
+
+
+        @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+    </div>
+
+    <div style='text-align: right; margin-top: 1em; padding-right: 25px;'>
+        @Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Update";
+            btnSettings.Style.Add("margin-right", "1em");
+            btnSettings.ClientSideEvents.Click = "function(s, e){ ModuleOptionGridView.UpdateEdit(); }";
+        }).GetHtml()
+        @Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Cancel";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ ModuleOptionGridView.CancelEdit(); }";
+        }).GetHtml()
+    </div>
+    <div style='clear: both'></div>
+</div>
+
+<script type="text/javascript" id="dxss_1">
+    $("#image-droppable").droppable({
+        hoverClass: "drop-hover",
+        drop: function (event, ui) {
+            $("#ImageID").val(ui.helper.data("image-id"));
+
+            if ($("#image").length) {
+                $("#image").attr("src", "https://flock.designersguild.com/ImageLibrary/156/" + ui.helper.data("image-id") + ".jpeg");
+            } else {
+                $("#image-droppable").append("<img id='image' src='https://flock.designersguild.com/ImageLibrary/156/" + ui.helper.data("image-id") + ".jpeg' title='ImageID: " + ui.helper.data("image-id") + "'/>")
+            }
+        }
+    });
+
+    initDragDrop();
+</script>

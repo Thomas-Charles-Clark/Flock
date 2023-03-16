@@ -1,0 +1,228 @@
+﻿@using Flock.Models;
+@using Flock.ViewModels;
+@model Flock.ViewModels.CareerListingViewModel
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+}
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "CareersSelectorGridView";
+
+    settings.CallbackRouteValues = new { Action = "CareersSelectorGridViewPartial", Controller = "Careers" };
+
+    settings.SettingsEditing.AddNewRowRouteValues = new { Action = "CareersSelectorGridViewAddNew", Controller = "Careers" };
+
+    settings.SettingsEditing.UpdateRowRouteValues = new { Action = "CareersSelectorGridViewUpdate", Controller = "Careers" };
+
+    settings.SettingsEditing.DeleteRowRouteValues = new { Action = "CareersSelectorGridViewDelete", Controller = "Careers" };
+
+    settings.CustomActionRouteValues = new { Action = "CareersSelectorGridViewCustomCommand", Controller = "Careers" };
+
+    settings.KeyFieldName = "CareerListingID";
+
+    settings.ClientSideEvents.Init = @"function(s, e) { 
+        InitalizejQuery();
+    }";
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+        InitalizejQuery();
+    }";
+
+    settings.HtmlRowPrepared = (sender, e) =>
+    {
+        if (e.RowType == GridViewRowType.Data)
+        {
+            e.Row.Attributes.Add("data-career-listing-id", e.KeyValue.ToString());
+            e.Row.Attributes.Add("data-sort-order", e.GetValue("SortOrder").ToString());
+        }
+    };
+
+    settings.Styles.Row.CssClass = "draggable";
+
+    MVCxGridViewColumn ReplacementCommandColumn = new MVCxGridViewColumn();
+    ReplacementCommandColumn.Name = "ReplacementCommandColumn";
+    ReplacementCommandColumn.FieldName = "ReplacementCommandColumn";
+    ReplacementCommandColumn.Caption = "";
+    ReplacementCommandColumn.HeaderStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+    ReplacementCommandColumn.HeaderStyle.Font.Bold = true;
+    ReplacementCommandColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+    ReplacementCommandColumn.VisibleIndex = 10;
+    ReplacementCommandColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+    ReplacementCommandColumn.SetHeaderCaptionTemplateContent(c => { });
+    ReplacementCommandColumn.SetHeaderTemplateContent(c => {
+        ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue' onclick='CareersSelectorGridView.AddNewRow();'>New</a>");
+    });
+    ReplacementCommandColumn.SetDataItemTemplateContent(c => {
+        ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' style='margin-right: 3px;' onclick='CareersSelectorGridView.StartEditRow(" + c.VisibleIndex + ");'>Edit</a>");
+        ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' onclick='$.confirm(function() { CareersSelectorGridView.DeleteRow(" + c.VisibleIndex + "); }, function() { });'>Delete</a>");
+    });
+    settings.Columns.Add(ReplacementCommandColumn);
+
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+    settings.SettingsPager.PageSizeItemSettings.ShowAllItem = true;
+    settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "10", "20", "30", "50" };
+    settings.SettingsPager.PageSize = 30;
+    settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    settings.SettingsPager.PageSizeItemSettings.Visible = true;
+    settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+
+    MVCxGridViewColumn CareerListingIDColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn TitleColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn LocationColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ContentsColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ContactEmailColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ContactPostalColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ApplyBeforeColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn SortOrderColumn = new MVCxGridViewColumn();
+
+    CareerListingIDColumn.FieldName = "CareerListingID";
+    CareerListingIDColumn.Name = "CareerListingID";
+    CareerListingIDColumn.Caption = "Career Listing ID";
+    CareerListingIDColumn.Width = 80;
+    CareerListingIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    CareerListingIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    CareerListingIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    CareerListingIDColumn.Visible = true;
+    settings.Columns.Add(CareerListingIDColumn);
+
+    TitleColumn.FieldName = "Title";
+    TitleColumn.Name = "Title";
+    TitleColumn.Caption = "Title";
+    TitleColumn.Width = 300;
+    TitleColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    TitleColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    TitleColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(TitleColumn);
+
+    LocationColumn.FieldName = "Location";
+    LocationColumn.Name = "Location";
+    LocationColumn.Caption = "Location";
+    LocationColumn.Width = 300;
+    LocationColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    LocationColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    LocationColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(LocationColumn);
+
+    ContactEmailColumn.FieldName = "ContactEmail";
+    ContactEmailColumn.Name = "ContactEmail";
+    ContactEmailColumn.Caption = "Contact Email";
+    ContactEmailColumn.Visible = false;
+    ContactEmailColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    settings.Columns.Add(ContactEmailColumn);
+
+    ContactPostalColumn.FieldName = "ContactPostal";
+    ContactPostalColumn.Name = "ContactPostal";
+    ContactPostalColumn.Caption = "Contact Postal";
+    ContactPostalColumn.Visible = false;
+    ContactPostalColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    settings.Columns.Add(ContactPostalColumn);
+
+    ApplyBeforeColumn.FieldName = "ApplyBeforeDT";
+    ApplyBeforeColumn.Name = "ApplyBeforeDT";
+    ApplyBeforeColumn.Caption = "Apply Before";
+    ApplyBeforeColumn.Width = 110;
+    ApplyBeforeColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    ApplyBeforeColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    ApplyBeforeColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    ApplyBeforeColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    settings.Columns.Add(ApplyBeforeColumn);
+
+    OnDateColumn.FieldName = "OnDate";
+    OnDateColumn.Name = "OnDate";
+    OnDateColumn.Caption = "On Date";
+    OnDateColumn.Width = 110;
+    OnDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    OnDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    settings.Columns.Add(OnDateColumn);
+
+    OffDateColumn.FieldName = "OffDate";
+    OffDateColumn.Name = "OffDate";
+    OffDateColumn.Caption = "Off Date";
+    OffDateColumn.Width = 110;
+    OffDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    OffDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    settings.Columns.Add(OffDateColumn);
+
+    WebStatusColumn.FieldName = "WebStatusID";
+    WebStatusColumn.Name = "WebStatusID";
+    WebStatusColumn.Caption = "Web Status";
+    WebStatusColumn.Width = 110;
+    WebStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    WebStatusColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    WebStatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    WebStatusColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    WebStatusColumn.SetDataItemTemplateContent(c => {
+        var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "WebStatusID"));
+        string colour = "black";
+        string statusText = "unknown";
+        statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+        switch (i)
+        {
+            case 0:
+                colour = "green";
+                break;
+            case 1:
+                colour = "orange";
+                break;
+            case 2:
+                colour = "orange";
+                break;
+            case 3:
+                colour = "green";
+                break;
+            case 4:
+                colour = "red";
+                break;
+            default: break;
+        }
+        string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+        ViewContext.Writer.Write(res);
+    });
+    settings.Columns.Add(WebStatusColumn);
+
+    SortOrderColumn.Name = "SortOrder";
+    SortOrderColumn.FieldName = "SortOrder";
+    SortOrderColumn.Caption = "Sort Order";
+    SortOrderColumn.Visible = false;
+    SortOrderColumn.SortAscending();
+    settings.Columns.Add(SortOrderColumn);
+
+    settings.SetEditFormTemplateContent(c => {
+        if (Model == null)
+            ViewContext.Writer.Write(Html.Action("CareersSelectorGridEditFormPartial", "Careers", new { CareerListingID = c.KeyValue }));
+        else
+            ViewContext.Writer.Write(Html.Partial("_CareersListingEditFormPartial", Model));
+    });
+
+    settings.HeaderFilterFillItems = (sender, e) => {
+        MVCxGridView gridView = (MVCxGridView)sender;
+        switch (e.Column.Name)
+        {
+            case "WebStatusID":
+                e.Values.Clear();
+                foreach(var s in UoW.GetRepository<Status>().GetAll())
+                {
+                    e.AddValue(s.Name, s.StatusID.ToString());
+                }
+                e.AddShowAll();
+                break;
+        }
+    };
+
+}).BindToLINQ("", "", (s, e) => {
+    var source = UoW.GetRepository<Flock.Models.vwCareerListing>().GetAll();
+
+    e.QueryableSource = source;
+    e.KeyExpression = "CareerListingID";
+}).GetHtml()

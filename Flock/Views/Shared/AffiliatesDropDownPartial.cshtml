@@ -1,0 +1,90 @@
+﻿@model List<Flock.Models.MarketingPartner>
+@{ var MarketingPartnerID = ViewBag.SelectedAffiliateID;
+   //ViewContext.Writer.Write(Html.DropDownListFor(m => MarketingPartnerID,
+   //    new SelectList(Model, "MarketingPartnerID", "MarketingPartnerName"),
+   //    new { name = "MarketingPartnerID", id = "Form" + ViewBag.FormID + "MarketingPartnerID" }).ToHtmlString());
+
+    string name = "Form";
+   
+    name = name + ViewBag.FormID;
+    
+    @Html.DevExpress().DropDownEdit(settings => {
+        settings.Name = name + "MarketingPartnerDD"; //"MarketingPartnerID" + ViewBag.FormID.ToString();
+        settings.Style.Add("margin", "0 7px 0 0");
+        settings.Width = 200;
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        settings.Text = "Marketing Partner";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+        settings.Properties.DropDownWindowWidth = System.Web.UI.WebControls.Unit.Pixel(270);
+
+        settings.SetDropDownWindowTemplateContent(c => {
+            ViewContext.Writer.Write("<div>");
+            Html.DevExpress().ListBox(lbSettings =>
+            {
+                lbSettings.Name = name + "MarketingPartnerListBox";
+                lbSettings.Properties.TextField = "Name";
+                lbSettings.Properties.ValueField = "MarketingPartnerID";
+                lbSettings.Properties.ValueType = typeof(long);
+                lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                lbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+                    " + name + @"MarketingPartnerDD.SetText(s.GetSelectedItem().text);
+                }";
+            }).BindList(Model).Render();
+            
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+//            @Html.DevExpress().Button(
+//                buttonSettings =>
+//                {
+//                    buttonSettings.Name = name + "ButtonManage";
+//                    buttonSettings.Style.Add("margin-right", "7px");
+//                    buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+//                            $.ajax({ 
+//                                url: '" + @Url.Action("MarketingPartnerManagementGridView", "CMS") + @"',
+//                                type: 'POST',
+//                                traditional: true,
+//                                data: {},
+//                                success: function(data) { 
+//                                    $('#dialog-marketingpartner-inner').html(data); 
+//                                    $('#dialog-marketingpartner-manage').dialog('open');
+//                                },
+//                              error: function(e, r, s) {
+//                                    $.showError(e, s, a);
+//                                },
+//                                timeout: 20000
+//                            });
+//                        }";
+//                    buttonSettings.Text = "Manage";
+//                    buttonSettings.Style.Add("float", "left");
+//                }
+//                ).Render();
+
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                        buttonSettings.Name = name + "ButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            " + name + @"MarketingPartnerDD.HideDropDown();
+                            " + name + @"MarketingPartnerDD.SetText('Marketing Partner');
+                            " + name + @"MarketingPartnerListBox.UnselectAll();
+                        }";
+                        buttonSettings.Text = "Clear";
+                        buttonSettings.Style.Add("float", "left");
+                }
+                ).Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Name = name + "ButtonClose";
+                    buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                        " + name + @"MarketingPartnerDD.HideDropDown();
+                    }";
+                    
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }).Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+    }).GetHtml()
+}

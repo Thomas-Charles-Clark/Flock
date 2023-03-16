@@ -1,0 +1,151 @@
+﻿@model Flock.ViewModels.TranslateHtmlSectionViewModel
+@{
+    ViewBag.Title = "Translate HTML Sections";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/translations.css")
+    @Styles.Render("~/content/codemirror.css")
+
+    <style type="text/css">
+        #container {
+            width: 1320px;
+        }
+        /*.dxgvFooter_MetropolisBlue .dxgv {
+            border-top: 1px solid #c0c0c0;
+        }*/
+        fieldset {
+            padding: 2px;
+        }
+        input {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        .buttons-table {
+            border: 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .buttons-table td {
+            width: 25%;
+            text-align: center;
+        }
+        .translation-subheading-label {
+            display: none;
+            line-height: 35px;
+            font-size: 12px;
+            font-weight: normal;
+            float: right;
+            margin-right: 2em;
+        }
+    </style>
+}
+@section scripts {
+    @Scripts.Render("~/bundles/js/codemirror-htmleditor")
+}
+<script type="text/javascript">
+    function LoadTranslator(RowKey, completeFunction) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("LoadHtmlSectionTranslator", "Translations")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                HTMLSectionID: RowKey,
+                TargetLanguage: TranslationTargetLanguageListBox.GetSelectedItem().text,
+                TargetLanguageID: TranslationTargetLanguageListBox.GetValue()
+            },
+            success: function (data) {
+                if (typeof completeFunction === 'function')
+                    completeFunction();
+                $('#ajax-container').html(data);
+                $('#translator-container').fadeIn('fast');
+                LoadingPanel.Hide();
+            },
+            timeout: 20000
+        });
+    }
+
+    function DetectUnsavedChanges()
+    {
+        return (window.HeadingChanged || window.SubHeadingChanged || window.TitleTagChanged || window.URLKeywordsChanged || window.MetaDescriptionChanged);
+    }
+
+    function SaveTranslation(completeFunction) {
+
+        LoadingPanel.Show();
+
+        $.ajax({
+            url: '@Url.Action("Save_HtmlSection", "Translations")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                HTMLSectionID: $("#HtmlSection-id-hidden").val(),
+                LanguageID: TranslationTargetLanguageListBox.GetValue(),
+                OriginalContents: window["original-htmleditor"].getValue(),
+                TranslatedContents: window["translation-htmleditor"].getValue(),
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                if (typeof completeFunction === 'function') {
+                    completeFunction();
+                }
+            },
+            timeout: 120000
+        });
+    }
+
+    $.extend({
+        unsavedWarning: function (yesCallback, noCallback, args) {
+            $("<div></div>").dialog({
+                title: "Warning",
+                width: 250,
+                height: "auto",
+                buttons: [{
+                    text: "Yes",
+                    click: function () {
+                        yesCallback(args);
+                        $(this).remove();
+                    }
+                },
+                {
+                    text: "No",
+                    click: function () {
+                        noCallback(args);
+                        $(this).remove();
+                    }
+                }
+                ],
+                close: function (event, ui) { $(this).remove(); },
+                resizable: false,
+                modal: true
+            }).html("<p style='margin-top: 10px;'>You have unsaved changes.</p><p>Are you sure you wish to proceed?</p>").parent().addClass("alert");
+        }
+    });
+</script>
+
+<h4 class="page-heading">
+    Translate HTML Sections
+</h4>
+<div class="page-subheading">
+
+    <h5 style="font-size: 1.5em; line-height: 1.5em">
+        It is crucially important that the HTML markup <span>remains the same</span> as the original.<br/>
+        If you have any doubts or need assistance with the HTML in the below sections, please email <a href="mailto:itsupport@designersguild.com">itsupport@designersguild.com</a>, including the HTML Seciton ID, Target Language, and Translation.
+    </h5>
+
+    @Html.ValidationSummary()
+    @Html.Action("TranslateHtmlSectionTargetLanguageDropDown", "Translations", new { TargetLanguageID = Model.TargetLanguageID })
+    <div class="clearfix"></div>
+</div>
+
+<div id="grid-container">
+    @Html.Action("TranslateHtmlSectionGridView", "Translations", new { targetLanguageID = Model.TargetLanguageID, HtmlSectionID = Model.HtmlSectionID })
+</div>
+
+<div id="ajax-container">
+
+</div>

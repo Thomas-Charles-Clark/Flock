@@ -1,0 +1,89 @@
+﻿@model List<Flock.Models.CheckoutLog_BasketInspectorSelectResult>
+@{
+    System.Globalization.NumberFormatInfo nfi = new System.Globalization.CultureInfo("en-gb").NumberFormat;
+    nfi.NumberDecimalDigits = 2;
+    nfi.CurrencyDecimalDigits = 2;
+
+
+    decimal? delivery = 0.0M;
+    
+    if(Model.Select(p => p.DeliveryInc).FirstOrDefault() != null)
+    {
+        delivery = Model.Select(p => p.DeliveryInc).FirstOrDefault();
+    }
+
+    decimal? subTotal = Model.Select(p => p.PriceInc).Sum();//.ToString("C", nfi);
+
+    decimal? total = delivery + subTotal;
+}
+<table class="checkout-basket-inspector table table-condensed table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Product ID
+            </th>
+            <th>
+                Image
+            </th>
+            <th>
+                Code
+            </th>
+            <th>
+                Basket Name
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Price Inc
+            </th>
+        </tr>
+    </thead>
+    @foreach (var m in Model)
+    {
+        <tr>
+            <td>
+                @(m.ProductID)
+            </td>
+            <td>
+                <img src="https://flock.designersguild.com/imagelibrary/156/@(m.ImageID).jpeg" style="width: 100px;"/>
+            </td>
+            <td>
+                @(m.Code)
+            </td>
+            <td>
+                @(m.BasketName)
+            </td>
+            <td>
+                @(m.Quantity)
+            </td>
+            <td style="text-align: right;">
+                @((m.PriceInc ?? 0).ToString("C", nfi))
+            </td>
+        </tr>
+    }
+    <tr>
+        <th colspan="4" style="text-align: right;">
+            SubTotal
+        </th>
+        <th style="text-align: right;">
+            @((subTotal ?? 0M).ToString("C", nfi))
+        </th>
+    </tr>
+    <tr>
+        <th colspan="4" style="text-align: right;">
+            Delivery
+        </th>
+        <th style="text-align: right;">
+            @((delivery ?? 0M).ToString("C", nfi))
+        </th>
+    </tr>
+    <tr>
+        <th colspan="4" style="text-align: right;">
+            Total
+        </th>
+        <th style="text-align: right;">
+            @((subTotal ?? 0M).ToString("C", nfi))
+        </th>
+    </tr>
+</table>

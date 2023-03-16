@@ -1,0 +1,26 @@
+﻿@Html.DevExpress().TextBox(settings => 
+    {
+        settings.Name = "ProductCollectionFreeTextSearchBox";
+        settings.Text = "Search...";
+        settings.Properties.ClientSideEvents.GotFocus = @"function(s, e) {  
+            ProductCollectionFreeTextSearchBox.SetText('');
+        }";
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(42);
+        settings.Style.Add("margin-bottom", "8px");
+        settings.Style.Add("float", "left");
+        settings.Properties.EnableClientSideAPI = true;
+        settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) { 
+            if (typeof(incrementalFilterTimer) != 'undefined' && incrementalFilterTimer != null) {
+                window.clearTimeout(incrementalFilterTimer);
+            }
+        }";
+        settings.Properties.ClientSideEvents.KeyUp = @"function(s, e) {
+            if (typeof(incrementalFilterTimer) != 'undefined' && incrementalFilterTimer != null) {
+                window.clearTimeout(incrementalFilterTimer);
+                incrementalFilterTimer = window.setTimeout(SubmitSearch, 2000);
+            }
+            else
+                incrementalFilterTimer = window.setTimeout(SubmitSearch, 2000);
+        }";
+    }).GetHtml()

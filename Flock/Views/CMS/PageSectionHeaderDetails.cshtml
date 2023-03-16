@@ -1,0 +1,193 @@
+﻿@model Flock.ViewModels.BasePageSection
+<div class="header-control-wrapper">
+    <div>
+        <label>Heading</label>
+        @Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
+        {
+            settings.Properties.ClientInstanceName = "PageSection" + Model.PageSectionID + "PageSectionHeading";
+            settings.Name = "PageSection" + Model.PageSectionID + "PageSectionHeading";
+            settings.Properties.MaxLength = 70;
+            settings.Width = 313;
+
+            if (Model.IsHeader)
+            {
+                settings.ClientEnabled = false;
+            }
+        }).GetHtml()
+    </div>
+    <div class="checkbox-wrapper inline-wrapper">
+        <label>Is Header?</label>
+        @Html.DevExpress().CheckBoxFor(m => Model.IsHeader, settings =>
+        {
+            settings.Name = "PageSection" + Model.PageSectionID + "IsHeader";
+            settings.Properties.ValueChecked = true;
+            settings.Properties.ValueUnchecked = false;
+        }).GetHtml()
+    </div>
+    <div class="checkbox-wrapper inline-wrapper">
+        <label>Is Half-Width?</label>
+        @Html.DevExpress().CheckBoxFor(m => Model.HalfWidth, settings =>
+        {
+            settings.Name = "PageSection" + Model.PageSectionID + "HalfWidth";
+            settings.Properties.ValueChecked = true;
+            settings.Properties.ValueUnchecked = false;
+        }).GetHtml()
+    </div>
+    <div>
+        <label>Platform</label>
+        @Html.DevExpress().ComboBoxFor(m => Model.PlatformSwitch, settings =>
+        {
+            settings.Name = "PageSection" + Model.PageSectionID + "PlatformSwitch";
+            settings.Properties.Items.Add("Both", null);
+            settings.Properties.Items.Add("Desktop Only", false);
+            settings.Properties.Items.Add("Mobile Only", true);
+            settings.Width = 80;
+        }).GetHtml()
+    </div>
+    <div>
+        <label>Audience</label>
+        <div class="d-flex">
+            @Html.DevExpress().ComboBoxFor(m => Model.TradeSwitch, settings =>
+            {
+                settings.Name = "PageSection" + Model.PageSectionID + "TradeSwitch";
+                settings.Properties.Items.Add("Everyone", null);
+                settings.Properties.Items.Add("Retail Only", false);
+                settings.Properties.Items.Add("Trade Only", true);
+                settings.Properties.ClientSideEvents.ValueChanged = @"function (s, e) {
+                    if (s.GetValue() != true) {
+                        PageSection" + Model.PageSectionID + @"TradePartnerAvailability.SetValue(0);
+                        PageSection" + Model.PageSectionID + @"TradePartnerAvailability.SetClientVisible(false);
+                    } else {
+                        PageSection" + Model.PageSectionID + @"TradePartnerAvailability.SetClientVisible(true);
+                    }
+                }";
+                settings.Width = 85;
+            }).GetHtml()
+            @Html.DevExpress().ComboBoxFor(m => Model.TradePartnerAvailability, settings =>
+            {
+                settings.Name = "PageSection" + Model.PageSectionID + "TradePartnerAvailability";
+                settings.Properties.Items.Add("Both Partners and Non-Partners", (byte)0);
+                settings.Properties.Items.Add("Non Partners Only", (byte)1);
+                settings.Properties.Items.Add("Trade Partners Only", (byte)2);
+                settings.Width = 196;
+                settings.ClientVisible = Model.TradeSwitch == true;
+            }).GetHtml()
+        </div>
+    </div>
+</div>
+<div class="header-control-wrapper">
+    <div>
+        <label>Name</label>
+        @Html.DevExpress().TextBoxFor(m => Model.PageSectionName, settings =>
+        {
+            settings.Name = "PageSection" + Model.PageSectionID + "PageSectionName";
+            settings.Width = 180;
+            if (Model.PageSectionName == null || Model.PageSectionName == "")
+                settings.Text = "Name";
+        }).GetHtml()
+        @Html.ValidationMessageFor(m => Model.PageSectionName)
+    </div>
+    <div class="inline-wrapper">
+        <label>On Date</label>
+        @Html.DevExpress().DateEditFor(m => Model.OnDate, settings =>
+        {
+            settings.Name = "PageSection" + Model.PageSectionID + "OnDate";
+            settings.Width = 90;
+        }).GetHtml()
+        @Html.ValidationMessageFor(m => Model.OnDate)
+    </div>
+    <div class="inline-wrapper">
+        <label>Off Date</label>
+        @Html.DevExpress().DateEditFor(m => Model.OffDate, settings =>
+        {
+            settings.Name = "PageSection" + Model.PageSectionID + "OffDate";
+            settings.Width = 90;
+        }).GetHtml()
+        @Html.ValidationMessageFor(m => Model.OffDate)
+    </div>
+    <div class="inline-wrapper">
+        <label>Status: </label>
+        @{
+            var statusColour = "black";
+            if (Model.Status != null)
+            {
+                switch (Model.Status.Replace('_', ' '))
+                {
+                    case "On":
+                        statusColour = "green";
+                        break;
+                    case "Pending Off (On)":
+                        statusColour = "#DEC400";
+                        break;
+                    case "Pending On":
+                        statusColour = "#DEC400";
+                        break;
+                    case "Pre-Launch":
+                        statusColour = "orange";
+                        break;
+                    case "Off":
+                    case "Unsaved":
+                        statusColour = "red";
+                        break;
+                    default: break;
+                }
+                <label class="page-section-web-status" style="color: @(statusColour);">@Model.Status.Replace('_', ' ')</label>
+            }
+            else
+            {
+                <label class="page-section-web-status" style="color: @(statusColour);">Unknown</label>
+            }
+        }
+    </div>
+    @if (Model.PageSectionTypeID == 4)
+    {
+        @Html.DevExpress().ComboBox(settings =>
+        {
+            settings.Name = "PageSection_" + Model.PageSectionID.ToString() + "_ProductPageGridSorter";
+            //settings.Properties.NullDisplayText = "Sort by...";
+            //settings.Properties.NullText = "Sort by...";
+            settings.Properties.Items.Add(new ListEditItem("Sort by...", ""));
+            settings.Properties.Items.Add(new ListEditItem("Best Sellers - UK", "bestseller-uk"));
+            settings.Properties.Items.Add(new ListEditItem("Best Sellers - US", "bestseller-us"));
+            settings.Properties.Items.Add(new ListEditItem("Clearance", "clearance"));
+            settings.Properties.Items.Add(new ListEditItem("Colour - Hot to Cold", "colour-hotcold"));
+            settings.Properties.Items.Add(new ListEditItem("Colour - Cold to Hot", "colour-coldhot"));
+            settings.Properties.Items.Add(new ListEditItem("Launch", "launch"));
+            settings.Properties.Items.Add(new ListEditItem("Stock", "stock"));
+            settings.Properties.ValueType = typeof(string);
+            settings.Width = 140;
+            settings.SelectedIndex = 0;
+
+            settings.Style.Add("float", "right");
+
+            settings.Properties.DropDownWidth = 140;
+
+            settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                    switch(s.GetSelectedItem().value) {
+                        case 'bestseller-uk':
+                            SortProductGridByBestSeller(" + Model.PageSectionID.ToString() + @", 1);
+                        break;
+                        case 'bestseller-us':
+                            SortProductGridByBestSeller("+ Model.PageSectionID.ToString() +@", 2);
+                        break;
+                        case 'clearance':
+                            SortProductGridByClearance(" + Model.PageSectionID.ToString() + @");
+                        break;
+                        case 'colour-coldhot':
+                            SortProductGridByColour(" + Model.PageSectionID.ToString() + @", true);
+                        break;
+                        case 'colour-hotcold':
+                            SortProductGridByColour(" + Model.PageSectionID.ToString() + @", false)
+                        break;
+                        case 'launch':
+                            SortProductGridByLaunch(" + Model.PageSectionID.ToString() + @");
+                        break;
+                        case 'stock':
+                            SortProductGridByStock(" + Model.PageSectionID.ToString() + @");
+                        break;
+                        default: break;
+                    }
+                }";
+        }).GetHtml()
+    }
+</div>

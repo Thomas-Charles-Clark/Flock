@@ -1,0 +1,81 @@
+﻿<div class="resource-panel-container" style="width: 555px; margin-bottom: 0; float: right;">
+    <fieldset id="product-search-fieldset">
+        <legend style="font-size: 1em;">Product Search</legend>
+        <div id="product-search-dataview">
+            <div style="padding: 1em 1em 0px; background-color: white;">
+                <input type="hidden" id="product-search-small-marker" value="" />
+                @Html.Action("ProductSearchProductTypeDropDownPartial", "Products")
+                @Html.Action("ProductSearchBrandDropDownPartial", "Products")
+                @Html.Action("ProductSearchLaunchDropDownPartial", "Products")
+                @Html.Action("ProductSearchCollectionDropDownPartial", "Products")
+                @Html.Action("ProductSearchPatternDropDownPartial", "Products")
+                @Html.Action("ProductSearchColourDropDownPartial", "Products")
+                @Html.Action("ProductSearchStatusDropDownPartial", "Products")
+                @Html.Action("ProductSearchWebStatusDropDownPartial", "Products")
+                @Html.Action("ProductSearchStockStatusDropDownPartial", "Products")
+                @Html.Action("ProductSearchAssociationDropDownPartial", "Products")
+                @Html.Action("ProductSearchPriceListDropDownPartial", "Products")
+                @Html.Action("ShopAvailabilityDropDownPartial", "Products")
+                @Html.Action("ProductSearchNameOrIDTextPartial", "Products")
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "ProductClearFiltersButton";
+                    settings.Text = "Reset";
+                    settings.Style.Add("padding-top", "5px");
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(26);
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    settings.ControlStyle.BackColor = System.Drawing.Color.FromArgb(139, 191, 229);
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        ProductSearchProductTypeListBox.UnselectAll();
+                        ProductSearchProductTypeDD.SetText('Product Type');
+		                ProductSearchBrandListBox.UnselectAll();
+                        ProductSearchBrandDD.SetText('Brand');
+		                ProductSearchLaunchListBox.UnselectAll();
+		                ProductSearchLaunchDD.SetText('Launch');
+                        ProductSearchCollectionListBox.UnselectAll();
+                        ProductSearchCollectionDD.SetText('Collection');
+		                ProductSearchPatternListBox.UnselectAll();
+                        ProductSearchPatternDD.SetText('Pattern');
+		                ProductSearchColourListBox.UnselectAll();
+                        ProductSearchColourDD.SetText('Colour');
+		                ProductSearchStatusListBox.UnselectAll();
+                        ProductSearchStatusDD.SetText('Status');
+                        ProductSearchNameOrIDTextBox.SetText('Name, Code or ID');
+
+                        $('#product-searching-icon').fadeIn('fast');
+                        $.ajax({
+                            url: '" + Url.Action("ProductSearchSmall", "Products") + @"',
+                            traditional: true,
+                            data: { 
+                                ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                                BrandID: ProductSearchBrandListBox.GetValue(),
+                                LaunchID: ProductSearchLaunchListBox.GetValue(),
+                                PatternID: ProductSearchPatternListBox.GetValue(),
+                                Status: ProductSearchStatusListBox.GetValue(),
+                                StatusID: ProductSearchWebStatusListBox.GetValue(),
+                                StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                                CollectionID: ProductSearchCollectionListBox.GetValue(),
+                                ColourID: ProductSearchColourListBox.GetValue(),
+                                SearchString: ProductSearchNameOrIDTextBox.GetValue(),
+                                ProductPageAssociation: ProductSearchAssociatedListBox.GetValue()
+                            },
+                            success: function(data) {
+                                $('#product-data-view-container').html(data);
+                                $('#product-searching-icon').fadeOut('slow');
+                            },
+                            error: function(e, s, a) {
+                                $.showError(e, s, a, function() { $('#product-searching-icon').fadeOut('slow'); });
+                            },
+                            timeout: 20000
+                        });
+                    }";
+                }).GetHtml()
+                <img id="product-searching-icon" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both"></div>
+            </div>
+            <div id="product-data-view-container" style="background-color: white;">
+                @Html.Action("ProductSearchSmall", "Products")
+            </div>
+        </div>
+    </fieldset>
+</div>

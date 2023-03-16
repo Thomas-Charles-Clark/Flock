@@ -1,0 +1,517 @@
+﻿@{
+    ViewBag.Title = "Sale Prices";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    
+    <style type="text/css">
+        #container {
+            width: 2400px !important;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Sale Prices</h4>
+
+<div class="page-subheading">
+    @Html.Action("SalePricePriceListDropDownPartial", "Promotions")
+    <div style="width: 215px; float: left;">
+        <h5 style="font-size: 12px; line-height: 13px; float: left; margin-right: 1em; ">Currency:</h5><h5 id="price-list-currency" style="font-size: 12px; line-height: 13px; margin-left: 1em; font-weight: normal;"></h5>
+    </div>
+    <div style="width: 215px; float: left;"><h5 style="font-size: 12px; line-height: 13px; float: left; margin-right: 1em;">Exchange Rate:</h5><h5 id="price-list-exchange-rate" style="font-size: 12px; line-height: 13px; margin-left: 1em; font-weight: normal;"></h5></div>
+    @*<div style="width: 215px; float: left;">
+        <button id="column-hide">
+            Fewer Columns
+        </button>
+    </div>*@
+
+    <div class="clearfix"></div>
+</div>
+
+<div id="tabs">
+    <ul>
+        <li><a href="#new-sale-group-product-select">1. Select Products</a></li>
+        <li id="criteria-tab"><a href="#new-sale-group-criteria-select">2. Specify Sale Criteria</a></li>
+        <li id="review-tab"><a href="#new-sale-group-review">3. Review &amp; Save</a></li>
+    </ul>
+    <div id="new-sale-group-product-select">
+        @Html.Partial("_AddNewSaleGroupProductSelectGrid")
+    </div>
+    <div id="new-sale-group-criteria-select">
+        @Html.Partial("_AddNewSaleGroupCriteria")
+    </div>
+    <div id="new-sale-group-review">
+    </div>
+</div>
+
+<div id="confirm-detail-delete">
+    <h5>
+        Are you sure you want to delete this Sale Price record?
+    </h5>
+</div>
+
+<script type="text/javascript">
+    var maxDiscountValuePercentage = 99.9;
+    var minDiscountValuePercentage = 0.01;
+
+    var maxDiscountValueAmount = null;
+    var minDiscountValueAmount = 0.01;
+
+    function ConfirmDetailDelete(Grid, VisibleIndex)
+    {
+        $("#confirm-detail-delete").data("grid", Grid);
+        $("#confirm-detail-delete").data("visibleIndex", VisibleIndex);
+        $("#confirm-detail-delete").dialog("open");
+    }
+
+    function Reset() {
+        AddNewSaleGroupProductSelectGrid.UnselectRows();
+        Discount.SetValue(null);
+        DiscountTypeListBox.SetSelectedIndex(-1);
+        DiscountType.SetText("");
+        $(SaleGroupName.GetInputElement()).css('color', 'darkgray');
+        SaleGroupName.SetText("Sale Name");
+        SaleOnDate.SetValue(null);
+        SaleOffDate.SetValue(null);
+        StockMinimum.SetValue(null);
+        $("#tabs").tabs("option", "disabled", [1, 2]);
+        $("#tabs").tabs("option", "active", 0);
+    }
+
+    function CalculateExcuse() {
+        var hasError = false;
+
+        var excuse = "You may not Review yet because:";
+
+        if (SaleGroupName.GetValue() == null || SaleGroupName.GetValue() == "" || SaleGroupName.GetValue() == "Sale Name")
+        {
+            hasError = true;
+            excuse += "\r\nSale Name has not been provided.";
+        }
+
+        if (DiscountTypeListBox.GetValue() == null) {
+            hasError = true;
+            excuse += "\r\nDiscount Type has not been provided.";
+        }
+
+        if (Discount.GetValue() == null || Discount.GetValue() == 0) {
+            hasError = true;
+            excuse += "\r\nDiscount value is not valid.";
+        }
+
+        if (SaleOnDate.GetValue() == null) {
+            hasError = true;
+            excuse += "\r\nOn Date has not been provided.";
+        }
+
+        if (SaleOnDate.GetValue() != null) {
+            if (SaleOffDate.GetValue() != null)
+                if (SaleOnDate.GetValue() >= SaleOffDate.GetValue()) {
+                    hasError = true;
+                    excuse += "\r\nOff Date preceeds On Date.";
+                }
+        }
+
+        if (hasError)
+            $("#review-tab").prop("title", excuse);
+        else
+            $("#review-tab").prop("title", "Review");
+    }
+
+
+    $("#tabs").tabs({
+        disabled: [1, 2],
+        beforeActivate: function (event, ui) {
+            if (ui.newTab.context.href.indexOf('review') != -1) {
+
+                LoadingPanel.Show();
+                AddNewSaleGroupProductSelectGrid.GetSelectedFieldValues("ProductID", GotSelectedProductIDsCallbackForReview)
+
+            }
+            else
+            {
+                $("#new-sale-group-review").html("");
+            }
+            if (ui.newTab.context.href.indexOf('criteria') != -1) {
+                // must... get the least price, and prevent discount type amount >= min
+                // how do we get those values, then.
+                AddNewSaleGroupProductSelectGrid.GetSelectedFieldValues('PriceInc', SetMaxDiscountAmount);
+            }
+        }
+    });
+
+    function GotSelectedProductIDsCallbackForReview(result) {
+        
+        var onDate = SaleOnDate.GetValue();
+
+        if (onDate != null)
+            onDate = new Date(onDate.getFullYear(), onDate.getMonth(), onDate.getDate()).toUTCString();
+
+        var offDate = SaleOffDate.GetValue();
+
+        if (offDate != null)
+            offDate = new Date(offDate.getFullYear(), offDate.getMonth(), offDate.getDate()).toUTCString();
+
+        $.ajax({
+            url: '@Url.Action("NewSaleGroupReview", "Promotions")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                Name: SaleGroupName.GetValue(),
+                KeyString: result.toString(),
+                PriceListID: SalePricePriceListListBox.GetValue(),
+                SalePriceTypeID: DiscountTypeListBox.GetValue(),
+                Discount: Discount.GetValue(),
+                OnDate: onDate,
+                OffDate: offDate,
+                StockMinimum: StockMinimum.GetValue()
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#new-sale-group-review").html(data);
+            },
+            error: function (e, s, a) {
+                alert(s + ' error');
+                LoadingPanel.Hide();
+                $("#new-sale-group-review").html(e.responseText);
+                //log e
+            },
+            timeout: 60000
+        });
+    }
+
+    function GotSelectedProductIDsCallbackForOverwriteCheck(result) {
+
+        var onDate = SaleOnDate.GetValue();
+
+        if (onDate != null)
+            onDate = new Date(onDate.getFullYear(), onDate.getMonth(), onDate.getDate()).toUTCString();
+
+        var offDate = SaleOffDate.GetValue();
+
+        if (offDate != null)
+            offDate = new Date(offDate.getFullYear(), offDate.getMonth(), offDate.getDate()).toUTCString();
+
+        $.ajax({
+            url: '@Url.Action("CanSaveWithoutOverwrite", "Promotions")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                Name: SaleGroupName.GetValue(),
+                KeyString: result.toString(),
+                PriceListID: SalePricePriceListListBox.GetValue(),
+                SalePriceTypeID: DiscountTypeListBox.GetValue(),
+                Discount: Discount.GetValue(),
+                OnDate: onDate,
+                OffDate: offDate,
+                StockMinimum: StockMinimum.GetValue()
+            },
+            success: function (data) {
+                if (data === '0') {
+                    AddNewSaleGroupProductSelectGrid.GetSelectedFieldValues("ProductID", GotSelectedProductIDsCallbackForSave);
+                    
+                }
+                else
+                    $("#cannot-save-dialog").dialog("open");
+            },
+            error: function (e, s, a) {
+                alert(s + ' error');
+                //log e
+            },
+            timeout: 20000
+        });
+    }
+
+    function GotSelectedProductIDsCallbackForSave(result) {
+
+        var onDate = SaleOnDate.GetValue();
+
+        if (onDate != null)
+            onDate = new Date(onDate.getFullYear(), onDate.getMonth(), onDate.getDate()).toUTCString();
+
+        var offDate = SaleOffDate.GetValue();
+
+        if (offDate != null)
+            offDate = new Date(offDate.getFullYear(), offDate.getMonth(), offDate.getDate()).toUTCString();
+
+        $.ajax({
+            url: '@Url.Action("SaveSalePrices", "Promotions")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                Name: SaleGroupName.GetValue(),
+                KeyString: result.toString(),
+                PriceListID: SalePricePriceListListBox.GetValue(),
+                SalePriceTypeID: DiscountTypeListBox.GetValue(),
+                Discount: Discount.GetValue(),
+                OnDate: onDate,
+                OffDate: offDate,
+                StockMinimum: StockMinimum.GetValue(),
+                OverwriteConflicts: false
+            },
+            success: function (data) { $("#save-success-dialog").dialog("open"); },
+            error: function (e, s, a) {
+                alert(s + ' error');
+                alert(e.responseText);
+                //log e
+            },
+            timeout: 20000
+        });
+    }
+
+    function SetMaxDiscountAmount(data) {
+        maxDiscountValueAmount = Math.min.apply(Math, data) - 1;
+        $("#discount-amount-max").html(maxDiscountValueAmount);
+    }
+
+    function VerifyCriteria() {
+
+        var isValid = true;
+
+        if (SaleGroupName.GetValue() == null || SaleGroupName.GetValue() == "Sale Name")
+            isValid = false;
+
+        if (Discount.GetValue() == null || Discount.GetValue() == 0)
+            isValid = false;
+
+        if (Discount.GetValue() != null) {
+            if (DiscountTypeListBox.GetValue() == 2) {
+                if (Discount.GetValue() > maxDiscountValueAmount)
+                    Discount.SetValue(maxDiscountValueAmount);
+            }
+            else if (DiscountTypeListBox.GetValue() == 1) {
+                if (Discount.GetValue() > 99) {
+                    Discount.SetValue(99);
+                }
+            }
+        }
+
+        if (DiscountTypeListBox.GetValue() == null)
+            isValid = false;
+
+        if (SaleOnDate.GetValue() == null)
+            isValid = false;
+
+        if (SaleOnDate.GetValue() != null) {
+            if (SaleOffDate.GetValue() != null)
+                if (SaleOnDate.GetValue() >= SaleOffDate.GetValue()) {
+                    isValid = false;
+                }
+        }
+
+
+        //if (SaleOffDate.GetValue() == null)
+        //    isValid = false;
+        CalculateExcuse();
+
+        if (isValid)
+            $("#tabs").tabs('option', 'disabled', []);
+        else
+            $("#tabs").tabs('option', 'disabled', [2]);
+
+        return isValid;
+    }
+
+    $(document).ready(function () {
+        $("#criteria-tab").prop("title", "You may not specify Sale Criteria yet because you have not selected any products.");
+        $("#review-tab").prop("title", "You may not Review yet because you have not selected any products.");
+        //CalculateExcuse();
+        $("#confirm-detail-delete").dialog({
+            title: "Confirm Delete",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                    window[$(this).data("grid")].DeleteRow($(this).data("visibleIndex"));//], 1);
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+        //$("#column-hide").on("click", function () { HideColumns(); });
+
+        //$("#update-discount-dialog").dialog({
+        //    title: "Selection",
+        //    width: 600,
+        //    height: "auto",
+        //    autoOpen: false,
+        //    resizable: false,
+        //    buttons: {
+        //        Ok: function () {
+        //            switch ($(this).data("type")) {
+        //                case "update":
+        //                    var keys = SalePriceGridView.GetSelectedKeysOnPage();
+        //                    for (var i = 0; i < keys.length; i++) {
+        //                        var cell = $("#SalePriceGridView tr.data-row td:first-child").filter(function () {
+        //                            return $(this).html() == keys[i];
+        //                        }).first();
+        //                        var index = $(cell).parent().parent().children().index($(cell).parent()) - 3;
+        //                        BulkUpdateValuesClientSide(keys[i], '#SalePriceGridView_DXDataRow' + index, 0);
+        //                    }
+        //                    break;
+
+        //                case "addnew":
+        //                    var keys = SalePriceAddNewGridView.GetSelectedKeysOnPage();
+        //                    for (var i = 0; i < keys.length; i++) {
+        //                        var cell = $("#SalePriceAddNewGridView tr.add-new-data-row td:first-child").filter(function () {
+        //                            return $(this).html() == keys[i];
+        //                        }).first();
+        //                        var index = $(cell).parent().parent().children().index($(cell).parent()) - 3;
+        //                        BulkUpdateValuesClientSide(keys[i], '#SalePriceAddNewGridView_DXDataRow' + index, -1);
+        //                    }
+        //                    break;
+        //                default: break;
+        //            }
+        //            $(this).data("type", "");
+
+        //            $(this).dialog("close");
+        //        },
+        //        Cancel: function () {
+        //            $(this).dialog("close");
+        //        }
+        //    }
+        //});
+
+        $("#confirm-dialog").dialog({
+            title: "Confirm",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () {
+                    switch ($(this).data("action")) {
+                        case "overwrite":
+                            $(this).dialog("close");
+                            $("#overwrite-confirm-dialog").dialog("open");
+                            break;
+                        default:
+                            $(this).dialog("close");
+                            PerformSave();
+                            break;
+                    }
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $("#overwrite-confirm-dialog").dialog({
+            title: "Are you absolutely sure?",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+
+                    PerformOverwriteSave();
+                },
+                Cancel: function () { $(this).dialog("close"); }
+            }
+        });
+
+        $("#save-success-dialog").dialog({
+            title: "Saved.",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () { $(this).dialog("close"); Reset(); }
+            }
+        });
+
+        $("#cannot-save-dialog").dialog({
+            title: "Save Denied.",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () { $(this).dialog("close"); }
+            }
+        });
+    });
+
+    function PerformSave() {
+
+        AddNewSaleGroupProductSelectGrid.GetSelectedFieldValues("ProductID", GotSelectedProductIDsCallbackForOverwriteCheck);
+
+    }
+
+    function PerformOverwriteSave() {
+
+        AddNewSaleGroupProductSelectGrid.GetSelectedFieldValues("ProductID", GotSelectedProductIDsCallbackForOverwriteSave);
+    }
+
+    function GotSelectedProductIDsCallbackForOverwriteSave(result) {
+
+        var onDate = SaleOnDate.GetValue();
+
+        if (onDate != null)
+            onDate = new Date(onDate.getFullYear(), onDate.getMonth(), onDate.getDate()).toUTCString();
+
+        var offDate = SaleOffDate.GetValue();
+
+        if (offDate != null)
+            offDate = new Date(offDate.getFullYear(), offDate.getMonth(), offDate.getDate()).toUTCString();
+
+        $.ajax({
+            url: '@Url.Action("SaveSalePrices", "Promotions")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                Name: SaleGroupName.GetValue(),
+                KeyString: result.toString(),
+                PriceListID: SalePricePriceListListBox.GetValue(),
+                SalePriceTypeID: DiscountTypeListBox.GetValue(),
+                Discount: Discount.GetValue(),
+                OnDate: onDate,
+                OffDate: offDate,
+                StockMinimum: StockMinimum.GetValue(),
+                OverwriteConflicts: true
+            },
+            success: function (data) { $("#save-success-dialog").dialog("open"); },
+            error: function (e, s, a) {
+                alert(s + ' error');
+                alert(e.responseText);
+                //log e
+            },
+            timeout: 20000
+        });
+    }
+</script>
+
+<div id="save-success-dialog">
+    <h5>Saved successfully.</h5>
+    <p>You will be returned to Step 1.</p>
+</div>
+
+
+<div id="confirm-dialog">
+    <h5>Are you sure?</h5>
+    <p id="extra-confirm-message" style="display: none;"></p>
+</div>
+
+<div id="overwrite-confirm-dialog">
+    <h5>WARNING:</h5>
+    <p>
+        This will overwrite exisiting sale price information.
+    </p>
+</div>
+
+<div id="cannot-save-dialog">
+    <h5>You cannot save while conflicts exist without using the overwrite button.</h5>
+</div>
+
+@section scripts {
+    
+}

@@ -1,0 +1,89 @@
+﻿@{
+    ViewBag.Title = "Prices";
+    Layout = "~/Views/Products/_OverviewLayout.cshtml";
+}
+@model Flock.ViewModels.ProductPricesViewModel
+@section styles {
+    @Styles.Render("~/Content/prices.css")
+<style type="text/css">
+    #bulk-action-panel {
+        position: static;
+        float: none;
+        margin-left: 0;
+        right: 0;
+        margin-bottom: 1em;
+        width: 350px;
+    }
+
+    #bulk-action-panel ul li {
+        margin-bottom: 6px;
+    }
+    </style>
+}
+<h4 class="page-heading">Product Prices</h4>
+
+<div class="page-subheadings" style="margin-bottom: 1em;">
+    <div style="margin-bottom: 7px;">
+        @Html.Action("PricesOverviewPriceListDropDownPartial", "Products")
+        <div style="width: 215px; float: left;"><h5>Currency:</h5><h5 id="price-list-currency" style="margin-left: 1em; font-weight: normal;"></h5></div>
+        <div style="width: 215px; float: left;"><h5>Exchange Rate:</h5><h5 id="price-list-exchange-rate" style="margin-left: 1em; font-weight: normal;"></h5></div>
+        <div class="clearfix"></div>
+    </div>
+    @Html.Action("PricesOverviewCollectionDropDownPartial", "Products")
+    @Html.Action("PricesOverviewColourDropDownPartial", "Products")
+    <div class="clearfix"></div>
+</div>
+
+<div id="bulk-action-panel">
+    <h4>Bulk Action Panel</h4>
+    <ul style="margin: 10px 0px 10px 10px;">
+        <li>
+            <a href="javascript:;" title="Synchronise prices with Mertex" onclick="SynchroniseWithMertex()">Synchronise selected prices with Mertex</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Synchronise prices with Mertex" onclick="SynchroniseAllWithMertex()">Synchronise all prices with Mertex</a>
+        </li>
+    </ul>
+</div>
+<div id="ProductPricesGridContainer">
+    @Html.Action("ProductPricesGridViewPartial")
+</div>
+
+<script type="text/javascript">
+    function SynchroniseWithMertex() {
+        var confirm = window.confirm("Are you sure you want to synchronise SELECTED prices with Mertex?");
+        if (confirm) {
+            var keys = null;
+
+            if (typeof (ProductPricesGridView) != "undefined" && ProductPricesGridView != false)
+                keys = ProductPricesGridView.GetSelectedKeysOnPage();
+
+            if (typeof (keys) != "undefined" && keys != false)
+                if (typeof (ProductPricesGridView) != "undefined" && typeof (ProductPricesGridView) != false)
+                    ProductPricesGridView.PerformCallback({ commandType: 'MertexSync', keyString: keys.toString(), PriceListID: PricesOverviewPriceListListBox.GetValue() });
+                else
+                    alert("Select at least one product.")
+        }
+    }
+
+    function SynchroniseAllWithMertex() {
+        var confirm = window.confirm("Are you sure you want to synchronise ALL prices with Mertex?");
+        if (confirm) {
+            $.ajax({
+                url: '@Url.Action("SynchroniseAllProductPricesWithMertex", "Products")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    PriceListID: PricesOverviewPriceListListBox.GetValue()
+                },
+                success: function (data) {
+                    ProductPricesGridView.Refresh();
+                },
+                error: function (e, s, a) {
+                    alert(e.responseText);
+                },
+                timeout: 360000
+            });
+        }
+    }
+</script>

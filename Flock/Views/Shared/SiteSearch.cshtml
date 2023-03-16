@@ -1,0 +1,155 @@
+﻿@using Flock.ViewModels
+<div class="resource-panel-container">
+    <fieldset id="country-search-fieldset">
+        <legend onclick="$('.hideable-dataview').not('#country-dataview').slideUp('fast'); $('#country-dataview').slideToggle('fast'); ">Country Search (click to expand / contract)</legend>
+        <div id="country-dataview" class="hideable-dataview" style="display: none;">
+            <div style="padding: 1em 1em 0px; background-color: white;">
+                @Html.Action("CountrySearchMarketDropDownPartial", "CountrySearch")
+                @Html.Action("CountrySearchContinentDropDownPartial", "CountrySearch")
+                @Html.Action("CountrySearchRegionDropDownPartial", "CountrySearch")
+                @Html.Action("CountrySearchLanguageDropDownPartial", "CountrySearch")
+                @Html.DevExpress().Button(settings =>
+           {
+               settings.Style.Add("float", "left");
+               settings.Name = "CountryClearFiltersButton";
+               settings.Text = "Reset";
+               settings.Style.Add("line-height", "32px");
+               settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+               settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+               //settings.ControlStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0072C6");
+               settings.ClientSideEvents.Click = @"function(s, e) {
+                        CountrySearchMarketListBox.UnselectAll();
+                        CountrySearchMarketDD.SetText('Market');
+                        CountrySearchContinentListBox.UnselectAll();
+                        CountrySearchContinentDD.SetText('Continent');
+                        CountrySearchRegionListBox.UnselectAll();
+                        CountrySearchRegionDD.SetText('Region');
+                        CountrySearchLanguageListBox.UnselectAll();
+                        CountrySearchLanguageDD.SetText('Language');
+                        CountrySearchNameTextBox.SetText('Country Name');
+
+                         $.ajax({
+                            url: '" + Url.Action("Search", "CountrySearch") + @"',
+                            traditional: true,
+                            data: {
+                                MarketID: CountrySearchMarketListBox.GetValue(),
+                                ContinentID: CountrySearchContinentListBox.GetValue(),
+                                RegionID: CountrySearchRegionListBox.GetValue(),
+                                LanguageID: CountrySearchLanguageListBox.GetValue(),
+                                SearchString: CountrySearchNameTextBox.GetValue(),
+                                TableLock: CountrySearchCLTableLock.GetValue()
+                            },
+                            success: function(data) {
+                                $('#country-search-data-view-container').html(data);
+                                $('#country-searching-icon').fadeOut('slow');
+                                if (typeof (InitCountryDragDrop) == 'function')
+                                    InitCountryDragDrop();
+                            },
+                            error: function(e, s, a) {
+                                $.showError(e, s, a, function() { $('#country-searching-icon').fadeOut('slow'); });
+                            },
+                            timeout: 20000
+                        });
+                    }";
+           }).GetHtml()
+                @Html.Action("CountrySearchNameTextBox", "CountrySearch")
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Width = 295;
+               settings.Name = "CountrySearchCLIDLockLbl";
+               settings.Style.Add("line-height", "32px");
+               settings.Text = "Only show Countries from the Country Language Table";
+           }).GetHtml()
+
+                @Html.DevExpress().CheckBox(settings =>
+           {
+               settings.Name = "CountrySearchCLTableLock";
+               settings.Properties.ValueChecked = true;
+               settings.Properties.ValueUnchecked = false;
+               settings.Checked = true;
+               settings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                        $('#country-searching-icon').fadeIn('fast');
+                        $.ajax({
+                            url: '" + Url.Action("Search", "CountrySearch") + @"',
+                            traditional: true,
+                            data: {
+                                MarketID: CountrySearchMarketListBox.GetValue(),
+                                ContinentID: CountrySearchContinentListBox.GetValue(),
+                                RegionID: CountrySearchRegionListBox.GetValue(),
+                                LanguageID: CountrySearchLanguageListBox.GetValue(),
+                                SearchString: CountrySearchNameTextBox.GetText(),
+                                TableLock: CountrySearchCLTableLock.GetValue()
+                            },
+                            success: function(data) {
+                                $('#country-search-data-view-container').html(data);
+                                $('#country-searching-icon').fadeOut('slow');
+                                if (typeof (InitCountryDragDrop) == 'function')
+                                    InitCountryDragDrop();
+                            },
+                            error: function(e, s, a) {
+                                $.showError(e, s, a, function() { $('#country-searching-icon').fadeOut('slow'); });
+                            },
+                            timeout: 60000
+                        });
+                    }";
+           }).GetHtml()
+
+
+                @Html.DevExpress().Button(button =>
+           {
+               button.Text = "Add All";
+               button.Name = "CountryAddAllButton";
+               button.Style.Add("float", "left");
+               button.Style.Add("line-height", "32px");
+               button.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+               button.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+               //button.ControlStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0072C6");
+               //button.ControlStyle = System.Drawing.ColorTranslator.FromHtml("#0072C6");
+               button.Style.Add("text-align", "center");
+               button.Style.Add("float", "right");
+               button.Style.Add("margin-right", "55px");
+               button.ClientSideEvents.Click = @"function(s, e) {
+                            if($('#add-all-country-dialog').length > 0) {
+                                $('#add-all-country-dialog').dialog('open');
+                            }
+                            else if(typeof(UpdateCountryRestrictions) == 'function') {
+                                window.CountryRestrictions = new Array();
+                                if ($('#country-restriction-placeholder').length > 0)
+                                    $('#country-restriction-placeholder').remove();
+                                $('.country-restriction-flag').each(function(index) {
+                                    window.CountryRestrictions.push({ ID: $(this).data('country-id'), SortOrder: 0 });
+                                });
+                                $('.country-flag').each(function (index) {
+                                    window.CountryRestrictions.push({ ID: $(this).data('country-id'), SortOrder: 0 });
+                                });
+                                UpdateCountryRestrictions();
+                                if (typeof (InitCountryDragDrop) == 'function')
+                                    InitCountryDragDrop();
+                            }
+                        }";
+           }).GetHtml()
+                <img id="country-searching-icon" style="display: none;" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both"></div>
+            </div>
+            <div id="country-search-data-view-container" style="background-color: white;">
+                @if (Model == null)
+                {
+                    @Html.Action("Search", "CountrySearch")
+                }
+                else
+                {
+                    if (Model.GetType().GetProperty("ColumnCount") == null)
+                    {
+                        @Html.Action("Search", "CountrySearch")
+                    }
+                    else
+                    {
+                        @Html.Action("Search", "CountrySearch", new CountrySearchHelperModel() { ColumnCount = Model.ColumnCount })
+                    }
+                }
+            </div>
+        </div>
+
+    </fieldset>
+    <div style="clear: both"></div>
+</div>

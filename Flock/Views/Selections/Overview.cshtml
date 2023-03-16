@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewBag.Title = "Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+    @Styles.Render("~/Content/selections.css")
+<style type="text/css">
+    #container {
+        width: 1250px;
+    }
+    </style>
+}
+
+<h4 class="page-heading">Selections</h4>
+
+@Html.Partial("SelectionOverviewGridViewPartial")
+

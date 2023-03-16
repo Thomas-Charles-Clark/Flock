@@ -1,0 +1,67 @@
+﻿@model Flock.ViewModels.StoreEventViewModel
+<div id="store-event-edit-form">
+
+    @Html.DevExpress().TextBoxFor(m => Model.Name, tbSettings =>
+    {
+        tbSettings.Name = "Name";
+        tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(60);
+        tbSettings.Properties.Caption = "Name";
+        tbSettings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+        tbSettings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+        tbSettings.Properties.CaptionCellStyle.Width = 90;
+        tbSettings.Properties.MaxLength = 100;
+        tbSettings.ShowModelErrors = true;
+        tbSettings.Style.Add("margin", "0 1em 1em 0");
+        tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    }).GetHtml()
+
+    <div style='clear: both'></div>
+
+    @Html.DevExpress().ListBox(settings =>
+    {
+        settings.Name = "StoreEventLocationsListBox";
+        settings.Properties.ValueType = typeof(short);
+        settings.Properties.ValueField = "StoreEventLocationID";
+        settings.Properties.TextField = "Name";
+        settings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        settings.Properties.Caption = "Location(s)";
+        settings.Properties.CaptionCellStyle.Width = 90;
+        settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+        settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Top;
+        settings.ControlStyle.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+
+        settings.Height = 85;
+        
+        settings.ShowModelErrors = true;
+        
+        if (Model.SelectedStoreEventLocations != null)
+        {
+            settings.PreRender = (sender, e) =>
+            {
+                ASPxListBox listBox = (ASPxListBox)sender;
+                foreach (ListEditItem item in listBox.Items)
+                    if (Model.SelectedStoreEventLocations.Select(p => p.StoreEventLocationID).Contains((short)item.Value))
+                        item.Selected = true;
+            };
+        }
+
+    }).BindList(Model.StoreEventLocations).GetHtml()
+
+    <div id="store-event-edit-form-buttons">
+        @Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Update";
+            btnSettings.Style.Add("margin-right", "1em");
+            btnSettings.ClientSideEvents.Click = "function(s, e){ StoreEventGridView.UpdateEdit(); }";
+        }).GetHtml()
+        @Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Cancel";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ StoreEventGridView.CancelEdit(); }";
+        }).GetHtml()
+    </div>
+</div>

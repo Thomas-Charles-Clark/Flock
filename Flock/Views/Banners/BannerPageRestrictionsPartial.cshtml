@@ -1,0 +1,72 @@
+﻿@model List<Flock.Models.Page>
+<div class="content-panel-container">
+    <fieldset id="page-restriction-fieldset">
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#page-restriction-section').slideToggle('fast');">
+            Page Restrictions (click to expand / contract)
+            <img id="page-restriction-busy" class="fieldset-busy" src="~/Images/SystemIcons/busy-icon.gif" />
+        </legend>
+        <div id="page-restriction-section" style="background-color: white; padding: 1em;">
+            @if (Model.Count == 0)
+            {
+                <div id="page-restriction-placeholder" class="page-restriction-placeholder" style="padding: 1em; font-size: 1.4em; background-color: white;">
+                    By default, Banners are available to all Pages.<br /><br />Only add pages to this list if you want to specify which pages may display this Banner.
+                </div>
+            }
+            else
+            {
+                using (var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>())
+                {
+                    foreach (var page in Model)
+                    {
+                        var i = UoW.GetRepository<Flock.Models.Page_Image>().GetAll().Where(p => p.PageID == page.PageID && p.TemplateImageID == 1).FirstOrDefault();
+                        if(i != null)
+                        {
+                            if (i.ImageID != 0 && i.ImageID != null)
+                            {
+                                <div class="page-restriction-block" style="width: auto; height: auto; border: 0;" data-page-id="@(page.PageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                    <div style="width: 195px; display: table-cell; vertical-align: middle;">
+                                        <img src="https://flock.designersguild.com/imagelibrary/195/@(i.ImageID).jpeg" alt="@(i.ImageID)" title="@(i.ImageID)" />
+                                    </div>
+                                    <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="removePageRestriction($(this))" />
+                                    <br />
+                                    <label style="margin-top: 5px">@(page.Name)</label>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="page-restriction-block" style="width: auto; height: auto; border: 0;" data-page-id="@(page.PageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                <div style="width: 195px; display: table-cell; vertical-align: middle;">
+                                    <img style="width: 100%" title="Page ID: 10" src="/images/admin/ar2-placeholder.png" alt="" />
+                                </div>
+                                <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="removePageRestriction($(this))" />
+                                <br />
+                                <label style="margin-top: 5px">@(page.Name)</label>
+                            </div>
+                        }
+                    }
+
+
+                    @*<div id="page-restriction-section" style="background-color: white; padding: 1em;">
+                        @foreach (Flock.Models.Page page in Model)
+                        {
+                            <div class="page-restriction-block" data-page-id="@(page.PageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                <div style="background-color: #e1e1e1; width: 100%; height: 80px;"></div>
+                                <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="$(this).parent().remove(); RemovePageFromRestriction()" />
+                                <br />
+                                <label style="margin-top: 5px">@(page.Name)</label>
+                            </div>
+                        }
+                        <div style="clear: both;"></div>
+                    </div>*@
+                }
+            }
+            <div class="page-restriction-placeholder" style="clear: both;"></div>
+        </div>
+
+    </fieldset>
+</div>
+<script type="text/javascript">
+    if (typeof (InitPagesDragDrop) == 'function')
+        InitPagesDragDrop();
+</script>

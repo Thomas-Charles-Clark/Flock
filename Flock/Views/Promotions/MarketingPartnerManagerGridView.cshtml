@@ -1,0 +1,48 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "MarketingPartnerManager";
+    settings.KeyFieldName = "MarketingPartnerID";
+    settings.CallbackRouteValues = new { Controller = "Promotions", Action = "MarketingPartnerManagerGridView" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Promotions", Action = "AddNewMarketingPartner" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Promotions", Action = "UpdateMarketingPartner" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Promotions", Action = "DeleteMarketingPartner" };
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(450);
+    settings.Style.Add("margin", "0 auto;");
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+    settings.CommandColumn.ShowDeleteButton = true;
+    settings.SettingsBehavior.ConfirmDelete = true;
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+    settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Name";
+    NameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    var nProperties = NameColumn.PropertiesEdit as TextBoxProperties;
+    nProperties.MaxLength = 50;
+    NameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    settings.Columns.Add(NameColumn);
+
+
+    MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+    CreatedDTColumn.Name = "CreatedDT";
+    CreatedDTColumn.FieldName = "CreatedDT";
+    CreatedDTColumn.Caption = "Created";
+    CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    CreatedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    settings.Columns.Add(CreatedDTColumn);
+    
+}).BindToLINQ("", "", (s, e) =>
+{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<MarketingPartner>().GetAll().Where(p => p.DeletedDT == null);
+
+    e.KeyExpression = "MarketingPartnerID";
+    e.QueryableSource = source;
+}).GetHtml()

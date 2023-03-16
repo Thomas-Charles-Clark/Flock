@@ -1,0 +1,176 @@
+@{
+    Layout = "~/Views/CMS/Compose/_ComposerLayout.cshtml";
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/js/calendar")
+}
+@section Styles {
+    @Styles.Render("~/bundles/css/calendar")
+}
+
+@*<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Calendar</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/bundles/css/ribbon")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body onload="init()">
+
+    @Html.Partial("~/Views/Admin/_NavigationPartial.cshtml")*@
+
+    <div class="container" id="container">
+        <hr />
+
+        <h1>Calendar</h1>
+
+        <script type="text/javascript">
+            function init() {
+                //2013-02-18 00:00:00
+                scheduler.config.xml_date = "%Y-%n-%d %H:%i:%s";
+
+                //scheduler.config.lightbox.sections.push({ height: 25, name: "event_calendar_id", map_to: "event_calendar_id", type: "textarea" });
+                //scheduler.form_blocks.textarea.set_value = function (node, value, ev) {
+                //    node.firstChild.value = value || 1;
+                //}
+
+                scheduler.locale.labels.year_tab = "Year";
+
+
+                scheduler.form_blocks["custom_field_0"] = {
+                    render: function (sns) {
+                        return "<div class='dhx_cal_ltext'><input type='text'>";
+                    },
+                    set_value: function (node, value, ev) {
+                        node.childNodes[0].value = value || "";
+                    },
+                    get_value: function (node, ev) {
+                        ev.location = node.childNodes[0].value;
+                        return node.childNodes[0].value;
+                    },
+                    focus: function (node) {
+                        var a = node.childNodes[0]; a.select(); a.focus();
+                    }
+                }
+                scheduler.form_blocks["custom_field_1"] = {
+                    render: function (sns) {
+                        return "<div class='dhx_cal_ltext'><input type='text'>";
+                    },
+                    set_value: function (node, value, ev) {
+                        node.childNodes[0].value = value || "";
+                    },
+                    get_value: function (node, ev) {
+                        ev.location = node.childNodes[0].value;
+                        return node.childNodes[0].value;
+                    },
+                    focus: function (node) {
+                        var a = node.childNodes[0]; a.select(); a.focus();
+                    }
+                }
+                scheduler.form_blocks["custom_field_2"] = {
+                    render: function (sns) {
+                        return "<div class='dhx_cal_ltext'>Cal_ID&nbsp;<input id='calendar_id' value='1' type='text'></div>";
+                    },
+                    set_value: function (node, value, ev) {
+                        node.childNodes[1].value = value || "1";
+                        var style = "none";
+                        node.style.display = style; // editor area
+                        node.previousSibling.style.display = style; //section header
+                        $(node).parent().css('display', style);
+                        //node.previousSibling.style.display = style;
+                        scheduler.setLightboxSize(); //correct size of lightbox
+                    },
+                    get_value: function (node, ev) {
+                        ev.location = node.childNodes[1].value;
+                        return node.childNodes[1].value;
+                    },
+                    focus: function (node) {
+                        var a = node.childNodes[1]; a.select(); a.focus();
+                    }
+                }
+                scheduler.form_blocks["custom_field_3"] = {
+                    render: function (sns) {
+                        return "<div class='dhx_cal_ltext'>EvTypeID&nbsp;<input id='event_type_id' value='1' type='text'></div>";
+                    },
+                    set_value: function (node, value, ev) {
+                        node.childNodes[1].value = value || "3";
+                        var style = "none";
+                        node.style.display = style; // editor area
+                        node.previousSibling.style.display = style; //section header
+                        $(node).parent().css('display', style);
+                        //node.previousSibling.style.display = style;
+                        scheduler.setLightboxSize(); //correct size of lightbox
+                    },
+                    get_value: function (node, ev) {
+                        ev.location = node.childNodes[1].value;
+                        return node.childNodes[1].value;
+                    },
+                    focus: function (node) {
+                        var a = node.childNodes[1]; a.select(); a.focus();
+                    }
+                }
+
+                scheduler.config.lightbox.sections = [
+                    { name: "subject", height: 200, map_to: "text", type: "custom_field_0", focus: true },
+                    { name: "description", height: 200, map_to: "description", type: "custom_field_1" },
+                    { name: "calendar_id", height: 25, map_to: "calendar_id", type: "custom_field_2" },
+                    { name: "event_type_id", height: 25, map_to: "event_type_id", type: "custom_field_3" },
+                    { name: "time", height: 72, type: "time", map_to: "auto" }
+                ]
+
+                scheduler.locale.labels.section_calendar_id = "Calendar ID";
+                scheduler.locale.labels.section_event_type_id = "Event Type ID";
+                scheduler.locale.labels.section_subject = "Subject";
+
+
+                scheduler.init("scheduler_here", new Date(), "month");
+                //scheduler.event_calendar_id = 1;
+                scheduler.load('@Url.Action("CalendarData", "Calendar")');  //path to the newly created action
+
+                //scheduler.locale.labels.event_calendar_id = "CalendarID";
+
+
+
+                var dp = new dataProcessor('@Url.Action("CalendarSave", "Calendar")');
+                dp.init(scheduler);
+                dp.setTransactionMode("POST", false);
+
+                //dp._sendData = function(a, b) {
+                //    if (a) {
+                //        a.event_calender_id = 1;
+                //        if (!this.callEvent("onBeforeDataSending", b ? [b, this.getState(b), a] : [null, null, a]))
+                //            return !1;
+                //        b && (this._in_progress[b] = (new Date).valueOf());
+                //        var c = new dtmlXMLLoaderObject(this.afterUpdate, this, !0),
+                //            d = this.serverProcessor + (this._user ? getUrlSymbol(this.serverProcessor) + ["dhx_user=" + this._user, "dhx_version=" + this.obj.getUserData(0, "version")].join("&") : "");
+                //        this._tMode != "POST" ? c.loadXML(d + (d.indexOf("?") != -1 ? "&" : "?") + this.serialize(a, b)) : c.loadXML(d, !0, this.serialize(a, b));
+                //        this._waitMode++
+                //    }
+                //}
+            };
+        </script>
+        <div id="scheduler_here" class="dhx_cal_container" style="width: 100%; min-height: 600px;">
+            <div class="dhx_cal_navline">
+                <div class="dhx_cal_prev_button">Prev</div>
+                <div class="dhx_cal_next_button">Next</div>
+                <div class="dhx_cal_today_button"></div>
+                <div class="dhx_cal_date"></div>
+                <div class="dhx_cal_tab" name="day_tab" style="removed:204px;"></div>
+                <div class="dhx_cal_tab" name="week_tab" style="removed:140px;"></div>
+                <div class="dhx_cal_tab" name="month_tab" style="removed:76px;"></div>
+                <div class="dhx_cal_tab" name="year_tab" style="right:280px;"></div>
+            </div>
+            <div class="dhx_cal_header">
+            </div>
+            <div class="dhx_cal_data">
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Designers Guild</p>
+        </footer>
+    </div>

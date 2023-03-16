@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "Brochure Requests";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        function GetLabels() {
+            var keys = BrochureRequestGridView.GetSelectedKeysOnPage().toString();
+
+            $("#report-downloader").remove();
+
+            LoadingPanel.Show();
+
+            var iFrame = $("<iframe id='report-downloader' style='display: none; width: 0px; height: 0px;' src='/admin/assets/generatebrochurerequestlabels?keys="+keys+"&brochureID="+BrochureIDComboBox.GetSelectedItem().value.toString()+"'></iframe>")
+
+            $("body").append(iFrame);
+
+            LoadingPanel.Hide();
+
+            BrochureRequestGridView.Refresh();
+        }
+
+        function GetXlsx() {
+            var keys = BrochureRequestGridView.GetSelectedKeysOnPage().toString();
+
+            $("iframe").remove();
+
+            LoadingPanel.Show();
+
+            var iFrame = $("<iframe style='display: none; width: 0px; height: 0px;' src='/admin/assets/generatebrochurerequestxlsx?keys=" + keys + "&brochureID=" + BrochureIDComboBox.GetSelectedItem().value.toString() + "'></iframe>")
+
+            $("body").append(iFrame);
+
+            LoadingPanel.Hide();
+
+            BrochureRequestGridView.Refresh();
+        }
+    </script>
+}
+<h4 class="page-heading">Brochure Requests</h4>
+
+<div class="page-subheading">
+    <i style="font-size: 0.8em">The Get Xlsx button is primarily for the US, who need to format the data exported for their own labels. Filter this grid as necessary, using the header row pin filters as well as the standard filters on the second row. Then, for the UK, use the right hand checkbox to select a group of brochure request records to export and click the Get Labels link in the top-right of the grid.</i>
+</div>
+
+    <div class="page-subheading">
+        @Html.Partial("_BrochureRequestComboBoxPartial")
+        <input id="get-xlsx-button" style="display: none; margin: 0 7px 7px 13px; height: 32px; float: left;" type="submit" value="Get Xlsx" onclick="GetXlsx()"/>
+        <div style="clear: both;"></div>
+    </div>
+
+    <div id="brochure-request-gridview-container">
+
+    </div>
+    <input type="hidden" title="Note: This will export all rows, regardless of your current paging. Ensure you have checked filtered the Processed column." id="brochure-id-hidden" name="BrochureID" value=""/>

@@ -1,0 +1,58 @@
+﻿#container {
+    width: auto;
+}
+
+table.bundled-products {
+    width: 100%;
+    margin: 12px 0;
+    border-collapse: collapse;
+}
+
+table.bundled-products td,
+table.bundled-products th {
+    padding: 3px 6px;
+    border: 1px solid #ccc;
+}
+
+table.bundled-products td.quantity {
+    text-align: center;
+}
+
+table span.glyphicon {
+    cursor: pointer;
+}
+
+#autocomplete-container {
+    float: left;
+    margin-top: 12px;
+}
+
+#autocomplete-container ul.ui-autocomplete {
+    max-height: 300px;
+    overflow-y: scroll;
+    width: auto;
+}
+
+#autocomplete-container ul.ui-autocomplete li {
+    font-family: "Segoe UI", Helvetica, "Droid Sans", Tahoma, Geneva, sans-serif;
+    padding: 3px 4px 3px 4px;
+}
+    #autocomplete-container ul.ui-autocomplete li a {
+        display: block;
+    }
+
+    #autocomplete-container ul.ui-autocomplete li a:hover,
+    #autocomplete-container ul.ui-autocomplete li:hover > a {
+        background-color: transparent;
+        border: 1px solid transparent;
+    }
+
+    #autocomplete-container ul.ui-autocomplete li a.ui-state-focus {
+        border: 1px solid transparent;
+        background: transparent;
+        color: initial; 
+    }
+
+td#BundledProducts_CC {
+    display: none;
+}

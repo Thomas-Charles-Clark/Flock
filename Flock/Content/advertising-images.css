@@ -1,0 +1,116 @@
+﻿.container {
+    max-width: 100%;
+}
+
+#name-description-container {
+    float: left;
+    width: 450px;
+}
+
+button span.glyphicon {
+    margin-right: 10px;
+    top: 2px;
+}
+
+td.checker {
+    width: 100px;
+}
+
+.images-table {
+    width: auto;
+    margin: 20px auto; 
+}
+
+.images-table span.glyphicon {
+    font-size: 14px;
+}
+
+    .images-table > tbody > tr > td.description {
+        width: 200px;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        -ms-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    }
+
+    .ui-sortable-placeholder {
+        background-color: rgba(174, 255, 93, 0.71);
+    }
+
+/*.ui-sortable-helper {
+    display: table;
+}*/
+
+.images-table > tbody:not(.controls) {
+    cursor: pointer;
+}
+
+.images-table > tbody > tr > td.yes {
+    /*background-color: rgba(26, 208, 58, 0.50);*/
+    text-align: center;
+}
+
+.images-table > tbody > tr > td.no {
+    background-color: rgba(255, 0, 0, 0.6);
+    color: black;
+    text-align: center;
+}
+
+.images-table > tbody:not(.controls) > tr:hover > td:not(.no) {
+    background-color: rgb(247, 247, 247);
+}
+
+td.delete {
+    color: red;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+td.edit {
+    color: #3071a9;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.images-table > tbody.controls > tr > td {
+    text-align: right;
+}
+
+#edit-form-dates-container {
+    margin-bottom: 15px;
+}
+
+.popup-button-container {
+    float: right;
+}
+
+.popup-button-container button.btn-success {
+    margin-right: 15px;
+}
+
+.image-upload-caption {
+    margin-bottom: 8px;
+}
+
+#upload-controls-container {
+    float: none;
+}
+
+#thumbnail-container {
+    width: 290px;
+    float: left;
+    padding: 20px 25px;
+}
+
+#thumbnail-container img {
+    width: 100%;
+}
+
+p.edit-form-notes {
+    font-style: italic;
+    font-size: 11px;
+    margin-bottom: 15px;
+    line-height: 18px;
+}

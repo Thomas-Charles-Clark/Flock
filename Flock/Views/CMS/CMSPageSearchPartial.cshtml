@@ -1,0 +1,23 @@
+﻿<div class="resource-panel-container">
+    <fieldset id="page-search-fieldset">
+        <legend onclick="$('.hideable-dataview').not('#page-dataview').slideUp('fast'); $('#page-dataview').slideToggle('fast');">CMS Page Search (click to expand / contract)</legend>
+        <div id="page-dataview" class="hideable-dataview" style="display: none;">
+            <div style="padding: 1em 1em 0px; background-color: white;">                                
+                @Html.Action("PageSearchSiteSectionDropDownPartial", "CMS")
+                @Html.Action("PageSearchParentPageDropDownPartial", "CMS")
+                @Html.Action("PageSearchStatusDropDownPartial", "CMS")
+                @Html.Action("PageSearchNameTextBox", "ProductPages")
+                <img id="page-searching-icon" style="display: none;" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both"></div>
+            </div>
+            <div id="page-data-view-container" style="background-color: white;">
+                @Html.Action("PageSearch", "CMS")
+            </div>
+        </div>
+    </fieldset>
+    <div style="clear: both"></div>
+</div>
+<script type="text/javascript">
+    if (typeof (InitPagesDragDrop) == 'function')
+        InitPagesDragDrop();
+</script>

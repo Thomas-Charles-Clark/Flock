@@ -1,0 +1,25 @@
+﻿@model List<Flock.Models.Page_Image>
+@if (Model.Count == 0)
+{
+    <div class="pod-sortable pod-image-placeholder">
+        <img src ="/Images/admin/ar2-placeholder.png" style="width: 332px;" alt="Image not set." title="You must set a primary image for this page." />
+    </div>
+}
+else
+{
+    foreach (Flock.Models.Page_Image i in Model)
+    {
+        <div data-image-id="@i.ImageID" class="pod-sortable pod-image" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <img style="width: 325px;" src="https://flock.designersguild.com/ImageLibrary/322/@(i.ImageID).jpeg" alt="@(i.AltText)" title="@(i.TitleText)" />
+            <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromPagePods(1, @(i.ImageID))" />
+            @if(i.Image.DeletedDT != null)
+            {
+                <span class="pod-image-deleted-strip"></span>
+            }
+        </div>
+    }
+}
+<script type="text/javascript">
+    if (typeof (InitPodDragDrop) == "function")
+        InitPodDragDrop();
+</script>

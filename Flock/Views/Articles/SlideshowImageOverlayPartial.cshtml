@@ -1,0 +1,499 @@
+﻿@using Flock.Models
+@using Flock.ViewModels
+@model Flock.ViewModels.SlideshowImageOverlayViewModel
+
+@Html.DevExpress().Label(settings => { settings.Text = "Slideshow Overlay Settings"; settings.Style.Add("margin-top", "10px"); settings.Style.Add("line-height", "16px"); }).GetHtml()
+<div style="width: 800px;">
+    <div style="width: 100%; margin: 0 0 1em 0;">
+        @*NOT PASSING ARID BACK FROM SAVE FUNCTION WHICH IS WHY THE IMAGE ISN'T SHOWING UP ON SAVE-LOAD*@
+        <div class="slideshow-overlay-display-container slideshow-overlay-display-@(Model.ARID)" data-image-id="@(Model.ImageID)" style="background: url('https://flock.designersguild.com/imagelibrary/986/@(Model.ImageID).jpeg'); background-repeat: no-repeat; background-size: 100%; background-origin: padding-box; background-clip: border-box; background-color: transparent; background-position: 100% 50%;">
+            <div class="slideshow-overlay" style="color: rgb(@(Model.OverlayFontColour)); padding: 0.3em; top: @(Model.OverlayTop)%; left: @(Model.OverlayLeft)%; width: @(Model.OverlayWidth)%; height: @(Model.OverlayHeight)%; background-color: rgba(@(Model.OverlayBackgroundColour), @(Model.OverlayBackgroundOpacity))">
+                <h5 id="slideshow-@(Model.PageSectionID)-overlay-heading" style="font-size: 0.9em; margin: 0; margin-left: 4px; line-height: 15px;">@(Model.OverlayHeading)</h5>
+                <p id="slideshow-@(Model.PageSectionID)-overlay-text" style="font-size: 0.8em; margin: 0; margin-left: 4px;">@(Model.OverlayText)</p>
+            </div>
+        </div>
+    </div>
+    <div style="width: 100%;">
+        <div style="width: 50%; float: left;">
+            <button type="button" value="Previous" onclick="SlideshowDialogPrev(@(Model.PageSectionID))" style="margin-right: 8px; float: left;">Previous</button>
+            <button type="button" value="Next" onclick="SlideshowDialogNext(@(Model.PageSectionID))" style="margin-right: 8px; float: left;">Next</button>
+            <span style='line-height: 26px; width:44px; margin-left: 30px;'>
+                <label style="margin-bottom: 0;" id="current-index-lbl">@(Model.Index)</label>
+                /
+                <label style="margin-bottom: 0;" id="slideshow-image-count-lbl">@(Model.ImagesTotal)</label>
+            </span>
+            <button type="button" style="float: right; margin-right: 20px;" value="CopyAll" onclick="$.confirm(function () {MergeAcrossSlideshow(@(Model.PageSectionID));}, function() { });">Apply Throughout</button>
+            <div style="clear: both;"></div>
+
+            @Html.DevExpress().Label(settings => { settings.Text = "Overlay Position"; settings.Style.Add("margin-top", "10px"); settings.Style.Add("float", "left"); settings.Style.Add("margin-right", "8px"); settings.Style.Add("line-height", "26px"); }).GetHtml()
+
+            @Html.DevExpress().ComboBoxFor(m => Model.SlideshowOverlayPositionID, settings =>
+       {
+           settings.Name = "SlideShow" + Model.PageSectionID.ToString() + "OverlayPositionID";
+           settings.Properties.ValueField = "SlideshowOverlayPositionID";
+           settings.Properties.ValueType = typeof(byte?);
+           settings.Properties.TextField = "Name";
+           settings.Style.Add("margin-top", "7px");
+           settings.ShowModelErrors = true;
+           settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+
+                    $('#slideshow-" + Model.PageSectionID + @"-overlay-position [value^='+s.GetValue()+']').prop('selected', true);
+
+                    AlterSlideshowOverlay('" + Model.PageSectionID + @"')
+                }";
+       }).BindList(LargeDatabaseDataProvider.GetSlideshowOverlayPositions()).GetHtml()
+            <div style="clear: both"></div>
+
+            @Html.DevExpress().Label(settings => { settings.Text = "Overlay Top"; settings.Width = 86; settings.Style.Add("margin-top", "12px"); settings.Style.Add("float", "left"); settings.Style.Add("margin-right", "8px"); settings.Style.Add("line-height", "26px"); }).GetHtml()
+            @Html.DevExpress().SpinEditFor(m => Model.OverlayTop, settings =>
+            {
+                settings.Name = "SlideShow" + Model.PageSectionID.ToString() + "OverlayTop";
+                settings.Properties.MinValue = 0.0M;
+                settings.Properties.MaxValue = 100.0M;
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+                settings.Properties.Increment = 1.0M;
+                settings.Properties.DisplayFormatString = "F2";
+                settings.Style.Add("margin-top", "10px");
+                settings.Style.Add("margin-right", "20px");
+                settings.Height = 26;
+                settings.Width = 86;
+                settings.Style.Add("float", "left");
+                settings.Properties.AllowNull = false;
+                settings.Properties.NullText = "0.60";
+                settings.ReadOnly = false;
+                settings.Properties.ClientSideEvents.NumberChanged = @"function(s, e) {
+                    var targ = $('#page-section-" + Model.PageSectionID + @"-advanced-settings').find('.slideshow-overlay').first();
+
+                    if(s.GetValue() + window['SlideShow" + Model.PageSectionID + @"OverlayHeight'].GetValue() > 100) {
+                        s.SetValue(100 - window['SlideShow" + Model.PageSectionID + @"OverlayHeight'].GetValue());
+                        return;
+                    }
+
+                    $(targ).css('top', s.GetValue() + '%');
+                }";
+            }).GetHtml()
+
+            @Html.DevExpress().Label(settings => { settings.Text = "Overlay Left"; settings.Width = 86; settings.Style.Add("margin-top", "12px"); settings.Style.Add("float", "left"); settings.Style.Add("margin-right", "8px"); settings.Style.Add("line-height", "26px"); }).GetHtml()
+            @Html.DevExpress().SpinEditFor(m => Model.OverlayLeft, settings =>
+            {
+                settings.Name = "SlideShow" + Model.PageSectionID.ToString() + "OverlayLeft";
+                settings.Properties.MinValue = 0.0M;
+                settings.Properties.MaxValue = 100.0M;
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+                settings.Properties.Increment = 1.0M;
+                settings.Properties.DisplayFormatString = "F2";
+                settings.Style.Add("margin-top", "10px");
+                settings.Style.Add("margin-right", "20px");
+                settings.Height = 26;
+                settings.Width = 86;
+                settings.Style.Add("float", "left");
+                settings.Properties.AllowNull = false;
+                settings.Properties.NullText = "0.60";
+                settings.ReadOnly = false;
+                settings.Properties.ClientSideEvents.NumberChanged = @"function(s, e) {
+                    var targ = $('#page-section-" + Model.PageSectionID + @"-advanced-settings').find('.slideshow-overlay').first();
+
+                    if(s.GetValue() + window['SlideShow" + Model.PageSectionID + @"OverlayWidth'].GetValue() > 100) {
+                        s.SetValue(100 - window['SlideShow" + Model.PageSectionID + @"OverlayWidth'].GetValue());
+                        return;
+                    }
+
+                    $(targ).css('left', s.GetValue() + '%');
+                }";
+            }).GetHtml()
+
+            <div style="clear: both;"></div>
+
+            @Html.DevExpress().Label(settings => { settings.Text = "Overlay Width"; settings.Width = 86; settings.Style.Add("margin-top", "12px"); settings.Style.Add("float", "left"); settings.Style.Add("margin-right", "8px"); settings.Style.Add("line-height", "26px"); }).GetHtml()
+            @Html.DevExpress().SpinEditFor(m => Model.OverlayWidth, settings =>
+            {
+                settings.Name = "SlideShow" + Model.PageSectionID.ToString() + "OverlayWidth";
+                settings.Properties.MinValue = 1.0M;
+                settings.Properties.MaxValue = 100.0M;
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+                settings.Properties.Increment = 1.0M;
+                settings.Properties.DisplayFormatString = "F2";
+                settings.Style.Add("margin-top", "10px");
+                settings.Style.Add("margin-right", "20px");
+                settings.Height = 26;
+                settings.Width = 86;
+                settings.Style.Add("float", "left");
+                settings.Properties.AllowNull = false;
+                settings.Properties.NullText = "0.60";
+                settings.ReadOnly = false;
+                settings.Properties.ClientSideEvents.NumberChanged = @"function(s, e) {
+                    var targ = $('#page-section-" + Model.PageSectionID + @"-advanced-settings').find('.slideshow-overlay').first();
+
+                    if(s.GetValue() + window['SlideShow" + Model.PageSectionID + @"OverlayLeft'].GetValue() > 100) {
+                        s.SetValue(100 - window['SlideShow" + Model.PageSectionID + @"OverlayLeft'].GetValue());
+                        return;
+                    }
+
+                    $(targ).css('width', s.GetValue() + '%');
+                }";
+            }).GetHtml()
+
+            @Html.DevExpress().Label(settings => { settings.Text = "Overlay Height"; settings.Width = 86; settings.Style.Add("margin-top", "12px"); settings.Style.Add("float", "left"); settings.Style.Add("margin-right", "8px"); settings.Style.Add("line-height", "26px"); }).GetHtml()
+            @Html.DevExpress().SpinEditFor(m => Model.OverlayHeight, settings =>
+            {
+                settings.Name = "SlideShow" + Model.PageSectionID.ToString() + "OverlayHeight";
+                settings.Properties.MinValue = 1.0M;
+                settings.Properties.MaxValue = 100.0M;
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+                settings.Properties.Increment = 1.0M;
+                settings.Properties.DisplayFormatString = "F2";
+                settings.Style.Add("margin-top", "10px");
+                settings.Style.Add("margin-right", "20px");
+                settings.Height = 26;
+                settings.Width = 86;
+                settings.Style.Add("float", "left");
+                settings.Properties.AllowNull = false;
+                settings.Properties.NullText = "0.60";
+                settings.ReadOnly = false;
+                settings.Properties.ClientSideEvents.NumberChanged = @"function(s, e) {
+                    var targ = $('#page-section-" + Model.PageSectionID + @"-advanced-settings').find('.slideshow-overlay').first();
+
+                    if(s.GetValue() + window['SlideShow" + Model.PageSectionID + @"OverlayTop'].GetValue() > 100) {
+                        s.SetValue(100 - window['SlideShow" + Model.PageSectionID + @"OverlayTop'].GetValue());
+                        return;
+                    }
+
+                    $(targ).css('height', s.GetValue() + '%');
+                }";
+            }).GetHtml()
+            <div style="clear:both;"></div>
+            <select id="slideshow-@(Model.PageSectionID.ToString())-overlay-position" style="display: none; width: 100px; float: left; margin-top: 10px; height: 26px; padding: 0;">
+                @foreach (var sop in Flock.ViewModels.LargeDatabaseDataProvider.GetSlideshowOverlayPositions())
+                {
+                    <option value="@(sop.SlideshowOverlayPositionID)"
+                            data-top="@(sop.OverlayTop)"
+                            data-left="@(sop.OverlayLeft)"
+                            data-width="@(sop.OverlayWidth)"
+                            data-height="@(sop.OverlayHeight)"
+                            @(sop.SlideshowOverlayPositionID == Model.SlideshowOverlayPositionID ? "selected='selected'" : "")>
+                        @(sop.Name)
+                    </option>
+                }
+            </select>
+            <div style="clear: both;"></div>
+            @Html.DevExpress().Label(settings => { settings.Text = "Overlay Opacity"; settings.Style.Add("margin-right", "8px"); settings.Width = 86; settings.Style.Add("margin-top", "10px"); settings.Style.Add("float", "left"); settings.Style.Add("line-height", "32px"); }).GetHtml()
+            @Html.DevExpress().SpinEditFor(m => Model.OverlayBackgroundOpacity, settings =>
+            {
+                settings.Name = "SlideShow" + Model.PageSectionID.ToString() + "OverlayOpacity";
+                settings.Properties.MinValue = 0.05M;
+                settings.Properties.MaxValue = 1.0M;
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+                settings.Properties.Increment = 0.05M;
+                settings.Properties.DisplayFormatString = "F2";
+                settings.Style.Add("margin-top", "10px");
+                settings.Height = 26;
+                settings.Width = 86;
+                settings.Style.Add("float", "left");
+                settings.Properties.AllowNull = false;
+                settings.Properties.NullText = "0.60";
+                settings.ReadOnly = false;
+                settings.Properties.ClientSideEvents.NumberChanged = @"function(s, e) {
+                    var targ = $('#page-section-" + Model.PageSectionID + @"-advanced-settings').find('.slideshow-overlay').first();
+                    var currentColor = targ.css('background-color')
+                    var firstParenth = currentColor.indexOf('(');
+                    var lastComma = currentColor.lastIndexOf(',');
+                    var newVal = s.GetValue();
+                    var count = currentColor.match(new RegExp(/[,]/g));
+                    if(count.length == 2) {
+                        var newColor = currentColor.slice(firstParenth + 1, currentColor.length - 1) + ', ' + newVal;
+                    }
+                    else {
+                        var newColor = currentColor.slice(firstParenth + 1, lastComma + 1) + ' ' + newVal;
+                    }
+                    $(targ).css('background-color', 'rgba(' + newColor + ')');
+                }";
+            }).GetHtml()
+            <div style="clear: both;"></div>
+
+            <div id="colour-tabs-container-@(Model.PageSectionID.ToString())" style="display: none; margin: 1em; margin-left: 0em;">
+                <div id="colour-tabs-@(Model.PageSectionID.ToString())">
+                    <ul>
+                        <li><a href="#overlay-colour-@(Model.PageSectionID.ToString())">Overlay Colour</a></li>
+                        <li><a href="#font-colour-@(Model.PageSectionID.ToString())">Font Colour</a></li>
+                    </ul>
+                    <div id="overlay-colour-@(Model.PageSectionID.ToString())" style="padding: 0.5em;">
+                        <div id="colorpick-overlay-@(Model.PageSectionID.ToString())"></div>
+                    </div>
+                    <div id="font-colour-@(Model.PageSectionID.ToString())" style="padding: 0.5em;">
+                        <div id="colorpick-font-@(Model.PageSectionID.ToString())"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div style="width: 50%; float: left;">
+            @Html.DevExpress().Label(settings => { settings.Text = "Display Overlay"; settings.Width = 85; settings.Style.Add("margin-right", "8px"); settings.Style.Add("float", "left"); settings.Style.Add("line-height", "32px"); }).GetHtml()
+            @Html.DevExpress().CheckBoxFor(m => Model.DisplayOverlay, settings => { settings.Style.Add("margin-right", "8px"); settings.Style.Add("float", "left"); settings.Name = "Slideshow" + Model.PageSectionID.ToString() + "DisplayOverlay"; settings.Style.Add("margin-top", "5px"); settings.Properties.ClientInstanceName = "SlideShow" + Model.PageSectionID + "DisplayOverlay"; }).GetHtml()
+
+            @Html.DevExpress().Label(settings => { settings.Text = "Auto Hide Overlay"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("float", "left"); settings.Style.Add("line-height", "32px"); }).GetHtml()
+            @Html.DevExpress().CheckBoxFor(m => Model.AutoHideOverlay, settings => { settings.Name = "Slideshow" + Model.PageSectionID.ToString() + "AutoHideOverlay"; settings.Style.Add("float", "left"); settings.Style.Add("margin-top", "5px"); settings.Properties.ClientInstanceName = "SlideShow" + Model.PageSectionID + "AutoHideOverlay"; }).GetHtml()
+            <div style="clear: both;"></div>
+            @Html.DevExpress().Label(settings => { settings.Text = "Show Hotspots?"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("float", "left"); settings.Style.Add("line-height", "32px"); }).GetHtml()
+            @Html.DevExpress().CheckBoxFor(m => Model.ShowHotspots, settings => { settings.Style.Add("margin-right", "8px"); settings.Style.Add("float", "left"); settings.Name = "Slideshow" + Model.PageSectionID.ToString() + "ShowHotspots"; settings.Style.Add("margin-top", "5px"); settings.Properties.ClientInstanceName = "SlideShow" + Model.PageSectionID + "ShowHotspots"; }).GetHtml()
+
+            @Html.DevExpress().Label(settings => { settings.Text = "Overlay Fade"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("float", "left"); settings.Style.Add("line-height", "32px"); }).GetHtml()
+            @Html.DevExpress().CheckBoxFor(m => Model.OverlayFade, settings => { settings.Name = "Slideshow" + Model.PageSectionID.ToString() + "OverlayFade"; settings.Style.Add("margin-top", "5px"); settings.Properties.ClientInstanceName = "SlideShow" + Model.PageSectionID + "OverlayFade"; }).GetHtml()
+            <div style="clear: both;"></div>
+
+            @Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Text = "Heading";
+                lblSettings.Style.Add("line-height", "26px");
+                lblSettings.Style.Add("margin-top", "10px");
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            @Html.DevExpress().TextBoxFor(m => Model.OverlayHeading, settings =>
+            {
+                settings.Name = "Slideshow" + Model.PageSectionID.ToString() + "OverlayHeading";
+                settings.Width = 280;
+                settings.Properties.MaxLength = 70;
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin-right", "2em");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                settings.Properties.ClientSideEvents.KeyUp = @"function(s, e) {
+                    $('#slideshow-" + Model.PageSectionID.ToString() + @"-overlay-heading').html(s.GetValue());
+                }";
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            @Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Text = "Text";
+                lblSettings.Style.Add("line-height", "26px");
+                lblSettings.Style.Add("margin-top", "10px");
+            }).GetHtml()
+
+            @Html.DevExpress().MemoFor(m => Model.OverlayText, settings =>
+            {
+                settings.Name = "Slideshow" + Model.PageSectionID.ToString() + "OverlayText";
+                settings.Properties.MaxLength = 500;
+                settings.Properties.Columns = 60;
+                settings.Properties.Rows = 6;
+                settings.Properties.NullDisplayText = "";
+                settings.Properties.NullText = "";
+                settings.ShowModelErrors = true;
+                settings.ControlStyle.Font.Name = "Segoe UI";
+                settings.ControlStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(9);
+                //settings.Style.Add("font-family", "'Segoe UI'!important");
+                //settings.Style.Add("font-size", "12px!important");
+                //settings.Style.Add("line-height", "16px!important");
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Properties.ClientSideEvents.KeyUp = @"function(s, e) {
+                    if(s.GetValue() != null)
+                        $('#slideshow-" + Model.PageSectionID.ToString() + @"-overlay-text').text(s.GetValue());
+                    else
+                        $('#slideshow-" + Model.PageSectionID.ToString() + @"-overlay-text').text('');
+                }";
+            }).GetHtml()
+            <div style="clear: both"></div>
+            @Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Text = "Links to: ";
+                lblSettings.Width = 44;
+                lblSettings.Style.Add("float", "left");
+                lblSettings.Style.Add("line-height", "32px");
+                lblSettings.Style.Add("margin-right", "1em");
+                lblSettings.Style.Add("margin-top", "20px");
+                lblSettings.AssociatedControlName = "Name";
+            }).GetHtml()
+            @{
+                var UoW = new Flock.DAL.UnitOfWork<FlockDataContext>();
+
+                var Linkage = "Nothing";
+                var LinkTypeID = 1;
+                var LinkID = 0;
+                char? TypeChar = 'x';
+
+                if (Model.PageID != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.Page>().GetAll().Where(p => p.PageID == Model.PageID).Select(p => p.Name).Single();
+                    TypeChar = 'l';
+                    LinkID = Model.PageID.Value;
+                    LinkTypeID = 2;
+                }
+                else if (Model.ProductPageID != null)
+                {
+                    Linkage = UoW.GetRepository<ProductPage>().GetAll().Where(p => p.ProductPageID == Model.ProductPageID).Select(p => p.Name).Single();
+                    TypeChar = 'p';
+                    LinkID = Model.ProductPageID.Value;
+                    LinkTypeID = 3;
+                }
+                else if (Model.CollectionID != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.Collection>().GetAll().Where(p => p.CollectionID == Model.CollectionID).Select(p => p.Name).Single();
+                    TypeChar = 'c';
+                    LinkID = Model.CollectionID.Value;
+                    LinkTypeID = 4;
+                }
+                else if (Model.ExternalURL != null)
+                {
+                    Linkage = "External: " + Model.ExternalURL;
+                    TypeChar = null;
+                    LinkTypeID = 5;
+                }
+
+                var source = new List<object>
+                {
+                    new { SName = "Nothing", SID = (byte)1 },
+                    new { SName = "Page", SID = (byte)2 },
+                    new { SName = "Product Page", SID = (byte)3 },
+                    new { SName = "Collection", SID = (byte)4 },
+                    new { SName = "External URL", SID = (byte)5 }
+                };
+
+                @Html.DevExpress().ComboBox(cbSettings =>
+                {
+                    cbSettings.Name = "LinkTypeComboBox" + Model.PageSectionID.ToString();
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Properties.TextField = "SName";
+                    cbSettings.Properties.ValueField = "SID";
+                    cbSettings.Style.Add("margin-top", "20px");
+                    cbSettings.Style.Add("margin-right", "2em");
+                    cbSettings.Properties.ValueType = typeof(byte);
+                    cbSettings.SelectedIndex = (LinkTypeID - 1); // this (LinkTypeID-1) is an awkward fudge thanks to having to cater for pages whose ID is 0 - previously the source variable was 0 indexed, couldn't be
+                    cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                            RevealLinkSelector(s.GetSelectedItem().value, null, " + Model.PageSectionID.ToString() + @") ;
+                            if(s.GetSelectedItem().value == 1 || s.GetSelectedItem().value == 4)
+                                $('#link-" + Model.PageSectionID.ToString() + @"-test').hide();
+                            else
+                                $('#link-" + Model.PageSectionID.ToString() + @"-test').show();
+                        }";
+                    cbSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                            $('#link-selector-" + LinkTypeID + @"-" + Model.PageSectionID.ToString() + @"').show();
+                            if(" + LinkTypeID + @" != 1)
+                                RevealLinkSelector('" + LinkTypeID + @"', '" + LinkID + @"', " + Model.PageSectionID.ToString() + @");
+                            if(s.GetSelectedItem().value != 1 && s.GetSelectedItem().value != 4)
+                                $('#link-" + Model.PageSectionID.ToString() + @"-test').show();
+                            else
+                                $('#link-" + Model.PageSectionID.ToString() + @"-test').hide();
+                        }";
+                }).BindList(source).GetHtml()
+
+                @Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Text = "New Window";
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("margin-top", "20px");
+                    lblSettings.Style.Add("line-height", "32px");
+                }).GetHtml()
+
+                @Html.DevExpress().CheckBox(cbSettings =>
+                {
+                    cbSettings.Name = "Slideshow" + Model.PageSectionID.ToString() + "NewWindow";
+                    cbSettings.Style.Add("padding-top", "6px");
+                    cbSettings.Style.Add("margin-top", "21px");
+                    cbSettings.Style.Add("float", "left");
+                }).Bind(Model.NewWindow).GetHtml()
+
+                <div style="clear: both;"></div>
+
+                if (LinkTypeID == 2 || LinkTypeID == 3 || LinkTypeID == 4)
+                {
+                    <a id='link-@(Model.PageSectionID)-test' style="font-size: 11px; line-height: 32px; height: 32px; margin-bottom: 7px; margin-left: 0px; color: blue;" target='_blank' href='https://www.designersguild.com/uk/@(TypeChar)@(LinkID)'>@(Linkage)</a>
+                }
+            }
+            <div style="clear: both; margin-bottom: 1em;"></div>
+        </div>
+        <div style="clear: both;"></div>
+        <div style="width: 100%; position: relative; margin-top: 1em;">
+            <div id='link-selector-2-@(Model.PageSectionID)' class='link-selector'>
+                @Html.Partial("MenuBuilderPageSelectorGridPartial", "Slideshow" + Model.PageSectionID.ToString())
+            </div>
+
+            <div id='link-selector-3-@(Model.PageSectionID)' class='link-selector'>
+                @Html.Partial("MenuBuilderProductPageSelectorGridPartial", "Slideshow" + Model.PageSectionID.ToString())
+            </div>
+
+            <div id='link-selector-4-@(Model.PageSectionID)' class='link-selector'>
+                @Html.Partial("MenuBuilderCollectionSelectorGridPartial", "Slideshow" + Model.PageSectionID.ToString())
+            </div>
+
+            <div id='link-selector-5-@(Model.PageSectionID)' class='link-selector'>
+                @Html.DevExpress().Label(lblSettings =>
+            {
+                lblSettings.Text = "External URL";
+                lblSettings.Style.Add("line-height", "32px");
+            }).GetHtml()
+
+                @Html.DevExpress().TextBox(tbSettings =>
+            {
+                tbSettings.Name = "Slideshow" + Model.PageSectionID.ToString() + "ExternalURL";
+                tbSettings.Width = 280;
+                tbSettings.Properties.MaxLength = 255;
+                tbSettings.Properties.NullDisplayText = "External URL";
+            }).Bind(Model.ExternalURL).GetHtml()
+            </div>
+
+            <div style="width: 60%; position: absolute; top: 0; right: 0;">
+                <div style='clear: both'></div>
+                <div id='link-selector-1-@(Model.PageSectionID)' class='link-selector'>
+                    <input type='hidden' id='Slideshow@(Model.PageSectionID)page-id-hidden' value='@(Model.PageID == null ? "nothing" : Model.PageID.ToString())' />
+                    <input type='hidden' id='Slideshow@(Model.PageSectionID)product-page-id-hidden' value='@(Model.ProductPageID == null ? "nothing" : Model.ProductPageID.ToString())' />
+                    <input type='hidden' id='Slideshow@(Model.PageSectionID)collection-id-hidden' value='@(Model.CollectionID == null ? "nothing" : Model.CollectionID.ToString())' />
+                </div>
+                <div style='clear: both'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var startOverlayColour = '@(Model.OverlayBackgroundColour == null ? "255, 255, 255" : Model.OverlayBackgroundColour)';
+
+    var startFontColour = '@(Model.OverlayFontColour == null ? "0, 0, 0" : Model.OverlayFontColour)';
+
+    var rgb = startOverlayColour.split(',');
+
+    $('#colorpick-overlay-@(Model.PageSectionID.ToString())').ColorPicker({
+        color: { r: rgb[0], g: rgb[1], b: rgb[2] },
+        flat: true,
+        onChange: function (hsb, hex, rgb) {
+            var targ = $("#page-section-@(Model.PageSectionID)-advanced-settings").find(".slideshow-overlay").first();
+            var opa = window["SlideShow@(Model.PageSectionID)OverlayOpacity"].GetValue();
+            targ.css("background-color", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opa + ")");
+        }
+    });
+
+    rgb = startFontColour.split(',');
+
+    $('#colorpick-font-@(Model.PageSectionID.ToString())').ColorPicker({
+        color: { r: rgb[0], g: rgb[1], b: rgb[2] },
+        flat: true,
+        onChange: function (hsb, hex, rgb) {
+            var targ = $("#page-section-@(Model.PageSectionID)-advanced-settings").find(".slideshow-overlay").first();
+            targ.css("color", "rgb(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ")");
+        }
+    });
+
+    $("#colour-tabs-@(Model.PageSectionID.ToString())").tabs({});
+
+    $("#colour-tabs-container-@(Model.PageSectionID.ToString())").show();
+
+
+    var imagesList = [];
+
+    $("#page-section-@(Model.PageSectionID)-slideshow-images").children("div").each(function (index) {
+        imagesList.push($(this).data("image-id"));
+    });
+
+    $("#slideshow-image-count-lbl-@(Model.PageSectionID.ToString())").text(imagesList.length);
+
+</script>
+
+
+@*
+    When not totally exhausted, we need to create a manager for the styles which we're permitting the users to build.
+
+    Then you can just pick from a saved list of styles, or create a new one and save it.
+
+    Urgh.
+
+*@

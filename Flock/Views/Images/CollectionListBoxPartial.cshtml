@@ -1,0 +1,49 @@
+﻿@model List<Flock.Models.Collection>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Name = "CollectionListBox";
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        $('#searching-icon').fadeIn('fast');
+        CollectionDD.SetText(s.GetSelectedItem().text);
+        CollectionDD.HideDropDown();
+        $.ajax({
+            url: '" + Url.Action("ImageSearch", "Images") + @"',
+            traditional: true,
+            data: { 
+                ProductType: ProductTypeListBox.GetValue(),
+                Brand: BrandListBox.GetValue(),
+                Launch: LaunchListBox.GetValue(),
+                Collection: CollectionListBox.GetValue(),
+                AspectRatio: AspectRatioListBox.GetValue(),
+                ImageType: ImageTypeListBox.GetValue(),
+                Perspective: PerspectiveListBox.GetValue(),
+                HotspotStatus: HotspotStatusListBox.GetValue(),
+                Colour: ColourListBox.GetValue(),
+                Room: RoomListBox.GetValue(),
+                Style: StyleListBox.GetValue(),
+                NameOrID: NameOrIDTextBox.GetValue(),
+                SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue() 
+            },
+            success: function(data) {
+                $('#image-data-view-container').html(data);
+                $('#searching-icon').fadeOut('slow');
+            },
+            error: function(e, s, a) {
+                $('#searching-icon').fadeOut('slow');
+                alert(e.responseText);
+            },
+            timeout: 20000
+        });
+    }";
+    
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "CollectionID";
+}
+).BindList(Model).GetHtml()

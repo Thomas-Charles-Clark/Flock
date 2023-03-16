@@ -1,0 +1,66 @@
+﻿@model List<Flock.Models.Competition>
+@{ 
+    var MarketingPartnerID = ViewBag.SelectedCompetitionID;
+
+    string name = "Form";
+
+    name = name + ViewBag.FormID;
+
+    @Html.DevExpress().DropDownEdit(settings =>
+    {
+        settings.Name = name + "CompetitionDD"; 
+        settings.Style.Add("margin", "0 7px 0 0");
+        settings.Width = 200;
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        settings.Text = "Competition";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+        settings.Properties.DropDownWindowWidth = System.Web.UI.WebControls.Unit.Pixel(270);
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div>");
+            Html.DevExpress().ListBox(lbSettings =>
+            {
+                lbSettings.Name = name + "CompetitionListBox";
+                lbSettings.Properties.TextField = "Name";
+                lbSettings.Properties.ValueField = "CompetitionID";
+                lbSettings.Properties.ValueType = typeof(long);
+                lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                lbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                        " + name + @"CompetitionDD.SetText(s.GetSelectedItem().text);
+                        " + name + @"CompetitionDD.HideDropDown();
+                    }";
+            }).BindList(Model).Render();
+
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Name = name + "ButtonClear";
+                    buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                                " + name + @"CompetitionDD.HideDropDown();
+                                " + name + @"CompetitionDD.SetText('Competition');
+                                " + name + @"CompetitionListBox.UnselectAll();
+                            }";
+                    buttonSettings.Text = "Clear";
+                    buttonSettings.Style.Add("float", "left");
+                }
+                ).Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Name = name + "ButtonClose";
+                    buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                            " + name + @"CompetitionDD.HideDropDown();
+                        }";
+
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }).Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+    }).GetHtml()
+}

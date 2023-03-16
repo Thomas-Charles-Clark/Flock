@@ -1,0 +1,219 @@
+﻿@model Flock.ViewModels.ProductStockViewModel
+@{
+    ViewBag.Title = "Stock";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: auto;
+        }
+    </style>
+    }
+<h4 class="page-heading">Product Stock</h4>
+
+<div id="bulk-action-panel" style="float: none; position: relative; display: inline-block; margin-left: 0; right: 0; margin-bottom: 1em;">
+    <h4>Bulk Action Panel</h4>
+    <ul>
+        <li>
+            <a href="javascript:;" title="Enable" onclick="EnableSelectedProducts()">Enable</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Disable" onclick="DisableSelectedProducts()">Disable</a>
+        </li>
+    </ul>
+</div>
+
+<div id="ProductStockGridContainer" class="grid-container">
+    @Html.Action("ProductStockGridViewPartial")
+</div>
+
+<div style="clear: both;"></div>
+
+@section Scripts {
+@Scripts.Render("~/bundles/js/sparkline")
+<script type="text/javascript">
+        $(document).ready(function () {
+            $.fn.sparkline.defaults.common.width = "144px";
+            $.fn.sparkline.defaults.common.height = "30px";
+            //$('.inlinesparkline').sparkline();
+            $('.inlinesparkline').each(function () {
+                $(this).html($(this).data('sparkline'));
+                $(this).sparkline();
+            });
+        });
+
+        function ToggleProductPage(ProductPageID, ProductID)
+        {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("ToggleProductPages", "Products")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductPageID: ProductPageID,
+                    ProductID: ProductID
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    ProductStockGridView.Refresh();
+                },
+                timeout: 60000
+            });
+        }
+
+        function EnableSelectedProducts() {
+            var keys = null;
+
+            if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                keys = ProductOverviewGridView.GetSelectedKeysOnPage();
+
+            if (typeof (ProductStockGridView) != "undefined" && ProductStockGridView != false) {
+                if (keys == null) {
+                    if (ProductStockGridView.GetSelectedKeysOnPage().length > 0) {
+                        keys = ProductStockGridView.GetSelectedKeysOnPage();
+                    }
+                }
+                else {
+                    if (ProductStockGridView.GetSelectedKeysOnPage().length > 0) {
+                        keys += ',' + ProductStockGridView.GetSelectedKeysOnPage();
+                    }
+                }
+            }
+
+            if (window.DetailGrids) {
+                for (var i = 0; i < window.DetailGrids.length; i++) {
+                    if (keys == null) {
+                        if (window.DetailGrids[i].GetSelectedKeysOnPage().length > 0) {
+                            keys = window.DetailGrids[i].GetSelectedKeysOnPage();
+                        }
+                    }
+                    else {
+                        if (window.DetailGrids[i].GetSelectedKeysOnPage().length > 0) {
+                            if (keys.length > 0)
+                                keys += ',' + window.DetailGrids[i].GetSelectedKeysOnPage();
+                            else
+                                keys = window.DetailGrids[i].GetSelectedKeysOnPage();
+                        }
+                    }
+                }
+            }
+
+
+            if (typeof (keys) != "undefined" && keys != false)
+                if(typeof(ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                    ProductOverviewGridView.PerformCallback({ commandType: 'Enable', keyString: keys.toString() });
+                else if (typeof(ProductStockGridView) != "undefined" && ProductStockGridView != false)
+                    ProductStockGridView.PerformCallback({ commandType: 'Enable', keyString: keys.toString() });
+            else
+                alert("Select at least one product.")
+            return false;
+        }
+
+        function DisableSelectedProducts() {
+            var keys = null;
+
+            if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                keys = ProductOverviewGridView.GetSelectedKeysOnPage();
+
+            if (typeof (ProductStockGridView) != "undefined" && ProductStockGridView != false) {
+                if (keys == null) {
+                    if (ProductStockGridView.GetSelectedKeysOnPage().length > 0) {
+                        keys = ProductStockGridView.GetSelectedKeysOnPage();
+                    }
+                }
+                else {
+                    if (ProductStockGridView.GetSelectedKeysOnPage().length > 0) {
+                        keys += ',' + ProductStockGridView.GetSelectedKeysOnPage();
+                    }
+                }
+            }
+
+            if (window.DetailGrids) {
+                for (var i = 0; i < window.DetailGrids.length; i++) {
+                    if (keys == null) {
+                        if (window.DetailGrids[i].GetSelectedKeysOnPage().length > 0) {
+                            keys = window.DetailGrids[i].GetSelectedKeysOnPage();
+                        }
+                    }
+                    else {
+                        if (window.DetailGrids[i].GetSelectedKeysOnPage().length > 0 ) {
+                            if (keys.length > 0)
+                                keys += ',' + window.DetailGrids[i].GetSelectedKeysOnPage();
+                            else
+                                keys = window.DetailGrids[i].GetSelectedKeysOnPage();
+                        }
+                    }
+                }
+            }
+
+            if (typeof (keys) != "undefined" && keys != false)
+                if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                    ProductOverviewGridView.PerformCallback({ commandType: 'Disable', keyString: keys.toString() });
+                else if (typeof (ProductStockGridView) != "undefined" && ProductStockGridView != false)
+                    ProductStockGridView.PerformCallback({ commandType: 'Disable', keyString: keys.toString() });
+            else
+                alert("Select at least one product.")
+            return false;
+        }
+
+        function DeleteSelectedProducts() {
+            var conf = confirm("Are you sure?");
+            if (conf) {
+                var keys = null;
+
+                if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                    keys = ProductOverviewGridView.GetSelectedKeysOnPage();
+
+                if (typeof (ProductStockGridView) != "undefined" && ProductStockGridView != false) {
+                    if (keys == null)
+                        keys = ProductStockGridView.GetSelectedKeysOnPage();
+                    else {
+                        if (ProductStockGridView.GetSelectedKeysOnPage().toString() != "")
+                            keys += ',' + ProductStockGridView.GetSelectedKeysOnPage();
+                    }
+                }
+                if (typeof (keys) != "undefined" && keys != false)
+                    if (typeof (ProductOverviewGridView) != "undefined" && ProductOverviewGridView != false)
+                        ProductOverviewGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+            }
+        }
+
+        function AssignImage(listElement) {
+            // take whole list, first is selected, rest are not.
+            var perspectiveID = $(listElement).data("perspective-id");
+            var imageID = $(listElement).children("li").first().children("img").first().data("image-id");
+            var productID = window.DetailRowProductID;
+            $.ajax({
+                url: '@Url.Action("AssignImage", "Products")',
+                traditional: true,
+                type: 'POST',
+                data: {
+                    ProductID: productID,
+                    PerspectiveID: perspectiveID,
+                    ImageID: imageID
+                },
+                success: function () {
+
+                },
+                error: function (e, g, a) {
+                    alert(e.responseText);
+                }
+            });
+        }
+
+        function UnlockProductImages() {
+            $("#front-image-list").sortable({ update: function () { AssignImage($("#front-image-list")); }});
+            $("#back-image-list").sortable({ update: function () { AssignImage($("#back-image-list")); } });
+            $("#closeup-image-list").sortable({ update: function () { AssignImage($("#closeup-image-list")); } });
+            $("#styled-image-list").sortable({ update: function () { AssignImage($("#styled-image-list")); } });
+        }
+
+        function LockProductImages() {
+            $("#front-image-list").sortable("destroy");
+            $("#back-image-list").sortable("destroy");
+            $("#closeup-image-list").sortable("destroy");
+            $("#styled-image-list").sortable("destroy");
+        }
+</script>
+}

@@ -1,0 +1,38 @@
+﻿@model List<Flock.Models.Brochure>
+@Html.DevExpress().ComboBox(settings => {
+    settings.Name = "CollectionBrochureComboBox";
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Style.Add("float", "left");
+    
+    settings.Properties.DropDownWidth = 450;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.CallbackRouteValues = new { Controller = "Collections", Action = "CollectionComposeBrochureComboBoxPartial" };
+    settings.Properties.CallbackPageSize = 30;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "BrochureID";
+    settings.Properties.ValueType = typeof(short);
+    
+    settings.Properties.NullText = "Brochure Finder";
+    settings.Properties.Columns.Add("Name", "Name", 130);
+    settings.Properties.Columns.Add("Heading", "Heading", System.Web.UI.WebControls.Unit.Percentage(100));
+
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+        $.ajax({
+            url: '" + Url.Action("AssignCollectionBrochure", "Collections") + @"',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: $('#selected-collection-id').val(),
+                BrochureID: s.GetSelectedItem().value
+            },
+            success: function(data) { 
+                $('#collection-images-brochure-target').html(data);
+            },
+            error: function(e, s, a) { 
+                $.showError(e, s, a);
+            },
+            timeout: 60000
+        });
+    }";
+}).BindList(Model).GetHtml()

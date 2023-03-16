@@ -1,0 +1,1242 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<FlockDataContext>();
+
+        settings.Name = "SalePriceGridView";
+        settings.CallbackRouteValues = new { Controller = "Promotions", Action = "SalePriceGridView" };
+
+        settings.CustomActionRouteValues = new { Controller = "Promotions", Action = "SalePriceGridViewCustomCommand" };
+        settings.SettingsEditing.BatchUpdateRouteValues = new { Controller = "Promotions", Action = "SalePriceGridViewBatchEditingUpdate" };
+        settings.ClientSideEvents.BeginCallback = @"function OnBeginCallback(s, e) {
+            if(window.LessColumns)
+                HideColumns();
+
+            e.customArgs['PriceListID'] = SalePricePriceListListBox.GetValue();
+
+            var beh = s.GetBatchEditHelper();
+
+            SalePriceGridView.batchEditClientState.columnIndices.push(21);
+            SalePriceGridView.batchEditClientState.columnIndices.push(22);
+
+             for (var key in beh.updatedValues) {
+               var obj = beh.updatedValues[key];
+//must add properties 24, 22, 21, 20, 19?
+
+                var cell = $('#SalePriceGridView tr.data-row td:first-child').filter(function () {
+                    return $(this).html() == key;
+                }).first();
+
+                var index = $(cell).parent().parent().children().index($(cell).parent()) - 3;
+
+               if(!obj.hasOwnProperty('21')) {
+                    obj['21'] = new Array();
+                    obj['21'].push($('#SalePriceGridView_DXDataRow' + (index)).children().eq(20).html());
+                    obj['21'].push($('#SalePriceGridView_DXDataRow' + (index)).children().eq(20).html());
+                }
+                if(!obj.hasOwnProperty('22')) {
+                    obj['22'] = new Array();
+                    obj['22'].push($('#SalePriceGridView_DXDataRow' + (index)).children().eq(21).html());
+                    obj['22'].push($('#SalePriceGridView_DXDataRow' + (index)).children().eq(21).html());
+                }
+//                
+//               for (var prop in obj) {
+//                  // important check that this is objects own property 
+//                  // not from prototype prop inherited
+//                  if(obj.hasOwnProperty(prop)){
+//                    ;
+//                  }
+//               }
+            }
+
+        }";
+
+        settings.ClientSideEvents.Init = @"function(s, e) { 
+            s.GetBatchEditHelper().ChangeCellStyle = ChangeCellStyleOverride;
+            //s.GetBatchEditHelper().CancelEdit = CancelEditOverride;
+
+        }";
+        
+        settings.ClientSideEvents.EndCallback = @"function(s, e) {
+            if(window.LessColumns)
+                $('.hideable-column').hide();
+            s.GetBatchEditHelper().ChangeCellStyle = ChangeCellStyleOverride;
+            //s.GetBatchEditHelper().CancelEdit = CancelEditOverride;
+        }";
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.SettingsBehavior.AllowSelectSingleRowOnly = false;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        //settings.Style.Add("float", "left");
+        settings.CommandColumn.VisibleIndex = 100;
+        settings.CommandColumn.Visible = true;
+
+        settings.Styles.Row.CssClass = "data-row";
+
+        settings.CommandColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowEditButton = false;
+        settings.CommandColumn.ShowUpdateButton = false;
+        settings.CommandColumn.ShowCancelButton = false;
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.Width = 70;
+
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("Select All");
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+        });
+
+        settings.KeyFieldName = "SalePriceID";
+
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowHeaderFilterButton = true;
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "10", "20", "50", "100", "200", "500" };
+        //settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        //settings.SettingsDetail.ShowDetailRow = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(Html.Action("ProductPricesGridDetailPartial", "Products", new { ProductID = c.KeyValue }));
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "SalePriceID";
+            column.Name = "SalePriceID";
+            column.Caption = "Sale Price ID";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.ReadOnly = true;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            
+        });
+
+        MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+        ProductTypeColumn.FieldName = "ProductTypeID";
+        ProductTypeColumn.Name = "ProductTypeID";
+        ProductTypeColumn.Caption = "Product Type";
+        ProductTypeColumn.CellStyle.CssClass = "hideable-column";
+        ProductTypeColumn.FilterCellStyle.CssClass = "hideable-column";
+        ProductTypeColumn.HeaderStyle.CssClass = "hideable-column";
+        ProductTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ProductTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        ProductTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        ProductTypeColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        ProductTypeColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        ProductTypeColumn.SetDataItemTemplateContent(c =>
+        {
+            int ProductTypeID = 0;
+            string ProductType = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "ProductTypeID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ProductTypeID") != null)
+            {
+                ProductTypeID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "ProductTypeID"));
+                ProductType = UoW.GetRepository<Flock.Models.ProductType>().GetAll().Where(p => p.ProductTypeID == ProductTypeID).Select(p => p.Name).Single();
+            }
+
+            ViewContext.Writer.Write("<span style='color: black'>" + ProductType + "</span>");
+        });
+        settings.Columns.Add(ProductTypeColumn);
+
+        MVCxGridViewColumn BrandColumn = new MVCxGridViewColumn();
+        BrandColumn.FieldName = "BrandID";
+        BrandColumn.Name = "BrandID";
+        BrandColumn.Caption = "Brand";
+        BrandColumn.Width = 250;
+        BrandColumn.CellStyle.CssClass = "hideable-column";
+        BrandColumn.FilterCellStyle.CssClass = "hideable-column";
+        BrandColumn.HeaderStyle.CssClass = "hideable-column";
+        BrandColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        BrandColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        BrandColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        BrandColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        BrandColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        BrandColumn.SetDataItemTemplateContent(c =>
+        {
+            int BrandID = 0;
+            string Brand = "<i>Not Set</i>";
+
+            if (DataBinder.Eval(c.DataItem, "BrandID") != DBNull.Value && DataBinder.Eval(c.DataItem, "BrandID") != null)
+            {
+                BrandID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "BrandID"));
+                Brand = UoW.GetRepository<Flock.Models.Brand>().GetAll().Where(p => p.BrandID == BrandID).Select(p => p.Name).Single();
+            }
+
+            ViewContext.Writer.Write("<span style='color: black'>" + Brand + "</span>");
+        });
+        settings.Columns.Add(BrandColumn);
+
+        MVCxGridViewColumn LaunchColumn = new MVCxGridViewColumn();
+        LaunchColumn.FieldName = "LaunchID";
+        LaunchColumn.Name = "LaunchID";
+        LaunchColumn.Caption = "Launch";
+        LaunchColumn.Width = 250;
+        LaunchColumn.CellStyle.CssClass = "hideable-column";
+        LaunchColumn.FilterCellStyle.CssClass = "hideable-column";
+        LaunchColumn.HeaderStyle.CssClass = "hideable-column";
+        LaunchColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        LaunchColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        LaunchColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        LaunchColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        LaunchColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        LaunchColumn.SetDataItemTemplateContent(c =>
+        {
+            int LaunchID = 0;
+            string Launch = "<i>Not Set</i>";
+
+            if (DataBinder.Eval(c.DataItem, "LaunchID") != DBNull.Value && DataBinder.Eval(c.DataItem, "LaunchID") != null)
+            {
+                LaunchID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "LaunchID"));
+                Launch = UoW.GetRepository<Flock.Models.Launch>().GetAll().Where(p => p.LaunchID == LaunchID).Select(p => p.Name).Single();
+            }
+
+            ViewContext.Writer.Write("<span>" + Launch + "</span>");
+        });
+        settings.Columns.Add(LaunchColumn);
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Enabled";
+            column.Name = "Enabled";
+            column.Caption = "Enabled";
+            column.CellStyle.CssClass = "hideable-column";
+            column.FilterCellStyle.CssClass = "hideable-column";
+            column.HeaderStyle.CssClass = "hideable-column";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                bool? enabledState = (bool?)DataBinder.Eval(c.DataItem, "Enabled");
+                if (enabledState != null)
+                {
+                    if (enabledState == true)
+                        ViewContext.Writer.Write("<span style='color: green'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                    else
+                        ViewContext.Writer.Write("<span style='color: red'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                }
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                bool? enabledState = (bool?)DataBinder.Eval(c.DataItem, "Enabled");
+                if (enabledState != null)
+                {
+                    if (enabledState == true)
+                        ViewContext.Writer.Write("<span style='color: green'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                    else
+                        ViewContext.Writer.Write("<span style='color: red'>" + DataBinder.Eval(c.DataItem, "Enabled") + "</span>");
+                }
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Status";
+            column.Name = "Status";
+            column.Caption = "Status";
+            column.CellStyle.CssClass = "hideable-column";
+            column.FilterCellStyle.CssClass = "hideable-column";
+            column.HeaderStyle.CssClass = "hideable-column";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                char enabledState = '?';
+                if (DataBinder.Eval(c.DataItem, "Status") != DBNull.Value && DataBinder.Eval(c.DataItem, "Status") != null)
+                    enabledState = (char)DataBinder.Eval(c.DataItem, "Status");
+                switch (enabledState)
+                {
+                    case 'C':
+                        ViewContext.Writer.Write("<span style='color: green'>" + enabledState + "</span>");
+                        break;
+                    case 'D':
+                        ViewContext.Writer.Write("<span style='color: red'>" + enabledState + "</span>");
+                        break;
+                    case 'L':
+                        ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+                        break;
+                    case 'Y':
+                        ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+                        break;
+                    default:
+                        ViewContext.Writer.Write("<span style='color: black'>" + enabledState + "</span>");
+                        break;
+                }
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "StatusID";
+            column.Name = "WebStatus";
+            column.Caption = "Web Status";
+            column.CellStyle.CssClass = "hideable-column";
+            column.FilterCellStyle.CssClass = "hideable-column";
+            column.HeaderStyle.CssClass = "hideable-column";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+                string colour = "black";
+                string statusText = "unknown";
+                statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+                switch (i)
+                {
+                    case 0:
+                        colour = "green";
+                        break;
+                    case 1:
+                        colour = "orange";
+                        break;
+                    case 2:
+                        colour = "orange";
+                        break;
+                    case 3:
+                        colour = "green";
+                        break;
+                    case 4:
+                        colour = "red";
+                        break;
+                    default: break;
+                }
+                string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+                ViewContext.Writer.Write(res);
+            });
+        });
+
+        MVCxGridViewColumn StockStatusColumn = new MVCxGridViewColumn();
+        StockStatusColumn.FieldName = "StockStatusID";
+        StockStatusColumn.Name = "StockStatus";
+        StockStatusColumn.Caption = "Stock";
+        StockStatusColumn.Width = 250;
+        StockStatusColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        StockStatusColumn.CellStyle.CssClass = "hideable-column";
+        StockStatusColumn.FilterCellStyle.CssClass = "hideable-column";
+        StockStatusColumn.HeaderStyle.CssClass = "hideable-column";
+        StockStatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        StockStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        StockStatusColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        StockStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            int StockStatusID = 0;
+            if (DataBinder.Eval(c.DataItem, "StockStatusID") != DBNull.Value && DataBinder.Eval(c.DataItem, "StockStatusID") != null)
+                StockStatusID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "StockStatusID"));
+            string stockStatus = "<i>Unknown</i>";
+
+            stockStatus = UoW.GetRepository<Flock.Models.StockStatus>().GetAll().Where(p => p.StockStatusID == StockStatusID).Select(p => p.StockStatus1).Single();
+
+
+            switch (StockStatusID)
+            {
+                case 1:
+                    ViewContext.Writer.Write("<span style='color: green'>" + stockStatus + "</span>");
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    ViewContext.Writer.Write("<span style='color: orange'>" + stockStatus + "</span>");
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    ViewContext.Writer.Write("<span style='color: red'>" + stockStatus + "</span>");
+                    break;
+
+                default:
+                    ViewContext.Writer.Write("<span style='color: black'>" + stockStatus + "</span>");
+                    break;
+            }
+        });
+        settings.Columns.Add(StockStatusColumn);
+
+        settings.Columns.Add("FreeStock");
+        MVCxGridViewColumn FreeStockColumn = settings.Columns["FreeStock"] as MVCxGridViewColumn;
+        FreeStockColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        FreeStockColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        FreeStockColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        FreeStockColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        FreeStockColumn.CellStyle.CssClass = "hideable-column";
+        FreeStockColumn.FilterCellStyle.CssClass = "hideable-column";
+        FreeStockColumn.HeaderStyle.CssClass = "hideable-column";
+        FreeStockColumn.EditFormSettings.Visible = DefaultBoolean.False;
+
+        settings.Columns.Add("PODueDate");
+        MVCxGridViewColumn PODueDateColumn = settings.Columns["PODueDate"] as MVCxGridViewColumn;
+        PODueDateColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        PODueDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        PODueDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PODueDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        PODueDateColumn.CellStyle.CssClass = "hideable-column";
+        PODueDateColumn.FilterCellStyle.CssClass = "hideable-column";
+        PODueDateColumn.HeaderStyle.CssClass = "hideable-column";
+        PODueDateColumn.EditFormSettings.Visible = DefaultBoolean.False;
+
+        settings.Columns.Add("POFreeStock");
+        MVCxGridViewColumn POFreeStockColumn = settings.Columns["POFreeStock"] as MVCxGridViewColumn;
+        POFreeStockColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        POFreeStockColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        POFreeStockColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        POFreeStockColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        POFreeStockColumn.CellStyle.CssClass = "hideable-column";
+        POFreeStockColumn.FilterCellStyle.CssClass = "hideable-column";
+        POFreeStockColumn.HeaderStyle.CssClass = "hideable-column";
+        POFreeStockColumn.EditFormSettings.Visible = DefaultBoolean.False;
+
+
+        // select column
+
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ProductID";
+            column.Name = "ProductID";
+            column.Caption = "Product ID";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Code";
+            column.Name = "Code";
+            column.Caption = "Code";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Name";
+            column.Name = "Name";
+            column.Caption = "Name";
+            column.Width = 260;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "Name") != DBNull.Value)
+                    ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "Name"));
+                else
+                    ViewContext.Writer.Write("<i>NULL</i>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "PriceInc";
+            column.Name = "PriceInc";
+            column.Caption = "PriceInc";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "PriceEx";
+            column.Name = "PriceEx";
+            column.Caption = "PriceEx";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "TaxPercentage";
+            column.Name = "TaxPercentage";
+            column.Caption = "Tax %";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? TXP = (decimal?)DataBinder.Eval(c.DataItem, "TaxPercentage");
+
+                if (TXP != null)
+                {
+                    ViewContext.Writer.Write(String.Format("{0:F1}%", TXP));
+                }
+                else
+                {
+                    ViewContext.Writer.Write("0.0%");
+                }
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "CostSterling";
+            column.Name = "CostSterling";
+            column.Caption = "Cost Sterling";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.PropertiesEdit.DisplayFormatString = "C2";
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "CostSterling") != DBNull.Value)
+                    ViewContext.Writer.Write(String.Format("{0:C2}", (decimal)DataBinder.Eval(c.DataItem, "CostSterling")));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Discount";
+            column.Name = "Discount";
+            column.Caption = "Discount";
+            column.FilterCellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.EditCellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.CellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            column.PropertiesEdit.DisplayFormatString = "{0:F2}";
+            var spineditproperties = column.PropertiesEdit as SpinEditProperties;
+            spineditproperties.DisplayFormatInEditMode = true;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            spineditproperties.MaxValue = Decimal.MaxValue;
+            spineditproperties.MinValue = 0.01M;
+            //spineditproperties.ClientInstanceName
+            spineditproperties.ClientSideEvents.NumberChanged = @"function(s, e) {
+                // can't get the rowkeyaler that the spinedit is sitting on.
+                var rowIndex = $('#SalePriceGridView tr.data-row').index($(s.GetInputElement()).parent().parent().parent().parent().parent().parent().parent()) - 1;
+                // get SalePriceTypeID
+                var saleType = '';
+                if($('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(19).children().length == 0)
+                    saleType = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(19).html();
+                else
+                    saleType = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(19).children().eq(0).html();
+                
+                var ExRate = $('#price-list-exchange-rate').html();
+                var costSterling = $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(17).html().replace('£', '');
+                var costCurrency = costSterling * ExRate;
+
+                if(saleType == 'Amount Off') {
+                    var currentPriceInc = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(14).html();
+                    var currentPriceEx = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(15).html();
+
+                    var newPriceInc = currentPriceInc - s.GetValue();
+                    var newPriceEx = currentPriceEx - s.GetValue();
+
+                    if(s.GetValue() <= 0) {
+                        window.cellEditError = true;
+                        window.errorTipText = 'Discount must be greater than zero.';
+                    
+                        if(typeof(window.updateErrors) != 'object')
+	                        window.updateErrors = new Object();
+
+                        if(!window.updateErrors.hasOwnProperty(rowIndex))
+                            window.updateErrors[rowIndex] = new Object();
+                          
+                        if(!window.updateErrors[rowIndex].hasOwnProperty('Discount'))
+                            window.updateErrors[rowIndex].Discount = new Object();
+
+                        if(!$.isEmptyObject(window.updateErrors[rowIndex]))
+                            alert('You will NOT not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', DISCOUNT_ERR ');
+                    }
+                    else {
+                        if(typeof(window.updateErrors) == 'object') {
+                            if(window.updateErrors.hasOwnProperty(rowIndex))
+                                if(window.updateErrors[rowIndex].hasOwnProperty('Discount'))
+                                    delete window.updateErrors[rowIndex].Discount;
+                            if($.isEmptyObject(window.updateErrors[rowIndex]))
+                                alert('You WILL be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', NO_ERR 1 ');
+                            else
+                                alert('You will NOT not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex] + ', errors remain.');
+                        }
+                    }
+
+
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).html((Math.round(newPriceInc * 100 ) / 100).toFixed(2));
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).css('background-color', '#D7F9C7');
+
+                    if(!(newPriceInc > 0))
+                    {
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).css('background-color', '#FF0000');
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).attr('title', 'SalePriceInc must be a positive value.');
+                    }
+
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).html((Math.round(newPriceEx * 100 ) / 100).toFixed(2));
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).css('background-color', '#D7F9C7');
+
+                    if(!(newPriceEx > 0))
+                    {
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).css('background-color', '#FF0000');
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).attr('title', 'SalePriceEx must be a positive value.');
+                    }
+
+                    var GM = (((newPriceEx - costCurrency) / newPriceEx) * 100);
+                    GM = Math.round(GM);
+
+                    if(newPriceEx <= 0 || GM < 0)
+                        GM = 0;
+
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).html(GM + '%');
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#D7F9C7');
+
+                    if(GM < 30)
+                    {
+                        $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#D7F9C7');
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(22).attr('title', 'Gross Margin Warning.');
+
+                        if (GM == 0)
+                            $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#FF0000');
+                    }
+                }
+
+                if(saleType == 'Percent Off') {
+                    var currentPriceInc = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(14).html();
+                    var currentPriceEx = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(15).html();
+                    
+                    var newPriceInc = currentPriceInc * (1 - (s.GetValue() / 100));
+                    var newPriceEx = currentPriceEx * (1 - (s.GetValue() / 100));
+
+                    if(s.GetValue() <= 0) {
+                        window.cellEditError = true;
+                        window.errorTipText = 'Discount must be greater than zero.';
+                    
+                        if(typeof(window.updateErrors) != 'object')
+	                        window.updateErrors = new Object();
+
+                        if(!window.updateErrors.hasOwnProperty(rowIndex))
+                            window.updateErrors[rowIndex] = new Object();
+                          
+                        if(!window.updateErrors[rowIndex].hasOwnProperty('Discount'))
+                            window.updateErrors[rowIndex].Discount = new Object();
+
+                        if(!$.isEmptyObject(window.updateErrors[rowIndex]))
+                            alert('You will NOT not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', DISCOUNT_ERR 3 ');
+                    }
+                    else {
+                        if(typeof(window.updateErrors) == 'object') {
+                            if(window.updateErrors.hasOwnProperty(rowIndex))
+                                if(window.updateErrors[rowIndex].hasOwnProperty('Discount'))
+                                    delete window.updateErrors[rowIndex].Discount;
+                            if($.isEmptyObject(window.updateErrors[rowIndex]))
+                                alert('You WILL be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', NO_ERR 4 ');
+                            else
+                                alert('You will NOT not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex] + ', errors remain.');
+                        }
+                    }
+
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).html((Math.round(newPriceInc * 100 ) / 100).toFixed(2));
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).css('background-color', '#D7F9C7');
+
+                    if(!(newPriceInc > 0))
+                    {
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).css('background-color', '#FF0000');
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).attr('title', 'SalePriceInc must be a positive value.');
+                    }
+
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).html((Math.round(newPriceEx * 100 ) / 100).toFixed(2));
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).css('background-color', '#D7F9C7');
+
+                    if(!(newPriceEx > 0))
+                    {
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).css('background-color', '#FF0000');
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).attr('title', 'SalePriceEx must be a positive value.');
+                    }
+
+                    var GM = (((newPriceEx - costCurrency) / newPriceEx) * 100);
+                    GM = Math.round(GM);
+
+                    if(newPriceEx <= 0 || GM < 0)
+                        GM = 0;
+
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).html(GM + '%');
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#D7F9C7');
+
+                    if(GM < 30)
+                    {
+                        $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#D7F9C7');
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(22).attr('title', 'Gross Margin Warning.');
+
+                        if (GM == 0)
+                            $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#FF0000');
+                    }
+                }
+            }";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "SalePriceTypeID";
+            column.Name = "DiscountType";
+            column.Caption = "Discount Type";
+            column.FilterCellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.EditCellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.CellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var i = (byte?)DataBinder.Eval(c.DataItem, "SalePriceTypeID");
+                if (i != null)
+                {
+                    var sptid = UoW.GetRepository<SalePriceType>().GetAll().Where(p => p.SalePriceTypeID == i).Select(p => p.Name).Single();
+                    ViewContext.Writer.Write("<span id='SalePrice-" + c.VisibleIndex + "-SPTID'>" + sptid + "</span>");
+                }
+                else
+                {
+                    ViewContext.Writer.Write("<span id='SalePrice-" + c.VisibleIndex + "-SPTID'><i>NULL</i></span>");
+                }
+            });
+            var comboBoxProperties = column.PropertiesEdit as ComboBoxProperties;
+            comboBoxProperties.DataSource = UoW.GetRepository<SalePriceType>().GetAll();
+            comboBoxProperties.TextField = "Name";
+            comboBoxProperties.ValueField = "SalePriceTypeID";
+            comboBoxProperties.ValueType = typeof(byte);
+            comboBoxProperties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                // can't get the rowkeyaler that the spinedit is sitting on.
+                var rowIndex = $('#SalePriceGridView tr.data-row').index($(s.GetInputElement()).parent().parent().parent().parent().parent().parent().parent()) - 1;
+                // get SalePriceTypeID
+                var saleType = s.GetText();
+
+                var ExRate = $('#price-list-exchange-rate').html();
+                var costSterling = $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(17).html().replace('£', '');
+                var costCurrency = costSterling * ExRate;
+
+                if(saleType == 'Amount Off') {
+                    var currentPriceInc = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(14).html();
+                    var currentPriceEx = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(15).html();
+
+                    var discount = '';
+
+                    if($('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(18).children().length == 0)
+                        discount = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(18).html();
+                    else
+                        discount = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(18).children().eq(0).html();
+
+                   
+                    if(discount <= 0) {
+                        window.cellEditError = true;
+                        window.errorTipText = 'Discount must be greater than zero.';
+                    
+                        if(typeof(window.updateErrors) != 'object')
+	                        window.updateErrors = new Object();
+
+                        if(!window.updateErrors.hasOwnProperty(rowIndex))
+                            window.updateErrors[rowIndex] = new Object();
+                          
+                        if(!window.updateErrors[rowIndex].hasOwnProperty('Discount'))
+                            window.updateErrors[rowIndex].Discount = new Object();
+                        if(!$.isEmptyObject(window.updateErrors[rowIndex]))
+                            alert('you will not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', because currently:  You are a mug. Nuff said. 5 ');
+						
+                    }
+                    else {
+                        if(typeof(window.updateErrors) == 'object') {
+                            if(window.updateErrors.hasOwnProperty(rowIndex))
+                                if(window.updateErrors[rowIndex].hasOwnProperty('Discount'))
+                                    delete window.updateErrors[rowIndex].Discount;
+                            if($.isEmptyObject(window.updateErrors[rowIndex]))
+                                alert('You WILL be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', NO_ERR 4 ');
+                            else
+                                alert('You will NOT not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex] + ', errors remain.');
+                        }
+                    }
+
+                    var newPriceInc = currentPriceInc - discount;
+                    var newPriceEx = currentPriceEx - discount;
+
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).html((Math.round(newPriceInc * 100 ) / 100).toFixed(2));
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).css('background-color', '#D7F9C7');
+
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).html((Math.round(newPriceEx * 100 ) / 100).toFixed(2));
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).css('background-color', '#D7F9C7');
+
+                    var GM = (((newPriceEx - costCurrency) / newPriceEx) * 100);
+                    GM = Math.round(GM);
+
+                    if(newPriceEx <= 0 || GM < 0)
+                        GM = 0;
+
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).html(GM + '%');
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#D7F9C7');
+
+                    if(GM < 30)
+                    {
+                        $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#D7F9C7');
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(22).attr('title', 'Gross Margin Warning.');
+
+                        if (GM == 0)
+                            $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#FF0000');
+                    }
+                }
+
+                if(saleType == 'Percent Off') {
+                    var currentPriceInc = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(14).html();
+                    var currentPriceEx = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(15).html();
+
+                    var discount = '';
+
+                    if($('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(18).children().length == 0)
+                        discount = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(18).html();
+                    else
+                        discount = $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(18).children().eq(0).html();
+
+                    
+                    if(discount <= 0) {
+                        window.cellEditError = true;
+                        window.errorTipText = 'Discount must be greater than zero.';
+                    
+                        if(typeof(window.updateErrors) != 'object')
+	                        window.updateErrors = new Object();
+
+                        if(!window.updateErrors.hasOwnProperty(rowIndex))
+                            window.updateErrors[rowIndex] = new Object();
+                          
+                        if(!window.updateErrors[rowIndex].hasOwnProperty('Discount'))
+                            window.updateErrors[rowIndex].Discount = new Object();
+                        if(!$.isEmptyObject(window.updateErrors[rowIndex]))
+                        if(!$.isEmptyObject(window.updateErrors[rowIndex]))
+                            alert('you will not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', because currently:  You are a mug. Nuff said. 7 ');
+						
+                    }
+                    else {
+                        if(typeof(window.updateErrors) == 'object') {
+                            if(window.updateErrors.hasOwnProperty(rowIndex))
+                                if(window.updateErrors[rowIndex].hasOwnProperty('Discount'))
+                                    delete window.updateErrors[rowIndex].Discount;
+                            if($.isEmptyObject(window.updateErrors[rowIndex]))
+                                alert('You WILL be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', NO_ERR 4 ');
+                            else
+                                alert('You will NOT not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex] + ', errors remain.');
+                        }
+                    }
+
+                    var newPriceInc = currentPriceInc * (1 - (discount / 100));
+                    var newPriceEx = currentPriceEx * (1 - (discount / 100));
+
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).html((Math.round(newPriceInc * 100 ) / 100).toFixed(2));
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(20).css('background-color', '#D7F9C7');
+
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).html((Math.round(newPriceEx * 100 ) / 100).toFixed(2));
+                    $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(21).css('background-color', '#D7F9C7');
+
+                    var GM = (((newPriceEx - costCurrency) / newPriceEx) * 100);
+                    GM = Math.round(GM);
+
+                    if(newPriceEx <= 0 || GM < 0)
+                        GM = 0;
+
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).html(GM + '%');
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#D7F9C7');
+
+                    if(GM < 30)
+                    {
+                        $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#D7F9C7');
+                        $('#SalePriceGridView_DXDataRow'+rowIndex).children().eq(22).attr('title', 'Gross Margin Warning.');
+
+                        if (GM == 0)
+                            $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(22).css('background-color', '#FF0000');
+                    }
+                }
+            }";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "SalePriceInc";
+            column.Name = "SalePriceInc";
+            column.Caption = "SalePriceInc";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+            column.ReadOnly = true;
+        });
+
+        //settings.CustomUnboundColumnData = (s, e) =>
+        //{
+        //    if (e.Column.FieldName == "SalePriceIncUNBOUND")
+        //    {
+        //        decimal discount = (decimal)e.GetListSourceFieldValue("Discount");
+        //        e.Value = (decimal)e.GetListSourceFieldValue("PriceInc") - discount;
+        //    }
+        //};
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "SalePriceEx";
+            column.Name = "SalePriceEx";
+            column.Caption = "SalePriceEx";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.PropertiesEdit.DisplayFormatString = "F2";
+            column.ReadOnly = true;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "GMPercentage";
+            column.Name = "GMPercentage";
+            column.Caption = "GM%";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.SetDataItemTemplateContent(c =>
+            {
+                decimal? GMP = (decimal?)DataBinder.Eval(c.DataItem, "GMPercentage");
+
+                if (GMP != null)
+                {
+                    ViewContext.Writer.Write(String.Format("{0:F0}%", GMP));
+                }
+                else
+                {
+                    ViewContext.Writer.Write("0%");
+                }
+            });
+            column.SetEditItemTemplateContent(c =>
+            {
+                if (DataBinder.Eval(c.DataItem, "GMPercentage") != DBNull.Value)
+                    ViewContext.Writer.Write(String.Format("{0:F0}%", (decimal)DataBinder.Eval(c.DataItem, "GMPercentage")));
+                else
+                    ViewContext.Writer.Write("0.0%");
+            });
+        });
+        
+        settings.Columns.Add(column =>
+        {
+            column.Name = "OnDate";
+            column.FieldName = "OnDate";
+            column.Caption = "On Date";
+            column.FilterCellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.EditCellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.CellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            
+            var dateEditProperties = column.PropertiesEdit as DateEditProperties;
+            dateEditProperties.ClientSideEvents.DateChanged = @"function(s, e) { 
+                var rowIndex = $('#SalePriceGridView tr.data-row').index($(s.GetInputElement()).parent().parent().parent().parent().parent().parent().parent()) - 1;
+                var onDate = s.GetDate();
+                
+                var offDate = new Date();
+
+                if($('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(24).children().length == 0)
+                    offDate = new Date($('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(24).html());
+                else
+                    offDate = new Date($('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(24).children().eq(0).html());
+
+
+                if(DateSanityCheck(onDate, offDate)) {
+                    var status = CalculateStatus(onDate, offDate);
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(25).html(status.StatusText);
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(25).css('background-color', '#D7F9C7');
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(24).css('background-color', '#D7F9C7');
+                    
+
+                    if(typeof(window.updateErrors) == 'object') {
+                        if(window.updateErrors.hasOwnProperty(rowIndex))
+                            if(window.updateErrors[rowIndex].hasOwnProperty('Date'))
+                                delete window.updateErrors[rowIndex].Date;
+                        if($.isEmptyObject(window.updateErrors[rowIndex]))
+                            alert('You WILL be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', NO_ERR 5 ');
+                        else
+                            alert('You will NOT not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex] + ', errors remain.');
+                    }
+                }
+                else {
+                    window.cellEditError = true;
+                    window.errorTipText = 'On Date must preceed Off Date.';
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(24).css('background-color', '#FF0000');
+
+                    if(typeof(window.updateErrors) != 'object')
+	                    window.updateErrors = new Object();
+
+                    if(!window.updateErrors.hasOwnProperty(rowIndex))
+                        window.updateErrors[rowIndex] = new Object();
+                          
+                    if(!window.updateErrors[rowIndex].hasOwnProperty('Date'))
+                        window.updateErrors[rowIndex].Date = new Object();
+
+                    if(!$.isEmptyObject(window.updateErrors[rowIndex]))
+                        alert('you will not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', DATE_ERR ');
+                }
+            }";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "OffDate";
+            column.FieldName = "OffDate";
+            column.Caption = "Off Date";
+            column.FilterCellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.EditCellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.CellStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(236, 244, 251);
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            var dateEditProperties = column.PropertiesEdit as DateEditProperties;
+            dateEditProperties.ClientSideEvents.DateChanged = @"function(s, e) { 
+                var rowIndex = $('#SalePriceGridView tr.data-row').index($(s.GetInputElement()).parent().parent().parent().parent().parent().parent().parent()) - 1;
+
+                var onDate = new Date();
+
+                if($('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(23).children().length == 0)
+                    onDate = new Date($('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(23).html());
+                else
+                    onDate = new Date($('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(23).children().eq(0).html());
+
+
+                var offDate = s.GetDate();
+
+                if(DateSanityCheck(onDate, offDate)) {
+                    var status = CalculateStatus(onDate, offDate);
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(25).html(status.StatusText);
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(25).css('background-color', '#D7F9C7');
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(23).css('background-color', '#D7F9C7');
+
+                    if(typeof(window.updateErrors) == 'object') {
+                        if(window.updateErrors.hasOwnProperty(rowIndex))
+                            if(window.updateErrors[rowIndex].hasOwnProperty('Date'))
+                                delete window.updateErrors[rowIndex].Date;
+                        if($.isEmptyObject(window.updateErrors[rowIndex]))
+                            alert('You WILL be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', NO_ERR 5 ');
+                        else
+                            alert('You will NOT not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex] + ', errors remain.');
+                    }
+                }
+                else {
+                    window.cellEditError = true;
+                    window.errorTipText = 'Off Date must succeed On Date';
+                    $('#SalePriceGridView_DXDataRow' + (rowIndex)).children().eq(23).css('background-color', '#FF0000');
+
+                    if(typeof(window.updateErrors) != 'object')
+	                    window.updateErrors = new Object();
+
+                    if(!window.updateErrors.hasOwnProperty(rowIndex))
+                        window.updateErrors[rowIndex] = new Object();
+                          
+                    if(!window.updateErrors[rowIndex].hasOwnProperty('Date'))
+                        window.updateErrors[rowIndex].Date = new Object();
+
+                    if(!$.isEmptyObject(window.updateErrors[rowIndex]))
+                        alert('you will not be able to save changes to SalePriceID: '+window.updateErrors[rowIndex]+', DATE_ERR ');
+                }
+            }";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        //    gridViewName.GetBatchEditHelper().SetClientValue(2, 2, s.GetRowKey(e.visibleIndex), s.GetRowKey(e.visibleIndex));
+        //And:
+        //    gridViewName.GetBatchEditHelper().ProcessServerUpdatedRows(2);
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "SalePriceStatus";
+            column.Name = "SalePriceStatus";
+            column.Caption = "Status";
+            column.Width = 150;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "SalePriceStatus"));
+                string colour = "black";
+                string statusText = "unknown";
+                statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+                switch (i)
+                {
+                    case 0:
+                        colour = "green";
+                        break;
+                    case 1:
+                        colour = "orange";
+                        break;
+                    case 2:
+                        colour = "orange";
+                        break;
+                    case 3:
+                        colour = "green";
+                        break;
+                    case 4:
+                        colour = "red";
+                        break;
+                    default: break;
+                }
+                string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+                ViewContext.Writer.Write(res);
+            });
+        });
+
+
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Conflicts";
+            column.Name = "Conflicts";
+            column.Caption = "Conflicts";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "Enabled":
+                    e.AddShowAll();
+                    break;
+                case "Discrepancy":
+                    e.Values.Clear();
+                    e.AddValue("Yes", "Yes");
+                    e.AddValue("No", "No");
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+
+        settings.HtmlRowPrepared = (s, e) =>
+        {
+            if (e.RowType != GridViewRowType.Data) return;
+
+            if (e.GetValue("Conflicts") != null)
+            {
+                var x = Convert.ToInt32(e.GetValue("Conflicts"));
+                if (x != 0)
+                {
+                    e.Row.BackColor = System.Drawing.Color.FromArgb(255, 241, 241);
+                }
+            }
+        };
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "WebStatus":
+                case "SalePriceStatus":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "StockStatusID":
+                    e.Values.Clear();
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(StockStatusColumn, "Unknown"));
+                    foreach (var pt in UoW.GetRepository<Flock.Models.StockStatus>().GetAll().OrderBy(p => p.StockStatusID))
+                    {
+                        e.AddValue(pt.StockStatus1, pt.StockStatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "ProductTypeID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.ProductType>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.ProductTypeID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "BrandID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Brand>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.BrandID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "LaunchID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Launch>().GetAll().OrderByDescending(p => p.LaunchDate))
+                    {
+                        e.AddValue(pt.Name, pt.LaunchID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+        //settings.Columns.Add("GM");
+
+    });
+
+    if (ViewData["UpdateErrors"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["UpdateErrors"]);
+    }
+}
+@grid.BindToLINQ(string.Empty, string.Empty, (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    var source = dataContext.GetRepository<Flock.Models.vwSalePrice>().GetAll();
+    
+    if (Session["SalePricePriceListID"] != null)
+    {
+        var x = Convert.ToByte(Session["SalePricePriceListID"]);
+        source = source.Where(p => p.PriceListID == x);
+    }
+    else
+    {
+        source = source.Where(p => p.PriceListID == 1);
+    }
+    e.KeyExpression = "SalePriceID";
+    e.QueryableSource = source;
+}).GetHtml()

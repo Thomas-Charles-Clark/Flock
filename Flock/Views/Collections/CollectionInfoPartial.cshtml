@@ -1,0 +1,166 @@
+﻿@model Flock.ViewModels.CollectionViewModel
+<fieldset>
+    <legend style="color: black; border-bottom-color: #929292;" onclick="$('#collection-info-inner').slideToggle('fast');">
+        Collection Info (click to expand / contract)
+        <span style="float: right; margin: 0 0.5em">Collection ID: @Model.CollectionID</span>
+        <img id="collection-info-busy" class="busy" src="/images/systemicons/busy-icon.gif" />
+    </legend>
+    <div id="collection-info-inner" style="background-color: white; padding: 1em; position: relative;">
+        <div style="clear: both;"></div>
+
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Name:</label>
+        @Html.HiddenFor(m => Model.CollectionID)
+        @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+        {
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(400);
+            settings.Properties.MaxLength = 100;
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).GetHtml()
+        <div style="clear: both;"></div>
+
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Code:</label>
+        @Html.DevExpress().TextBoxFor(m => Model.Code, settings =>
+        {
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(400);
+            settings.Properties.MaxLength = 20;
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).GetHtml()
+        <div style="clear: both;"></div>
+
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">P.B. Code:</label>
+        @Html.DevExpress().TextBoxFor(m => Model.PatternBookCode, settings =>
+        {
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(400);
+            settings.Properties.MaxLength = 20;
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).GetHtml()
+        <div style="clear: both;"></div>
+
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Brand:</label>
+        @Html.DevExpress().ComboBoxFor(m => Model.BrandID, settings =>
+        {
+            settings.Name = "CollectionBrand";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.Properties.ValueType = typeof(byte);
+            settings.Properties.ValueField = "BrandID";
+            settings.Properties.TextField = "Name";
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(400);
+            settings.Properties.MaxLength = 100;
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).BindList(args => { return Flock.ViewModels.LargeDatabaseDataProvider.GetBrands(args); }, args => {
+            return Flock.ViewModels.LargeDatabaseDataProvider.GetBrandByID(args); 
+        }).GetHtml()
+        <div style="clear: both;"></div>
+
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Launch:</label>
+        @Html.DevExpress().ComboBoxFor(m => Model.LaunchID, settings =>
+        {
+            settings.Name = "CollectionLaunch";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.Properties.ValueType = typeof(short);
+            settings.Properties.ValueField = "LaunchID";
+            settings.Properties.TextField = "Name";
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(400);
+            settings.Properties.MaxLength = 100;
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).BindList(args => { return Flock.ViewModels.LargeDatabaseDataProvider.GetLaunches(args); }, args =>
+        {
+            return Flock.ViewModels.LargeDatabaseDataProvider.GetLaunchByID(args);
+        }).GetHtml()
+        <div style="clear: both;"></div>
+
+
+
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">On Date:</label>
+        @Html.DevExpress().DateEditFor(m => Model.OnDate, settings =>
+        {
+            settings.Properties.DisplayFormatString = "d";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).GetHtml()
+        <div style="clear: both;"></div>
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">Off Date:</label>
+        @Html.DevExpress().DateEditFor(m => Model.OffDate, settings =>
+        {
+            settings.Properties.DisplayFormatString = "d";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).GetHtml()
+        @Html.ValidationMessageFor(m => Model.OffDate)
+        <div style="clear: both;"></div>
+        @{
+            var i = Model.WebStatusID;
+            var colour = "black";
+            if (i != null)
+            {
+                switch (i)
+                {
+                    case 0:
+                        colour = "green";
+                        break;
+                    case 1:
+                        colour = "orange";
+                        break;
+                    case 2:
+                        colour = "orange";
+                        break;
+                    case 3:
+                        colour = "green";
+                        break;
+                    case 4:
+                        colour = "red";
+                        break;
+                    default: break;
+                }
+            }
+            <label style="float: left; line-height: 30px; margin-right: 1em; width: 300px;">Web Status: <span style="margin-left: 19px;color: @(colour)">@(Model.WebStatus)</span></label>
+        }
+        <div style="clear: both;"></div>
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">New Status:</label>
+        @Html.DevExpress().CheckBoxFor(m => Model.New, settings =>
+        {
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "4px 7px 7px 0");
+
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).GetHtml()
+        @Html.ValidationMessageFor(m => Model.New)
+        <div style="clear: both;"></div>
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 130px;">Preview Colourways</label>
+        @Html.DevExpress().CheckBoxFor(m => Model.PreviewColourways, settings =>
+        {
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "4px 7px 7px 0");
+
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).GetHtml()
+        @Html.ValidationMessageFor(m => Model.PreviewColourways)
+        <div style="clear: both;"></div>
+        @if (ViewData["EditError"] != null)
+        {
+            <span style="float: left; margin: 8px 0;" class="field-validation-error">@(ViewData["EditError"])</span>
+            <div style="clear: both;"></div>
+        }
+        <img id="collection-info-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveCollectionInfo();" />
+        <div style="clear: both;"></div>
+    </div>
+</fieldset>

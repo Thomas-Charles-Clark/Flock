@@ -1,0 +1,52 @@
+﻿@model Flock.ViewModels.SearchImpactViewModel
+@{
+    ViewBag.Title = "Search Impact";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/css/searchimpact")
+}
+@section scripts {
+    @Scripts.Render("~/Scripts/jquery.multisortable-searchsortorder.js")
+    @Scripts.Render("~/bundles/js/knockout")
+    @Scripts.Render("~/bundles/js/searchimpact")
+}
+@Html.Partial("_serverDataPartial", Model)
+
+@section outsideContainer {
+    <div id="busy-wrap" data-bind="fadeVisible: busy"><div class='uil-ring-css'><div></div></div></div>
+}
+
+<div class="page-heading">
+    <h4>Search Impact</h4>
+</div>
+
+<div class="page-subheading">
+    <select data-bind="options: availableProductTypes, value: selectedProductTypeID, optionsCaption: 'Product Type', optionsText: 'Name', optionsValue: 'ProductTypeID'"></select>
+    <select data-bind="options: availableLaunches, value: selectedLaunchID, optionsCaption: 'Launch', optionsText: 'Name', optionsValue: 'LaunchID'"></select>
+    <button class="btn btn-info btn-sm" data-bind="visible: (selectedProductTypeID() != null) && (selectedLaunchID() != null), click: function() { reset() }">Reset</button>
+    <div class="clearfix"></div>
+    @*<p id="selected-count"></p>*@
+</div>
+
+<div class="row">
+    <div id="search-results-container" class="row">
+        <!-- ko foreach: searchResults -->
+        <div class="col-xs-4" data-bind="attr: { 'data-product-page-id': ProductPageID }">
+            <div class="search-result">
+                @*<div class="marker"></div>*@
+                @*<div class="result-text">
+                        <h4 class="panel-title" data-bind="text: Heading"></h4>
+                    </div>*@
+                <img class="product-image" data-bind="attr: { src: 'https://flock.designersguild.com/imagelibrary/322/' + ImageID + '.jpeg' }" />
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+
+<script type="text/javascript">
+    var viewModel = new searchImpactViewModel();
+
+    ko.applyBindings(viewModel);
+</script>

@@ -1,0 +1,17 @@
+﻿@* This provides a simple Memo edit for a single Task Description. *@
+@model String
+
+<div id="task-description-editor" class="task-details">
+    @Html.DevExpress().MemoFor(m => Model, settings =>
+    {
+        settings.Name = "Description";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Properties.RootStyle.Border.BorderColor = System.Drawing.ColorTranslator.FromHtml("#d4d4d4");
+        settings.Properties.FocusedStyle.Border.BorderColor = System.Drawing.ColorTranslator.FromHtml("#c0c0c0");
+        settings.Height = 100;
+    }).GetHtml()
+
+    <input type="button" value="Cancel" class="task-button-right" />
+    <input type="button" value="Save" class="task-button-right" />
+    <div class="clearfix task-details"></div>
+</div>

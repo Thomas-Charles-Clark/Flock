@@ -1,0 +1,65 @@
+﻿@model Flock.Models.PageSection
+
+@using (Ajax.BeginForm("PageSectionSaveBasicSettings", "CMS", 
+    new {   pageSectionID = Model.PageSectionID.ToString() }, 
+    new AjaxOptions {   UpdateTargetId = "pagesection-settings-container", 
+                        HttpMethod = "POST", 
+                        //OnComplete = "", 
+                        OnSuccess = "PageSectionBasicSettingsSaveSuccess"
+                    }, 
+                new { style = "width: 50%; float: left; margin-bottom: 0" }))
+    {
+                <div>
+                    <div>
+                        <div><h4>Section Settings:</h4></div>
+                        <div>
+                            <label for="SlideShowName">Height:</label>
+                            @Html.TextBoxFor(m => Model.Height)
+                            @Html.DropDownListFor(m => Model.HeightUnit, Flock.Models.Pages.PagesModel.GetCssUnitOptions(), new { style = "width: 65px" })
+                        </div>
+
+                        <div>
+                            <label for="SlideShowName">Width:</label>
+                            @Html.TextBoxFor(m => Model.Width)
+                            @Html.DropDownListFor(m => Model.HeightUnit, Flock.Models.Pages.PagesModel.GetCssUnitOptions(), new { style = "width: 65px" })
+                        </div>
+                    </div>
+                </div>
+            <br />
+            <input type="submit" value="Apply" />
+    }
+
+<div style="clear: both"></div>
+
+<script type="text/javascript">
+    function PageSectionBasicSettingsSaveSuccess(arg) {
+        
+            var psid = "@Model.PageSectionID";
+            var element = $('[psid='+psid+']');
+
+            var ss = $("<div style='width: 100%;' class='removable'></div>");
+            var arrow = $("#settings-arrow").detach();
+            element.children(0).html("");
+
+            $.ajax({
+                url: '/admin/CMS/PageSectionBasicSettings',
+                type: 'POST',
+                datatype: "json",
+                data: {
+                    "pageSectionID": psid.toString()
+                },
+                success: function (data) {
+                    ss.append(data);
+                    //element.css("height", "350px");
+                    element.children(0).append(ss);
+                    element.append(arrow);
+                    SetSortable();
+                },
+                error: function (event, request, settings) {
+                    window.alert('AjaxError' + ' : ' + settings);
+                },
+                timeout: 20000
+            });
+
+        }
+</script>

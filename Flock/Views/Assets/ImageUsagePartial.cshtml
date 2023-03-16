@@ -1,0 +1,88 @@
+﻿@using Flock.Models
+@model System.Data.Linq.IMultipleResults
+
+@{
+    using (var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>())
+    {
+        var Products = Model.GetResult<ImageUsage_Product>().ToList();
+        var ProductPages = Model.GetResult<ImageUsage_ProductPage>().ToList();
+        var Pages = Model.GetResult<ImageUsage_Page>().ToList();
+        var Slideshows = Model.GetResult<ImageUsage_Slideshow>().ToList();
+        var Collections = Model.GetResult<ImageUsage_Collection>().ToList();
+        var Articles = Model.GetResult<ImageUsage_Article>().ToList();
+        var Animations = Model.GetResult<ImageUsage_Animation>().ToList();
+        
+        @*<h6>Products: @(Products.Count)</h6>
+        <h6>ProductPages: @(ProductPages.Count)</h6>
+        <h6>Pages: @(Pages.Count)</h6>
+        <h6>Slideshows: @(Slideshows.Count)</h6>
+        <h6>Collections: @(Collections.Count)</h6>*@
+    
+        <div id="content-panel-container" style="float: left;">
+            <div class="content-panel-container">
+                <fieldset id="product-page-swap-fieldset">
+                    <legend>Image Usage</legend>
+                    <div style="background-color: white; padding: 1em;">
+                        <div style="width: 640px;">
+                            <div style="width: 100%; margin-right: 20px;">
+                            <dl style="margin-top: 0;">
+                                <dt>Products (@(Products.Count))</dt>
+                                <dd>
+                                    @foreach (var i in Products)
+                                    {
+                                        <span style="display: block"><a href="/admin/products/images" target="_blank">Product @(i.ProductID)</a> - @(i.Detail)</span>
+                                    }
+                                </dd>
+                                <dt>Product Pages (@(ProductPages.Count))</dt>
+                                <dd>
+                                    @foreach (var i in ProductPages)
+                                    {
+                                        <span style="display: block"><a href="/admin/productpages/compose/@(i.ProductPageID)" target="_blank">Product Page @(i.ProductPageID)</a> - @(i.Detail)</span>
+                                    }
+                                </dd>
+                                <dt>Pages (@(Pages.Count))</dt>
+                                <dd>
+                                    @foreach (var i in Pages)
+                                    {
+                                        <span style="display: block"><a href="/admin/cms/compose/@(i.PageID)" target="_blank">Page @(i.PageID)</a> - @(i.Detail)</span>
+                                    }
+                                </dd>
+                                <dt>Slideshows (@(Slideshows.Count))</dt>
+                                <dd>
+                                    @foreach (var i in Slideshows)
+                                    {
+                                        var psID = UoW.GetRepository<PageSection_SlideShow>().GetAll().Where(p => p.SlideShowID == i.SlideShowID).Select(p => p.PageSectionID).Single();
+                                        var pID = UoW.GetRepository<PageSection_Page>().GetAll().Where(p => p.PageSectionID == psID).Select(p => p.PageID).SingleOrDefault();
+                                        <span style="display: block"><a href="/admin/cms/compose/@(pID)" target="_blank">SlideShow @(i.SlideShowID)</a> - @(i.Detail)</span>
+                                    }
+                                </dd>
+                                <dt>Collections (@(Collections.Count))</dt>
+                                <dd>
+                                    @foreach (var i in Collections)
+                                    {
+                                        <span style="display: block;"><a href="/admin/collections/compose/@(i.CollectionID)" target="_blank">Collection @(i.CollectionID)</a> - @(i.Detail)</span>
+                                    }
+                                </dd>
+                                <dt>Articles (@(Articles.Count))</dt>
+                                <dd>
+                                    @foreach (var i in Articles)
+                                    {
+                                        <span style="display: block;"><a href="/admin/articles/compose/@(i.ArticleID)" target="_blank">Article @(i.ArticleID)</a> - @(i.Detail)</span>
+                                    }
+                                </dd>
+                                <dt>Animations (@(Animations.Count))</dt>
+                                <dd>
+                                    @foreach (var i in Animations)
+                                    {
+                                        <span style="display: block;">Animation @(i.AnimationID) - @(i.Detail)</span>
+                                    }
+                                </dd>
+                            </dl>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    }
+}

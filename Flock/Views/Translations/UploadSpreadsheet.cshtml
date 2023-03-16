@@ -1,0 +1,62 @@
+﻿
+@{
+    ViewBag.Title = "Translation Spreadsheet Upload";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+        #results-container {
+            text-align: center;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Translation Spreadsheet Upload</h4>
+
+@using (Html.BeginForm("UploadControlForm", "UploadControl", FormMethod.Post))
+{
+    <div class="page-subheading">        
+        @Html.Action("TranslationUploadLanguageTableDropDown")
+        @Html.Action("TranslationUploadLanguageDropDown")
+        @Html.DevExpress().CheckBox(settings =>
+        {
+            settings.Name = "PreserveNulls";
+            settings.Style.Add("float", "right");
+            settings.Style.Add("line-height", "23px !important");
+            settings.Style.Add("margin", "0 100px 7px 0");
+            settings.Properties.ValueChecked = true;
+            settings.Properties.ValueUnchecked = false;
+            settings.Checked = true;
+        }).GetHtml()
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Text = "Preserve Nulls";
+            settings.Style.Add("float", "right");
+            settings.Style.Add("line-height", "28px");
+            settings.Style.Add("margin", "0 7px 7px 0");
+        }).GetHtml()
+
+
+        @Html.DevExpress().UploadControl(settings =>
+        {
+            settings.Name = "UploadControl";
+            settings.CallbackRouteValues = new { Controller = "Translations", Action = "UploadControlUpload" };
+
+            settings.ShowUploadButton = true;
+            settings.ShowProgressPanel = true;
+
+            settings.ClientSideEvents.FileUploadComplete = @"function(s, e) {
+                $('#results-container').html(e.callbackData);
+            }";
+
+            settings.ValidationSettings.Assign(Flock.Controllers.TranslationsControllerUploadControlSettings.ValidationSettings);
+        }).GetHtml()
+        <div style="clear: both;"></div>
+    </div>
+}
+<div style="clear: both;"></div>
+
+<h5 id="results-container"></h5>

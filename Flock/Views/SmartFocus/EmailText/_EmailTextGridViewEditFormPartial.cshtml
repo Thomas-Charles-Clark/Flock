@@ -1,0 +1,67 @@
+﻿@model Flock.ViewModels.EmailTextViewModel
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+}
+<div style='width: 500px; margin: 0 auto;'>
+    <div>
+        @Html.DevExpress().Label(settings => {
+            settings.Text = "Email Template ID";
+            settings.Width = 96;
+            settings.Style.Add("float", "left");
+            settings.Style.Add("line-height", "32px");
+            settings.Style.Add("margin-right", "1em");
+        }).GetHtml()
+
+        @Html.DevExpress().ComboBox(settings => {
+            settings.Name = "EmailTemplateID";
+            settings.Style.Add("float", "left");
+            settings.Properties.ValueType = typeof(int);
+            settings.Properties.ValueField = "TemplateID";
+            settings.Properties.TextField = "Name";       
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            settings.ShowModelErrors = true;
+        }).BindList(UoW.GetRepository<Flock.Models.SmartFocusEmailTemplate>().GetAll().ToList()).Bind(Model == null ? null : Model.EmailTemplateID).GetHtml()
+
+        <div style="clear: both; margin-top: 1em; "></div>
+
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Text = "Text";
+            settings.Width = 96;
+            settings.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            settings.Style.Add("float", "left");
+            settings.Style.Add("line-height", "32px");
+            settings.Style.Add("margin-right", "1em");
+        }).GetHtml()
+
+        @Html.DevExpress().Memo(mSettings =>
+        {
+            mSettings.Name = "Text";
+            mSettings.Properties.Columns = 50;
+            mSettings.Properties.Rows = 10;
+            mSettings.Width = 366;
+            mSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            mSettings.ShowModelErrors = true;
+        }).Bind(Model == null ? null : Model.Text).GetHtml()
+
+
+    </div>
+
+    <div style='text-align: right; margin-top: 1em; padding-right: 25px;'>
+        @Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Update";
+            btnSettings.Style.Add("margin-right", "1em");
+            btnSettings.ClientSideEvents.Click = "function(s, e){ EmailTextGridView.UpdateEdit(); }";
+        }).GetHtml()
+        @Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Cancel";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ EmailTextGridView.CancelEdit(); }";
+        }).GetHtml()
+    </div>
+</div>

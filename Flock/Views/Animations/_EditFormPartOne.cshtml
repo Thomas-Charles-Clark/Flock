@@ -1,0 +1,90 @@
+﻿@model Flock.ViewModels.AnimationDetailModel
+
+@{
+    var slideIDToLoad = Model.SlideToLoad;
+
+    if (Model.Animation.Slides.Where(p => p.DeletedDT == null).Count() > 0 && slideIDToLoad == null)
+    {
+        slideIDToLoad = Model.Animation.Slides.Where(p => p.DeletedDT == null).OrderBy(p => p.SortOrder).Select(p => p.SlideID).First();
+    }
+}
+
+<div id="slide-compose-container">
+    @Html.Action("LoadSlideDetail", new { AnimationID = Model.Animation.AnimationID, SlideID = slideIDToLoad })
+</div>
+
+<div id="animation-slides-container" class="horizontal-slides-container area-table-ar@(Model.Animation.AspectRatioID) animation-slides-container-ar@(Model.Animation.AspectRatioID)">
+    @foreach (var s in Model.Animation.Slides.Where(p => p.DeletedDT == null).OrderBy(p => p.SortOrder))
+    {
+        var selected = "";
+
+        if (s.SlideID == slideIDToLoad)
+        {
+            selected = "selected-slide";
+        }
+
+        switch (s.SlideTypeID)
+        {
+            case 1:
+                if (s.ImageID == null)
+                {
+                    <div class="animation-slide animation-slide-ar@(Model.Animation.AspectRatioID) @(selected)" onclick="LoadSlideDetail(@(s.SlideID))" data-slide-id="@(s.SlideID)" data-image-id="null">
+                        <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveSlide(@(s.SlideID)) }, function () { }, 'Are you sure?')"></span>
+                        <span>@(s.SortOrder): @(s.SlideType.Name) <em>(Not Assigned)</em></span>
+                    </div>
+                }
+                else
+                {
+                    <div class="animation-slide animation-slide-ar@(Model.Animation.AspectRatioID) @(selected)" onclick="LoadSlideDetail(@(s.SlideID))" data-slide-id="@(s.SlideID)" data-image-id="@(s.ImageID)" title="Image ID: @(s.ImageID)">
+                        <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveSlide(@(s.SlideID)) }, function () { }, 'Are you sure?')"></span>
+                        <img src="https://flock.designersguild.com/imagelibrary/195/@(s.ImageID).jpeg" />
+                    </div>
+                }
+                break;
+            case 2:
+                if (s.VideoID == null)
+                {
+                    <div class="animation-slide animation-slide-ar@(Model.Animation.AspectRatioID) @(selected)" onclick="LoadSlideDetail(@(s.SlideID))" data-slide-id="@(s.SlideID)" data-video-id="null">
+                        <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveSlide(@(s.SlideID)) }, function () { }, 'Are you sure?')"></span>
+                        <span>@(s.SortOrder): @(s.SlideType.Name) <em>(Not Assigned)</em></span>
+                    </div>
+                }
+                else
+                {
+                    <div class="animation-slide animation-slide-ar@(Model.Animation.AspectRatioID) @(selected)" onclick="LoadSlideDetail(@(s.SlideID))" data-slide-id="@(s.SlideID)" data-video-id="@(s.VideoID)" title="Video ID: @(s.VideoID)">
+                        <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveSlide(@(s.SlideID)) }, function () { }, 'Are you sure?')"></span>
+                        <p>@s.Video.Name</p>
+                    </div>
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+    @if (Model.Animation.Slides.Count == 0)
+    {
+        @*<div class="animation-slide-placeholder animation-slide-placeholder-ar@(Model.Animation.AspectRatioID)"></div>*@
+    }
+</div>
+
+<script type="text/javascript">
+    initAnimationSlideSortable();
+
+    $("#call-to-action-grid-dialog").dialog({
+        title: 'Calls to Action',
+        width: 'auto',
+        height: 'auto',
+        autoOpen: false,
+        resizable: false,
+        buttons: {
+            'Close': function () {
+                $(this).dialog("close");
+            }
+        },
+        close: function (ev, ui) {
+            if ($(".selected-slide").data("slide-id") != null)
+            LoadSlideDetail($(".selected-slide").data("slide-id"));
+        }
+    });
+</script>

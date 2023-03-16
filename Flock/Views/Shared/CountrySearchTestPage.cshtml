@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Country Search Test Page";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section Styles
+{
+    @Styles.Render("~/Content/CountrySearch.css")
+}
+
+<h2>Country Search</h2>
+
+@Html.Partial("~/Views/Shared/CountrySearch.cshtml")

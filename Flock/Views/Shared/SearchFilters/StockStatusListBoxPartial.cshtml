@@ -1,0 +1,62 @@
+﻿@model List<Flock.Models.StockStatus>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ProductSearchStockStatusDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductSearchStockStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#product-searching-icon').fadeIn('fast');
+            ProductSearchStockStatusDD.SetText(s.GetSelectedItem().text);
+            ProductSearchStockStatusDD.HideDropDown();
+            $('#product-searching-icon').fadeIn('fast');
+            var SearchText = ProductSearchNameOrIDTextBox.GetText();
+            $.ajax({
+                url: '" + Url.Action("ProductSearch", "Products") + @"',
+                traditional: true,
+                data: { 
+                    ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                    BrandID: ProductSearchBrandListBox.GetValue(),
+                    LaunchID: ProductSearchLaunchListBox.GetValue(),
+                    PatternID: ProductSearchPatternListBox.GetValue(),
+                    Status: ProductSearchStatusListBox.GetValue(),
+                    StatusID: ProductSearchWebStatusListBox.GetValue(),
+                    StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                    CollectionID: ProductSearchCollectionListBox.GetValue(),
+                    ColourID: ProductSearchColourListBox.GetValue(),
+                    SearchString: SearchText,
+                    ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                    PriceListID: ProductSearchPriceListListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#product-data-view-container').html(data);
+                    $('#product-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $('#product-searching-icon').fadeOut('slow');
+                    alert(e.responseText);
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else
+    {
+        listBoxSettings.Name = "WebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            alert('Not Implemented');
+        }";
+    }
+    
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    listBoxSettings.Properties.ValueField = "StockStatusID";
+    listBoxSettings.Properties.TextField = "StockStatus1";
+}
+).BindList(Model).GetHtml()

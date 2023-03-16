@@ -1,0 +1,190 @@
+﻿@using Flock.Controllers
+
+@{
+    ViewBag.Title = "Page";
+    Layout = "~/Views/CMS/Compose/_ComposerLayout.cshtml";
+}
+
+<h2>Compose Page</h2>
+<h4>PageID:</h4><div id="page-id-div">@ViewData["PageID"]</div>
+<h4>Controller: @ViewContext.RouteData.Values["controller"]</h4>
+<h4>Action: @ViewContext.RouteData.Values["action"]</h4>
+<div id="status-div"></div>
+
+<div id="menu-builder-content">
+    <div class="pure-g">
+        <div id="page-builder-lhs" class="pure-u-1-5 sidebar">
+            <div id="new-content-container">
+                <label for="new-content-container">Content</label>
+                <ul>
+                    <li id="section-type-new-product" class="section-type">Product</li>
+                    <li id="section-type-new-image" class="section-type">Image</li>
+                    <li id="section-type-new-html" class="section-type">HTML</li>
+                    <li id="section-type-new-slideshow" class="section-type">SlideShow</li>
+                    <li id="section-type-new-banner" class="section-type">Banner</li>
+                    <li id="section-type-new-other" class="section-type">Other</li>
+                </ul>
+            </div>
+            <div id="layout-controls-container">
+                <label for="layout-controls-container">Layout Controls</label>
+                <ul>
+                    <li><div id="full-width-layout-control" class="layout-control"></div></li>
+                    <li><div id="one-four-layout-control" class="layout-control"><div class="one-fifth"></div><div class="four-fifths"></div></div></li>
+                    <li><div id="four-one-layout-control" class="layout-control"><div class="four-fifths" style="margin: 0; margin-right: 4px;"></div><div class="one-fifth" style="margin: 0;"></div></div></li>
+                    <li><div id="fifths-layout-control" class="layout-control"><div class="one-fifth-short"></div><div class="one-fifth-short"></div><div class="one-fifth-short"></div><div class="one-fifth-short"></div><div class="one-fifth-short" style="margin: 0;"></div></div></li>
+                    <li>
+                        <div id="category-layout-control" class="layout-control">
+                            <div class="one-quarter-tall"></div>
+                            <div class="one-quarter-short"></div><div class="one-quarter-short"></div><div class="one-quarter-short" style="margin: 0"></div>
+                            <div class="one-quarter-short"></div><div class="one-quarter-short"></div><div class="one-quarter-short" style="margin: 0"></div>
+                            <div class="one-quarter-short"></div><div class="one-quarter-short"></div><div class="one-quarter-short" style="margin: 0"></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <input type="button" value="Save" onclick="SavePage(@ViewData["PageID"])" />
+            
+            <input type="button" value="Clear" onclick="ClearPage(@ViewData["PageID"])" />
+        </div>
+        <div id="page-builder-rhs" class="pure-u-4-5 main">
+            <div id="page-chassis" class="pure-g">
+                <div id="page-section-1" style="margin-bottom: 0.5em;" class="pure-g ui-droppable">
+                <div id="content-item-3254" style="border: 1px dashed #808080; height: 300px;" class="pure-u-1-4"></div>
+                </div>
+                <div id="page-section-2" class="pure-g ui-droppable">
+                <div id="content-item-3265" style="border: 1px dashed #808080; height: 300px;" class="pure-u-1-4"></div>
+                </div>
+                @*@{ Html.RenderPartial("~/Views/Admin/CMS/Compose/PageDisplayPartial.cshtml", (object)Model); }*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="settings-arrow"></div>
+
+<div id="settings-pane">
+    <div id="settings-pane-inner">
+        <div id="slideshow-settings-container">
+        </div>
+        <div id="html-editor-container">
+        </div>
+        <div id="pagesection-settings-container">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+ @*   var pageSections = new Array();
+    
+    @for (var i = 0; i < Model.Count; i++)
+    {
+        @: var thisSection = new Object();
+        @: thisSection.contents = "@Model[i].Contents"
+        @: thisSection.parentID = "@Model[i].ParentID"
+        @: thisSection.sortOrder = "@Model[i].SortOrder"
+        @: thisSection.PageSectionID = "@Model[i].PageSectionID"
+        @: pageSections.push(thisSection);
+    }
+
+    //pageSections.sort(function(a, b) { 
+    //    return a.sortOrder - b.sortOrder
+    //});
+
+    if(pageSections.length > 0)
+    {
+        for(var i = 0; i < pageSections.length; i++)
+        {
+            var thisSection = $(htmlDecode(htmlDecode(pageSections[i].contents)));
+            
+            // cannot! must use attr type
+            var attr = thisSection.attr("type");
+
+            thisSection.attr("psid", pageSections[i].PageSectionID);
+            
+            $("#"+pageSections[i].parentID).append(thisSection);
+
+            if(typeof(attr) !== 'undefined' && attr !== false)
+            {
+                switch(attr.toLowerCase())//if(attr == "slideshow")
+                {
+                    case "slideshow":
+                        var element = thisSection.children(0);
+
+                        if(thisSection.PageSectionID !== "undefined" && thisSection.PageSectionID !== false)
+                            LoadSlideshow(element, thisSection.attr("psid"));
+                        break;
+                    case "html":
+                        var element = thisSection.children(0);
+                        if(thisSection.PageSectionID !== "undefined" && thisSection.PageSectionID !== false)
+                            LoadHtml(element, thisSection.attr("psid"));
+                        break;
+                    default: 
+                        break;
+                }
+            }
+        }
+        SetSortable();
+    }
+    
+    function LoadSlideshow(element, pID) {
+        $.ajax({
+            url: '/admin/CMS/ImageSliderPartial',
+            type: 'POST',
+            datatype: "json",
+            data: {
+                "pageSectionID": pID.toString()
+            },
+            success: function (data) {
+                var ss = $("<div style='width: 100%; height: 350px;' class='removable'></div>");
+                ss.append(data);
+                element.css("height", "350px");
+                element.append(ss);
+            },
+            error: function (event, request, settings) {
+                window.alert('AjaxError' + ' : ' + settings);
+            },
+            timeout: 20000
+        });
+    }
+
+    function LoadHtml(element, pID) {
+        $.ajax({
+            url: '/admin/CMS/HtmlPartial',
+            type: 'POST',
+            datatype: "json",
+            data: {
+                "pageSectionID": pID.toString()
+            },
+            success: function (data) {
+                var ss = $("<div style='width: 100%;' class='removable'></div>");
+                ss.append(data);
+                //element.css("height", "350px");
+                element.append(ss);
+            },
+            error: function (event, request, settings) {
+                window.alert('AjaxError' + ' : ' + settings);
+            },
+            timeout: 20000
+        });
+    }*@
+
+    $(document).ready(function() {
+        if(!$("#ShowNavigationBar").is(':checked')) {
+            $('#SettingsNavigationBar_Position, #SettingsNavigationBar_Mode, #SettingsNavigationBar_ThumbnailsModeNavigationButtonVisibility').attr('disabled', 'disabled');
+        }
+        $('form :input:checkbox, select').not('#PredefinedScenario').change(
+            function() {
+                $('#PredefinedScenario').val(null);
+            }
+        );
+        $('#PredefinedScenario').change(
+            function() {
+                if($(this).val())
+                    $('form').submit();
+            }
+        );
+        //$("#settings-pane").hide();
+        //$("#settings-arrow").hide();
+    });
+</script>

@@ -1,0 +1,42 @@
+﻿@model List<Flock.Models.DeliveryException>
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "GridView";
+
+    settings.CallbackRouteValues = new { Controller = "ecommerce", Action = "DeliveryExceptionsGridView" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ecommerce", Action = "DeliveryExceptionsGridViewAddNew" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ecommerce", Action = "DeliveryExceptionsGridViewUpdate" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ecommerce", Action = "DeliveryExceptionsGridViewDelete" };
+
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.VisibleIndex = 0;
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.ShowDeleteButton = true;
+    settings.SettingsBehavior.ConfirmDelete = true;
+
+    settings.KeyFieldName = "DeliveryExceptionID";
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        e.customArgs['countryId'] = DeliveryExceptionsCountryListBox.GetValue();
+    }";
+
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Name";
+    NameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    var nProp = NameColumn.PropertiesEdit as TextBoxProperties;
+    nProp.MaxLength = 50;
+    settings.Columns.Add(NameColumn);
+
+    MVCxGridViewColumn DateColumn = new MVCxGridViewColumn();
+    DateColumn.Name = "Date";
+    DateColumn.FieldName = "Date";
+    DateColumn.Caption = "Date";
+    DateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    settings.Columns.Add(DateColumn);
+    
+}).Bind(Model.OrderByDescending(p => p.Date)).GetHtml()

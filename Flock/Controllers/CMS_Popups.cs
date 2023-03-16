@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NLog;
+using System.Web;
+using System.Web.Mvc;
+using DevExpress.Web;
+using Flock.Models;
+using System.Web.Script.Serialization;
+using DevExpress.Web.Mvc;
+using Flock.DAL;
+using Flock.ViewModels;
+//using Flock.Classes.Auth;
+using System.Data.Linq;
+
+namespace Flock.Controllers.Admin
+{
+    public partial class CMSController : Controller
+    {
+        public ActionResult Popups()
+        {
+            return View("Popups/Popups");
+        }
+    }
+}

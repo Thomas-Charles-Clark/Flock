@@ -1,0 +1,63 @@
+﻿@Html.DevExpress().ComboBox(settings => {
+    settings.Name = "AttributeProductPageListBox";
+    settings.Properties.NullDisplayText = "Product Page";
+    settings.Properties.NullText = "Product Page";
+    settings.Style.Add("margin", "0 7px 0px 0");
+    settings.Style.Add("float", "right");
+    settings.Width = 200;
+    settings.Height = 35;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "AttributeProductPageDropDownPartial" };
+    settings.Properties.CallbackPageSize = 10;
+    settings.ControlStyle.BackColor = System.Drawing.Color.FromArgb(254, 233, 152);
+    settings.Properties.TextField = "Name";
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "ProductPageID";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.EnableClientSideAPI = true;
+    settings.Properties.FilterMinLength = 2;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    
+    settings.Properties.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['ID'] = AttributeProductPageListBox.GetValue();
+        e.customArgs['ProductTypeID'] = AttributeProductTypeListBox.GetValue();
+        e.customArgs['BrandID'] = AttributeBrandListBox.GetValue();
+        e.customArgs['LaunchID'] = AttributeLaunchListBox.GetValue();
+        e.customArgs['WebStatusID'] = AttributeWebStatusListBox.GetValue();
+        e.customArgs['TemplateID'] = AttributeTemplateListBox.GetValue();
+    }";
+
+    settings.Properties.ClientSideEvents.EndCallback = @"function(s, e) { 
+        $('#attribute-product-page-select-busy').fadeOut('fast');
+    }";
+    
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        s.SetText(s.GetSelectedItem().text);
+        s.HideDropDown();
+        $('#attribute-product-page-select-busy').fadeIn('fast');
+        $('#attribute-compose-link').attr('href', '/admin/productpages/compose/' + s.GetSelectedItem().value);
+        $.ajax({ 
+            url: '" + @Url.Action("AttributeMainPartial", "ProductPages") + @"',
+            type: 'POST',
+            traditional: true,
+            data: { 
+                ID: s.GetSelectedItem().value
+            },
+            success: function(data) {
+                $('#attribute-main-target').html(data);
+                $('#attribute-product-page-select-busy').fadeOut('fast');
+            },
+            error: function(e, s, a) { 
+                $.showError(e, s, a, function() { $('#attribute-product-page-select-busy').fadeOut('fast'); });
+            },
+            timeout: 20000
+        });
+    }";
+
+    settings.Properties.ClientSideEvents.Init = @"function(s, e) {
+        s.SetSelectedItem(s.FindItemByValue(" + ViewBag.AttributeSelectedProductPageID + @"));
+        if(s.GetSelectedItem() != null && s.GetSelectedItem() != false) {
+            s.SetText(s.GetSelectedItem().text);
+        }
+    }";
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetProductPageListTextFiltered, Flock.ViewModels.LargeDatabaseDataProvider.GetProductPageByIDForAttributes).GetHtml()

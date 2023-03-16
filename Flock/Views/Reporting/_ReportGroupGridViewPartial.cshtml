@@ -1,0 +1,20 @@
+﻿@model List<Flock.Models.ReportGroup>
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "ReportGroupGridView";
+    settings.CallbackRouteValues = new { Controller = "Reporting", Action = "ReportGroupGridViewPartial" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Reporting", Action = "ReportGroupGridViewPartialAddNew" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Reporting", Action = "ReportGroupGridViewPartialUpdate" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Reporting", Action = "ReportGroupGridViewPartialDelete" };
+    
+    settings.KeyFieldName = "ReportGroupID";
+
+    settings.Columns.Add("Name");
+
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.VisibleIndex = 1;
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.ShowDeleteButton = true;
+    settings.SettingsBehavior.ConfirmDelete = true;
+        
+}).Bind(Model).GetHtml()

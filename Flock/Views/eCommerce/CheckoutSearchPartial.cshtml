@@ -1,0 +1,401 @@
+﻿@model List<Flock.Models.Checkout_SearchResult>
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "CheckoutIDGridView";
+        settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "CheckoutSearchPartial" };
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            var fd = FromDate.GetDate();
+            if(fd != null)
+                fd = fd.toGMTString();
+
+            var td = ToDate.GetDate();
+            if(td != null)
+                td = td.toGMTString();
+            e.customArgs['SearchString'] = SearchBox.GetValue();
+            e.customArgs['CountryID'] = CountrySelector.GetValue();
+            e.customArgs['Trade'] = TradeAccountComboBox.GetValue();
+            e.customArgs['FromDate'] = fd;
+            e.customArgs['ToDate'] = td;
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+            $('.row-basket-dialog').dialog({
+                width: 'auto',
+                height: 'auto',
+                autoOpen: false,
+                buttons: {
+                    Close: function () {
+                        $(this).dialog('close');
+                    }
+                }        
+            });
+        }";
+
+        settings.ClientSideEvents.RowClick = "OnRowClick";
+        settings.ClientSideEvents.DetailRowExpanding = "OnDetailRowExpanding";
+        settings.ClientSideEvents.DetailRowCollapsing = "OnDetailRowCollapsing";
+        settings.Settings.ShowGroupPanel = true;
+        settings.SettingsBehavior.AllowGroup = false;
+
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+
+        settings.Styles.Row.Cursor = "pointer";
+
+        settings.SettingsPager.PageSize = 25;
+
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.KeyFieldName = "CheckoutID";
+
+        MVCxGridViewColumn CheckoutTypeColumn = new MVCxGridViewColumn();
+        CheckoutTypeColumn.Name = "CheckoutType";
+        CheckoutTypeColumn.FieldName = "CheckoutType";
+        CheckoutTypeColumn.Caption = "Checkout Type";
+        CheckoutTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        CheckoutTypeColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        CheckoutTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        settings.Columns.Add(CheckoutTypeColumn);
+
+        MVCxGridViewColumn CheckoutIDColumn = new MVCxGridViewColumn();
+        CheckoutIDColumn.Name = "CheckoutID";
+        CheckoutIDColumn.FieldName = "CheckoutID";
+        CheckoutIDColumn.Caption = "Checkout ID";
+        CheckoutIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CheckoutIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CheckoutIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(CheckoutIDColumn);
+
+        MVCxGridViewColumn TransactionIDColumn = new MVCxGridViewColumn();
+        TransactionIDColumn.Name = "TransactionID";
+        TransactionIDColumn.FieldName = "TransactionID";
+        TransactionIDColumn.Caption = "Transaction ID";
+        TransactionIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        TransactionIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        TransactionIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(TransactionIDColumn);
+
+        MVCxGridViewColumn CustomBasketColumn = new MVCxGridViewColumn();
+        CustomBasketColumn.Name = "CustomBasketColumn";
+        CustomBasketColumn.FieldName = "CustomBasketColumn";
+        CustomBasketColumn.Caption = "Basket";
+        CustomBasketColumn.Width = 40;
+        CustomBasketColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        CustomBasketColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        CustomBasketColumn.SetDataItemTemplateContent(c => {
+            ViewContext.Writer.Write("<img src='/images/icons/32/basket2.png' style='width: 22px; height: 20px; cursor: pointer;' onclick='event.stopPropagation(); $(\"#row-" + c.KeyValue.ToString() + "-basket-dialog\").dialog(\"option\", \"title\", \"Basket Inspector: CheckoutID " + c.KeyValue.ToString() + "\"); $(\"#row-" + c.KeyValue.ToString() + "-basket-dialog\").dialog(\"open\");'/>");
+            ViewContext.Writer.Write("<div id='row-" + c.KeyValue.ToString() + "-basket-dialog' class='row-basket-dialog' style='display: none;'>" + Html.Action("CheckoutBasketInspectorPartial", "eCommerce", new { CheckoutID = c.KeyValue }).ToHtmlString() + "</div>");
+            ViewContext.Writer.Write(@"
+                <script type='text/javascript'>
+                    $('#row-" + c.KeyValue.ToString() + @"-basket-dialog').dialog({
+                        width: 'auto',
+                        height: 'auto',
+                        autoOpen: false,
+                        buttons: {
+                            Close: function () {
+                                $(this).dialog('close');
+                            }
+                        }        
+                    });
+                </script>"
+            );
+        });
+        settings.Columns.Add(CustomBasketColumn);
+
+        MVCxGridViewColumn GuidColumn = new MVCxGridViewColumn();
+        GuidColumn.Name = "GUID";
+        GuidColumn.FieldName = "GUID";
+        GuidColumn.Caption = "GUID";
+        GuidColumn.Width = 120;
+        GuidColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        GuidColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        GuidColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(GuidColumn);
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "PriceListID";
+            column.Name = "PriceListID";
+            column.Caption = "Price List";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Width = 160;
+            column.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<img src='/images/icons/countryflags/22px/" + DataBinder.Eval(c.DataItem, "CountryID").ToString() + ".png' style='float: left; margin-right: 4px;' />");
+            });
+        });
+
+        MVCxGridViewColumn TotalPayableColumn = new MVCxGridViewColumn();
+        TotalPayableColumn.FieldName = "TotalPayable";
+        TotalPayableColumn.Name = "TotalPayable";
+        TotalPayableColumn.Caption = "Total";
+        TotalPayableColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        TotalPayableColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        TotalPayableColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        settings.Columns.Add(TotalPayableColumn);
+
+        MVCxGridViewColumn MaxCheckoutStageColumn = new MVCxGridViewColumn();
+        MaxCheckoutStageColumn.FieldName = "MaxCheckoutStageID";
+        MaxCheckoutStageColumn.Name = "MaxCheckoutStageID";
+        MaxCheckoutStageColumn.Caption = "Max Checkout Stage";
+        MaxCheckoutStageColumn.Width = 160;
+        MaxCheckoutStageColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        MaxCheckoutStageColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        MaxCheckoutStageColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        MaxCheckoutStageColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        MaxCheckoutStageColumn.SetDataItemTemplateContent(c =>
+        {
+            var mcsID = Convert.ToByte(DataBinder.Eval(c.DataItem, "MaxCheckoutStageID"));
+            var mcs = UoW.GetRepository<Flock.Models.CheckoutStage>().GetAll().Where(p => p.CheckoutStageID == mcsID).Select(p => p.Name).Single();
+            ViewContext.Writer.Write(mcs);
+        });
+        settings.Columns.Add(MaxCheckoutStageColumn);
+
+        MVCxGridViewColumn MinCheckoutStageColumn = new MVCxGridViewColumn();
+        MinCheckoutStageColumn.FieldName = "LastCheckoutStageID";
+        MinCheckoutStageColumn.Name = "LastCheckoutStageID";
+        MinCheckoutStageColumn.Caption = "Last Checkout Stage";
+        MinCheckoutStageColumn.Width = 160;
+        MinCheckoutStageColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        MinCheckoutStageColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        MinCheckoutStageColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        MinCheckoutStageColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        MinCheckoutStageColumn.SetDataItemTemplateContent(c =>
+        {
+            var mcsID = Convert.ToByte(DataBinder.Eval(c.DataItem, "LastCheckoutStageID"));
+            var mcs = UoW.GetRepository<Flock.Models.CheckoutStage>().GetAll().Where(p => p.CheckoutStageID == mcsID).Select(p => p.Name).Single();
+            ViewContext.Writer.Write(mcs);
+        });
+        settings.Columns.Add(MinCheckoutStageColumn);
+
+
+        MVCxGridViewColumn AttemptsColumn = new MVCxGridViewColumn();
+        AttemptsColumn.Name = "PaymentAttempts";
+        AttemptsColumn.FieldName = "PaymentAttempts";
+        AttemptsColumn.Caption = "Failed Payment Attempts";
+        AttemptsColumn.Width = 62;
+        AttemptsColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        AttemptsColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        AttemptsColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        AttemptsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+
+        AttemptsColumn.SetDataItemTemplateContent(c =>
+        {
+            var attempts = 0;
+            if (DataBinder.Eval(c.DataItem, "PaymentAttempts") != null)
+            {
+                attempts = Convert.ToInt32(DataBinder.Eval(c.DataItem, "PaymentAttempts"));
+            }
+
+            ViewContext.Writer.Write("<a href='javascript:;' onclick='event.stopPropagation(); $(\"#row-" + c.KeyValue.ToString() + "-failed-payment-attempts-dialog\").dialog(\"option\", \"title\", \"Failed Payment Attempts: CheckoutID " + c.KeyValue.ToString() + "\"); $(\"#row-" + c.KeyValue.ToString() + "-failed-payment-attempts-dialog\").dialog(\"open\");'>" + attempts + "</a>");
+            ViewContext.Writer.Write("<div id='row-" + c.KeyValue.ToString() + "-failed-payment-attempts-dialog' class='row-basket-dialog' style='display: none;'>" + Html.Action("CheckoutFailedAttemptsInspectorPartial", "eCommerce", new { CheckoutID = c.KeyValue }).ToHtmlString() + "</div>");
+            ViewContext.Writer.Write(@"
+                <script type='text/javascript'>
+                    $('#row-" + c.KeyValue.ToString() + @"-failed-payment-attempts-dialog').dialog({
+                        width: 'auto',
+                        height: 'auto',
+                        autoOpen: false,
+                        buttons: {
+                            Close: function () {
+                                $(this).dialog('close');
+                            }
+                        }        
+                    });
+                </script>"
+            );
+        });
+
+        settings.Columns.Add(AttemptsColumn);
+
+
+        //C.CountryID,
+        //        C.CheckoutID,
+        //        C.StartDT,
+        //        C.MemberID,
+        //        C.VisitorID
+
+        MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+        CreatedDTColumn.Name = "StartDT";
+        CreatedDTColumn.FieldName = "StartDT";
+        CreatedDTColumn.Caption = "Start Date";
+        CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        CreatedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CreatedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CreatedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(CreatedDTColumn);
+
+        MVCxGridViewColumn EndDTColumn = new MVCxGridViewColumn();
+        EndDTColumn.Name = "EndDT";
+        EndDTColumn.FieldName = "EndDT";
+        EndDTColumn.Caption = "End Date";
+        EndDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        EndDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        EndDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        EndDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(EndDTColumn);
+
+        MVCxGridViewColumn ReleasedDTColumn = new MVCxGridViewColumn();
+        ReleasedDTColumn.Name = "ReleasedDT";
+        ReleasedDTColumn.FieldName = "ReleasedDT";
+        ReleasedDTColumn.Caption = "Released Date";
+        ReleasedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ReleasedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        ReleasedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(ReleasedDTColumn);
+
+        MVCxGridViewColumn MemberIDColumn = new MVCxGridViewColumn();
+        MemberIDColumn.Name = "MemberID";
+        MemberIDColumn.FieldName = "MemberID";
+        MemberIDColumn.Caption = "Member ID";
+        MemberIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        MemberIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        MemberIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(MemberIDColumn);
+
+        MVCxGridViewColumn EmailColumn = new MVCxGridViewColumn();
+        EmailColumn.Name = "Email";
+        EmailColumn.FieldName = "Email";
+        EmailColumn.Caption = "Email";
+        EmailColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        EmailColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        EmailColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(EmailColumn);
+
+        MVCxGridViewColumn PhoneColumn = new MVCxGridViewColumn();
+        PhoneColumn.Name = "PhoneNumber";
+        PhoneColumn.FieldName = "PhoneNumber";
+        PhoneColumn.Caption = "Phone";
+        PhoneColumn.Width = 150;
+        PhoneColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+        PhoneColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PhoneColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        PhoneColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        PhoneColumn.SetDataItemTemplateContent(c => {
+            var mID = (int?)DataBinder.Eval(c.DataItem, "MemberID");
+            if(mID != null)
+            {
+                var phoneNumbers = UoW.GetRepository<Flock.Models.MemberAddress>().GetAll().Where(p => p.MemberID == mID.Value).Select(p => p.PhoneNumber).Distinct().ToList();
+                foreach (var pn in phoneNumbers)
+                    ViewContext.Writer.Write(pn + System.Environment.NewLine);
+            }
+        });
+        settings.Columns.Add(PhoneColumn);
+
+        MVCxGridViewColumn UserAgentColumn = new MVCxGridViewColumn();
+        UserAgentColumn.Name = "UserAgent";
+        UserAgentColumn.FieldName = "UserAgent";
+        UserAgentColumn.Caption = "User Agent";
+        UserAgentColumn.Width = 150;
+        UserAgentColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        UserAgentColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        //PayPalTransRefColumn.SetDataItemTemplateContent(c => {
+        //    if(DataBinder.Eval(c.DataItem, "PayPalTransRef") != null)
+        //        ViewContext.Writer.Write("<a href='#' onclick='copyToClipboard(\"" + DataBinder.Eval(c.DataItem, "PayPalTransRef").ToString() + "\"); return false;'>" + DataBinder.Eval(c.DataItem, "PayPalTransRef").ToString() + "</a>");
+        //});
+        settings.Columns.Add(UserAgentColumn);
+
+        MVCxGridViewColumn VisitorIDColumn = new MVCxGridViewColumn();
+        VisitorIDColumn.Name = "VisitorID";
+        VisitorIDColumn.FieldName = "VisitorID";
+        VisitorIDColumn.Caption = "Visitor ID";
+        VisitorIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        VisitorIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        VisitorIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(VisitorIDColumn);
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "VisitorCountryID";
+            column.Name = "VisitorCountryID";
+            column.Caption = "Country";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Width = 160;
+            column.SetDataItemTemplateContent(c =>
+            {
+                string vcID = DataBinder.Eval(c.DataItem, "VisitorCountryID") == null ? null : DataBinder.Eval(c.DataItem, "VisitorCountryID").ToString();
+
+                string vcN = DataBinder.Eval(c.DataItem, "VisitorCountryName") == null ? null : DataBinder.Eval(c.DataItem, "VisitorCountryName").ToString();
+
+                if(vcID != null && vcN != null)
+                    ViewContext.Writer.Write("<img src='/images/icons/countryflags/22px/" + DataBinder.Eval(c.DataItem, "VisitorCountryID").ToString() + ".png' title='"+DataBinder.Eval(c.DataItem, "VisitorCountryName").ToString()+"' style='float: left; margin-right: 4px;' />");
+            });
+        });
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.ShowDetailButtons = false;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(Html.Action("CheckoutLogGridPartial", "eCommerce", new { CheckoutID = Convert.ToInt64(DataBinder.Eval(c.DataItem, "CheckoutID")) }));
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "MaxCheckoutStageID":
+                    e.Values.Clear();
+                    foreach (var s in UoW.GetRepository<Flock.Models.CheckoutStage>().GetAll())
+                    {
+                        e.AddValue(s.Name.ToString(), s.CheckoutStageID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "LastCheckoutStageID":
+                    e.Values.Clear();
+                    foreach (var s in UoW.GetRepository<Flock.Models.CheckoutStage>().GetAll())
+                    {
+                        e.AddValue(s.Name.ToString(), s.CheckoutStageID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "PriceListID":
+                    e.Values.Clear();
+                    //e.AddValue("United Kingdom", "81");
+                    //e.AddValue("United States", "238");
+                    var PL = UoW.GetRepository<Flock.Models.PriceList>().GetAll().ToList();
+                    foreach(var p in PL)
+                    {
+                        e.AddValue(p.Name, p.PriceListID.ToString());
+                    }
+                    //foreach (var c in UoW.GetRepository<Flock.Models.Country>().GetAll().Where(p => PL.Contains(p.PriceListID)))
+                    //{
+                    //    e.AddValue(c.Name, c.CountryID.ToString());
+                    //}
+                    e.AddShowAll();
+                    break;
+                case "VisitorCountryID":
+                    e.Values.Clear();
+                    foreach (var c in UoW.GetRepository<Flock.Models.Country>().GetAll())
+                    {
+                        e.AddValue(c.Name, c.CountryID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+
+                default: break;
+            }
+        };
+    });
+ }
+@grid.Bind(Model).GetHtml()

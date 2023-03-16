@@ -1,0 +1,70 @@
+﻿<div class="resource-panel-container">
+    <fieldset id="page-search-fieldset">
+        <legend onclick="$('.hideable-dataview').not('#page-dataview').slideUp('fast'); $('#page-dataview').slideToggle('fast');">Page Search (click to expand / contract)</legend>
+        <div id="page-dataview" class="hideable-dataview" style="display: none;">
+            <div style="padding: 1em 1em 0px; background-color: white;">
+                @Html.Action("PageSearchSiteSectionDropDownPartial", "Pages")
+                @*@Html.Action("PageSearchTemplateDropDownPartial", "Pages")*@
+                @Html.Action("PageSearchNameOrIDTextPartial", "Pages")
+                @Html.DevExpress().Button(button =>
+                {
+                    button.Text = "Add All";
+                    button.Name = "PageAddAllButton";
+                    button.Style.Add("float", "left");
+                    button.Style.Add("margin-right", "7px");
+                    button.Style.Add("line-height", "32px");
+                    button.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    button.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    //settings.ControlStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0072C6");
+                    button.Style.Add("text-align", "center");
+
+                    button.ClientSideEvents.Click = @"function(s, e) {
+                            if(typeof(BulkAddPages) == 'function') {
+                                BulkAddPages();
+                            }
+                        }";
+                }).GetHtml()
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "PageClearFiltersButton";
+                    settings.Text = "Reset";
+                    settings.Style.Add("line-height", "32px");
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    //settings.ControlStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0072C6");
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        PageSearchSiteSectionListBox.UnselectAll();
+                        PageSearchSiteSectionDD.SetText('Site Section');
+//                        PageSearchTemplateListBox.UnselectAll();
+//                        PageSearchTemplateDD.SetText('Template');
+                        PageSearchNameTextBox.SetText('Name, Code or ID');
+                        $('#page-searching-icon').fadeIn('fast');
+                        $.ajax({
+	                        url: '" + Url.Action("PageSearch", "Pages") + @"',
+	                        traditional: true,
+	                        data: {
+		                        SiteSectionID: PageSearchSiteSectionListBox.GetValue(),
+//                                TemplateID: PageSearchTemplateListBox.GetValue(),
+                                SearchString: PageSearchNameTextBox.GetValue()
+	                        },
+	                        success: function(data) {
+		                        $('#page-searching-icon').fadeOut('fast');
+		                        $('#page-data-view-container').html(data);
+	                        },
+	                        error: function(e, s, a) {
+		                        $.showError(e, s, a, function() { $('#page-searching-icon').fadeOut('fast'); });
+	                        },
+	                        timeout: 20000
+                        });
+                    }";
+                }).GetHtml()
+                <img id="page-searching-icon" style="display: none;" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both"></div>
+            </div>
+            <div id="page-data-view-container" style="background-color: white;">
+                @Html.Action("PageSearch", "Pages")
+            </div>
+        </div>
+    </fieldset>
+    <div style="clear: both"></div>
+</div>

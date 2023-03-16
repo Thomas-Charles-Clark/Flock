@@ -1,0 +1,35 @@
+﻿* {
+    box-sizing: border-box;
+
+    -moz-box-sizing: border-box;
+}
+
+input {
+height: 30px !important;
+font-family: "verdana";
+}
+
+label { 
+    float: left;
+    line-height: 30px;
+    margin: 0px 0.5em 0px 0px;
+    width: 105px;
+    text-align: right;
+}
+
+.container {
+    width: 400px;
+}
+
+ul {
+    list-style-type: none;
+    margin-top: 1em;
+}
+
+    ul li {
+        margin-bottom: 0.4em;
+    }
+
+#submit {
+    float: right;
+}

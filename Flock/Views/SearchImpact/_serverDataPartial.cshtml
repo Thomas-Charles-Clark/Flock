@@ -1,0 +1,10 @@
+﻿@model Flock.ViewModels.SearchImpactViewModel
+<script type="text/javascript">
+    function getAvailableProductTypes() {
+        return @Html.Raw(Json.Encode(Model.AvailableProductTypes))
+    }
+
+    function getAvailableLaunches() {
+        return @Html.Raw(Json.Encode(Model.AvailableLaunches))
+    }
+</script>

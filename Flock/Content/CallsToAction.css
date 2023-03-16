@@ -1,0 +1,40 @@
+﻿.container {
+    width: auto;
+}
+
+.btn {
+    padding: 3px 9px;
+}
+
+label {
+    margin-bottom: unset;
+}
+
+.edit-form-table > tbody > tr > td {
+    padding-bottom: 10px;
+}
+
+.edit-form-table > tbody > tr > td > table {
+    float: right;
+}
+
+td.buttons-cell {
+    text-align: right;
+    padding-right: 26px;
+}
+
+#selector-panel {
+    float: left;
+}
+
+#detail-panel {
+    float: left;
+}
+
+#selector-grid-container {
+    margin-bottom: 20px;
+}
+
+.add-button {
+    
+}

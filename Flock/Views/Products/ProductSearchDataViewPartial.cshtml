@@ -1,0 +1,205 @@
+@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "ProductToCollection_ProductDataView";
+    
+    settings.CallbackRouteValues = new { Controller = "Products", Action = "ProductSearch" };
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['ProductTypeID'] =  ProductSearchProductTypeListBox.GetValue();
+        e.customArgs['BrandID'] = ProductSearchBrandListBox.GetValue();
+        e.customArgs['LaunchID'] = ProductSearchLaunchListBox.GetValue();
+        e.customArgs['PatternID'] = ProductSearchPatternListBox.GetValue();
+        e.customArgs['Status'] = ProductSearchStatusListBox.GetValue();
+        e.customArgs['StatusID'] = ProductSearchWebStatusListBox.GetValue();
+        e.customArgs['StockStatusID'] = ProductSearchStockStatusListBox.GetValue();
+        e.customArgs['CollectionID'] = ProductSearchCollectionListBox.GetValue();
+        e.customArgs['ColourID'] = ProductSearchColourListBox.GetValue();
+        e.customArgs['SearchString'] = ProductSearchNameOrIDTextBox.GetText();
+    }";
+    settings.ClientSideEvents.EndCallback = @"function(s, e) {
+        if(typeof(ProductAssociationHeaderCollectionListBox) != 'undefined' && typeof(ProductAssociationHeaderCollectionListBox) != false) {
+            if (typeof (ProductAssociationHeaderCollectionListBox.GetValue()) != 'undefined' && ProductAssociationHeaderCollectionListBox.GetValue() != false &&  $('#collection-header-hidden-id').val() != '') {
+                $('.draggable').draggable({
+                    helper: 'clone',
+                    start: function (e, ui) {
+                        $(ui.helper).css('z-index', '300000');
+                    },
+                    connectToSortable: '#collection-contents-sortable'
+                });
+
+                $('#collection-contents-sortable').sortable({
+                    placeholder: 'ui-state-highlight-collection-contents',
+                    update: function (ev, ui) {
+                        $('#collection-contents-sortable').sortable('refresh');
+                        window.products = new Array();
+                        $('#collection-contents-sortable').children('div').each(function (index) {
+                            if ($(this).data('product-id') != false && typeof ($(this).data('product-id')) != 'undefined')
+                                products.push({ ProductID: $(this).data('product-id'), SortOrder: index });
+                        });
+                        UpdateCollection();
+                    }
+                });
+            }
+        }
+        $('.product').draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css('z-index', '300000');
+            },
+            connectToSortable: '#primary-product-sortable, #secondary-product-sortable'
+        });
+
+        if (typeof (InitProductDragDrop) == 'function')
+            InitProductDragDrop();
+
+        if (typeof (InitPrimaryProductDragDrop) == 'function')
+            InitPrimaryProductDragDrop();
+
+        if (typeof (initDragDrop) == 'function')
+            initDragDrop();
+    }";
+    
+    settings.Style.Add("background-color", "white");
+    settings.Style.Add("width", "100%");
+    settings.Style.Add("margin", "0");
+    
+
+    settings.CustomActionRouteValues = new { Controller = "Products", Action = "ProductToCollection_ProductDataViewFilter" };
+    settings.AllowPaging = true;
+    settings.AlwaysShowPager = true;
+    settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    settings.PagerSettings.PageSizeItemSettings.Visible = true;
+    settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+    settings.SettingsTableLayout.RowsPerPage = 4;
+    settings.SettingsTableLayout.ColumnCount = 5;
+    settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(14);
+
+    settings.EmptyDataText = "<h4>No results</h4>";
+    settings.SetItemTemplateContent(
+    c =>
+    {
+        var statusColour = "#000000";
+        var statusText = "Not Checked";
+        
+
+        switch (Convert.ToByte(DataBinder.Eval(c.DataItem, "StockStatusID")))
+        {
+            case 1:
+                statusText = "In Stock";
+                statusColour = "green";
+                break;
+            case 2:
+                statusText = "Due in 3-5 days";
+                statusColour = "#DEC400";
+                break;
+            case 3:
+                statusText = "Due in 1-2 weeks";
+                statusColour = "#DEC400";
+                break;
+            case 4: 
+                statusText = "Due within 1 month";
+                statusColour = "orange";
+                break;
+            case 5: 
+                statusText = "Due within 8 weeks";
+                statusColour = "orange";
+                break;
+            case 6: 
+                statusText = "Due within 3 months";
+                statusColour = "red";
+                break;
+            case 7: 
+                statusText = "Out of Stock";
+                statusColour = "red";
+                break;
+            case 8:
+                statusText = "Not Checked";
+                statusColour = "red";
+                break;
+            default: break;
+        }
+        System.Globalization.TextInfo myTI = new System.Globalization.CultureInfo("en-US",false).TextInfo;
+        
+        var discID = "";
+        var ppID = "null";
+        if (DataBinder.Eval(c.DataItem, "ProductPageID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ProductPageID") != null)
+            ppID = DataBinder.Eval(c.DataItem, "ProductPageID").ToString();
+        if (DataBinder.Eval(c.DataItem, "ImageID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ImageID") != null)
+            discID = DataBinder.Eval(c.DataItem, "ImageID").ToString();
+        if (discID != "")
+        {
+            
+            ViewContext.Writer.Write(
+                "<div id='image-box-" + DataBinder.Eval(c.DataItem, "ImageID") + "' class='draggable product'  style='width: 158px;' data-associated-product-page='"+ppID+"' data-product-id='" + DataBinder.Eval(c.DataItem, "ProductID") + "'>" +
+                "<div style=\"height: 156px;\">" +
+                    "<img id=\"" + "img" + discID + "\" title=\"Product ID: " + DataBinder.Eval(c.DataItem, "ProductID") + "\" src=\"" + Url.Content("https://flock.designersguild.com/ImageLibrary/156/" + discID + ".jpeg") + "\" alt=\"\" />" +
+                "</div>" +
+                "<div class='DataViewItemTitle'>" + myTI.ToTitleCase(((string)DataBinder.Eval(c.DataItem, "Name") ?? "").ToString().ToLower()) + "<br/>" + DataBinder.Eval(c.DataItem, "Code") + "<br/>" +
+                "Stock Status: <span style='color: " + statusColour + ";'>" + statusText + "</span>" +
+                "</div>" +
+                "</div>"
+            );
+        }
+        else
+        {
+            ViewContext.Writer.Write(
+                "<div id='image-box-" + DataBinder.Eval(c.DataItem, "ImageID") + "' class='draggable product'  style='width: 158px;' data-associated-product-page='" + ppID + "' data-product-id='" + DataBinder.Eval(c.DataItem, "ProductID") + "'>" +
+                "<div style=\"height: 156px;\">" +
+                    "<img id=\"" + "img" + discID + "\" title=\"Product ID: " + DataBinder.Eval(c.DataItem, "ProductID") + "\"  style='width: 156px; height: 156px;' src=\"" + Url.Content("~/Images/Admin/image-not-set.png") + "\" alt=\"\" />" +
+                "</div>" +
+                "<div class='DataViewItemTitle'>" + myTI.ToTitleCase((string)(DataBinder.Eval(c.DataItem, "Name") ?? "").ToString().ToLower()) + "<br/>" + DataBinder.Eval(c.DataItem, "Code") + "<br/>" +
+                "Stock Status: <span style='color: " + statusColour + ";'>" + statusText + "</span>" +
+                "</div>" +
+                "</div>"
+            );
+        }
+    }
+
+); 
+}).Bind(Model).GetHtml()
+<script type="text/javascript">
+    //toast
+    if(typeof(ProductAssociationHeaderCollectionListBox) != 'undefined' && typeof(ProductAssociationHeaderCollectionListBox) != false) {
+        if (typeof (ProductAssociationHeaderCollectionListBox.GetValue()) != "undefined" && ProductAssociationHeaderCollectionListBox.GetValue() != false && $("#collection-header-hidden-id").val() != "") {
+        $(".draggable").draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#collection-contents-sortable"
+        });
+
+        $("#collection-contents-sortable").sortable({
+            placeholder: 'ui-state-highlight-collection-contents',
+            update: function (ev, ui) {
+                $("#collection-contents-sortable").sortable("refresh");
+                window.products = new Array();
+                $("#collection-contents-sortable").children("div").each(function (index) {
+                    if ($(this).data("product-id") != false && typeof ($(this).data("product-id")) != "undefined")
+                        products.push({ ProductID: $(this).data("product-id"), SortOrder: index });
+                });
+                UpdateCollection();
+            }
+        });
+    }
+    }
+
+    $('.product').draggable({
+        helper: 'clone',
+        start: function (e, ui) {
+            $(ui.helper).css("z-index", "300000");
+        },
+        connectToSortable: '#primary-product-sortable, #secondary-product-sortable'
+    });
+
+    if (typeof (InitProductDragDrop) == 'function')
+        InitProductDragDrop();
+
+    if (typeof (InitPrimaryProductDragDrop) == 'function')
+        InitPrimaryProductDragDrop();
+
+    if (typeof (InitSecondaryProductDragDrop) == 'function')
+        InitSecondaryProductDragDrop();
+
+    if (typeof (initDragDrop) == 'function')
+        initDragDrop();
+</script>

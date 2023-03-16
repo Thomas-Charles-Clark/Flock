@@ -1,0 +1,38 @@
+﻿@model List<Flock.Models.vwCollection_RelatedCollection>
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#related-collection-inner').slideToggle('fast')">Related Collections (click to expand / contract)</legend>
+        <div id="related-collection-inner" style="background-color: white; padding-right: 1em; padding-left: 1em; position: relative; display: block; padding-top: 1em; padding-bottom: 1em;">
+            <img id="collection-related-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+            @if (Model.Count == 0)
+            {
+                <h5 id="collection-placeholder"><i>No related collections have been set.</i></h5>
+            }
+            else
+            {
+                foreach (Flock.Models.vwCollection_RelatedCollection i in Model)
+                {
+                    if (i.ImageID != null)
+                    {
+                        <div data-collection-id="@i.RelatedCollectionID" class="related-collection-sortable" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                            <img src="https://flock.designersguild.com/imagelibrary/195/@(i.ImageID).jpeg" />
+                            <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveRelatedCollectionFromCollection(@(i.RelatedCollectionID))" />
+                            <label style="display: block;">@i.Name</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div data-collection-id="@i.RelatedCollectionID" class="related-collection-sortable" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                            <img src="/Images/Admin/image-not-set-thin.png" />
+                            <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveRelatedCollectionFromCollection(@(i.RelatedCollectionID))" />
+                            <label style="display: block;">@i.Name</label>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    initDragDrop();
+</script>

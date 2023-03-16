@@ -1,0 +1,66 @@
+﻿@model Flock.ViewModels.Bronto.BrontoListsViewModel
+@{
+    ViewBag.Title = "Bronto Lists";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/BrontoLists.css")
+}
+<script type="text/javascript">
+    function SubAccountSelected(s, e) {
+        var subAccountId = s.GetValue();
+
+        $.ajax({
+            url: '/admin/bronto/LoadSubAccountLists',
+            type: 'POST',
+            traditional: true,
+            async: true,
+            data: {
+                SubAccountID: subAccountId
+            },
+            success: function (data) {
+                $("#subaccount-detail").html(data);
+            },
+            timeout: 30000
+        });
+    }
+
+    function FetchListsFromBronto(subAccountId) {
+        $.ajax({
+            url: '/admin/bronto/FetchListsFromBronto',
+            type: 'POST',
+            traditional: true,
+            async: true,
+            data: {
+                SubAccountID: subAccountId 
+            },
+            success: function (data) {
+                if (typeof ListGridView === 'object') {
+                    ListGridView.Refresh();
+                }
+            },
+            timeout: 30000
+        });
+    }
+</script>
+
+<h4 class="page-heading">Bronto Lists</h4>
+
+<div class="page-subheading">
+    @Html.DevExpress().ComboBoxFor(m => Model.SelectedSubAccount, settings =>
+    {
+        settings.Name = "SubAccount";
+        settings.Properties.ValueField = "SubAccountID";
+        settings.Properties.TextField = "Name";
+        settings.Properties.NullText = "Select";
+        settings.Properties.Caption = "Sub Account";
+        settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+
+        settings.Properties.ClientSideEvents.SelectedIndexChanged = "SubAccountSelected";
+
+    }).BindList(Model.SubAccounts).GetHtml()
+</div>
+
+<div id="subaccount-detail">
+
+</div>

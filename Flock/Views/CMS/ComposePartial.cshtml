@@ -1,0 +1,145 @@
+﻿@using Flock.Models.ContentItems;
+@model Flock.ViewModels.PageViewModel
+
+
+@foreach (PageSectionModel ps in Model.PageSectionModels)
+{
+    <div id="page-section-@ps.PageSection.PageSectionID" class="page-section pure-g">
+    @foreach (ContentItem ci in ps.ContentItems)
+    {
+        // this... should definitely place them in order, because they should've been sorted by their sortorder already!
+        switch (ci.ItemType)
+        {
+            case ContentItemType.HTML:
+                HtmlItem htmlItem = (HtmlItem)ci;
+                <div class="@htmlItem.Record.Class" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@htmlItem.Record.HtmlID">
+                    <div class="section-inner">
+                        <div class="section-contents">
+                            @Html.Raw(htmlItem.Record.Contents)
+                        </div>
+                    </div>
+                </div>
+                break;
+            case ContentItemType.SlideShow:
+                SlideShowItem slideShowItem = (SlideShowItem)ci;
+                <div class="@slideShowItem.Record.Class" style="height: 492px;" data-sort-order="@ci.SortOrder"  data-type="slideshow" data-content-id="@slideShowItem.Record.SlideShowID">
+                    <div class="section-inner" style="height: 100%">
+                        <div class="section-contents">
+                            @{Html.RenderAction("ImageSliderPartial", "CMS", new { SlideShowID = @slideShowItem.Record.SlideShowID });}
+                        </div>
+                    </div>
+                </div> 
+                break;
+            case ContentItemType.Form:
+            FormItem formItem = (FormItem)ci;
+                <div class="@formItem.ClassName" data-sort-order="@ci.SortOrder"  data-type="form" data-content-id="@formItem.Record.FormID">
+                    @switch(formItem.Record.FormType)
+                    {
+                        case 1:
+                            <div class="section-inner" id="form-id-@formItem.Record.FormID">
+                                <div class="section-contents">
+                                    @{Html.RenderAction("NewsletterFormDisplayPartial", "Forms", new { FormID = @formItem.Record.FormID });}
+                                </div>
+                            </div>
+                            break;
+                                                
+                        case 2:
+                            <div class="section-inner" id="form-id-@formItem.Record.FormID">
+                                <div class="section-contents">
+                                    @{Html.RenderAction("CompetitionFormDisplayPartial", "Forms", new { FormID = @formItem.Record.FormID });}
+                                </div>
+                            </div>
+                            break;
+
+                        default: break;   
+                    }
+                </div>   
+                break;
+            case ContentItemType.Grid:
+                        GridSectionItem gridItem = (GridSectionItem)ci;
+                        switch (gridItem.Record.Purpose)
+                        {
+                            case 1:
+                                <div class="@gridItem.Record.Class content-grid" style="background-color:#C0FAC9; min-height: 200px;" data-sort-order="@ci.SortOrder" data-type="grid" data-content-id="@gridItem.Record.GridID">
+                                    <div class="pure-g" id="grid-section-@gridItem.Record.GridID">
+                                        @foreach (ContentItem gridContentItem in gridItem.Contents)
+                                        {
+                                            switch (gridContentItem.ItemType)
+                                            {
+                                                case ContentItemType.HTML:
+                                                    HtmlItem gridHtmlItem = (HtmlItem)gridContentItem;
+                                                    <div class="@gridHtmlItem.Record.Class" style="background-color: #ff6a00" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@gridHtmlItem.Record.HtmlID">
+                                                    <div class="section-inner">
+                                                        @Html.Raw(gridHtmlItem.Record.Contents)
+                                                    </div>
+                                                </div>
+                                                    break;
+                                                // snip
+                                                default: break;
+                                            }
+                                        }
+                                </div>
+                                </div>
+                                        break;
+
+                            case 2: // must present filters side and results side. in results side, echo contents of grid.
+                                <div class='pure-u-1-4' style='min-height: 600px; background-color: #9DB9D5;'>
+                                    <div class="section-inner">
+                                        <em style="font-size: 2em">Here go some filter group things</em>
+                                    </div>
+                                </div>
+                                <div class="pure-u-3-4" style='min-height: 600px; background-color: #DCEDFF;' class='@gridItem.Record.Class'>
+                                    <div class="pure-g">
+                                        @foreach (ContentItem gridContentItem in gridItem.Contents)
+                                        {
+                                            switch (gridContentItem.ItemType)
+                                            {
+                                                case ContentItemType.SearchResult:
+                                                    SearchResultItem searchResultItem = (SearchResultItem)gridContentItem;
+                                                        <div class="@searchResultItem.ClassName" data-sort-order="@searchResultItem.SortOrder"  data-type="" data-content-id="">
+                                                        <div class="section-inner" style="padding: 5px;box-sizing: border-box; -moz-box-sizing: border-box;">
+                                                            <div style="padding: 5px; height: 150px; box-sizing: border-box; -moz-box-sizing: border-box; background-color: #ff6a00">
+                                                                @Html.Raw(searchResultItem.ArbitraryContents)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    break;
+                                                case ContentItemType.HTML:
+                                                    HtmlItem gridHtmlItem = (HtmlItem)gridContentItem;
+                                                        <div class="@gridHtmlItem.Record.Class" style="background-color: #ff6a00" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@gridHtmlItem.Record.HtmlID">
+                                                        <div class="section-inner">
+                                                            @Html.Raw(gridHtmlItem.Record.Contents)
+                                                        </div>
+                                                    </div>
+                                                    break;
+                                                // snip
+                                                default: break;
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                        break;
+
+                            default: break;
+                        }
+
+                        break;
+                                      
+                        case ContentItemType.Blank:
+                        Flock.Models.ContentItems.BlankContentItem blankItem = (Flock.Models.ContentItems.BlankContentItem)ci;
+                        <div class="@blankItem.Record.Class" data-sort-order="@ci.SortOrder"  data-type="blank" data-content-id="@blankItem.Record.BlankContentItemID">
+                            <div class="section-inner blank-item">
+                                <div class="section-contents">
+                                    &nbsp;
+                                </div>
+                            </div>
+                        </div>
+                        break;
+            default: 
+                <h4>Other Content Item!</h4>
+                        break;
+        }
+    }
+    </div>
+}
+@*<script type="text/javascript">dispatchMQEvent(0);</script>*@

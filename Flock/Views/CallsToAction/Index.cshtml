@@ -1,0 +1,64 @@
+﻿@model Flock.ViewModels.CallsToActionViewModel
+@{
+    ViewBag.Title = "Calls to Action";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+    @Styles.Render("~/Content/callstoaction.css")
+}
+<script type="text/javascript">
+    function SaveCallToActionDetails() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '/admin/callstoaction/CallToActionGridViewPartialUpdate',
+            type: 'POST',
+            data: {
+                CallToActionID: $("#call-to-action-id").val(),
+                Name: Name.GetValue(),
+                Text: Text.GetValue(),
+                NewWindow: NewWindow.GetValue(),
+                PageID: PageID.GetValue(),
+                ArticleID: ArticleID.GetValue(),
+                CollectionID: CollectionID.GetValue(),
+                ProductPageID: ProductPageID.GetValue(),
+                ExternalURL: ExternalURL.GetValue(),
+                StyleID: StyleID.GetValue(),
+                CallToActionWidthModeID: CallToActionWidthModeID.GetValue(),
+                AppearanceDelay: AppearanceDelay.GetValue(),
+                VisibilityDuration: VisibilityDuration.GetValue()
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#detail-panel").html(data);
+                $.info("Save", "Successful");
+            },
+            error: function (xhr, s, e) {
+                LoadingPanel.Hide();
+                $("#detail-panel").html(xhr.responseText);
+            },
+            timeout: 30000
+        });
+    }
+
+    function CancelCallToActionDetails() {
+        $("#detail-panel").empty();
+    }
+</script>
+
+<h4 class="page-heading">
+    Calls to Action
+</h4>
+
+<div id="selector-panel">
+    <div id="selector-grid-container">
+        @Html.Action("CallToActionGridViewPartial")
+    </div>
+
+    <button class="btn btn-primary add-button" onclick="GridView.AddNewRow();">Add New</button>
+</div>
+
+<div id="detail-panel">
+
+</div>
+
+<div class="clearfix"></div>

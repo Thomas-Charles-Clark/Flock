@@ -1,0 +1,57 @@
+﻿@model List<Flock.Models.AspectRatio>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Name = "AspectRatioListBox";
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ImageSearchAspectRatioDropDownPartial")
+    {
+        listBoxSettings.Name = "ImageSearchAspectRatioListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#image-searching-icon').fadeIn('fast');
+            ImageSearchAspectRatioDD.SetText(s.GetSelectedItem().text);
+            ImageSearchAspectRatioDD.HideDropDown();
+            $.ajax({
+                url: '" + Url.Action("ImageSearch", "Images") + @"',
+                traditional: true,
+                data: { 
+                    ProductType: ImageSearchProductTypeListBox.GetValue(),
+                    Brand: ImageSearchBrandListBox.GetValue(),
+                    Launch: ImageSearchLaunchListBox.GetValue(),
+                    Collection: ImageSearchCollectionListBox.GetValue(),
+                    AspectRatio: ImageSearchAspectRatioListBox.GetValue(),
+                    ImageType: ImageSearchImageTypeListBox.GetValue(),
+                    Perspective: ImageSearchPerspectiveListBox.GetValue(),
+                    HotspotStatus: ImageSearchHotspotStatusListBox.GetValue(),
+                    Colour: ImageSearchColourListBox.GetValue(),
+                    Room: ImageSearchRoomListBox.GetValue(),
+                    Style: ImageSearchStyleListBox.GetValue(),
+                    NameOrID: ImageSearchNameOrIDTextBox.GetValue(),
+                    SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue(),
+                    Resolution: ResolutionListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#image-data-view-container').html(data);
+                    $('#image-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function() { $('#image-searching-icon').fadeOut('slow'); });
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "AspectRatioID";
+}
+).BindList(Model).GetHtml()

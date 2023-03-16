@@ -1,0 +1,27 @@
+﻿@model Flock.ViewModels.CollectionViewModel
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#bottom-section-inner').slideToggle('fast')">Images &amp; Brochure Section (click to expand / contract)</legend>
+        <div id="bottom-section-inner" style="background-color: white; padding-right: 1em; padding-left: 1em; position: relative; display: block; padding-top: 1em; padding-bottom: 1em;">
+            <div id="lower-container" style="margin-top: 10px; width: 100%">
+                <div style="position: relative;" class="bottom-item">
+                    <span style='position: absolute; left: 0; top: 0; z-index: 10;'>Supporting Image: Square only</span>
+                    <img id="collection-sp1-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                    <div id="collection-sp1-container" class="droppable" data-collection-id="@(Model.CollectionID)">
+                        @Html.Partial("CollectionSP1Image", Model.CollectionImages.Where(p => p.TemplateImageID == 3).ToList(), new ViewDataDictionary())
+                    </div>
+                </div>
+                <div style="position: relative;" class="bottom-item">
+                    <span style='position: absolute; left: 0; top: 0; z-index: 10;'>Supporting Image: Square only</span>
+                    <img id="collection-sp2-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                    <div id="collection-sp2-container" class="droppable" data-collection-id="@(Model.CollectionID)">
+                        @Html.Partial("CollectionSP2Image", Model.CollectionImages.Where(p => p.TemplateImageID == 4).ToList(), new ViewDataDictionary())
+                    </div>
+                </div>
+                
+                <div style="clear: both;"></div>
+                
+            </div>
+        </div>
+    </fieldset>
+</div>

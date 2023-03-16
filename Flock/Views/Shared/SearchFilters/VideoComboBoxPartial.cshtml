@@ -1,0 +1,39 @@
+﻿@model List<Flock.Models.Video>
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "CollectionVideoComboBox";
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Style.Add("float", "left");
+
+    settings.Properties.DropDownWidth = 450;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDownList;
+    settings.CallbackRouteValues = new { Controller = "Collections", Action = "CollectionComposeVideoComboBoxPartial" };
+    settings.Properties.CallbackPageSize = 30;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "VideoID";
+    settings.Properties.ValueType = typeof(short);
+
+    settings.Properties.NullText = "Video Finder";
+    settings.Properties.Columns.Add("Name", "Name");
+    settings.Properties.Columns.Add("Description", "Description", System.Web.UI.WebControls.Unit.Percentage(60));
+
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        $.ajax({
+            url: '" + Url.Action("AssignCollectionVideo", "Collections") + @"',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: $('#selected-collection-id').val(),
+                VideoID: s.GetSelectedItem().value
+            },
+            success: function(data) {
+                $('#collection-video-target').html(data);
+            },
+            error: function(e, s, a) {
+                alert(s + ' error: e.responseText was: ' + e.responseText);
+            },
+            timeout: 60000
+        });
+    }";
+}).BindList(Model).GetHtml()

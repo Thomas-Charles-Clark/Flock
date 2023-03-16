@@ -1,0 +1,75 @@
+﻿@model Flock.ViewModels.ProductPageClassifierHeaderViewModel
+
+@Html.DevExpress().Label(settings =>
+{
+    settings.Text = "Show me all";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("line-height", "34px");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+@Html.Action("ClassifierProductTypeDropDown", new { SelectedProductTypeID = Model.SelectedProductTypeID })
+
+@Html.DevExpress().Label(settings =>
+{
+    settings.Text = "where";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("line-height", "34px");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+@Html.Action("ClassifierAttributeGroupDropDownPartial", new { ProductTypeID = Model.SelectedProductTypeID, SelectedAttributeGroupID = Model.SelectedAttributeGroupID })
+
+@Html.Action("ClassifierToggleDropDownPartial", new { ToggleState = Model.SelectedToggleState })
+
+@Html.Action("ClassifierAttributeDropDownPartial", new { AttributeGroupID = Model.SelectedAttributeGroupID, SelectedAttributeID = Model.SelectedAttributeID, SelectedToggleState = Model.SelectedToggleState })
+
+@Html.DevExpress().Label(settings =>
+{
+    settings.Text = "or Name is: ";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("line-height", "34px");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+@Html.DevExpress().TextBox(settings => {
+    settings.Name = "NameSearch";
+    settings.Height = 34;
+    settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) { 
+        
+    if(e.htmlEvent.keyCode == 13) {
+        var ProductTypeID = ClassifierProductTypeListBox.GetSelectedItem() == null ? null : ClassifierProductTypeListBox.GetSelectedItem().value;
+        var AttributeGroupID = AttributeGroupListBox.GetSelectedItem() ==  null ? null : AttributeGroupListBox.GetSelectedItem().value;
+        var AttributeID = null;
+        if (typeof AttributeListBox === 'object')
+            AttributeID = AttributeListBox.GetSelectedItem() == null ? null : AttributeListBox.GetSelectedItem().value;
+        var ToggleState = ToggleListBox.GetSelectedItem() == null ? null : ToggleListBox.GetSelectedItem().value;
+
+        var SearchString = s.GetText();
+
+        if(ProductTypeID == null || AttributeGroupID == null)
+            return;
+
+            $.ajax({
+                url: '" + Url.Action("ClassificationResultsPartial", "ProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    ProductTypeID: ProductTypeID,
+                    AttributeGroupID: AttributeGroupID,
+                    AttributeID: AttributeID,
+                    Toggle: ToggleState,
+                    SearchString: SearchString
+                },
+                success: function(data) {
+                    $('#ajax-target').html(data);
+                    LoadingPanel.Hide();
+                }
+            });
+        }
+    }";
+}).GetHtml()
+
+<input type="button" style="float: right;" value="Save All" onclick="SaveAll()" />
+
+<div style="clear: both;"></div>

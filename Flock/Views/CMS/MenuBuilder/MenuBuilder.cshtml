@@ -1,0 +1,274 @@
+﻿@using Flock.ViewModels
+@{
+    Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewBag.Title = "Menu Builder";
+}
+@section styles{
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/Content/product-page-composition.css")
+    @Styles.Render("~/Content/menu-builder.css")
+    <style type="text/css">
+        #container {
+            width: 1380px !important;
+        }
+        input.dxb-hb {
+            font-size: 0 !important;
+        }
+
+        .dxgvFooter_MetropolisBlue td.dxgv {
+            border-top: 1px solid #c0c0c0 !important;
+        }
+        .country-restriction-flag {
+            float: left;
+            vertical-align: top;
+            margin-right: 1em;
+            position: relative;
+            width: 48px;
+            height: 82px;
+        }
+        .flag {
+            width: 22px;
+            height: 22px;
+        }
+        .resource-panel-container {
+            width: 500px;
+            float: right;
+        }
+        #grid-container {
+            width: 860px;
+            float: left;
+        }
+        #country-restriction-busy {
+            width: 22px;
+            height: 22px;
+            top: 4px;
+            right: 4px;
+        }
+    </style>
+}
+@section scripts {
+<script type="text/javascript">
+    function InitalizejQuery() {
+        $('.dxgvDataRow_MetropolisBlue.draggable').draggable({
+            helper: 'clone',
+            start: function (ev, ui) {
+                var $draggingElement = $(ui.helper);
+                $draggingElement.width(window[$(this).closest('[data-grid-view-name]').data("grid-view-name")].GetWidth());
+            }
+        });
+
+        $('.dxgvDataRow_MetropolisBlue.draggable').droppable({
+            activeClass: "menu-hover",
+            tolerance: "intersect",
+            hoverClass: "menu-activeHover",
+            drop: function (event, ui) {
+                var draggingSortIndex = ui.draggable.data("sort-order");
+                var targetSortIndex = $(this).data("sort-order");
+
+                if (targetSortIndex == undefined || targetSortIndex == null)
+                    targetSortIndex = 0;
+
+                var menuID = ui.draggable.data("menu-id");
+
+                window[$(this).closest('[data-grid-view-name]').data("grid-view-name")].PerformCallback({ CommandType: "DragRow", MenuID: menuID, DraggingSI: draggingSortIndex, TargetSI: targetSortIndex });
+                //"DRAGROW|" + draggingSortIndex + '|' + targetSortIndex);
+            }
+        });
+    }
+
+    function MenuItemCopy() {
+
+        OriginMenuSelector.Validate();
+
+        if (OriginMenuSelector.GetIsValid()) {
+            $.ajax({
+                url: '/admin/cms/MenuCopy',
+                type: 'POST',
+                data: {
+                    originMenuID: OriginMenuSelector.GetValue(),
+                    destinationMenuID: DestinationMenuSelector.GetValue()
+                },
+                success: function (data) {
+                    MenuCopyPopup.Hide();
+                    MenuBuilderGridView.Refresh();
+                    $.info('Info', 'Copy Completed');
+                },
+                timeout: 20000
+            });
+        }
+    }
+</script>
+
+    <script type="text/javascript">
+
+        function RevealLinkSelector(index, selectedValue, pageSectionID) {
+            $(".link-selector").hide();
+            $("#link-selector-" + index).show();
+            switch (Number(index)) {
+                case 1:
+                    $("#page-id-hidden").val(null);
+                    window["ExternalURL"].SetText('');
+                    window["ExternalURL"].SetValue(null);
+                    $("#link-test").hide();
+                    break;
+                case 2:
+                    window["MenuBuilderPageSelectorGrid"].AdjustControl();
+                    //window.setTimeout(function () {
+                    //    if (selectedValue != null)
+                    //        window["Slideshow" + pageSectionID + "MenuBuilderPageSelectorGrid"].AutoFilterByColumn(0, selectedValue);
+                    //}, 2500);
+                    break;
+                case 5:
+                    //$("#page-id-hidden").val("nothing");
+
+                    break;
+                default: break;
+            }
+        }
+    </script>
+}
+
+<h4 class="page-heading">Menu Builder</h4>
+
+<div id="grid-container">
+    @Html.Action("MenuBuilderGridViewPartial", "CMS")
+
+    <button id="menu-copy-btn" class="btn btn-success">Menu Copier</button>
+</div>
+
+<div id="resource-container">
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml", new CountrySearchHelperModel() { ColumnCount = 5 })
+</div>
+
+<div style="clear: both;"></div>
+
+<script type="text/javascript">
+
+    function InitCountryDragDrop() {
+        $("#country-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".country-restriction-flag",
+            placeholder: ".ui-state-highlight-country-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('country-flag')) {
+                    $("#country-restriction-section").sortable("refresh");
+                    window.CountryRestrictions = new Array();
+                    if ($("#country-restriction-placeholder").length > 0)
+                        $("#country-restriction-placeholder").remove();
+                    $("#country-restriction-section").children("div").each(function (index) {
+                        window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                    });
+                    UpdateCountryRestrictions();
+                }
+            }
+        });
+        $(".country-flag").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#country-restriction-section"
+        });
+    }
+
+    function UpdateCountryRestrictions() {
+        if ($("#country-restriction-section").length > 0) {
+            $("#country-restriction-busy").fadeIn("fast");
+            $.ajax({
+                url: '@Url.Action("UpdateMenuCountryRestrictions", "CMS")',
+                type: "POST",
+                traditional: true,
+                data: { MenuID: Number($("#country-restriction-section").data("menu-id")), Countries: JSON.stringify(window.CountryRestrictions) },
+                success: function (data) {
+                    $("#country-restriction-busy").fadeOut("fast");
+                    $("#country-restriction-container").html(data);
+                    MenuBuilderGridView.Refresh();
+                },
+                error: function (e, s, a) {
+                    $("#country-restriction-busy").fadeOut("fast");
+                    alert(e.responseText);
+                },
+                timeout: 20000
+            });
+        }
+    }
+
+    function RemoveCountryFromRestriction() {
+        $("#country-restriction-section").sortable("refresh");
+        window.CountryRestrictions = new Array();
+        if ($("#country-restriction-placeholder").length > 0)
+            $("#country-restriction-placeholder").remove();
+        $("#country-restriction-section").children("div").each(function (index) {
+            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+        });
+        UpdateCountryRestrictions();
+    }
+
+    function RemoveAllCountryRestrictions() {
+        var confirm = window.confirm("Are you sure?");
+        if (confirm) {
+            window.CountryRestrictions = new Array();
+            UpdateCountryRestrictions();
+        }
+    }
+    $(document).ready(function () {
+
+    });
+</script>
+
+@{
+    Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext> UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    
+}
+
+@Html.DevExpress().PopupControl(settings => {
+    settings.Name = "MenuCopyPopup";
+    settings.PopupElementID = "menu-copy-btn";
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.HeaderText = "Menu Copy";
+    settings.Modal = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.Width = 400;
+    settings.SetContent(() => {
+        ViewContext.Writer.Write("<p style='font-style: italic; margin-bottom: 1em;'>You may leave Destination Menu blank to create a new menu.</p>");
+        
+        Html.DevExpress().ComboBox(cbSettings => {
+            cbSettings.Name = "OriginMenuSelector";
+            cbSettings.Properties.TextField = "Name";
+            cbSettings.Properties.ValueField = "MenuID";
+            cbSettings.Properties.ValueType = typeof(byte);
+            cbSettings.Properties.Caption = "Select Origin Menu";
+            cbSettings.Properties.CaptionCellStyle.Width = 200;
+            cbSettings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+            cbSettings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+            cbSettings.Properties.ClientSideEvents.Validation = @"function(s, e) { 
+                e.isValid = false;
+                
+                if(s.GetValue() == null)
+                    return;
+                else 
+                    e.isValid = true;
+
+                return e.isValid;
+            }";
+            cbSettings.Properties.ValidationSettings.ErrorText = "You must select an Origin Menu.";
+        }).BindList(UoW.GetRepository<Flock.Models.Menu>().GetAll().Where(p => p.DeletedDT == null).OrderBy(p => p.SortOrder).Select(p => new { MenuID = p.MenuID, Name = String.Format("{0}: {1}", p.MenuID, p.Name) }).ToList()).Render();
+        ViewContext.Writer.Write("<div style='width: 100%; height: 20px;'></div>");
+        Html.DevExpress().ComboBox(cbSettings =>
+        {
+            cbSettings.Name = "DestinationMenuSelector";
+            cbSettings.Properties.TextField = "Name";
+            cbSettings.Properties.ValueField = "MenuID";
+            cbSettings.Properties.ValueType = typeof(byte);
+            cbSettings.Properties.Caption = "Select Destination Menu";
+            cbSettings.Properties.CaptionCellStyle.Width = 178;
+            cbSettings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+            cbSettings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+        }).BindList(UoW.GetRepository<Flock.Models.Menu>().GetAll().Where(p => p.DeletedDT == null).OrderBy(p => p.SortOrder).Select(p => new { MenuID = p.MenuID, Name = String.Format("{0}: {1}", p.MenuID, p.Name) }).ToList()).Render();
+
+        ViewContext.Writer.Write("<button class='btn btn-success' onclick='MenuItemCopy();' style='float: right; margin-top: 1em;'>Copy</button>");
+
+        ViewContext.Writer.Write("<div class='clearfix'></div>");
+    });
+}).GetHtml()

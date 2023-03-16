@@ -1,0 +1,48 @@
+﻿@model Flock.ViewModels.TaskSearchViewModel
+@{
+    var t = Model.Tasks.Where(p => p.TaskID == ViewBag.CurrentRecursionTaskID).Single();
+}
+<li id="task-id-@(t.TaskID)" class="@(t.TaskTypeID == 1 ? "bug" : "task")">
+    <div class="task-row @(t.TaskTypeID == 1 ? "bug bug-border" : "task task-border")" data-task-id="@(t.TaskID)">
+        @if (Model.Tasks.Where(p => p.ParentTaskID == t.TaskID).Count() > 0)
+        {
+            <span title="Click to Show/Hide Children" class="disclose ui-icon ui-icon-minusthick">
+                <span></span>
+            </span>
+        }
+        <span title="Click to Reveal/Hide Details" class="reveal ui-icon ui-icon-carat-1-s">
+            <span></span>
+        </span>
+        TaskID: @(t.TaskID) - @(t.Name) - This is a <span data-bind="text: getTaskType(@(t.TaskTypeID))"></span>
+
+
+        <div class="task-details task-details-closed">
+              @*<h5>
+                    Notes
+                    <span title="Click to Add Note" class="add-note-control ui-icon ui-icon-plusthick" onclick="addNote(@(t.TaskID), '@(t.Name)')"></span>
+                </h5>
+                @foreach (var tn in Model.GenerateModel.TaskNotes.Where(p => p.TaskID == t.TaskID))
+                {
+                    <div class="task-row-inner">
+                        @(tn.Note)
+                        <span title="Click to Delete Note" class="remove-note-control ui-icon ui-icon-trash" onclick="$.confirm(function () { deleteNote(@(tn.TaskNoteID)) }, function () { })">
+                            <span></span>
+                        </span>
+                    </div>
+                }*@
+            <div class="task-details clearfix"></div>
+        </div>
+    </div>
+
+    @if (t.TaskTypeID == 2)
+    {
+        <ol>
+            @foreach (var st in Model.Tasks.Where(p => p.ParentTaskID == t.TaskID))
+            {
+                ViewBag.CurrentRecursionTaskID = st.TaskID;
+                @Html.Partial("_TaskPartial", Model)
+            }
+        </ol>
+    }
+</li>
+

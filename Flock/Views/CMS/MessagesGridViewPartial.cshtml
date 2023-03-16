@@ -1,0 +1,25 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "MessageGridView";
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "MessagesGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "CMS", Action = "MessagesGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "CMS", Action = "MessagesGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "CMS", Action = "MessagesGridViewPartialDelete" };
+
+        settings.CustomActionRouteValues = new { Controller = "CMS", Action = "MessagesGridViewPartialCustomCommand" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        
+    });
+}
+@grid.BindToLINQ("", "", (s, e) => { 
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<Message>().GetAll().Where(p => p.DeletedDT == null);
+
+    e.KeyExpression = "MessageID";
+    e.QueryableSource = source;
+}).GetHtml()

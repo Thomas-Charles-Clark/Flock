@@ -1,0 +1,278 @@
+﻿@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+        
+        settings.Name = "PageSectionOverviewGridView";
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "PageSectionOverviewGridViewPartial" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CustomActionRouteValues = new { Controller = "CMS", Action = "PageSectionGridViewCustomCommand" };
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            settings.CommandColumn.ShowSelectCheckbox = true;
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+        });
+        
+        settings.ClientSideEvents.CustomButtonClick = @"function(s,e) { 
+            switch(e.text) {
+                case 'Compose':
+                    alert('Must send PageID, not e.nodeKey');
+                    //OpenComposer(e.nodeKey);
+                break;
+                case 'Preview':
+                    alert('Must preview page!');
+                break;
+                default: break;
+            }
+            return false;
+        }";
+
+        settings.KeyFieldName = "PageSectionID";
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowHeaderFilterButton = true;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.SettingsBehavior.AllowSelectSingleRowOnly = false;
+
+        MVCxGridViewColumn SiteSectionColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn ParentPageIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn ParentPageNameColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PageIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PageNameColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PageSectionIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PageSectionNameColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PageSectionTypeIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn SortOrderColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+
+        SiteSectionColumn.FieldName = "SiteSectionID";
+        SiteSectionColumn.Name = "SiteSectionID";
+        SiteSectionColumn.Caption = "Site Section";
+        SiteSectionColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        SiteSectionColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        SiteSectionColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        SiteSectionColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        SiteSectionColumn.SetDataItemTemplateContent(c =>
+        {
+            string siteSection = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "SiteSectionID") != DBNull.Value && DataBinder.Eval(c.DataItem, "SiteSectionID") != null)
+                siteSection = UoW.GetRepository<Flock.Models.SiteSection>().GetAll().Where(p => p.SiteSectionID == (byte)DataBinder.Eval(c.DataItem, "SiteSectionID")).Select(p => p.Name).Single();
+            ViewContext.Writer.Write(siteSection);
+        });
+        settings.Columns.Add(SiteSectionColumn);
+
+        ParentPageIDColumn.FieldName = "ParentPageID";
+        ParentPageIDColumn.Name = "ParentPageID";
+        ParentPageIDColumn.Caption = "Parent Page ID";
+        ParentPageIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        ParentPageIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ParentPageIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(ParentPageIDColumn);
+
+        ParentPageNameColumn.FieldName = "ParentPageName";
+        ParentPageNameColumn.Name = "ParentPageName";
+        ParentPageNameColumn.Caption = "Parent Page Name";
+        ParentPageNameColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        ParentPageNameColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        ParentPageNameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ParentPageNameColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(ParentPageNameColumn);
+
+        PageIDColumn.FieldName = "PageID";
+        PageIDColumn.Name = "PageID";
+        PageIDColumn.Caption = "Page ID";
+        PageIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        PageIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PageIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(PageIDColumn);
+
+        PageNameColumn.FieldName = "PageName";
+        PageNameColumn.Name = "PageName";
+        PageNameColumn.Caption = "Page Name";
+        PageNameColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        PageNameColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        PageNameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PageNameColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(PageNameColumn);
+
+        PageSectionIDColumn.FieldName = "PageSectionID";
+        PageSectionIDColumn.Name = "PageSectionID";
+        PageSectionIDColumn.Caption = "Page Section ID";
+        PageSectionIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        PageSectionIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PageSectionIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(PageSectionIDColumn);
+
+        PageSectionTypeIDColumn.FieldName = "PageSectionTypeID";
+        PageSectionTypeIDColumn.Name = "PageSectionTypeID";
+        PageSectionTypeIDColumn.Caption = "Page Section Type";
+        PageSectionTypeIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        PageSectionTypeIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        PageSectionTypeIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        PageSectionTypeIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(PageSectionTypeIDColumn);
+        PageSectionTypeIDColumn.SetDataItemTemplateContent(c =>
+        {
+            string pageSectionType = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "PageSectionTypeID") != DBNull.Value && DataBinder.Eval(c.DataItem, "PageSectionTypeID") != null)
+            {
+                var i = (byte)DataBinder.Eval(c.DataItem, "PageSectionTypeID");
+                pageSectionType = UoW.GetRepository<Flock.Models.PageSectionType>().GetAll().Where(p => p.PageSectionTypeID == i).Select(p => p.Name).Single();
+            }
+            ViewContext.Writer.Write(pageSectionType);
+        });
+
+        SortOrderColumn.FieldName = "SortOrder";
+        SortOrderColumn.Name = "SortOrder";
+        SortOrderColumn.Caption = "Sort Order";
+        SortOrderColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        SortOrderColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        SortOrderColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        SortOrderColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(SortOrderColumn);
+        
+        WebStatusColumn.FieldName = "StatusID";
+        WebStatusColumn.Name = "WebStatus";
+        WebStatusColumn.Caption = "Web Status";
+        WebStatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        WebStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        WebStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+            string colour = "black";
+            string statusText = "unknown";
+            statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+            switch (i)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+                ViewContext.Writer.Write(res);
+            });
+        settings.Columns.Add(WebStatusColumn);
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "OnDate";
+            column.FieldName = "OnDate";
+            column.Caption = "On Date";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "OffDate";
+            column.FieldName = "OffDate";
+            column.Caption = "Off Date";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+            column.Name = "Compose";
+            column.Caption = "";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<a style='margin-right: 6px;' href='" + Url.Action("compose", "cms", new { id = DataBinder.Eval(c.DataItem, "PageID") }) + "'>Compose</a>");
+                ViewContext.Writer.Write("<a href='http://previewflock.designersguild.com/" + DataBinder.Eval(c.DataItem, "PageID") + "'>Preview</a>");
+            });
+        });
+
+        settings.Style.Add("width", "85%");
+        settings.Style.Add("float", "left");
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "WebStatus":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "SiteSectionID":
+                    e.Values.Clear();
+                    foreach (var wse in (Flock.ViewModels.SiteSectionEnum[])Enum.GetValues(typeof(Flock.ViewModels.SiteSectionEnum)))
+                    {
+                        e.AddValue(Enum.GetName(typeof(Flock.ViewModels.SiteSectionEnum), wse).Replace('_', ' '), Convert.ToByte(wse).ToString());//foreach (var suit in (Suit[])Enum.GetValues(typeof(Suit))
+                    }
+                    e.AddShowAll();
+                    break;
+                case "PageSectionTypeID":
+                    e.Values.Clear();
+                    foreach (var wse in (Flock.ViewModels.PageSectionTypeEnum[])Enum.GetValues(typeof(Flock.ViewModels.PageSectionTypeEnum)))
+                    {
+                        e.AddValue(Enum.GetName(typeof(Flock.ViewModels.PageSectionTypeEnum), wse).Replace('_', ' '), Convert.ToByte(wse + 1).ToString());//foreach (var suit in (Suit[])Enum.GetValues(typeof(Suit))
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ(string.Empty, string.Empty, (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    var source = dataContext.GetRepository<Flock.Models.vwPageSection>().GetAll();
+
+    e.KeyExpression = "PageSectionID";
+    e.QueryableSource = source;
+}).GetHtml()

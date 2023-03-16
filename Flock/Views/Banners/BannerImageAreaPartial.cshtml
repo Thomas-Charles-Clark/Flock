@@ -1,0 +1,348 @@
+﻿@model Flock.ViewModels.BannerComposeViewModel
+@{ 
+     bool isEmailCapture = ((Model.BannerLocations.Count() == 1) && (Model.BannerLocations.Select(p => p.BannerLocationID).ToList().Contains(55)));
+}
+
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#banner-image-area-1').slideToggle('fast')">
+            @(isEmailCapture ? "Image A" : "Banner Image" ) (click to expand / contract)
+            <img id="banner-image-busy" class="fieldset-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+        </legend>
+        <div id="banner-image-area-1" style="background-color: white; padding: 1em; width: 978px;">
+            <ul>
+                <li id="image-upload"><a href="#image-upload-tab">Upload</a></li>
+                <li id="image-libary"><a href="#image-library-tab">Image Library</a></li>
+                <li id="image-preview"><a href="#image-preview-tab">Preview</a></li>
+            </ul>
+
+            <div id="image-upload-tab">
+                @using (Html.BeginForm("BannerImageAreaPartial", "Banners", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.Hidden("BannerID", Model.BannerID)
+                    @Html.Hidden("source", 0);
+                    @Html.Hidden("isImageB", false)
+                    <label for="file">Filename: (.jpeg / .jpg / .gif only)</label>
+                    <input type="file" id="fileupload" size="40" style="width: 400px; margin-right: 12px;" name="file" accept="image/jpeg, image/jpg, image/gif" />
+                    <div style="clear: both;"></div>
+                    <div id="progress-wrapper" style="display: none;">
+                        <div id="progress-text" style="width: 100%; position: relative; top: 20px; height: 20px; line-height: 20px; text-align: center; z-index: 1000;">
+
+                        </div>
+                        <div id="progress" style="height: 20px;">
+                            <div class="bar" style="height: 20px; background-color: #44CC44; width: 0">
+                            </div>
+                        </div>
+                        <span id="error-span" class="field-validation-error" style="display: none;"></span>
+                    </div>
+                    @*<div id="progress" style="width: 100%; margin: 1em 0; border: 1px solid #6d6d6d; background-color: #e1e1e1;">
+                            <div class="bar" style="width: 0%; background-color:#7cc384; height:18px;"></div>
+                        </div>*@
+                }
+            </div>
+            <div id="image-library-tab">
+                <label style="text-align: left; border-bottom: 1px #6d6d6d; display: block;">Drag an image here from the Resource Panel to the right.</label>
+                <div id="image-library-target" style="width: 100%; height: 156px; border: 1px solid #cdcdcd;">
+
+                </div>
+            </div>
+            <div id="image-preview-tab">
+                <div style="position: relative; text-align: center;">
+                    <label style="text-align: left; border-bottom: 1px #6d6d6d; display: block;">Banner Image:</label>
+                    <div id="image-preview-container-1" style="display: block; width: 100%;">
+                        @if (Model.Version == 0)
+                        {
+                            <img style="max-width: 100%;" id="banner-image-preview-1" src="/images/admin/image-not-set.png" />
+                        }
+                        else
+                        {
+                            if (isEmailCapture)
+                            {
+                                if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "//bannerimages//512//" + Model.BannerID.ToString() + ".gif"))
+                                {
+                                    <img style="max-width: 100%;" id="banner-image-preview-1" src="/bannerimages/512/@(Model.BannerID.ToString()).gif?v=@(Model.Version)" />
+                                }
+                                else if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "//bannerimages//512//" + Model.BannerID.ToString() + ".jpeg"))
+                                {
+                                    <img style="max-width: 100%;" id="banner-image-preview-1" src="/bannerimages/512/@(Model.BannerID.ToString()).jpeg?v=@(Model.Version)" />
+                                }
+                                else
+                                {
+                                    ViewContext.Writer.Write($"Neither //bannerimages//512//" + Model.BannerID.ToString() + ".gif nor <br/>" +
+                                        "//bannerimages//512//" + Model.BannerID.ToString() + ".jpeg were found.");
+                                }
+                            }
+                            else
+                            {
+                                if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "//bannerimages//" + Model.WidestAvailableGeneratedImage + "//" + Model.BannerID.ToString() + ".gif"))
+                                {
+                                    <img style="max-width: 100%;" id="banner-image-preview-1" src="/bannerimages/@(Model.WidestAvailableGeneratedImage)/@(Model.BannerID.ToString()).gif?v=@(Model.Version)" />
+                                }
+                                else if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "//bannerimages//" + Model.WidestAvailableGeneratedImage + "//" + Model.BannerID.ToString() + ".jpeg"))
+                                {
+                                    <img style="max-width: 100%;" id="banner-image-preview-1" src="/bannerimages/@(Model.WidestAvailableGeneratedImage)/@(Model.BannerID.ToString()).jpeg?v=@(Model.Version)" />
+                                }
+                                else
+                                {
+                                    ViewContext.Writer.Write($"Neither //bannerimages//" + Model.WidestAvailableGeneratedImage + "//" + Model.BannerID.ToString() + ".gif nor <br/>" +
+                                        "//bannerimages//" + Model.WidestAvailableGeneratedImage + "//" + Model.BannerID.ToString() + ".jpeg were found.");
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+<script type="text/javascript">
+    $("#banner-image-area-1").tabs({
+        active: 2
+    });
+
+    $("#image-library-target").droppable({
+        accept: '.image',
+        activeClass: "ui-state-highlight-library-target",
+        drop: function (ev, ui) {
+            UpdateImageLibraryTarget(ev, ui, false);
+        }
+    });
+
+    $(function () {
+        $('#fileupload').fileupload({
+            url: '@Url.Action("BannerImageAreaPartial", "Banners")',
+            dataType: 'json',
+            maxNumberOfFiles: 1,
+            autoUpload: false,
+            replaceFileInput: false,
+            add: function (e, data) {
+                $(".upload-injected").remove();
+                $("#image-preview-container")
+                data.context = $('<button id="upload-button" type="button" class="upload-injected"/>').text('Upload')
+                .insertAfter($('#fileupload'))
+                .click(function () {
+                    data.context = data.context.replaceAll($(this));
+                    data.submit();
+                    $("#upload-button").off("click");
+
+                    $('#progress-wrapper').fadeIn("fast");
+                });
+            },
+            done: function (e, data) {
+                $(".upload-injected").remove();
+                $('#progress-wrapper').fadeOut("fast");
+                if (data._response.result.files[0].name == "error") {
+                    $("#error-span").html(data._response.result.files[0].error);
+                    $("#error-span").css("color", "red");
+                    $("#error-span").fadeIn("fast");
+                    $("#banner-image-preview-1").fadeOut("fast", function () {
+                        $("#error-span").fadeIn("fast");
+                    });
+                    window.setTimeout(function () { $("#error-span").fadeOut("fast"); }, 10000);
+                }
+                else {
+                    $("#error-span").html(data._response.result.files[0].name + " uploaded OK");
+                    $("#error-span").css("color", "green");
+                    $("#error-span").fadeIn("fast");
+                    window.setTimeout(function () { $("#alert-span").fadeOut("fast"); }, 10000);
+                    $("#error-span").fadeOut("fast", function () {
+
+                        $("#image-preview-container").empty();
+                        $("#image-preview-container").append("<img src='" + data.result.files[0].url + "' style='max-width: 100%;' id='banner-image-preview-1' />");
+
+                        window.setTimeout(function () {
+                            $("#banner-image-preview-1").fadeIn("fast");
+                            $("#banner-image-area-1").tabs("option", "active", 2);
+                            $.ajax({
+                                url: '@Url.Action("BannerLocationPartial", "Banners")',
+                                type: 'POST',
+                                traditional: true,
+                                data: {
+                                    BannerID: $("#selected-banner-id").val()
+                                },
+                                success: function (data) {
+                                    $("#banner-location-sitesection-container").html(data);
+                                },
+                                error: function (e, s, a) {
+                                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                                },
+                                timeout: 20000
+                            });
+                        }, 1000);
+                    });
+                }
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progress .bar').css(
+                    'width',
+                    progress + '%'
+                );
+                $("#progress-text").html(progress + '%');
+            }
+        });
+    });
+</script>
+
+@if (isEmailCapture)
+{
+    <div class="content-panel-container">
+        <fieldset>
+            <legend style="color: black; border-bottom-color: #929292;" onclick="$('#banner-image-area-2').slideToggle('fast')">
+                Image B (click to expand / contract)
+                <img id="banner-image-busy-2" class="fieldset-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+            </legend>
+            <div id="banner-image-area-2" style="background-color: white; padding: 1em; width: 978px;">
+                <ul>
+                    <li id="image-upload-2"><a href="#image-upload-tab-2">Upload</a></li>
+                    <li id="image-libary-2"><a href="#image-library-tab-2">Image Library</a></li>
+                    <li id="image-preview-2"><a href="#image-preview-tab-2">Preview</a></li>
+                </ul>
+
+                <div id="image-upload-tab-2">
+                    @using (Html.BeginForm("BannerImageAreaPartial2", "Banners", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        @Html.Hidden("BannerID", Model.BannerID)
+                        @Html.Hidden("source", 0);
+                        @Html.Hidden("isImageB", true)
+                        <label for="file">Filename: (.jpeg / .jpg / .gif only)</label>
+                        <input type="file" id="fileupload-2" size="40" style="width: 400px; margin-right: 12px;" name="file" accept="image/jpeg, image/jpg, image/gif" />
+                        <div style="clear: both;"></div>
+                        <div id="progress-wrapper-2" style="display: none;">
+                            <div id="progress-text-2" style="width: 100%; position: relative; top: 20px; height: 20px; line-height: 20px; text-align: center; z-index: 1000;">
+
+                            </div>
+                            <div id="progress-2" style="height: 20px;">
+                                <div class="bar" style="height: 20px; background-color: #44CC44; width: 0">
+                                </div>
+                            </div>
+                            <span id="error-span-2" class="field-validation-error" style="display: none;"></span>
+                        </div>
+                        @*<div id="progress" style="width: 100%; margin: 1em 0; border: 1px solid #6d6d6d; background-color: #e1e1e1;">
+                                <div class="bar" style="width: 0%; background-color:#7cc384; height:18px;"></div>
+                            </div>*@
+                    }
+                </div>
+                <div id="image-library-tab-2">
+                    <label style="text-align: left; border-bottom: 1px #6d6d6d; display: block;">Drag an image here from the Resource Panel to the right.</label>
+                    <div id="image-library-target-2" style="width: 100%; height: 156px; border: 1px solid #cdcdcd;">
+
+                    </div>
+                </div>
+                <div id="image-preview-tab-2">
+                    <div style="position: relative; text-align: center;">
+                        <label style="text-align: left; border-bottom: 1px #6d6d6d; display: block;">Banner Image:</label>
+                        <div id="image-preview-container-2" style="display: block; width: 100%;">
+                            @if (Model.Version == 0)
+                            {
+                                <img style="max-width: 100%;" id="banner-image-preview-2" src="/images/admin/image-not-set.png" />
+                            }
+                            else
+                            {
+                                if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "//bannerimages//" + Model.WidestAvailableGeneratedImage + "//" + Model.BannerID.ToString() + "-B.gif"))
+                                {
+                                    <img style="max-width: 100%;" id="banner-image-preview-2" src="/bannerimages/@(Model.WidestAvailableGeneratedImage)/@(Model.BannerID.ToString())-B.gif?v=@(Model.Version)" />
+                                }
+                                else if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "//bannerimages//" + Model.WidestAvailableGeneratedImage + "//" + Model.BannerID.ToString() + "-B.jpeg"))
+                                {
+                                    <img style="max-width: 100%;" id="banner-image-preview-2" src="/bannerimages/@(Model.WidestAvailableGeneratedImage)/@(Model.BannerID.ToString())-B.jpeg?v=@(Model.Version)" />
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+
+    <script type="text/javascript">
+    $("#banner-image-area-2").tabs({
+        active: 2
+    });
+
+    $("#image-library-target-2").droppable({
+        accept: '.image',
+        activeClass: "ui-state-highlight-library-target",
+        drop: function (ev, ui) {
+            UpdateImageLibraryTarget(ev, ui, true);
+        }
+    });
+
+    $(function () {
+        $('#fileupload-2').fileupload({
+            url: '@Url.Action("BannerImageAreaPartial", "Banners")',
+            dataType: 'json',
+            maxNumberOfFiles: 1,
+            autoUpload: false,
+            replaceFileInput: false,
+            add: function (e, data) {
+                $(".upload-injected-2").remove();
+                $("#image-preview-container-2")
+                data.context = $('<button id="upload-button-2" type="button" class="upload-injected-2"/>').text('Upload')
+                .insertAfter($('#fileupload-2'))
+                .click(function () {
+                    data.context = data.context.replaceAll($(this));
+                    data.submit();
+                    $("#upload-button-2").off("click");
+
+                    $('#progress-wrapper-2').fadeIn("fast");
+                });
+            },
+            done: function (e, data) {
+                $(".upload-injected-2").remove();
+                $('#progress-wrapper-2').fadeOut("fast");
+                if (data._response.result.files[0].name == "error") {
+                    $("#error-span-2").html(data._response.result.files[0].error);
+                    $("#error-span-2").css("color", "red");
+                    $("#error-span-2").fadeIn("fast");
+                    $("#banner-image-preview-2").fadeOut("fast", function () {
+                        $("#error-span-2").fadeIn("fast");
+                    });
+                    window.setTimeout(function () { $("#error-span-2").fadeOut("fast"); }, 10000);
+                }
+                else {
+                    $("#error-span-2").html(data._response.result.files[0].name + " uploaded OK");
+                    $("#error-span-2").css("color", "green");
+                    $("#error-span-2").fadeIn("fast");
+                    window.setTimeout(function () { $("#alert-span-2").fadeOut("fast"); }, 10000);
+                    $("#error-span-2").fadeOut("fast", function () {
+
+                        $("#image-preview-container-2").empty();
+                        $("#image-preview-container-2").append("<img src='" + data.result.files[0].url + "' style='max-width: 100%;' id='banner-image-preview-2' />");
+
+                        window.setTimeout(function () {
+                            $("#banner-image-preview-2").fadeIn("fast");
+                            $("#banner-image-area-2").tabs("option", "active", 2);
+                            $.ajax({
+                                url: '@Url.Action("BannerLocationPartial", "Banners")',
+                                type: 'POST',
+                                traditional: true,
+                                data: {
+                                    BannerID: $("#selected-banner-id").val()
+                                },
+                                success: function (data) {
+                                    $("#banner-location-sitesection-container").html(data);
+                                },
+                                error: function (e, s, a) {
+                                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                                },
+                                timeout: 20000
+                            });
+                        }, 1000);
+                    });
+                }
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progress-2 .bar').css(
+                    'width',
+                    progress + '%'
+                );
+                $("#progress-text-2").html(progress + '%');
+            }
+        });
+    });
+    </script>
+}

@@ -1,0 +1,21 @@
+﻿@model Flock.ViewModels.BannerSearchHeader
+<div class="content-panel-container">
+    <fieldset id="banner-select-header">
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#banner-select-header-inner').slideToggle('fast');">
+            Banner Selector (click to expand / contract)
+            <img id="banner-select-header-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="banner-select-header-inner" style=" padding: 4px; padding-bottom: 0; ">
+            @Html.Action("ComposeBannerHeaderBannerLocationDropDownPartial", "Banners", new { SelectedBannerLocationID = Model.BannerLocationID })
+            @Html.Action("ComposeBannerHeaderSiteSectionDropDownPartial", "Banners", new { SelectedSiteSectionID = Model.SiteSectionID })
+            @Html.Action("ComposeBannerHeaderCountryDropDownPartial", "Banners", new { SelectedCountryID = Model.CountryID })
+            @Html.Action("ComposeBannerHeaderLanguageDropDownPartial", "Banners", new { SelectedLanguageID = Model.LanguageID })
+            @Html.Action("ComposeBannerHeaderWebStatusDropDownPartial", "Banners", new { SelectedStatusID = Model.StatusID })
+            <div id="banner-header-banner-drop-down-container">
+                @Html.Action("ComposeBannerHeaderBannerDropDownPartial", "Banners", new { SelectedBannerID = Model.BannerID, SelectedBannerLocationID = Model.BannerLocationID, SelectedSiteSectionID = Model.SiteSectionID, SelectedCountryID = Model.CountryID, SelectedLanguageID = Model.LanguageID, SelectedStatusID = Model.StatusID })
+            </div>
+            <img id="product-page-header-searching-icon" class="searching-icon" src="~/Images/SystemIcons/searching-icon.gif" />
+            <div style="clear: both"></div>
+        </div>
+    </fieldset>
+</div>

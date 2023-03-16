@@ -1,0 +1,284 @@
+﻿@model Flock.ViewModels.ImageManagerViewModel
+@{
+    ViewBag.Title = "Image Manager";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/Content/asset-management.css")
+    @Styles.Render("~/Content/composition-base.css")
+    
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #ImageInfoGridView_tcFC0 {
+            text-align: center;
+        }
+        #container {
+            width: 1560px;
+        }
+        .ui-state-highlight-product-page {
+            position: relative;
+            display: table-cell;
+            vertical-align: middle;
+            opacity: 0.4;
+            height: 190px;
+            width: 191px;
+            background-color: #f7dd88;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            line-height: 1.2em;
+        }
+
+        .dxtc-content {
+            padding: 0;
+            padding-top: 1em;
+        }
+        /*#ImageInfoGridView_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }*/
+    </style>
+}
+<div id="error-dialog">
+    <h5 id="error-text"></h5>
+</div>
+<div id="swap-complete">
+    <h5 id="swap-complete-text" style="display: none;">Swap Complete</h5>
+</div>
+
+<script type="text/javascript">
+    $("#error-dialog").dialog({
+        title: 'Error',
+        width: 350,
+        height: "auto",
+        resizable: false,
+        modal: false,
+        autoOpen: false,
+        buttons: {
+            Ok: function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+    $("#swap-complete").dialog({
+        title: 'Success',
+        width: 220,
+        height: "auto",
+        resizable: false,
+        modal: false,
+        autoOpen: false,
+        buttons: {
+            Ok: function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+    $("#swap-complete-text").show();
+</script>
+
+@section scripts {
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+
+    <script type="text/javascript">
+        function rowClick(id) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("ImageSwapPartial", "Assets")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ImageID: id
+                },
+                success: function (data) {
+                    $('#image-swap-container').html(data);
+                    $.ajax({
+                        url: '@Url.Action("InspectImage", "Assets")',
+                        type: 'POST',
+                        traditional: true,
+                        data: {
+                            ImageID: id
+                        },
+                        success: function (data) {
+                            $('#image-hub-target').html(data);
+
+                            $.ajax({
+                                url: '@Url.Action("ImageUsagePartial", "Assets")',
+                                type: 'POST',
+                                traditional: true,
+                                data: {
+                                    ImageID: id
+                                },
+                                success: function (data) {
+                                    $('#image-usage-target').html(data);
+                                    LoadingPanel.Hide();
+
+                                },
+                                error: function (e, s, a) {
+                                    LoadingPanel.Hide();
+                                    $.showError(e, s, a)
+                                },
+                                timeout: 20000
+                            });
+                        },
+                        error: function (e, s, a) {
+                            LoadingPanel.Hide();
+                            $.showError(e, s, a); // e, s, a, callback, args
+                        },
+                        timeout: 20000
+                    });
+                },
+                timeout: 20000
+            });
+        }
+    </script>
+
+    @*@if(Model.ImageID != null)
+    {
+    }*@
+}
+
+<h4 class="page-heading">
+    Image Assets
+</h4>
+<div class="page-subheading">
+    @Html.Partial("ImageInfoHubGridPartial")
+</div>
+
+
+<div id="large-image-dialog">
+    <div id="large-image-dialog-inner" style="display: none;">
+    </div>
+</div>
+<script type="text/javascript">
+    $("#large-image-dialog").dialog({
+        title: '',
+        width: "auto",
+        height: "auto",
+        modal: true,
+        autoOpen: false,
+        resizable: false,
+        buttons: {
+            Ok: function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+    $("#large-image-dialog-inner").show();
+
+    function ConfirmedDelete(args) {
+        ImageInfoGridView.DeleteRow(args[0]);
+        ImageInfoGridView.UpdateEdit();
+        //aspxGVScheduleCommand('ImageInfoGridView', ['Delete', args[0]], 0, args[1]);
+    }
+
+    function CheckSwapViability() {
+
+        var $original = $("#swap-original");
+        var $replacement = $("#swap-replacement");
+
+        if ($replacement.data("image-id") && $original.data("image-id")) {
+            if ($replacement.data("image-id") != $original.data("image-id")) {
+                SwapButton.SetEnabled(true);
+            }
+            else {
+                SwapButton.SetEnabled(false);
+            }
+        }
+        else {
+            SwapButton.SetEnabled(false);
+        }
+    }
+
+    function ConfigureReplacement() {
+
+        var $original = $("#swap-original");
+        var $replacement = $("#swap-replacement");
+
+        $replacement.droppable({
+            accept: ".ar" + $("#original-ar").val(),
+            activeClass: "ui-state-highlight-product-page",
+            revert: true,
+            drop: function (event, ui) {
+                //ReplacementAccept(ui.draggable);
+                $(".replacement-placeholder").remove();
+                $replacement.append($(ui.draggable).clone().css("margin", "0 auto"));
+                $replacement.data("image-id", $(ui.draggable).data("image-id"));
+                CheckSwapViability();
+                $("#swap-replacement").children().each(function () {
+                    $(this).addClass("replacement-placeholder");
+                });
+            }
+        });
+    }
+</script>
+
+@Html.DevExpress().PageControl(
+settings =>
+{
+    settings.Name = "ImageAssetTabs";
+    settings.ActivateTabPageAction = ActivateTabPageAction.Click;
+    settings.EnableHotTrack = false;
+    settings.SaveStateToCookies = false;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.TabAlign = TabAlign.Left;
+    settings.TabPosition = TabPosition.Top;
+    settings.Style.Add("margin", "0 auto");
+    settings.ActiveTabIndex = 0;
+    settings.TabPages.Add("Image Info").SetContent(() =>
+    {
+        if (Model.ImageID == null)
+        {
+            ViewContext.Writer.Write(
+                @"<div id='image-hub-target'>
+                    <h5>Please select an image from the grid above.</h5>
+                </div>"
+            );
+        }
+        else
+        {
+            ViewContext.Writer.Write(
+                @"<div id='image-hub-target'>
+                    "+Html.Action("LoadImageInspector", new { ImageID = Model.ImageID }).ToHtmlString()+@"
+                </div>"
+            );
+        }
+    });
+    settings.TabPages.Add("Image Swap").SetContent(() =>
+    {
+        if(Model.ImageID == null)
+        {
+            ViewContext.Writer.Write(
+                @"<div id='image-swap-container'>
+                    <h5>Please select an image from the grid above.</h5>
+                </div>"
+            );
+        }
+        else
+        {
+            ViewContext.Writer.Write(
+                @"<div id='image-swap-container'>
+                    " + Html.Action("LoadImageSwap", new { ImageID = Model.ImageID }).ToHtmlString() + @"
+                </div>"
+            );
+        }
+    });
+    settings.TabPages.Add("Image Usage").SetContent(() =>
+    {
+        if(Model.ImageID == null)
+        {
+            ViewContext.Writer.Write(
+                @"<div id='image-usage-target'>
+                    <h5>Please select an image from the grid above.</h5>
+                </div>"
+            );
+        }
+        else
+        {
+            ViewContext.Writer.Write(
+                @"<div id='image-usage-target'>
+                    " + Html.Action("LoadImageUsage", new { ImageID = Model.ImageID }).ToHtmlString() + @"
+                </div>"
+            );
+        }
+    });
+}).GetHtml()

@@ -1,0 +1,28 @@
+﻿#container {
+    
+}
+
+#items-container {
+    width: 100%;
+}
+
+.masonry-item {
+    float: left;
+}
+
+.masonry-item img {
+    width: 100%;
+    height: 100%;
+}
+
+.masonry-w1 {
+    width: 10%;
+}
+
+.masonry-w2 {
+    width: 10%;
+}
+
+.masonry-w3 {
+    width: 20%;
+}

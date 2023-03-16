@@ -1,0 +1,167 @@
+﻿@using Flock.ViewModels
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "ProductTypeGridView";
+    settings.CallbackRouteValues = new { Controller = "Attributes", Action = "ProductTypeGridViewPartial" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Attributes", Action = "ProductTypeGridViewAddNew" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Attributes", Action = "ProductTypeGridViewUpdate" };
+    settings.CustomActionRouteValues = new { Controller = "Attributes", Action = "ProductTypeGridViewCustomCommand" };
+    settings.SettingsBehavior.AllowGroup = false;
+
+    settings.SettingsBehavior.AllowSort = false;
+
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.Width = 650;
+
+    settings.CommandColumn.Visible = true;
+
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+    settings.CommandColumn.VisibleIndex = 100;
+
+    settings.KeyFieldName = "ProductTypeID";
+
+    MVCxGridViewColumn IDColumn = new MVCxGridViewColumn();
+    IDColumn.Name = "ProductTypeID";
+    IDColumn.FieldName = "ProductTypeID";
+    IDColumn.Caption = "ID";
+    IDColumn.Width = 40;
+    IDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    IDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    IDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    IDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    settings.Columns.Add(IDColumn);
+
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Name";
+    NameColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(NameColumn);
+
+    // do we need created DT?
+    
+    //MVCxGridViewColumn CheckStockColumn = new MVCxGridViewColumn();
+    //CheckStockColumn.Name = "CheckStock";
+    //CheckStockColumn.FieldName = "CheckStock";
+    //CheckStockColumn.Caption = "Check Stock";
+    //CheckStockColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    //CheckStockColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    //CheckStockColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    //CheckStockColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    //CheckStockColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+    //settings.Columns.Add(CheckStockColumn);
+
+    MVCxGridViewColumn AlternateColourwaysColumn = new MVCxGridViewColumn();
+    AlternateColourwaysColumn.Name = "AlternateColourways";
+    AlternateColourwaysColumn.FieldName = "AlternateColourways";
+    AlternateColourwaysColumn.Caption = "Alternate Colourways";
+    AlternateColourwaysColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    AlternateColourwaysColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    AlternateColourwaysColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    AlternateColourwaysColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    AlternateColourwaysColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+    settings.Columns.Add(AlternateColourwaysColumn);
+
+    MVCxGridViewColumn GiftWrappableColumn = new MVCxGridViewColumn();
+    GiftWrappableColumn.Name = "GiftWrappable";
+    GiftWrappableColumn.FieldName = "GiftWrappable";
+    GiftWrappableColumn.Caption = "Gift Wrappable";
+    GiftWrappableColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    GiftWrappableColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    GiftWrappableColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    GiftWrappableColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    GiftWrappableColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+    settings.Columns.Add(GiftWrappableColumn);
+    
+    MVCxGridViewColumn AllowReturnsColumn = new MVCxGridViewColumn();
+    AllowReturnsColumn.Name = "AllowReturns";
+    AllowReturnsColumn.FieldName = "AllowReturns";
+    AllowReturnsColumn.Caption = "Allow Returns";
+    AllowReturnsColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    AllowReturnsColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    AllowReturnsColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    AllowReturnsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    AllowReturnsColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+    settings.Columns.Add(AllowReturnsColumn);
+
+    MVCxGridViewColumn StockLocationColumn = new MVCxGridViewColumn();
+    StockLocationColumn.Name = "StockLocationID";
+    StockLocationColumn.FieldName = "StockLocationID";
+    StockLocationColumn.Caption = "Stock Location";
+    StockLocationColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    StockLocationColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    StockLocationColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    StockLocationColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    StockLocationColumn.EditFormSettings.VisibleIndex = 2;
+    StockLocationColumn.SetDataItemTemplateContent(c => {
+        var slID = Convert.ToByte(DataBinder.Eval(c.DataItem, "StockLocationID"));
+        List<Flock.Models.StockLocation> slocs = LargeDatabaseDataProvider.GetStockLocations() as List<Flock.Models.StockLocation>;
+        ViewContext.Writer.Write(slocs.Where(p => p.StockLocationID == slID).Select(p => p.Name).Single());
+    });
+    StockLocationColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+    var StockLocationProperties = StockLocationColumn.PropertiesEdit as ComboBoxProperties;
+    StockLocationProperties.DataSource = LargeDatabaseDataProvider.GetStockLocations();
+    StockLocationProperties.ValueField = "StockLocationID";
+    StockLocationProperties.ValueType = typeof(byte);
+    StockLocationProperties.TextField = "Name";
+    settings.Columns.Add(StockLocationColumn);
+    
+    MVCxGridViewColumn ShuffleColumn = new MVCxGridViewColumn();
+    ShuffleColumn.Name = "ShuffleColumn";
+    ShuffleColumn.FieldName = "ShuffleColumn";
+    ShuffleColumn.Caption = "Reorder";
+    ShuffleColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+    ShuffleColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    ShuffleColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    ShuffleColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    ShuffleColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+    ShuffleColumn.Width = 55;
+    ShuffleColumn.SetDataItemTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div>"
+            + "<img src='/images/icons/dxrip/shuffle-up.png' style='cursor: pointer; display: inline-block; margin-right: 1em;' onclick='ProductTypeGridView.PerformCallback({CommandType:\"MoveUp\", ProductTypeID: " + Convert.ToByte(c.KeyValue) + "});' />"
+            + "<img src='/images/icons/dxrip/shuffle-down.png' style='cursor: pointer; display: inline-block;' onclick='ProductTypeGridView.PerformCallback({CommandType:\"MoveDown\", ProductTypeID: " + Convert.ToByte(c.KeyValue) + "});' />"
+            + "<div style='clear: both;'></div></div>");
+    });
+    settings.Columns.Add(ShuffleColumn);
+    
+
+    MVCxGridViewColumn SortOrderColumn = new MVCxGridViewColumn();
+    SortOrderColumn.Name = "SortOrder";
+    SortOrderColumn.FieldName = "SortOrder";
+    SortOrderColumn.Caption = "Sort Order";
+    SortOrderColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    SortOrderColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    SortOrderColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    SortOrderColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    SortOrderColumn.SortAscending();
+    settings.Columns.Add(SortOrderColumn);
+
+    settings.CellEditorInitialize = (sender, e) =>
+    {
+        if ((sender as MVCxGridView).IsNewRowEditing)
+        {
+            if (e.Column.FieldName == "CheckStock" || 
+                e.Column.FieldName == "AlternateColourways" || 
+                e.Column.FieldName == "GiftWrappable" ||
+                e.Column.FieldName == "AllowReturns")
+            {
+                (e.Editor as ASPxCheckBox).Checked = false;
+            }
+        }
+    };
+    
+}).BindToLINQ("", "", (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var source = dataContext.GetRepository<Flock.Models.ProductType>().GetAll();
+    e.QueryableSource = source;
+
+    e.KeyExpression = "ProductTypeID";
+}).GetHtml()

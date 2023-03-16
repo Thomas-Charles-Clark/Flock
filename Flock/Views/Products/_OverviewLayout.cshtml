@@ -1,0 +1,80 @@
+﻿@model Flock.ViewModels.BaseViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")    
+    @Scripts.Render("~/bundles/modernizr")    
+    @Scripts.Render("~/bundles/jquery")
+    
+    @Scripts.Render("~/bundles/bootstrap")
+    
+    @Styles.Render("~/bundles/css/grids")
+    @Styles.Render("~/bundles/css/ribbon")
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/Content/ProductOverview.css")
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+    @Scripts.Render("~/bundles/js/page-composition")
+    @RenderSection("scripts", required: false)
+
+    @{
+        Html.DevExpress().GetScripts(
+           new Script[] {
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.Editors
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.GridView
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.HtmlEditor
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.NavigationAndLayout
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.TreeList
+                }
+           }
+       );
+
+        Html.DevExpress().GetStyleSheets(
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.Editors },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.GridView },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.HtmlEditor },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.TreeList }
+        );
+    }
+    @RenderSection("styles", required: false)
+    
+</head>
+<body>
+    
+    @Html.Partial("~/Views/Admin/_NavigationPartial.cshtml")
+
+    <div class="container" id="container">
+        @RenderBody()
+        <div style="clear: both"></div>
+        <hr />
+        <div id="ajaxTarget">
+
+        </div>
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Designers Guild</p>
+        </footer>
+    </div>
+    
+    
+
+    @Scripts.Render("~/bundles/js/ribbon")
+</body>
+</html>

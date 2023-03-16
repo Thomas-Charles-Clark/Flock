@@ -1,0 +1,220 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@using Flock.ViewModels
+@model List<ProductPageColourwayRow>
+@Html.DevExpress().GridView(settings => {
+    var UoW = new UnitOfWork<FlockDataContext>();
+    settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "AlternateColourwayGridPartial" };
+    settings.Name = "AlternateColourwayGridView";
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+    settings.SettingsPager.PageSize = 10;
+    settings.SettingsPager.PageSizeItemSettings.Visible = true;
+    settings.Settings.ShowFilterRow = true;
+
+    settings.ClientSideEvents.Init = @"function(s, e) { 
+        ConfigureSortables();
+    }";
+    
+    settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+        ConfigureSortables();
+    }";
+
+    MVCxGridViewColumn DesignIDColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn DesignNameColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn LaunchColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ProductCountColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn AlternateColourwayColumn = new MVCxGridViewColumn();
+    
+    DesignIDColumn.Name = "DesignID";
+    DesignIDColumn.FieldName = "DesignID";
+    DesignIDColumn.Caption = "Design ID";
+    DesignIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    DesignIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    DesignIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    DesignIDColumn.Width = 60;
+    settings.Columns.Add(DesignIDColumn);
+
+    DesignNameColumn.Name = "DesignName";
+    DesignNameColumn.FieldName = "Name";
+    DesignNameColumn.Caption = "Design";
+    DesignNameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    DesignNameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    DesignNameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(DesignNameColumn);
+
+    ProductTypeColumn.Name = "ProductTypeID";
+    ProductTypeColumn.FieldName = "ProductTypeID";
+    ProductTypeColumn.Caption = "Product Type";
+    ProductTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    ProductTypeColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    ProductTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    ProductTypeColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    ProductTypeColumn.SetDataItemTemplateContent(c =>
+        {
+            int ProductTypeID = 0;
+            string ProductType = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "ProductTypeID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ProductTypeID") != null)
+            {
+                ProductTypeID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "ProductTypeID"));
+                ProductType = UoW.GetRepository<Flock.Models.ProductType>().GetAll().Where(p => p.ProductTypeID == ProductTypeID).Select(p => p.Name).Single();
+            }
+
+            ViewContext.Writer.Write("<span style='color: black'>" + ProductType + "</span>");
+        });
+    settings.Columns.Add(ProductTypeColumn);
+
+    MVCxGridViewColumn BrandColumn = new MVCxGridViewColumn();
+    BrandColumn.FieldName = "BrandID";
+    BrandColumn.Name = "BrandID";
+    BrandColumn.Caption = "Brand";
+    BrandColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    BrandColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    BrandColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    BrandColumn.SetDataItemTemplateContent(c =>
+    {
+        int BrandID = 0;
+        string Brand = "<i>Not Set</i>";
+
+        if (DataBinder.Eval(c.DataItem, "BrandID") != DBNull.Value && DataBinder.Eval(c.DataItem, "BrandID") != null)
+        {
+            BrandID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "BrandID"));
+            Brand = UoW.GetRepository<Flock.Models.Brand>().GetAll().Where(p => p.BrandID == BrandID).Select(p => p.Name).Single();
+        }
+
+        ViewContext.Writer.Write("<span style='color: black'>" + Brand + "</span>");
+    });
+    settings.Columns.Add(BrandColumn);
+    LaunchColumn.Name = "LaunchID";
+    LaunchColumn.FieldName = "LaunchID";
+    LaunchColumn.Caption = "Launch";
+    LaunchColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    LaunchColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    LaunchColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    LaunchColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    LaunchColumn.SetDataItemTemplateContent(c =>
+    {
+        int LaunchID = 0;
+        string Launch = "<i>Not Set</i>";
+
+        if (DataBinder.Eval(c.DataItem, "LaunchID") != DBNull.Value && DataBinder.Eval(c.DataItem, "LaunchID") != null)
+        {
+            LaunchID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "LaunchID"));
+            Launch = UoW.GetRepository<Flock.Models.Launch>().GetAll().Where(p => p.LaunchID == LaunchID).Select(p => p.Name).Single();
+        }
+
+        ViewContext.Writer.Write("<span>" + Launch + "</span>");
+    });
+    settings.Columns.Add(LaunchColumn);
+
+    ProductCountColumn.Name = "ProductPageCount";
+    ProductCountColumn.FieldName = "ProductPageCount";
+    ProductCountColumn.Caption = "Products";
+    ProductCountColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    ProductCountColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    ProductCountColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    ProductCountColumn.Width = 80;
+    settings.Columns.Add(ProductCountColumn);
+
+    AlternateColourwayColumn.Name = "AlternateColourwayColumn";
+    AlternateColourwayColumn.FieldName = "ColourwayCount";
+    AlternateColourwayColumn.Caption = "Colourways";
+    AlternateColourwayColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    AlternateColourwayColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    AlternateColourwayColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    AlternateColourwayColumn.CellStyle.Wrap = DefaultBoolean.True;
+    AlternateColourwayColumn.CellStyle.Paddings.Padding = 0;
+    AlternateColourwayColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    AlternateColourwayColumn.FilterCellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    AlternateColourwayColumn.FilterCellStyle.CssClass = "colourway-filter-class";
+    AlternateColourwayColumn.SetDataItemTemplateContent(d =>
+    {
+        var Colourways =  (List<ProductPageAlternateColourwaySelect_Second>)DataBinder.Eval(d.DataItem, "Colourways");
+        Colourways = Colourways.OrderBy(p => p.SortOrder).ToList();
+        if (Colourways != null)
+        {
+            ViewContext.Writer.Write("<div class='colourway-sortable'>");
+            foreach (var c in Colourways)
+            {
+                var Name = "Not Set";
+                var Image = "";
+                if (c.ImageID == null)
+                    Image = "/images/admin/image-not-set-32.png";
+                else
+                    Image = "https://flock.designersguild.com/imagelibrary/156/" + c.ImageID.ToString() + ".jpeg";
+                ViewContext.Writer.Write("<img title='" + c.Name + " (ID: "+c.ProductPageID+")' class='colourway-image' data-product-page-id='"+ c.ProductPageID.ToString() +"' src='" + Image + "' />");
+            }
+            ViewContext.Writer.Write("</div>");
+        }
+    });
+
+
+
+
+    settings.HeaderFilterFillItems = (sender, e) =>
+    {
+        MVCxGridView gridView = (MVCxGridView)sender;
+        switch (e.Column.Name)
+        {
+            case "LaunchID":
+                e.Values.Clear();
+                foreach (var pt in UoW.GetRepository<Flock.Models.Launch>().GetAll().OrderByDescending(p => p.LaunchDate))
+                {
+                    e.AddValue(pt.Name, pt.LaunchID.ToString());
+                }
+                e.AddShowAll();
+                break;
+
+            case "ProductTypeID":
+                e.Values.Clear();
+                foreach (var pt in UoW.GetRepository<Flock.Models.ProductType>().GetAll().OrderBy(p => p.Name))
+                {
+                    e.AddValue(pt.Name, pt.ProductTypeID.ToString());
+                }
+                e.AddShowAll();
+                break;
+
+            case "BrandID":
+                e.Values.Clear();
+                foreach (var pt in UoW.GetRepository<Flock.Models.Brand>().GetAll().OrderBy(p => p.Name))
+                {
+                    e.AddValue(pt.Name, pt.BrandID.ToString());
+                }
+                e.AddShowAll();
+                break;
+
+
+            default: break;
+        }
+    };
+    
+    
+    //settings.CustomUnboundColumnData = (sender, e) =>
+    //{
+    //    if (e.Column.Name == "AlternateColourwayColumn")
+    //    {
+    //        IQueryable<ProductPageAlternateColourwaySelect_Second> Colourways = (IQueryable<ProductPageAlternateColourwaySelect_Second>)e.GetListSourceFieldValue("Colourways");
+
+    //        string result = "";
+            
+    //        if (Colourways != null)
+    //        {
+    //            foreach (var c in Colourways)
+    //            {
+    //                var Image = "";
+    //                if (c.ImageID == null)
+    //                    Image = "/images/admin/image-not-set.png";
+    //                else
+    //                    Image = "https://flock.designersguild.com/imagelibrary/156/" + c.ImageID.ToString() + ".jpg";
+    //                result += "<img style='margin-right: 1em;' src='" + Image + "' />";
+    //            }
+    //        }
+            
+    //        e.Value = result;
+    //    }
+    //};
+    
+    settings.Columns.Add(AlternateColourwayColumn);
+    
+}).Bind(Model).GetHtml()

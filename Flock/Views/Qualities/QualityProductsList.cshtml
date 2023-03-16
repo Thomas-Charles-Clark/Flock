@@ -1,0 +1,128 @@
+﻿@using Flock.Models
+@model List<Quality_Overview_Detail_ProductPageResult>
+
+<div id="quality-product-header" class="content-panel-container" style="margin-bottom: 0;">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#quality-product-header-inner').slideToggle('fast');">Products with this Quality (click to expand / contract)</legend>
+        <div id="quality-product-header-inner" style="background-color: white; padding: 1em;">
+            <div id="quality-product-grid-container">
+                @for (var i = 0; i < Model.Count; i++)
+                {
+                    <div style="float: left">
+                        @if (Model[i].ImageID != null)
+                        {
+                            <img src="https://flock.designersguild.com/imagelibrary/156/@(Model[i].ImageID).jpeg" title="Product ID: @(Model[i].ProductID)"/>
+                        }
+                        else
+                        {
+                            <img src='/images/admin/image-not-set.png' style='width: 156px;' title="Product ID: @(Model[i].ProductID)" />
+                        }
+                    </div>
+                    <div style="float: left; padding: 8px; padding-top: 0;">
+@if (Model[i].ProductPageID != null)
+{
+                        @Html.DevExpress().Label(settings =>
+                        {
+                            settings.Text = "Meta Description";
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("margin-right", "1em");
+                            settings.Style.Add("line-height", "30px");
+                            settings.Width = 95;
+                        }).GetHtml()
+
+                        @Html.DevExpress().MemoFor(m => Model[i].MetaDescription, settings =>
+                        {
+                            settings.Name = "ProductPageMetaDescription-"+i.ToString();
+                            settings.Style.Add("margin-bottom", "10px");
+                            settings.Style.Add("float", "left");
+                            settings.Width = 500;
+                            settings.Height = System.Web.UI.WebControls.Unit.Pixel(45);
+                        }).GetHtml()
+
+                        @Html.DevExpress().Button(settings => {
+                            settings.Name = "MetaDescriptionCopyBtn-"+i.ToString();
+                            settings.Text = "↑";
+                            settings.Style.Add("margin-left", "10px;");
+                            settings.Style.Add("margin-top", "12px");
+                            settings.ClientSideEvents.Click = @"function(s, e) { 
+                                ProductPageMetaDescription.SetText(window['ProductPageMetaDescription-" + i.ToString() + @"'].GetValue() == null ? '' : window['ProductPageMetaDescription-" + i.ToString() + @"'].GetValue());
+                            }";
+                        }).GetHtml()
+
+                        <div style="clear: both"></div>
+
+@Html.DevExpress().Label(settings =>
+{
+    settings.Text = "Sub Heading";
+    settings.Style.Add("line-height", "30px");
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin-right", "1em");
+    settings.Width = 95;
+}).GetHtml()
+
+@Html.DevExpress().TextBoxFor(m => Model[i].SubHeading, settings =>
+{
+    settings.Name = "ProductPageSubHeading-" + i.ToString();
+    settings.Style.Add("margin-bottom", "10px");
+    settings.Style.Add("float", "left");
+    settings.Width = 500;
+    
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "SubHeadingCopyBtn-" + i.ToString();
+    settings.Text = "↑";
+    settings.Style.Add("margin-left", "10px;");
+    settings.Style.Add("margin-top", "3px");
+    settings.ClientSideEvents.Click = @"function(s, e) { 
+        ProductPageSubHeading.SetText(window['ProductPageSubHeading-" + i.ToString() + @"'].GetValue() == null ? '' : window['ProductPageSubHeading-" + i.ToString() + @"'].GetValue());
+    }";
+}).GetHtml()
+
+                        <div style="clear: both;"></div>
+
+@Html.DevExpress().Label(settings =>
+{
+    settings.Text = "Description";
+    settings.Style.Add("line-height", "30px");
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin-right", "1em");
+    settings.Width = 95;
+}).GetHtml()
+
+@Html.DevExpress().MemoFor(m => Model[i].Description, settings =>
+{
+    settings.Name = "ProductPageDescription-" + i.ToString();
+    settings.Style.Add("margin-bottom", "10px");
+    settings.Width = 500;
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(45);
+    settings.Style.Add("float", "left");
+    
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "DescriptionCopyBtn-" + i.ToString();
+    settings.Text = "↑";
+    settings.Style.Add("margin-left", "10px");
+    settings.Style.Add("margin-top", "12px");
+    settings.ClientSideEvents.Click = @"function(s, e) { 
+        ProductPageDescription.SetText(window['ProductPageDescription-" + i.ToString() + @"'].GetValue() == null ? '' : window['ProductPageDescription-" + i.ToString() + @"'].GetValue());
+    }";
+}).GetHtml()
+    
+}
+else {
+                     <p style="font-style: italic; height: 152px; line-height: 144px;">This Product (ID @(Model[i].ProductID)) is not associated to a Product Page.</p>   
+}
+                    </div>
+
+                <div style="clear: both;"></div>
+                }
+            </div>
+            <div style="clear: both"></div>
+        </div>
+    </fieldset>
+</div>
+

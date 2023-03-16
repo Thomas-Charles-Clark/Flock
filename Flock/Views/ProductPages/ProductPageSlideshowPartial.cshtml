@@ -1,0 +1,64 @@
+﻿@model Flock.ViewModels.ProductPageComposeViewModel
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#slideshow-list').slideToggle('fast'); $('#product-page-text-slideshow-inner').slideToggle('fast')">Product Page Text & Slideshow Images</legend>
+        <div id="product-page-text-slideshow-inner" style="background-color: white; padding-right: 1em; padding-left: 1em; position: relative; display: block; padding-top: 1em; padding-bottom: 1em;">
+            <div style="float: right; width: 49%;">
+                <div>
+                    @Html.DevExpress().LabelFor(m => Model.Heading, settings =>
+                    {
+                        settings.Style.Add("margin-top", "1em");
+                        settings.Style.Add("margin-bottom", "2px");
+                    }).GetHtml()
+                    <img id="product-page-heading-busy" class="busy" style="float: right; margin-top: 0.8em; width: 20px;" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                    @Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
+                    {
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Name = "ProductPageHeading";
+                        settings.Properties.MaxLength = 70;
+                    }).GetHtml()
+                    @Html.DevExpress().LabelFor(m => Model.SubHeading, settings =>
+                    {
+                        settings.Style.Add("margin-top", "1em");
+                        settings.Style.Add("margin-bottom", "2px");
+                    }).GetHtml()
+                    <img id="product-page-subheading-busy" class="busy" style="float: right; margin-top: 0.8em; width: 20px;" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                    @Html.DevExpress().TextBoxFor(m => Model.SubHeading, settings =>
+                    {
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Name = "ProductPageSubHeading";
+                        settings.Properties.MaxLength = 70;
+                    }).GetHtml()
+
+
+                    @Html.DevExpress().LabelFor(m => Model.Description, settings =>
+                    {
+                        settings.Style.Add("margin-top", "1em");
+                        settings.Style.Add("margin-bottom", "2px");
+                    }).GetHtml()
+                    <div id="product-page-html-editor-container">                        
+                        @Html.Partial("ProductPageHTMLEditorPartial", Model.Description, new ViewDataDictionary())
+                    </div>
+                </div>
+            </div>
+            <div style="float: left; width: 49%;">
+                <span style="margin-bottom: 8px; display: inline-block;">Slideshow Images: Square only</span>
+                <span style="margin-bottom: 8px; float: right;"><a href="javascript:;" onclick="CopyPodToSlideshow()">Copy from Pod</a></span>
+                <img id="product-page-slideshow-busy" style="float: right; width: 20px;" class="busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                <div style="clear: both;"></div>
+                <div id="product-page-slideshow-container" class="droppable" data-product-page-id="@(Model.ProductPageID)">
+                    @Html.Partial("ProductPageSlideshowImagesPartial", Model.Images.Where(p => p.TemplateImageID == 2).ToList())
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+
+            <img id="product-page-text-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveProductPageText();" />
+            
+            @*<div id="slideshow-buttons">
+                <img id="slideshow-play-icon" class="slideshow-button" src="/Images/SystemIcons/slideshow-play-icon.png" />
+                <img id="slideshow-grid-icon" class="slideshow-button" src="/Images/SystemIcons/slideshow-grid-icon.png" />
+                <div style="clear: both;"></div>
+            </div>*@
+        </div>
+    </fieldset>
+</div>

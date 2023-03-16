@@ -1,0 +1,81 @@
+﻿@using Flock.ViewModels
+@using Flock.Models
+
+@model Flock.Models.SalesOverviewSummary
+
+@{
+    var nfi = new System.Globalization.CultureInfo("en-GB", false).NumberFormat;
+
+    nfi.CurrencyDecimalSeparator = ".";
+    nfi.CurrencyDecimalDigits = 2;
+
+    nfi.NumberDecimalSeparator = ".";
+    nfi.NumberDecimalDigits = 2;
+}
+
+@*  public decimal Total { get; set; }
+    public decimal AOV { get; set; }
+    public int Orders { get; set; }
+    public int AverageOrdersPerDay { get; set; }
+    public decimal AverageTotalQuantity { get; set; }
+    public int FirstOrders { get; set; }
+    public int RepeatOrders { get; set; }*@
+
+<table style="width: 50%; margin-bottom: 20px;" class="table table-bordered table-condensed table-striped">
+    <tr>
+        <th>
+            Total
+        </th>
+        <td>
+            @(Model.Total.HasValue ? Model.Total.Value.ToString("C", nfi) : ((decimal)0).ToString("C", nfi))
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Average Order Value
+        </th>
+        <td>
+            @(Model.AOV.HasValue ? Model.AOV.Value.ToString("C", nfi) : ((decimal)0).ToString("C", nfi))
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Orders
+        </th>
+        <td>
+            @(Model.Orders)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Avg Orders Per Day
+        </th>
+        <td>
+            @(Model.AverageOrdersPerDay)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Avg Total Quantity
+        </th>
+        <td>
+            @(Model.AverageTotalQuantity.HasValue ? Model.AverageTotalQuantity.Value.ToString("N", nfi) : "0.00")
+        </td>
+    </tr>
+    <tr>
+        <th>
+            First Orders
+        </th>
+        <td>
+            @(Model.FirstOrders)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Repeat Orders
+        </th>
+        <td>
+            @(Model.RepeatOrders)
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,91 @@
+﻿@model List<Flock.Models.BannerLocation>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   
+    
+    listBoxSettings.Properties.ValueField = "BannerLocationID";
+    listBoxSettings.Properties.TextField = "Name";
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "BannerOverviewBannerLocationDropDownPartial")
+    {
+        listBoxSettings.Name = "BannerOverviewBannerLocationListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#banner-searching-icon').fadeIn('fast');
+            BannerOverviewBannerLocationDD.SetText(s.GetSelectedItem().text);
+            BannerOverviewBannerLocationDD.HideDropDown();
+            BannerOverviewGridView.Refresh();
+        }";
+    }
+    else if (action == "ComposeBannerHeaderBannerLocationDropDownPartial")
+    {
+        listBoxSettings.Properties.TextField = "Name";
+        
+        listBoxSettings.Name = "ComposeBannerHeaderLocationListBox";
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        listBoxSettings.Height = System.Web.UI.WebControls.Unit.Pixel(250);
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ComposeBannerHeaderLocationDD.HideDropDown();
+            LoadingPanel.Show();
+            var items = s.GetSelectedItems();
+            var text = 'Banner Location';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Locations Selected)';
+            else if(items.length == 1)
+                text = items[0].text;
+            ComposeBannerHeaderLocationDD.SetText(text);
+            BannerSelectorGridView.Refresh();
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.BannerSelectHeaderSelectedBannerLocationID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ComposeBannerHeaderLocationDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "ComposeBannerBannerLocationListBoxPartial")
+    {
+        listBoxSettings.Name = "BannerLocationAssignmentListBox";
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+        listBoxSettings.Height = System.Web.UI.WebControls.Unit.Pixel(310); 
+        listBoxSettings.Style.Add("float", "left");
+        listBoxSettings.Style.Add("margin", "0 7px 7px 0");
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#banner-location-busy').fadeIn('fast');
+            $.ajax({
+                url: '" + Url.Action("UpdateBannerLocations", "Banners") + @"',
+                data: {
+                    BannerID: $('#banner-compose-section').data('banner-id'),
+                    BannerLocations: s.GetSelectedValues().toString()
+                },
+                type: 'POST',
+                traditional: true,
+                success: function(data) {
+                    $('#banner-location-busy').fadeOut('fast');
+                    $('#banner-location-sitesection-container').html(data);
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function() { $('#banner-location-busy').fadeOut('fast'); });
+                },
+                timeout: 60000
+            });
+        }";
+
+        if (ViewBag.BannerLocationAssignmentSelectedLocationIDs != null && ViewBag.BannerLocationAssignmentSelectedLocationIDs != "")
+        {
+            listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                var selectedArray = '" + ViewBag.BannerLocationAssignmentSelectedLocationIDs + @"';
+                selectedArray = selectedArray.split(',');
+                s.SelectValues(selectedArray);
+            }";
+        }
+    }
+}
+).BindList(Model).GetHtml()

@@ -1,0 +1,35 @@
+﻿@model List<Flock.Models.Country>
+<div style="width: 100%; border: 1px solid #cdcdcd;">
+        <fieldset id="country-restriction-fieldset">
+            <legend>Country Restrictions<a id="country-restriction-remove-all" href="#" onclick="RemoveAllCountryRestrictions();return false;">Remove All</a></legend>
+            <img id="country-restriction-busy" src="~/Images/SystemIcons/busy-icon-purple.gif" />
+            @if (Model.Count == 0)
+            {
+                <div id="country-restriction-section" style="height: 104px;">
+                    <div id="country-restriction-placeholder" style="padding: 1em; font-size: 1.4em; background-color: white;">
+                        By default, Snippets are available to all countries.<br /><br />Only add countries to this list if you want to restrict which countries can view this Snippet.
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div id="country-restriction-section">
+                    @foreach (Flock.Models.Country Country in Model)
+                    {
+                        <div class="country-restriction-flag" data-country-id="@(Country.CountryID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                            <img class="flag" src="~/Images/Icons/CountryFlags/256px/@(Country.CountryID).png" title="@(Country.LocalName)" />
+                            <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="$(this).parent().remove(); RemoveCountryFromRestriction()" />
+                            <br />
+                            <label style="margin-top: 5px">@(Country.LocalName)</label>
+                        </div>
+                    }
+                    <div style="clear: both;"></div>
+                </div>
+            }
+        </fieldset>
+    </div>
+
+    <script type="text/javascript">
+        if (typeof (InitCountryDragDrop) == "function")
+            InitCountryDragDrop();
+    </script>

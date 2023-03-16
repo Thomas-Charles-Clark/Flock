@@ -1,0 +1,93 @@
+﻿@if(Model.Count > 0) 
+{
+@Html.DevExpress().GridView(settings => {
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    
+    settings.Name = "Product" + Model[0].ProductID + "DetailGrid";
+
+    settings.Columns.Add("ProductReviewID");
+    
+    MVCxGridViewColumn ReviewPartnerColumn = new MVCxGridViewColumn();
+    ReviewPartnerColumn.Name = "ReviewPartnerID";
+    ReviewPartnerColumn.FieldName = "ReviewPartnerID";
+    ReviewPartnerColumn.Caption = "Review Partner";
+    ReviewPartnerColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    ReviewPartnerColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    ReviewPartnerColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+    ReviewPartnerColumn.SetDataItemTemplateContent(c => {
+        var ReviewPartnerID = (byte)DataBinder.Eval(c.DataItem, "ReviewPartnerID");
+        var ReviewPartner = UoW.GetRepository<Flock.Models.ReviewPartner>().GetAll().Where(p => p.ReviewPartnerID == ReviewPartnerID).Select(p => p.Name).Single();
+        ViewContext.Writer.Write(ReviewPartner);
+    });
+    settings.Columns.Add(ReviewPartnerColumn);
+    
+    settings.Columns.Add("CreatedDT").SortDescending();
+    settings.Columns.Add("Review");
+    settings.Columns.Add("Reply");
+    //settings.Columns.Add("Rating");
+
+    MVCxGridViewColumn StarsColumn = new MVCxGridViewColumn();
+    StarsColumn.Name = "Stars";
+    StarsColumn.Caption = "Rating";
+    StarsColumn.FieldName = "Rating";
+    StarsColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+    StarsColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    StarsColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    StarsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    StarsColumn.SetDataItemTemplateContent(c =>
+    {
+
+        decimal avg = 0.0M;
+        decimal pixelShift = 0;
+
+        if (DataBinder.Eval(c.DataItem, "Rating") != null)
+            avg = Convert.ToDecimal(DataBinder.Eval(c.DataItem, "Rating"));
+        //that ^ is out of 4, need out of 110
+        pixelShift = (avg * 110) / 5;
+        //pixelShift = avg * 2;
+        avg = (avg * 100) / 5; // to percentage
+        avg /= 20;
+        var niceAvg = Math.Round(avg * 100) / 100;
+
+        ViewContext.Writer.Write(@"
+            <div class='starRatingMaskWrapper'>
+                <div class='fiveStarRating'>
+                    <div class='whiteOut' style='background-position: " + pixelShift + @"px 0px'>
+                        <div class='starRatingMask'/> </div>
+                    </div>
+                </div>
+            </div>");
+    });
+    settings.Columns.Add(StarsColumn);
+
+    MVCxGridViewColumn ReadMoreColumn = new MVCxGridViewColumn();
+    ReadMoreColumn.Name = "ReadMore";
+    ReadMoreColumn.FieldName = "ReadMoreURL";
+    ReadMoreColumn.Caption = "Read More";
+    ReadMoreColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    ReadMoreColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    ReadMoreColumn.SetDataItemTemplateContent(c => {
+        ViewContext.Writer.Write("<a href='"+DataBinder.Eval(c.DataItem, "ReadMoreURL").ToString()+"' target='_blank'>Read More</a>");
+    });
+    settings.Columns.Add(ReadMoreColumn);
+    
+    
+    settings.HeaderFilterFillItems = (sender, e) =>
+    {
+        MVCxGridView gridView = (MVCxGridView)sender;
+        switch (e.Column.Name)
+        {
+            case "ReviewPartnerID":
+                e.Values.Clear();
+                foreach (var pt in UoW.GetRepository<Flock.Models.ReviewPartner>().GetAll())
+                {
+                    e.AddValue(pt.Name, pt.ReviewPartnerID.ToString());
+                }
+                e.AddShowAll();
+                break;
+            default: break;
+        }
+    };
+    
+}).Bind(Model).GetHtml();
+}

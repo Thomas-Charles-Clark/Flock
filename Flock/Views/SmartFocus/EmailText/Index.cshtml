@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Email Texts";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+    </style>
+}
+
+<h4 class="page-heading">SmartFocus Email Text</h4>
+
+<div id="email-text-grid-container">
+    @Html.Action("EmailTextGridViewPartial", "SmartFocus")
+</div>

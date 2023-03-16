@@ -1,0 +1,5 @@
+﻿@model Flock.ViewModels.Bronto.BrontoSubAccountListsViewModel
+
+<button class="btn btn-primary btn-sm" onclick="FetchListsFromBronto(@(Model.SubAccountID))">Fetch Lists from Bronto</button>
+
+@Html.Action("ListGridViewPartial", "Bronto", new { SubAccountID = Model.SubAccountID })

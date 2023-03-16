@@ -1,0 +1,317 @@
+﻿@{
+    ViewBag.Title = "Brochure Manager";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@model Flock.ViewModels.BrochureViewModel
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/Content/asset-management.css")
+    @Styles.Render("~/Content/composition-base.css")
+    @Styles.Render("~/Content/product-page-composition.css")
+    
+    <style type="text/css">
+        .flag {
+            width: 22px !important;
+            height: 22px !important;
+        }
+        .country-restriction-flag {
+            height: 54px;
+            width: 54px;
+        }
+        #country-restriction-container {
+            padding: 0.5em;
+        }
+    </style>
+}
+@section Scripts
+{
+    
+    @Scripts.Render("~/Scripts/jquery.ui-widget.js")
+    @Scripts.Render("~/Scripts/jquery.iframe-transport.js")
+    @Scripts.Render("~/Scripts/jquery.fileupload.js")
+
+
+
+<script type="text/javascript">
+        $(function () {
+            $("#cover-image-dialog").dialog({
+                title: "Cover Image Selector",
+                width: 750,
+                height: "auto",
+                resizable: false,
+                modal: true,
+                autoOpen: false,
+                buttons: {
+                    'Close': function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $("#interactive-brochure-dialog").dialog({
+                title: "Interactive Brochure Selector",
+                width: 750,
+                height: "auto",
+                resizable: false,
+                modal: true,
+                autoOpen: false,
+                buttons: {
+                    'Close': function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $("#pdf-dialog").dialog({
+                title: "PDF Selector",
+                width: 750,
+                height: "auto",
+                resizable: false,
+                modal: true,
+                autoOpen: false,
+                buttons: {
+                    'Close': function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $('#fileupload').fileupload({
+                url: '@Url.Action("BrochureUpload", "Assets")',
+                dataType: 'json',
+                maxNumberOfFiles: 1,
+                autoUpload: false,
+                replaceFileInput: false,
+                add: function (e, data) {
+                    $(".upload-injected").remove();
+                    data.context = $('<button type="button" class="upload-injected"/>').text('Upload')
+                    .insertAfter($('#fileupload'))
+                    .click(function () {
+                        data.context = data.context.replaceAll($(this));
+                        data.submit();
+                        $('#progress-wrapper').fadeIn("fast");
+                    });
+                },
+                done: function (e, data) {
+                    $(".upload-injected").remove();
+                    $('#progress-wrapper').fadeOut("fast");
+                    if (data._response.result.files[0].name == "error") {
+                        $("#alert-span").html(data._response.result.files[0].error);
+                        $("#alert-span").css("color", "red");
+                        $("#alert-span").fadeIn("fast");
+                        window.setTimeout(function () { $("#alert-span").fadeOut("fast"); }, 10000);
+                    }
+                    else {
+                        $("#alert-span").html(data._response.result.files[0].name + " uploaded OK");
+                        $("#alert-span").css("color", "green");
+                        $("#error-span").fadeIn("fast");
+                        window.setTimeout(function () { $("#alert-span").fadeOut("fast"); }, 10000);
+                        BrochureGridView.Refresh();
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progress .bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                    $("#progress-text").html(progress + '%');
+                }
+            });
+        });
+
+        function InitCountryDragDrop() {
+            $("#country-restriction-section").sortable({
+                helper: "clone",
+                connectWith: ".country-restriction-flag",
+                placeholder: ".ui-state-highlight-country-restriction",
+                update: function (ev, ui) {
+                    if ($(ui.item).hasClass('country-flag')) {
+                        $("#country-restriction-section").sortable("refresh");
+                        window.CountryRestrictions = new Array();
+                        if ($("#country-restriction-placeholder").length > 0)
+                            $("#country-restriction-placeholder").remove();
+                        $("#country-restriction-section").children("div").each(function (index) {
+                            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                        });
+                        UpdateCountryRestrictions();
+                    }
+                }
+            });
+            $(".country-flag").draggable({
+                helper: "clone",
+                start: function (e, ui) {
+                    $(ui.helper).css("z-index", "300000");
+                },
+                connectToSortable: "#country-restriction-section"
+            });
+        }
+
+        function UpdateCountryRestrictions() {
+            $("#country-restriction-busy").fadeIn("fast");
+            $.ajax({
+                url: '@Url.Action("UpdateBrochureCountryRestrictions", "Assets")',
+                type: "POST",
+                traditional: true,
+                data: { BrochureID: $('#selected-brochure-id').val(), Countries: JSON.stringify(window.CountryRestrictions) },
+                success: function (data) {
+                    $("#country-restriction-busy").fadeOut("fast");
+                    $("#country-restriction-container").html(data);
+                },
+                error: function (e, s, a) {
+                    $("#country-restriction-busy").fadeOut("fast");
+                    alert(e.responseText);
+                },
+                timeout: 20000
+            });
+        }
+
+        function RemoveCountryFromRestriction() {
+            $("#country-restriction-section").sortable("refresh");
+            window.CountryRestrictions = new Array();
+            if ($("#country-restriction-placeholder").length > 0)
+                $("#country-restriction-placeholder").remove();
+            $("#country-restriction-section").children("div").each(function (index) {
+                window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+            });
+            UpdateCountryRestrictions();
+        }
+
+        function RemoveAllCountryRestrictions() {
+            $.confirm(function () {
+                window.CountryRestrictions = new Array();
+                UpdateCountryRestrictions();
+            }, function () { });
+        }
+
+        function SaveBrochureDetails() {
+            var onDate = null;
+            if (OnDate.GetValue() != null)
+                onDate = OnDate.GetValue().toGMTString();
+            var offDate = null;
+            if (OffDate.GetValue() != null)
+                offDate = OffDate.GetValue().toGMTString();
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("SaveBrochureDetails", "Assets")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    BrochureID: $("#selected-brochure-id").val(),
+                    Name: Name.GetValue(),
+                    Description: Description.GetValue(),
+                    Code: Code.GetValue(),
+                    CoverImagePath: CoverImagePath.GetValue(),
+                    PDFPath: PDFPath.GetValue(),
+                    InteractiveBrochureURL: InteractiveBrochureURL.GetValue(),
+                    FileSizeMB: 0,
+                    BrandID: BrandID.GetValue(),
+                    LaunchID: LaunchID.GetValue(),
+                    ProductTypeIDs: ProductTypesListBox.GetSelectedValues().toString(),
+                    LanguageIDs: LanguagesListBox.GetSelectedValues().toString(),
+                    OnDate: onDate,
+                    OffDate: offDate
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#brochure-compose-container").html(data);
+                    BrochureGridView.Refresh();
+                    SuccessFade($("#brochure-details-save"));
+                },
+                error: function (e, s, a) {
+                    LoadingPanel.Hide();
+                    $("#brochure-compose-container").html(e.responseText);
+                    FailureFade($("#brochure-details-save"));
+                },
+                timeout: 30000
+            });
+        }
+</script>
+
+
+}
+
+<input type="hidden" id="selected-brochure-id" value="@(Model.BrochureID)" />
+
+<h4 class="page-heading">
+    Brochures
+</h4>
+
+@*<div id="brochure-upload-container">
+    <div class="content-panel-container">
+        <fieldset id="brochure-upload-fieldset">
+            <legend style="color: black; border-bottom-color: #929292;">
+                Upload New Brochure (.pdf only)
+                <span style="float: right; margin: 0 4px;"></span>
+            </legend>
+            <div id="brochure-upload-section" style="background-color: white; padding: 1em;">
+                <div id="brochure-upload-area">
+                    @using (Html.BeginForm("BrochureUpload", "Assets", FormMethod.Post, new { enctype = "multipart/form-data", style="margin-bottom: 0;" }))
+                    {
+                        <label for="file">File:</label>
+                        <input type="file" id="fileupload" size="40" style="width: 400px; margin-right: 12px;" name="file" accept="application/pdf" />
+                    }
+                    <span id="alert-span" class="field-validation-error" style="display: none; margin-top: 1em;"></span>
+                    <div id="progress-wrapper" style="display: none;">
+                        <div id="progress-text" style="width: 100%; position: relative; top: 20px; height: 20px; line-height: 20px; text-align: center; z-index: 1000;">
+
+                        </div>
+                        <div id="progress" style="height: 20px;">
+                            <div class="bar" style="height: 20px; background-color: #44CC44; width: 0%">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>*@
+<div style="float: right; width: 986px;">
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+</div>
+
+<div style="float: left; width: 986px;">
+    <div id="brochure-select-header-container">
+        <div class="content-panel-container">
+            <fieldset id="brochure-select-header">
+                <legend style="color: black; cursor: default; border-bottom-color: #929292;">Brochure Grid</legend>
+                <div id="brochure-select-header-inner" style="background-color: white;">
+                    <div id="brochure-header-grid-container">
+                        @using (Html.BeginForm())
+                        {
+                            @Html.Action("BrochureGridViewPartial")
+                        }
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div id="brochure-compose-container">
+        @if (ViewData["InvalidBrochureIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidBrochureIDError"])</h5>
+        }
+        @if (Model.BrochureID != null)
+        {
+            @Html.Partial("BrochureSettingsPartial", Model)
+        }
+    </div>
+</div>
+
+
+    <div id="cover-image-dialog">
+        @Html.Action("CoverImageFileManagerPartial", "Assets")
+    </div>
+
+    <div id="interactive-brochure-dialog">        
+        @Html.Action("InteractiveBrochureFileManagerPartial", "Assets")
+    </div>
+
+    <div id="pdf-dialog">
+        @Html.Action("PDFFileManagerPartial", "Assets")
+    </div>
+
+
+
+    <div style="clear: both;"></div>

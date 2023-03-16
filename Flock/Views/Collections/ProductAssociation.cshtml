@@ -1,0 +1,233 @@
+﻿@{
+    ViewBag.Title = "Collection Product Associations";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@model Flock.ViewModels.ProductToCollectionViewModel
+
+@section styles
+{
+    @Styles.Render("~/Content/collections.css")
+    @Styles.Render("~/Content/composition-base.css")
+    @Styles.Render("~/Content/collection-composition.css")
+    
+    <style type="text/css">
+        #ComposeCollectionGridSelector_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+    </style>
+}
+
+@section scripts
+{
+    
+}
+<script type="text/javascript">
+
+    function initDragDrop() {
+
+        $(".multisortable-container").multisortable({
+            items: ".collection-content",
+            placeholder: ".ui-state-highlight-collection-contents"
+        });
+
+        $("#collection-contents-sortable").sortable({
+            placeholder: 'ui-state-highlight-collection-contents'//,
+            //update: function (ev, ui) {
+                
+            //    UpdateCollection();
+            //}
+        });
+
+        $(".draggable").draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#collection-contents-sortable"
+        });
+    }
+
+    function UpdateCollection() {
+        console.log('sortable update function');
+        $("#collection-contents-sortable").sortable("refresh");
+        $("#collection-contents-placeholder").remove();
+        window.products = new Array();
+        $("#collection-contents-sortable").children("div").each(function (index) {
+            products.push({ ID: $(this).data("product-id"), SortOrder: index });
+        });
+
+        $.ajax({
+            url: '@Url.Action("UpdateCollection", "Collections")',//"/Products/UpdateCollectionAddProduct",
+            traditional: true,
+            type: "POST",
+            data: { CollectionID: $("#selected-collection-id").val(), Products: JSON.stringify(window.products) },
+            success: function (data) {
+                $('#collection-compose-container').html(data)
+                SuccessFade($("#save-attribute-button"));
+                return false;
+            },
+            error: function (e, s, a) {
+                alert(e.responseText);
+                FailureFade($("#save-attribute-button"));
+                return false;
+            }
+        });
+    }
+    function RemoveProductFromCollection(ProductID) {
+        var args = [];
+        args.push(ProductID);
+        $.confirm(ConfirmedRemoveProductFromCollection, function() { }, args);
+    }
+
+    function ConfirmedRemoveProductFromCollection(args) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("RemoveProductFromCollection", "Collections")',//"/Products/UpdateCollectionAddProduct",
+            traditional: true,
+            type: "POST",
+            data: { CollectionID: $("#selected-collection-id").val(), ProductID: args[0] },
+            success: function (data) {
+                $('#collection-compose-container').html(data);
+                LoadingPanel.Hide();
+                return false;
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                alert(e.responseText);
+                return false;
+            }
+        });
+    }
+
+    function LoadSuggestions() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("SuggestCollectionContents", "Collections")',
+            type: 'POST',
+            traditional: true,
+            data: { CollectionID: $("#selected-collection-id").val() },
+            success: function (data) {
+                $('#collection-compose-container').html(data);
+                LoadingPanel.Hide();
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                alert(s + ' error, e.responseText was: ' + e.responseText);
+            },
+            timeout: 30000
+        });
+    }
+
+    function ClearCollectionProducts() {
+        $.confirm(ConfirmedClearCollectionProducts, function () { });
+    }
+
+    function ConfirmedClearCollectionProducts() {
+        $('#collection-contents-sortable').html("");
+    }
+
+    function ReloadCollectionProducts() {
+        $.confirm(ConfirmedReloadCollectionProducts, function () { });
+    }
+
+    function ConfirmedReloadCollectionProducts(args) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("ChangeCollectionAssociation", "Collections")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: $("#selected-collection-id").val()
+            },
+            success: function (data) {
+                $('#collection-compose-container').html(data);
+                LoadingPanel.Hide();
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                alert(s + ' error: e.responseText was: ' + e.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function SaveCollectionProducts() {
+        var Products = new Array();
+        LoadingPanel.Show();
+        $("#collection-contents-placeholder").remove();
+        $("#collection-contents-sortable").children("div").each(function (index) {
+            Products.push({ ID: $(this).data("product-id"), SortOrder: index });
+        });
+
+        $.ajax({
+            url: '@Url.Action("SaveCollectionProducts", "Collections")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: $("#selected-collection-id").val(),
+                Products: JSON.stringify(Products)
+            },
+            success: function (data) {
+                $('#collection-compose-container').html(data);
+                LoadingPanel.Hide();
+                SuccessFade($("#save-attribute-button"));
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                alert(s + ' error: e.responseText was: ' + e.responseText);
+                FailureFade($("#save-attribute-button"));
+            },
+            timeout: 20000
+        });
+    }
+
+</script>
+
+<input type="hidden" id="selected-collection-id" value="@(Model.CollectionID)" />
+
+<h4 class="page-heading">
+    Collection Product Associations
+    <a  id="compose-link" class="productpage-compose link-img" target="_blank" style="float: right;" title="Compose" href="/admin/collections/compose/@(Model.CollectionID)"></a>
+</h4>
+
+<div id="product-search-grid">
+    @Html.Partial("~/Views/Products/ProductSearchPartial.cshtml")
+</div>
+
+
+<div style="float: left; width: 986px;">
+    <div id="collection-select-header-container">
+        <div class="content-panel-container" style="margin-bottom: 0;">
+            <fieldset id="collection-select-header">
+                <legend style="color: black; border-bottom-color: #929292;" onclick="$('#collection-select-header-inner').slideToggle('fast');">Collection Selector (click to expand / contract)</legend>
+                <div id="collection-select-header-inner" style="">
+                    <div id="collection-header-grid-container">
+                        @Html.Action("ComposeCollectionGridSelectorPartial", "Collections")
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div style="font-size: 0.9em; font-style: italic; line-height: 24px; width: 100%; text-align: center;">
+        <div style="background-color: green; width: 24px; height: 8px; margin-left: 4px; display: inline-block;"></div>
+        = Current
+        <div style="background-color: #DEC400; width: 24px; height: 8px; margin-left: 4px; display: inline-block;"></div>
+        = Limited
+        <div style="background-color: red; width: 24px; height: 8px; margin-left: 4px; display: inline-block;"></div>
+        = Discontinued (automatically removed from front-end)
+    </div>
+
+    <div id="collection-compose-container">
+        @if (ViewData["InvalidCollectionIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidCollectionIDError"])</h5>
+        }
+        @if (Model.CollectionID != null)
+        {
+            @Html.Action("CollectionContents", "Collections", new { CollectionID = Model.CollectionID })
+        }
+    </div>
+</div>
+<div style="clear: both;"></div>

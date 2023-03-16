@@ -1,0 +1,82 @@
+﻿@model Flock.ViewModels.SalePricesViewModel
+@{
+    ViewBag.Title = "Sale Prices";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/SalePrices.css")
+}
+@section scripts {
+    <script type="text/javascript">
+
+        window.productTypeId = null;
+        window.brandId = null;
+        window.priceListId = null;
+
+        function changePrefilterCheck() {
+            var t = $.confirm(function () { return true; }, function () { return false; }, null, 'Any unsaved changes will be lost');
+            console.log(t);
+            return r;
+        }
+
+        function loadSalePrices() {
+            var productTypeId = SalePricesProductTypeListBox.GetValue();
+            var brandId = SalePricesBrandListBox.GetValue();
+            var priceListId = SalePricesMarketListBox.GetValue();
+
+            if (productTypeId && priceListId) {
+                //$.ajax({
+                //    url: '/admin/promotions/loadSalePeriods',
+                //    type: 'POST',
+                    
+                //})
+            } else {
+
+            }
+        }
+    </script>
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="page-heading">
+            Sale Prices
+        </h4>
+        <p class="hint-text">
+            Product Type (Mandatory)<br />
+            Brand (Optional)<br />
+            Market (Mandatory, Singular)<br />
+            Margin Threshold... This exists simply to give a visual aid to the data on the page.
+            You're showing % discounts across product pages (and their products) - and you want to know if the applied discount will knock the margin.
+        </p>
+
+        <p class="hint-text">
+            <span style="color: #ff6a00">Quite important:</span> shouldn't allow any navigation away or clearing of what has been loaded onto the page without prompt. Hmm.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 col-xs-12">
+        @Html.Action("SalePricesProductTypeDropDownPartial", "Promotions")
+        @Html.Action("SalePricesBrandDropDownPartial", "Promotions")
+        @Html.Action("SalePricesMarketDropDownPartial", "Promotions")
+
+        @Html.DevExpress().SpinEdit(settings =>
+       {
+           settings.Name = "MarginThreshold";
+           settings.Properties.NullText = "Enter Margin Threshold";
+           settings.Style.Add("float", "left");
+           settings.Style.Add("margin", "0 7px 7px 0");
+           settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+           settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+           settings.Properties.MinValue = 0;
+           settings.Properties.MaxValue = 100;
+           settings.Properties.NumberType = SpinEditNumberType.Integer;
+           settings.Properties.DisplayFormatString = "{0:#\\%}";
+       }).GetHtml()
+    </div>
+    <div class="col-sm-8 col-xs-12">
+
+    </div>
+</div>

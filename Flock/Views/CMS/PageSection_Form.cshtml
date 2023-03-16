@@ -1,0 +1,285 @@
+﻿@using Flock.ViewModels
+@model Form_PageSection
+    <table class="form-details-table">
+        <tbody>
+            <tr>
+                <td style="padding: 0.5em">
+                    <label style="margin-bottom: 0;">
+                        Source
+                    </label>
+                </td>
+                <td style="padding: 0.5em">
+                    @Html.DevExpress().ComboBox(settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "SourceID";
+                        settings.Properties.ValueField = "SourceID";
+                        settings.Properties.ValueType = typeof(byte);
+                        settings.Properties.TextField = "Name";
+                        settings.Width = 250;
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                        settings.Properties.ClientSideEvents.ValueChanged = @"function (s, e) {
+                            $('.form-"+Model.FormID+@"-hideable').hide();
+                            switch (s.GetValue()) {
+                                case 1:
+                                    $('#form-"+Model.FormID+ @"-competition').show();
+                                    $('#form-"+Model.FormID+ @"-thirdparty').show();
+                                break;
+                                case 2:
+                                    $('#form-" + Model.FormID + @"-brochure').show();
+                                break;
+                                case 72:
+                                    $('#form-" + Model.FormID + @"-storeevent').show();
+                                break;
+                                default:
+                                break;
+                            }
+                        }";
+                    }).BindList(LargeDatabaseDataProvider.GetSources, LargeDatabaseDataProvider.GetSourceByID).Bind(Model.SourceID).GetHtml()
+                </td>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">
+                        Confirm Email
+                    </label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().CheckBoxFor(m => Model.ConfirmEmail, settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "ConfirmEmail";
+                        settings.ReadOnly = true;
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">Name</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.HiddenFor(m => Model.FormID)
+
+                    @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+                {
+                    settings.Name = "Form" + Model.FormID.ToString() + "Name";
+                    settings.ShowModelErrors = true;
+                    settings.Properties.MaxLength = 50;
+                    settings.Width = 250;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                }).GetHtml()
+                </td>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">Display Address Fields</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().CheckBoxFor(m => Model.DisplayAddressBlock, settings =>
+                {
+                    settings.Name = "Form" + Model.FormID.ToString() + "DisplayAddressBlock";
+                }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">Heading</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "Heading";
+                        settings.ShowModelErrors = true;
+                        settings.Properties.MaxLength = 70;
+                        settings.Width = 250;
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    }).GetHtml()
+                </td>
+                
+                <td style="padding: 0.5em">
+                    <label style="margin-bottom: 0;">
+                        Phone Number
+                    </label>
+                </td>
+                <td style="padding: 0.5em">
+                    @{
+
+                        var items = Enumerable.Empty<object>()
+                                        .Select(p => new { PhoneNumberRequired = (bool?)null, Name = "" })
+                                        .ToList();
+                    }
+                    @Html.DevExpress().ComboBox(settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "PhoneNumberRequired";
+                        settings.Properties.ValueField = "PhoneNumberRequired";
+                        settings.Properties.ValueType = typeof(bool?);
+                        settings.Properties.TextField = "Name";
+                        settings.Width = 250;
+                        settings.ShowModelErrors = true;
+
+                        items.Add(new { PhoneNumberRequired = (bool?)null, Name = "Not Collected" });
+                        items.Add(new { PhoneNumberRequired = (bool?)false, Name = "Optional" });
+                        items.Add(new { PhoneNumberRequired = (bool?)true, Name = "Mandatory" });
+
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    }).BindList(items).Bind(Model.PhoneNumberRequired).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">SubHeading</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().TextBoxFor(m => Model.SubHeading, settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "SubHeading";
+                        settings.ShowModelErrors = true;
+                        settings.Properties.MaxLength = 70;
+                        settings.Width = 250;
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    }).GetHtml()
+                </td>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">Use Captcha</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().CheckBoxFor(m => Model.UseCaptcha, settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "UseCaptcha";
+                        settings.ReadOnly = true;
+                    }).GetHtml()
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="form-@(Model.FormID)-competition" class="form-@(Model.FormID)-hideable" @if (Model.SourceID != 1) { ViewContext.Writer.Write("style='display: none'"); }>
+            <tr>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">Competition</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().ComboBoxFor(m => Model.CompetitionID, settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "CompetitionID";
+                        settings.Properties.ValueField = "CompetitionID";
+                        settings.Properties.ValueType = typeof(short);
+                        settings.Properties.TextField = "Name";
+                        settings.Width = 280;
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetNullableCompetitions()).GetHtml()
+                </td>
+                <td colspan="2"></td>
+            </tr>
+        </tbody>
+        <tbody id="form-@(Model.FormID)-thirdparty" class="form-@(Model.FormID)-hideable" @if (Model.SourceID != 1) { ViewContext.Writer.Write("style='display: none'"); }>
+            <tr>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">Third Party</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().ComboBoxFor(m => Model.ThirdPartyID, settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "ThirdPartyID";
+                        settings.Properties.ValueField = "ThirdPartyID";
+                        settings.Properties.ValueType = typeof(short);
+                        settings.Properties.TextField = "Name";
+                        settings.Width = 280;
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetNullableThirdParties()).GetHtml()
+                </td>
+                <td colspan="2"></td>
+            </tr>
+        </tbody>
+        <tbody id="form-@(Model.FormID)-brochure" class="form-@(Model.FormID)-hideable" @if (Model.SourceID != 2) { ViewContext.Writer.Write("style='display: none'"); }>
+            <tr>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">Brochure</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().ComboBoxFor(m => Model.BrochureID, settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "BrochureID";
+                        settings.Properties.ValueField = "BrochureID";
+                        settings.Properties.ValueType = typeof(short);
+                        settings.Properties.TextField = "Name";
+                        settings.Width = 280;
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetNullableBrochures()).GetHtml()
+                </td>
+                <td colspan="2"></td>
+            </tr>
+        </tbody>
+        <tbody id="form-@(Model.FormID)-storeevent" class="form-@(Model.FormID)-hideable" @if (Model.SourceID != 72) { ViewContext.Writer.Write("style='display: none'"); }>
+            <tr>
+                <td style="padding: 0.5em;">
+                    <label style="margin-bottom: 0;">Store Event</label>
+                </td>
+                <td style="padding: 0.5em;">
+                    @Html.DevExpress().ComboBoxFor(m => Model.StoreEventID, settings =>
+                        {
+                            settings.Name = "Form" + Model.FormID.ToString() + "StoreEventID";
+                            settings.Properties.ValueField = "StoreEventID";
+                            settings.Properties.ValueType = typeof(short);
+                            settings.Properties.TextField = "Name";
+                            settings.Width = 280;
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                        }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetNullableStoreEvents()).GetHtml()
+                </td>
+                <td colspan="2"></td>
+            </tr>
+        </tbody>
+    <tbody>
+        <tr>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+    </tbody>
+    <tbody>
+        <tr>
+            <td style="padding: 0.5em">
+                <label style="margin-bottom: 0;">
+                    Redirect to Page
+                </label>
+            </td>
+            <td colspan="3" style="padding: 0.5em">
+                @*@Html.DevExpress().ComboBox(settings =>
+                    {
+                        settings.Name = "Form" + Model.FormID.ToString() + "RedirectPageID";
+                        settings.Properties.ValueField = "PageID";
+                        settings.Properties.ValueType = typeof(int);
+                        settings.Properties.TextField = "Name";
+                        settings.Width = 250;
+                        settings.ShowModelErrors = true;
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+
+                        
+                        settings.Properties.DropDownWidth = 350;
+                        settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+                        settings.Properties.Columns.Add("PageID", "Page ID", 60);
+                        settings.Properties.Columns.Add("Name", "Name", 270);
+
+                    }).BindList(LargeDatabaseDataProvider.GetPageIDs, LargeDatabaseDataProvider.GetPageByID).Bind(Model.RedirectPageID).GetHtml()*@
+
+                @Html.Action("RedirectPageIDComboBoxPartial", "CMS", new { pageId = Model.RedirectPageID, formId = Model.FormID })
+            </td>
+        </tr>
+    </tbody>
+    <tbody>
+        <tr>
+            <td style="padding: 0.5em">
+                <label style="margin-bottom: 0;">
+                    Promotion Code
+                </label>
+            </td>
+            <td colspan="3" style="padding: 0.5em">
+                @Html.Action("PromotionCodeIDComboBoxPartial", "CMS", new { promotionCodeId = Model.PromotionCodeID, formId = Model.FormID })
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+    @if (ViewData["EditError"] != null)
+    {
+        <span style="float: left; margin: 8px 0;" class="field-validation-error">@(ViewData["EditError"])</span>
+        <div style="clear: both;"></div>
+    }
+    <img id="page-section-@(Model.PageSectionID)-save-success" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 0px; right: 0px;" onclick="SaveFormDetails(@(Model.FormID), @(Model.PageSectionID));" />
+
+    <div style="clear: both;"></div>

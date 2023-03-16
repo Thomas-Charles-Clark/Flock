@@ -1,0 +1,40 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "OrderGridView";
+        settings.CallbackRouteValues = new { Controller = "Orders", Action = "OrderGridPartial" };
+ 
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsPager.AlwaysShowPager = true;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+
+        MVCxGridViewColumn OrderIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn MemberIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn BasketIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn StatusColumn = new MVCxGridViewColumn();
+        
+        OrderIDColumn.Name = "OrderID";
+        OrderIDColumn.FieldName = "OrderID";
+        OrderIDColumn.Caption = "Order ID";
+        OrderIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OrderIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(OrderIDColumn);
+
+        MemberIDColumn.Name = "MemberID";
+        MemberIDColumn.FieldName = "MemberID";
+        MemberIDColumn.Caption = "Member ID";
+        MemberIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        MemberIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(MemberIDColumn);
+        
+    });
+}    
+@grid.BindToLINQ("", "", (s, e) => {
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<OrderHead>().GetAll();
+
+    e.KeyExpression = "OrderID";
+    e.QueryableSource = source;
+}).GetHtml()

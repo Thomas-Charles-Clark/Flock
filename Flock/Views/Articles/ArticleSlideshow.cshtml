@@ -1,0 +1,91 @@
+﻿@using Flock.ViewModels
+@model ArticleComposeViewModel
+@Html.DevExpress().ImageSlider(settings =>
+{
+    settings.Name = "ArticleSlideshow";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.EnableTheming = true;
+    settings.ShowNavigationBar = true;
+    settings.SettingsImageArea.ImageSizeMode = ImageSizeMode.FitProportional;
+    settings.SettingsImageArea.ItemTextVisibility = ElementVisibilityMode.OnMouseOver;
+    settings.SettingsImageArea.NavigationButtonVisibility = ElementVisibilityMode.None;
+    settings.SettingsImageArea.NavigationDirection = NavigationDirection.Horizontal;
+    settings.SettingsImageArea.AnimationDuration = 600;
+    settings.SettingsBehavior.AllowMouseWheel = true;
+    settings.SettingsBehavior.EnablePagingByClick = AutoBoolean.True;
+    settings.SettingsBehavior.EnablePagingGestures = true;
+    settings.SettingsBehavior.ExtremeItemClickMode = ExtremeItemClickMode.SelectAndSlide;
+    settings.SettingsBehavior.ImageLoadMode = ImageLoadMode.Auto;
+    settings.SettingsNavigationBar.ItemSpacing = 8;
+    settings.SettingsNavigationBar.Mode = NavigationBarMode.Dots;
+    settings.SettingsNavigationBar.PagingMode = NavigationBarPagingMode.Single;
+    settings.SettingsNavigationBar.Position = NavigationBarPosition.Bottom;
+    settings.SettingsNavigationBar.ThumbnailsModeNavigationButtonVisibility = ElementVisibilityMode.None;
+    settings.SettingsNavigationBar.VisibleItemsCount = 10;
+    settings.SettingsSlideShow.AutoPlay = true;
+    settings.SettingsSlideShow.Interval = 4000;
+    settings.SettingsSlideShow.PausePlayingWhenMouseOver = true;
+    settings.SettingsSlideShow.PlayPauseButtonVisibility = ElementVisibilityMode.OnMouseOver;
+    settings.SettingsSlideShow.StopPlayingWhenPaging = true;
+
+//    if (Model.ShowHotspots)
+//    {
+//        settings.ClientSideEvents.Init = @"function(s, e) {
+//            var width = 980;//$('#page-section-" + Model.PageSectionID + @"-slideshow').width();
+//            var desiredHeight = width / " + Model.AspectRatio + @";
+//            $('#page-section-" + Model.PageSectionID + @"-slideshow').css('height', desiredHeight+'px');
+//            s.AdjustControl();
+//            window.setTimeout(function() { ConfigureHotspots(" + Model.PageSectionID + @"); }, 1000);
+//        }";
+//    }
+//  else
+    if(Model.ArticleTemplateID == 2)
+    {
+        settings.ClientSideEvents.Init = @"function(s, e) {
+            var width = 986;
+            var desiredHeight = 377;
+            $('#article-slideshow').css('height', desiredHeight+'px');
+            s.AdjustControl();
+        }";
+    }
+    else if(Model.ArticleTemplateID == 4)
+    {
+        settings.ClientSideEvents.Init = @"function(s, e) {
+            var width = 986;
+            var desiredHeight = 598;
+            $('#article-slideshow').css('height', desiredHeight+'px');
+            s.AdjustControl();
+        }";
+    }
+    
+
+//    settings.ClientSideEvents.ActiveItemChanged = @"function(s, e) {
+//        $('.hotspot-reveal').stop(true).css('display', 'none');
+//    }";
+    
+    if (Model.Images.Where(p => p.TemplateImageID == 2).Count() == 0)
+    {
+        settings.Items.Add(
+            item =>
+            {
+                item.ImageUrl = Model.ArticleTemplateID == 2 ? "/images/admin/ar7-placeholder.png" : "/images/admin/ar2-placeholder.png";
+                item.NavigateUrl = null;
+                item.SetTextTemplateContent("");
+            });
+    }
+    else
+    {
+        var ssImages = Model.Images.Where(p => p.TemplateImageID == 2).ToList();
+        for (int i = 0; i < ssImages.Count(); i++)
+        {
+            settings.Items.Add(
+            item =>
+            {
+                item.ImageUrl = "https://flock.designersguild.com/imagelibrary/986/" + ssImages[i].ImageID + ".jpeg";
+                item.NavigateUrl = null;
+                item.SetTextTemplateContent("");
+            });
+        }
+    }
+}).GetHtml()

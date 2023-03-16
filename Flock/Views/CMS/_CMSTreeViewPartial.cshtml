@@ -1,0 +1,120 @@
+﻿@Html.DevExpress().TreeList(
+    settings => {
+        settings.Name = "treeList";
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "PageTreeListDataBindingPartial", marketID = ViewData["marketID"], siteSectionID = ViewData["siteSectionID"] };
+
+        settings.SettingsEditing.AddNewNodeRouteValues = new { Controller = "CMS", Action = "AddNewPage", marketID = ViewData["marketID"], siteSectionID = ViewData["siteSectionID"] };
+
+        settings.SettingsEditing.ConfirmDelete = true;
+        settings.SettingsEditing.UpdateNodeRouteValues = new { Controller = "CMS", Action = "UpdatePage" };
+        settings.SettingsEditing.DeleteNodeRouteValues = new { Controller = "CMS", Action = "DeletePage" };
+        settings.SettingsEditing.NodeDragDropRouteValues = new { Controller = "CMS", Action = "MovePage" };
+
+        // you want to compose the new page in a new window.
+        settings.ClientSideEvents.CustomButtonClick = @"function(s,e) { 
+            OpenComposer(e.nodeKey);
+            return false; 
+        }";
+            
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.AutoGenerateColumns = false;
+        settings.KeyFieldName = "PageID";
+        settings.ParentFieldName = "ParentID";
+        settings.RootValue = 0;
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "Name";
+            }
+        );
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "Title";
+            }
+        );
+
+        
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "MetaDescription";
+            }
+        );
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "Heading";
+            }
+        );
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "MarketingMessage";
+            }
+        );
+
+        settings.Columns.Add(
+            column =>
+            {
+                column.FieldName = "URL";
+            }
+        );
+        
+        
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.EnableCallbackAnimation = false;
+        
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.NewButton.Visible = true;
+        settings.CommandColumn.DeleteButton.Visible = true;
+        settings.CommandColumn.EditButton.Visible = true;
+        
+        
+        TreeListCommandColumnCustomButton composebutton = new TreeListCommandColumnCustomButton();
+        
+        composebutton.Text = "Compose";
+
+        settings.CommandColumn.CustomButtons.Add(composebutton);
+        
+         
+        
+        settings.SettingsBehavior.ExpandCollapseAction = TreeListExpandCollapseAction.NodeDblClick;
+        
+        settings.SettingsCookies.StoreExpandedNodes = true;
+
+        settings.ClientLayout = (s, e) =>
+        {
+            if (e.LayoutMode == ClientLayoutMode.Loading)
+            {
+                if (Session["TreeListState"] != null)
+                    e.LayoutData = (string)Session["TreeListState"];
+            }
+            else
+                Session["TreeListState"] = e.LayoutData;
+        };
+
+        settings.PreRender = (sender, e) =>
+        {
+            if (Session["TreeListState"] == null)
+                ((MVCxTreeList)sender).ExpandToLevel(0);
+        };
+    }
+).Bind(Model).GetHtml()
+
+<script type="text/javascript">
+    function OpenComposer(pageID) {
+        var url = '@Url.Action("compose", "cms", new { type = "page", id = -1 })';
+        url = url.replace(-1, pageID);
+
+        //window.open('/admin/cms/compose/page/'+e.nodeKey);  
+        window.location.href = url;
+    }
+</script>

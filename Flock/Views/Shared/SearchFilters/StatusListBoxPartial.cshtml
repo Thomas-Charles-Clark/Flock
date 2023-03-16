@@ -1,0 +1,96 @@
+﻿@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ProductSearchStatusDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductSearchStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#product-searching-icon').fadeIn('fast');
+            ProductSearchStatusDD.SetText(s.GetSelectedItem().text);
+            ProductSearchStatusDD.HideDropDown();
+            $('#product-searching-icon').fadeIn('fast');
+            var SearchText = ProductSearchNameOrIDTextBox.GetText();
+            $.ajax({
+                url: '" + Url.Action("ProductSearch", "Products") + @"',
+                traditional: true,
+                data: { 
+                    ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                    BrandID: ProductSearchBrandListBox.GetValue(),
+                    LaunchID: ProductSearchLaunchListBox.GetValue(),
+                    PatternID: ProductSearchPatternListBox.GetValue(),
+                    Status: ProductSearchStatusListBox.GetValue(),
+                    StatusID: ProductSearchWebStatusListBox.GetValue(),
+                    StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                    CollectionID: ProductSearchCollectionListBox.GetValue(),
+                    ColourID: ProductSearchColourListBox.GetValue(),
+                    SearchString: SearchText,
+                    ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                    PriceListID: ProductSearchPriceListListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#product-data-view-container').html(data);
+                    $('#product-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $('#product-searching-icon').fadeOut('slow');
+                    alert(e.responseText);
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else if (action == "ProductPageSearchStatusDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductPageSearchStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#product-page-searching-icon').fadeIn('fast');
+            ProductPageSearchStatusDD.SetText(s.GetSelectedItem().text);
+            ProductPageSearchStatusDD.HideDropDown();
+            $.ajax({
+	            url: '" + Url.Action("ProductPageSearch", "ProductPages") + @"',
+	            traditional: true,
+	            data: {
+		            ProductTypeID: ProductPageSearchProductTypeListBox.GetValue(),
+		            BrandID: ProductPageSearchBrandListBox.GetValue(),
+		            LaunchID: ProductPageSearchLaunchListBox.GetValue(),
+		            CollectionID: ProductPageSearchCollectionListBox.GetValue(),
+		            PatternID: ProductPageSearchPatternListBox.GetValue(),
+		            ColourID: ProductPageSearchColourListBox.GetValue(),
+		            StatusID: ProductPageSearchStatusListBox.GetValue(),
+		            SearchString: ProductPageSearchNameTextBox.GetValue()
+	            },
+	            success: function(data) {
+		            $('#product-page-searching-icon').fadeOut('fast');
+		            $('#product-page-data-view-container').html(data);
+	            },
+	            error: function(e, s, a) { 
+		            $('#product-page-searching-icon').fadeOut('fast');
+		            alert(e.responseText);
+	            },
+	            timeout: 60000
+            });
+        }";
+    }
+    else
+    {
+        listBoxSettings.Name = "StatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            alert('Not Implemented');
+        }";
+    }
+
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+
+    listBoxSettings.Properties.Items.Add("C", "C");
+    listBoxSettings.Properties.Items.Add("D", "D");
+    listBoxSettings.Properties.Items.Add("L", "L");
+    listBoxSettings.Properties.Items.Add("Y", "Y");
+}
+).GetHtml()

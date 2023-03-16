@@ -1,0 +1,35 @@
+﻿@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Name = "ImageTypeCheckComboBox";
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = "";
+    listBoxSettings.Properties.TextField = "Text";
+    listBoxSettings.Properties.ValueField = "Value";
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        if ($('#slideshow-image-data-view-container').length > 0)
+        {
+            $('#searching-icon').fadeIn('fast');
+            $.ajax({
+                url: '" + @Url.Action("ImageOverviewDataViewPartial", "Images") + @"',
+                data: { Colours: coloursCheckComboBox.GetSelectedValues().toString(), ImageTypes: ImageTypeCheckComboBox.GetSelectedValues().toString() },
+                success: function(data) { 
+                    $('#searching-icon').fadeOut('fast');
+                    $('#slideshow-image-data-view-container').html(data) 
+                },
+                error: function(e, s, a) { 
+                    $('#searching-icon').fadeOut('fast'); 
+                    alert(e.responseText); 
+                }
+                });
+        }
+    }";
+    listBoxSettings.Properties.Items.Add(new ListEditItem() { Text = "Inspirational", Value = 1 });
+    listBoxSettings.Properties.Items.Add(new ListEditItem() { Text = "Product", Value = 2 });
+}
+).GetHtml()

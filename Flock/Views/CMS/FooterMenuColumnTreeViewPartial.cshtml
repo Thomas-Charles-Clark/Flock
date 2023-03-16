@@ -1,0 +1,382 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+var tree = Html.DevExpress().TreeList(
+    settings =>
+    {
+        var FooterMenuID = ViewBag.FooterMenuID;
+        var Column = ViewBag.Column;
+
+        var UoW = new UnitOfWork<FlockDataContext>();
+
+        settings.Name = "Menu" + FooterMenuID + "Column" + Column + "TreeView";
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "FooterMenuColumnGridViewPartial" };
+
+        settings.SettingsEditing.AddNewNodeRouteValues = new { Controller = "CMS", Action = "AddNewFooterMenuItem" };
+        settings.SettingsEditing.UpdateNodeRouteValues = new { Controller = "CMS", Action = "UpdateFooterMenuItem" };
+        settings.SettingsEditing.DeleteNodeRouteValues = new { Controller = "CMS", Action = "DeleteFooterMenuItem" };
+        settings.SettingsEditing.NodeDragDropRouteValues = new { Controller = "CMS", Action = "MoveFooterMenuItem" };
+        settings.CustomActionRouteValues = new { Controller = "CMS", Action = "FooterMenuColumnTreeViewCustomCommand" };
+        
+        settings.SettingsEditing.ConfirmDelete = true;
+        settings.Theme = "Aqua";
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.SettingsBehavior.AllowDragDrop = true;
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['FooterMenuID'] = " + FooterMenuID + @";
+            e.customArgs['Column'] = " + Column + @";
+            
+            if(typeof(MenuBuilderPageSelectorGrid) == 'object')
+            {
+                if((MenuBuilderPageSelectorGrid.GetFocusedRowIndex() != -1 || $('#page-id-hidden').val() != 'nothing'))
+                    e.customArgs['PageID'] = $('#page-id-hidden').val();
+
+                if((MenuBuilderProductPageSelectorGrid.GetFocusedRowIndex() != -1 || $('#product-page-id-hidden').val() != 'nothing'))
+                    e.customArgs['ProductPageID'] = $('#product-page-id-hidden').val();
+
+                if((MenuBuilderCollectionSelectorGrid.GetFocusedRowIndex() != -1 || $('#collection-id-hidden').val() != 'nothing'))
+                    e.customArgs['CollectionID'] = $('#collection-id-hidden').val(); 
+    
+                if(LinkTypeComboBox.GetValue() == 4 && ExternalURL.GetInputElement() != null)
+                    e.customArgs['ExternalURL'] = ExternalURL.GetValue();
+
+                if(NewWindow.GetStateInput() != null)
+                    e.customArgs['NewWindow'] = NewWindow.GetValue();
+
+                if(Header.GetStateInput() != null)
+                    e.customArgs['Header'] = Header.GetValue();
+
+                if(LinkTypeComboBox.GetValue() == 0)
+                {
+                    delete e.customArgs['PageID'];
+                    delete e.customArgs['ProductPageID'];
+                    delete e.customArgs['CollectionID'];
+                    delete e.customArgs['ExternalURL'];
+                    e.customArgs['NewWindow'] = false;
+                }
+            }
+        }";
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.AutoGenerateColumns = false;
+        settings.KeyFieldName = "FooterMenuItemID";
+        settings.ParentFieldName = "ParentID";
+        settings.RootValue = null;
+
+        settings.Columns.Add(
+        column =>
+        {
+            column.FieldName = "Name";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Linkage";
+            column.Caption = "Link";
+            column.Width = 30;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+            column.SetDataCellTemplateContent(c =>
+            {
+                var title = "";
+                var PageID = (int?)DataBinder.Eval(c.DataItem, "PageID");
+                if (PageID != null)
+                {
+                    title = "Page ID: " + PageID.ToString() + " - " + UoW.GetRepository<Flock.Models.Page>().GetAll().Where(p => p.PageID == PageID).Select(p => p.Name).Single();
+                    ViewContext.Writer.Write("<div>" +
+                        "<img src='/images/icons/24/linkage.png' title='" + title + "' style='width: 13px; margin: 0 auto; display: inline-block;' />"
+                        + "</div>");
+                }
+                var CollectionID = (short?)DataBinder.Eval(c.DataItem, "CollectionID");
+                if (CollectionID != null)
+                {
+                    title = "Collection ID: " + CollectionID.ToString() + " - " + UoW.GetRepository<Flock.Models.Collection>().GetAll().Where(p => p.CollectionID == CollectionID).Select(p => p.Name).Single();
+                    ViewContext.Writer.Write("<div>" +
+                        "<img src='/images/icons/24/linkage.png' title='" + title + "' style='width: 13px; margin: 0 auto; display: inline-block;' />"
+                        + "</div>");
+                }
+                var ProductPageID = (int?)DataBinder.Eval(c.DataItem, "ProductPageID");
+                if (ProductPageID != null)
+                {
+                    title = "Product Page ID: " + ProductPageID.ToString() + " - " + UoW.GetRepository<ProductPage>().GetAll().Where(p => p.ProductPageID == ProductPageID).Select(p => p.Name).Single();
+                    ViewContext.Writer.Write("<div>" +
+                        "<img src='/images/icons/24/linkage.png' title='" + title + "' style='width: 13px; margin: 0 auto; display: inline-block;' />"
+                        + "</div>");
+                }
+                var ExternalURL = (string)DataBinder.Eval(c.DataItem, "ExternalURL");
+                if (ExternalURL != null)
+                {
+                    title = "External URL";
+                    ViewContext.Writer.Write("<img src='/images/icons/24/linkage.png' title=" + title + " style='width: 13px; margin: 0 auto; display: inline-block;' />");
+                }
+            });
+        });
+
+        settings.Columns.Add(
+        column =>
+        {
+            column.Name = "SortOrder";
+            column.FieldName = "SortOrder";
+            column.Caption = "Sort";
+            column.AllowSort = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.Width = 30;
+            column.SetDataCellTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<div style='margin: 0 auto; float: none !important;'>"
+                    + "<img src='/images/icons/dxrip/shuffle-up.png' style='cursor: pointer; display: inline-block;' onclick='Menu" + FooterMenuID + "Column" + Column + "TreeView.PerformCallback({CommandType:\"MoveUp\", FooterMenuItemID: " + Convert.ToByte(c.NodeKey) + "});' />"
+                    + "<img src='/images/icons/dxrip/shuffle-down.png' style='cursor: pointer; display: inline-block;' onclick='Menu" + FooterMenuID + "Column" + Column + "TreeView.PerformCallback({CommandType:\"MoveDown\", FooterMenuItemID: " + Convert.ToByte(c.NodeKey) + "});' />"
+                    + "<div style='clear: both;'></div></div>");
+            });
+        });
+
+        settings.Columns.Add(
+        column =>
+        {
+            column.FieldName = "FooterMenuItemID";
+            column.Caption = "ID";
+            column.Width = 30;
+            column.ReadOnly = true;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetEditCellTemplateContent(c => { });
+        });
+
+        settings.SetEditFormTemplateContent(c => {
+            ViewContext.Writer.Write("<div id='edit-form' style='min-width: 300px;'>");
+                ViewContext.Writer.Write("<div style='width: 100%;'>");
+                Html.DevExpress().Label(lblSettings => {
+                    lblSettings.Name = "NameLbl";
+                    lblSettings.Text = "Name";
+                    lblSettings.Width = 44;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "32px");
+                    lblSettings.Style.Add("margin-right", "1em");
+                    lblSettings.AssociatedControlName = "Name";
+                }).Render();
+                Html.DevExpress().TextBox(tbSettings => {
+                    tbSettings.Name = "Name";
+                    tbSettings.Style.Add("float", "left");
+                    tbSettings.ShowModelErrors = true;
+                    tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                }).Bind(DataBinder.Eval(c.DataItem, "Name")).Render();
+
+                ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+                var Linkage = "Nothing";
+                var LinkTypeID = 0;
+                var LinkID = 0;
+                char? TypeChar = 'x';
+            
+                if (DataBinder.Eval(c.DataItem, "PageID") != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.Page>().GetAll()
+                        .Where(p => p.PageID == Convert.ToInt32(DataBinder.Eval(c.DataItem, "PageID"))).Select(p => p.Name).Single();
+                    TypeChar = 'l';
+                    LinkID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "PageID"));
+                    LinkTypeID = 1;
+                }
+                else if (DataBinder.Eval(c.DataItem, "ProductPageID") != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.ProductPage>().GetAll()
+                        .Where(p => p.ProductPageID == Convert.ToInt32(DataBinder.Eval(c.DataItem, "ProductPageID"))).Select(p => p.Name).Single();
+                    TypeChar = 'p';
+                    LinkID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "ProductPageID"));
+                    LinkTypeID = 2;
+                }
+                else if (DataBinder.Eval(c.DataItem, "CollectionID") != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.Collection>().GetAll()
+                        .Where(p => p.CollectionID == Convert.ToInt16(DataBinder.Eval(c.DataItem, "CollectionID"))).Select(p => p.Name).Single();
+                    TypeChar = 'c';
+                    LinkID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "CollectionID"));
+                    LinkTypeID = 3;
+                }
+                else if (DataBinder.Eval(c.DataItem, "ExternalURL") != null)
+                {
+                    Linkage = "External: " + DataBinder.Eval(c.DataItem, "ExternalURL");
+                    TypeChar = null;
+                    LinkTypeID = 4;
+                }
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Name = "LinkLbl";
+                    lblSettings.Text = "Links to: ";
+                    lblSettings.Width = 44;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "32px");
+                    lblSettings.Style.Add("margin-right", "1em");
+                    lblSettings.AssociatedControlName = "Name";
+                }).Render();
+            
+                var source = new List<object> { 
+                        new { SName = "Nothing", SID = (byte)0 },
+                        new { SName = "Page", SID = (byte)1 }, 
+                        new { SName = "Product Page", SID = (byte)2 }, 
+                        new { SName = "Collection", SID = (byte)3 },
+                        new { SName = "External URL", SID = (byte)4 } };
+            
+                Html.DevExpress().ComboBox(cbSettings => {
+                    cbSettings.Name = "LinkTypeComboBox";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Properties.TextField = "SName";
+                    cbSettings.Properties.ValueField = "SID";
+                    cbSettings.Properties.ValueType = typeof(byte);
+                    cbSettings.SelectedIndex = LinkTypeID;
+                    cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+                        RevealLinkSelector(s.GetSelectedItem().value);
+                        if(s.GetSelectedItem().value == 0 || s.GetSelectedItem().value == 4)
+                            $('#link-test').hide();
+                        else
+                            $('#link-test').show();
+                    }";
+                    cbSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+                        $('#link-selector-" + LinkTypeID + @"').show();
+                        if(s.GetSelectedItem().value != 0 && s.GetSelectedItem().value != 4)
+                            $('#link-test').show();
+                        else
+                            $('#link-test').hide();
+                    }";
+                }).BindList(source).Render();
+
+
+                if (LinkTypeID == 1 || LinkTypeID == 2 || LinkTypeID == 3)
+                    ViewContext.Writer.Write("<a id='link-test' style='font-size: 15px; line-height: 32px; margin-bottom: 7px; margin-left: 7px;' target='_blank' href='http://flock-demo.designersguild.com/uk/" + TypeChar + LinkID + "' >" + Linkage + "</a>");
+                
+            
+                ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Text = "New Window";
+                    lblSettings.Style.Add("line-height", "32px");
+                }).Render();
+                Html.DevExpress().CheckBox(cbSettings =>
+                {
+                    cbSettings.Name = "NewWindow";
+                    cbSettings.Style.Add("line-height", "32px");
+                }).Bind(Convert.ToBoolean(DataBinder.Eval(c.DataItem, "NewWindow"))).Render();
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Text = "Header";
+                    lblSettings.Style.Add("line-height", "32px");
+                    lblSettings.Style.Add("margin-left", "4em");
+                }).Render();
+                Html.DevExpress().CheckBox(cbSettings =>
+                {
+                    cbSettings.Name = "Header";
+                    cbSettings.Style.Add("line-height", "32px");
+                }).Bind(Convert.ToBoolean(DataBinder.Eval(c.DataItem, "Header"))).Render();
+            
+                ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+                ViewContext.Writer.Write(@"
+                    <div id='link-selector-0' class='link-selector'>
+                        <input type='hidden' id='page-id-hidden' value='" + (DataBinder.Eval(c.DataItem, "PageID") == null ? "nothing" : DataBinder.Eval(c.DataItem, "PageID").ToString()) + @"' />
+                        <input type='hidden' id='product-page-id-hidden' value='" + (DataBinder.Eval(c.DataItem, "ProductPageID") == null ? "nothing" : DataBinder.Eval(c.DataItem, "ProductPageID").ToString()) + @"' />
+                        <input type='hidden' id='collection-id-hidden' value='" + (DataBinder.Eval(c.DataItem, "CollectionID") == null ? "nothing" : DataBinder.Eval(c.DataItem, "CollectionID").ToString()) + @"' />
+                    </div>
+                ");
+            
+                ViewContext.Writer.Write(@"
+                    <div id='link-selector-1' class='link-selector'>
+                        " + Html.Partial("MenuBuilderPageSelectorGridPartial", "") + @"
+                    </div>
+                ");
+            
+                ViewContext.Writer.Write(@"
+                    <div id='link-selector-2' class='link-selector'>
+                        " + Html.Partial("MenuBuilderProductPageSelectorGridPartial", "") + @"
+                    </div>
+                ");
+            
+                ViewContext.Writer.Write(@"
+                    <div id='link-selector-3' class='link-selector'>
+                        " + Html.Partial("MenuBuilderCollectionSelectorGridPartial", "") + @"
+                    </div>
+                ");
+
+                ViewContext.Writer.Write("<div id='link-selector-4' class='link-selector'>");
+                Html.DevExpress().TextBox(tbSettings => {
+                    tbSettings.Name = "ExternalURL";
+                    tbSettings.Properties.ClientInstanceName = "ExternalURL";
+                    tbSettings.Properties.NullDisplayText = "External URL";
+                }).Bind(DataBinder.Eval(c.DataItem, "ExternalURL")).Render();
+            ViewContext.Writer.Write("</div>");
+            
+            ViewContext.Writer.Write("</div>");
+
+            ViewContext.Writer.Write("<div style='clear: both'></div>");
+            
+            ViewContext.Writer.Write("<div style='text-align: right; margin-top: 1em;'>");
+            Html.DevExpress().Button(btnSettings => {
+                btnSettings.Name = "btnUpdate";
+                btnSettings.ControlStyle.CssClass = "button";
+                btnSettings.Text = "Update";
+                btnSettings.Style.Add("margin-right", "1em");
+                btnSettings.ClientSideEvents.Click = "function(s, e){ Menu" + FooterMenuID + "Column" + Column + "TreeView.UpdateEdit(); }";
+            }).Render();
+            Html.DevExpress().Button(btnSettings => {
+                btnSettings.Name = "btnCancel";
+                btnSettings.ControlStyle.CssClass = "button";
+                btnSettings.Text = "Cancel";
+                btnSettings.ClientSideEvents.Click = "function(s, e){ Menu" + FooterMenuID + "Column" + Column + "TreeView.CancelEdit(); }";
+            }).Render();
+
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("</div>");
+        });
+
+        settings.EnableCallbackAnimation = false;
+        settings.EnablePagingCallbackAnimation = false;
+        
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.NewButton.Visible = true;
+        settings.CommandColumn.DeleteButton.Visible = true;
+        settings.CommandColumn.EditButton.Visible = true;
+        settings.SettingsEditing.Mode = TreeListEditMode.PopupEditForm;
+        
+        settings.SettingsBehavior.ExpandCollapseAction = TreeListExpandCollapseAction.NodeDblClick;
+
+        settings.SettingsCookies.StoreExpandedNodes = true;
+
+        settings.ClientLayout = (s, e) =>
+        {
+            if (e.LayoutMode == ClientLayoutMode.Loading)
+            {
+                if (Session["TreeListState"] != null)
+                    e.LayoutData = (string)Session["TreeListState"];
+            }
+            else
+                Session["TreeListState"] = e.LayoutData;
+        };
+
+        settings.PreRender = (sender, e) =>
+        {
+            ((MVCxTreeList)sender).ExpandToLevel(3);
+        };
+
+        if (ViewData["NodeEditError"] != null)
+        {
+            settings.Settings.ShowFooter = true;
+            settings.CommandColumn.SetFooterCellTemplateContent(ViewData["NodeEditError"].ToString());
+        }
+        settings.Styles.Footer.Wrap = DefaultBoolean.True;
+        settings.Styles.GroupFooter.Wrap = DefaultBoolean.True;
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+    });
+
+    if (ViewData["NodeEditError"] != null)
+    {
+        tree.SetEditErrorText((string)ViewData["NodeEditError"]);
+    }
+    
+    tree.Bind(Model).GetHtml();
+}

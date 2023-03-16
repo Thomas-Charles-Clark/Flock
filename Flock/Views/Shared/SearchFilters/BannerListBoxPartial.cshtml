@@ -1,0 +1,41 @@
+﻿@model List<Flock.Models.vwBannerOverview>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ComposeBannerHeaderBannerDropDownPartial")
+    {
+        listBoxSettings.Name = "ComposeBannerHeaderBannerListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ComposeBannerHeaderBannerDD.SetText(s.GetSelectedItem().text);
+            ComposeBannerHeaderBannerDD.HideDropDown();
+            
+            var url = '" + @Url.Action("compose", "banners", new { id = "-1", countryid = "-2", bannerlocationid = "-3",  sitesectionid = "-4", bannerlanguageid = "-5", statusid = "-6" }) + @"';
+
+            url = url.replace('-1', s.GetSelectedItem().value);
+            url = url.replace('-2', ComposeBannerHeaderCountryListBox.GetValue());
+            url = url.replace('-3', ComposeBannerHeaderLocationListBox.GetValue());
+            url = url.replace('-4', ComposeBannerHeaderSiteSectionListBox.GetValue());
+            url = url.replace('-5', ComposeBannerHeaderLanguageListBox.GetValue());
+            url = url.replace('-6', ComposeBannerHeaderWebStatusListBox.GetValue());
+        
+            window.location.href = url;
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.BannerSelectHeaderSelectedBannerID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ComposeBannerHeaderBannerDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    listBoxSettings.Properties.ValueField = "BannerID";
+    listBoxSettings.Properties.TextField = "Name";
+}
+).BindList(Model).GetHtml()

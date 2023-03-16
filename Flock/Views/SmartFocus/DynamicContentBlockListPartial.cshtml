@@ -1,0 +1,48 @@
+﻿@using Flock.Classes.SmartFocus
+@model List<DynamicContentBlock>
+@{
+    if (Model != null)
+    {
+        <table>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Content Type
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    Content
+                </th>
+            </tr>
+
+            @foreach (DynamicContentBlock b in Model)
+            {
+                <tr>
+                    <td>
+                        @(b.ID)
+                    </td>
+                    <td>
+                        @(b.Name)
+                    </td>
+                    <td>
+                        @(b.ContentType)
+                    </td>
+                    <td>
+                        @(b.Description)
+                    </td>
+                    <td>
+                        @(b.Content)
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+}

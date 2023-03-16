@@ -1,0 +1,38 @@
+﻿@model Flock.ViewModels.BaseViewModel
+@*@if(Model != null)
+{
+@Html.DevExpress().ComboBox(
+    settings => {
+        settings.Name = "MarketListComboBox";
+        settings.Width = 140;
+        settings.Height = 15;
+        settings.SelectedIndex = 0;
+        //settings.CallbackRouteValues = new { Controller = "Admin", Action = "CMSSiteSectionComboBoxPartial" };
+        ////'/admin/cms/SiteSectionComboBoxPartial', {'marketID' : MarketListComboBox.GetValue().toString() } ) }";
+        settings.Properties.EnableClientSideAPI = true;
+        settings.Properties.ClientSideEvents.Init = "function(s, e) { $('#site-section-ddl-wrapper').load('" + Url.Action("SiteSectionComboBoxPartial") + "', { 'marketID' : MarketListComboBox.GetValue()}); }";
+        settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { $('#site-section-ddl-wrapper').load('" + Url.Action("SiteSectionComboBoxPartial") + "', { 'marketID' : MarketListComboBox.GetValue()}); }";
+        //settings.Properties.CallbackPageSize = 15;
+        settings.Properties.TextField = "Name";
+        settings.Properties.ValueField = "MarketID";
+    }
+).BindList(Model.Markets).GetHtml();
+}
+else
+{
+    @Html.DevExpress().ComboBox(
+    settings => {
+        settings.Name = "MarketListComboBox";
+        settings.Width = 140;
+        settings.Height = 15;
+        settings.SelectedIndex = 0;
+        //settings.CallbackRouteValues = new { Controller = "Admin", Action = "CMSSiteSectionComboBoxPartial" };
+        settings.Properties.EnableClientSideAPI = true;
+        settings.Properties.ClientSideEvents.Init = "function(s, e) { $('#site-section-ddl-wrapper').load('" + Url.Action("SiteSectionComboBoxPartial") + "', { 'marketID' : MarketListComboBox.GetValue()}); }";
+        settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { $('#site-section-ddl-wrapper').load('" + Url.Action("SiteSectionComboBoxPartial") + "', { 'marketID' : MarketListComboBox.GetValue()}); }";
+        //settings.Properties.CallbackPageSize = 15;
+        settings.Properties.TextField = "Name";
+        settings.Properties.ValueField = "MarketID";
+    }
+).BindList(ViewData["Markets"]).GetHtml()
+}*@

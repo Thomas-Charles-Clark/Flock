@@ -1,0 +1,336 @@
+﻿@using Flock.ViewModels
+@using Flock.Models
+@using Flock.DAL
+@model DeliveryOptionViewModel
+
+@{
+    using (var UoW = new UnitOfWork<FlockDataContext>())
+    {
+        <div class="content-panel-container">
+            <fieldset id="delivery-details-header">
+                <legend style="color: black; border-bottom-color: #929292; cursor: default;">Delivery Option Details</legend>
+                <div id="delivery-details-inner" style="background-color: white; padding: 1em;">
+                    <div id="delivery-details-container">
+                        <div style='width: 500px; float: left'>
+                            @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "DeliveryTypeLbl";
+                            lbl.Text = "Delivery Type";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "DeliveryTypeID";
+                        }).GetHtml()
+                            @Html.DevExpress().ComboBoxFor(m => Model.DeliveryServiceID, settings =>
+                        {
+                            settings.Name = "DeliveryServiceID";
+                            settings.Properties.NullDisplayText = "Delivery Service...";
+                            settings.Properties.NullText = "Delivery Service...";
+                            settings.Style.Add("margin-right", "1em");
+                            settings.Style.Add("float", "left");
+                            settings.Properties.CallbackPageSize = 15;
+                            var prop = settings.Properties as ComboBoxProperties;
+                            prop.TextField = "Name";
+                            prop.ValueField = "DeliveryServiceID";
+                            prop.ValueType = typeof(byte);
+                            prop.Buttons.Add("Clear");
+                            var b = settings.Properties.Buttons[0] as EditButton;
+                            settings.Properties.ClientSideEvents.ButtonClick = @"function(s, e) {
+                                if(e.buttonIndex == 0) {
+                                    s.SetSelectedIndex(-1);
+                                }
+                            }";
+                        }).BindList(args =>
+                        {
+                            return LargeDatabaseDataProvider.GetDeliveryServices(args);
+                        }, LargeDatabaseDataProvider.GetDeliveryServiceByID).GetHtml()
+                            <div style="clear: both"></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "NameLbl";
+                                lbl.Text = "Name";
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.Width = 140;
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.AssociatedControlName = "Name";
+                            }).GetHtml()
+                            @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+                            {
+                                settings.Name = "Name";
+                                settings.Properties.NullDisplayText = "Name...";
+                                settings.Properties.NullText = "Name...";
+                                settings.Properties.MaxLength = 100;
+                                settings.Properties.Width = 280;
+                                settings.ShowModelErrors = true;
+                                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                settings.Style.Add("margin-right", "1em");
+                                settings.Style.Add("float", "left");
+                            }).GetHtml()
+                            <div style="clear: both"></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "HaulCodeLbl";
+                                lbl.Text = "Haul Code";
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.Width = 140;
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.AssociatedControlName = "HaulCode";
+                            }).GetHtml()
+                            @Html.DevExpress().TextBoxFor(m => Model.HaulCode, settings =>
+                            {
+                                settings.Name = "HaulCode";
+                                settings.Properties.NullDisplayText = "Haul Code...";
+                                settings.Properties.NullText = "Haul Code...";
+                                settings.Properties.MaxLength = 10;
+                                settings.Style.Add("margin-right", "1em");
+                                settings.Style.Add("float", "left");
+                            }).GetHtml()
+                            <div style="clear: both"></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "CarrCodeLbl";
+                                lbl.Text = "Carr Code";
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.Width = 140;
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.AssociatedControlName = "CarrCode";
+                            }).GetHtml()
+                            @Html.DevExpress().TextBoxFor(m => Model.CarrCode, settings =>
+                            {
+                                settings.Name = "CarrCode";
+                                settings.Properties.NullDisplayText = "Carr Code...";
+                                settings.Properties.NullText = "Carr Code...";
+                                settings.Properties.MaxLength = 10;
+                                settings.Style.Add("margin-right", "1em");
+                                settings.Style.Add("float", "left");
+                            }).GetHtml()
+                            <div style="clear: both"></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "PostCodeRestrictionsLbl";
+                                lbl.Text = "PostCode Restrictions";
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.Width = 140;
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.AssociatedControlName = "PostCodeRestrictions";
+                            }).GetHtml()
+                            @Html.DevExpress().MemoFor(m => Model.PostCodeRestrictions, settings =>
+                            {
+                                settings.Name = "PostCodeRestrictions";
+                                settings.Properties.NullDisplayText = "PostCode Restrictions...";
+                                settings.Properties.NullText = "PostCode Restrictions";
+                                settings.Properties.Rows = 12;
+                                settings.Width = 348;
+                                settings.Properties.MaxLength = 1000;
+                                settings.Style.Add("margin-bottom", "1em");
+                                settings.Style.Add("float", "left");
+                            }).GetHtml()
+                            <div style="clear: both"></div>
+
+                            @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "MinThresholdLbl";
+                            lbl.Text = "Min Threshold";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "MinThreshold";
+                        }).GetHtml()
+                            @Html.DevExpress().SpinEditFor(m => Model.MinThreshold, settings =>
+                        {
+                            settings.Name = "MinThreshold";
+                            settings.Properties.NullDisplayText = "Min Threshold...";
+                            settings.Properties.NullText = "Min Threshold...";
+                            settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                            settings.Properties.DisplayFormatString = "F2";
+                            settings.Properties.LargeIncrement = 10;
+                            settings.Properties.Increment = 1;
+                            settings.Properties.MinValue = 0;
+                        }).GetHtml()
+                            <div style="clear: both"></div>                 
+                            @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "MaxThresholdLbl";
+                            lbl.Text = "Max Threshold";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "MaxThreshold";
+                        }).GetHtml()
+                            @Html.DevExpress().SpinEditFor(m => Model.MaxThreshold, settings =>
+                        {
+                            settings.Name = "MaxThreshold";
+                            settings.Properties.NullDisplayText = "Max Threshold...";
+                            settings.Properties.NullText = "Max Threshold...";
+                            settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                            settings.Properties.DisplayFormatString = "F2";
+                            settings.Properties.LargeIncrement = 10;
+                            settings.Properties.Increment = 1;
+                            settings.Properties.MinValue = 0;
+                        }).GetHtml()
+                            <div style="clear: both"></div>               
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "PricePerItemLbl";
+                                lbl.Text = "Price Per Item";
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.Width = 140;
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.AssociatedControlName = "PricePerItem";
+                            }).GetHtml()
+                            @Html.DevExpress().SpinEditFor(m => Model.PricePerItem, settings =>
+                            {
+                                settings.Name = "PricePerItem";
+                                settings.Properties.NullDisplayText = "PricePerItem...";
+                                settings.Properties.NullText = "Price Per Item...";
+                                settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+                                settings.Properties.DisplayFormatString = "F2";
+                                settings.Properties.LargeIncrement = 10;
+                                settings.Properties.Increment = 1;
+                            }).GetHtml()
+                            <div style="clear: both"></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "PricePerDispatchLbl";
+                                lbl.Text = "Price Per Dispatch";
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.Width = 140;
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.AssociatedControlName = "PricePerDispatch";
+                            }).GetHtml()
+                            @Html.DevExpress().SpinEditFor(m => Model.PricePerDispatch, settings =>
+                            {
+                                settings.Name = "PricePerDispatch";
+                                settings.Properties.NullDisplayText = "Price Per Dispatch...";
+                                settings.Properties.NullText = "Price Per Dispatch...";
+                                settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+                                settings.Properties.DisplayFormatString = "F2";
+                                settings.Properties.LargeIncrement = 10;
+                                settings.Properties.Increment = 1;
+                            }).GetHtml()
+                            <div style="clear: both;"></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "OnDateLbl";
+                                lbl.Text = "On Date";
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.Style.Add("margin-top", "110px");
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("width", "50px");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.AssociatedControlName = "OnDate";
+                            }).GetHtml()
+                            @Html.DevExpress().CalendarFor(m => Model.OnDate,
+                            edtSettings =>
+                            {
+                                edtSettings.Theme = "Aqua";
+                                edtSettings.ControlStyle.CssClass = "editor";
+                                edtSettings.ShowModelErrors = true;
+                                edtSettings.Properties.DisplayFormatString = "d";
+                                edtSettings.Properties.NullDisplayText = "Not Set";
+                                edtSettings.Style.Add("margin", "1em auto");
+                            }).GetHtml()
+                            <div style='clear:both'></div>
+                            <div style='width: 100%; height: 20px;'></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "OffDateLbl";
+                                lbl.Text = "Off Date";
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.Style.Add("margin-top", "110px");
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("width", "50px");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.AssociatedControlName = "OffDate";
+                            }).GetHtml()
+                            @Html.DevExpress().CalendarFor(m => Model.OffDate,
+                            edtSettings =>
+                            {
+                                edtSettings.Theme = "Aqua";
+                                edtSettings.ControlStyle.CssClass = "editor";
+                                edtSettings.ShowModelErrors = true;
+                                edtSettings.Properties.DisplayFormatString = "d";
+                                edtSettings.Properties.NullDisplayText = "Not Set";
+                                edtSettings.Style.Add("margin", "1em auto");
+                            }).GetHtml()
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div style="float: right; width: 400px; margin-bottom: 3em;">
+                            <div class="attribute-group" style="width: 100%;">
+                                @Html.Partial("DeliveryOptionProductTypesPartial", Model.AssignedProductTypes)
+
+                                <div style='clear:both'></div>
+                            </div>
+
+                            <div style='clear:both'></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "CountriesLbl";
+                                lbl.Text = "Countries";
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("margin-top", "1em");
+                                lbl.Style.Add("width", "150px");
+                                lbl.Style.Add("text-align", "right");
+                            }).GetHtml()
+                            @Html.DevExpress().HyperLink(lnk =>
+                            {
+                                lnk.Style.Add("line-height", "32px");
+                                lnk.Style.Add("float", "left");
+                                lnk.Style.Add("margin-right", "1em");
+                                lnk.Style.Add("margin-top", "1em");
+                                lnk.Style.Add("width", "150px");
+                                lnk.Style.Add("text-align", "right");
+                                lnk.Name = "RemoveCountriesLnk";
+                                lnk.NavigateUrl = "javascript:;";
+                                lnk.Properties.Text = "Remove All";
+                                lnk.Properties.ClientSideEvents.Click = @"function(s, e) {
+                                        RemoveAllCountryRestrictions();
+                                    }";
+                            }).GetHtml()
+                            <div style='clear:both'></div>
+                            @{
+        var CountriesPreModel = UoW.GetRepository<Delivery_Country>().GetAll().Where(p => p.DeliveryID == Model.DeliveryID).Select(p => p.CountryID).ToList();
+        var CountriesModel = UoW.GetRepository<Country>().GetAll().Where(p => CountriesPreModel.Contains(p.CountryID)).ToList();
+        ViewContext.Writer.Write("<div id='country-restriction-container' style='border: 1px solid #cdcdcd; margin-top: 0px; width: 100%'>");
+        ViewContext.Writer.Write(Html.Partial("DeliveryOptionCountryRestrictionsPartial", CountriesModel).ToHtmlString());
+        ViewContext.Writer.Write("</div>");
+                            }
+                            <div style='clear:both'></div>
+                        </div>
+                        <div style='clear:both'></div>
+                            <div style='position: relative;'>
+                                <img id="delivery-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 0px; right: 0px;" onclick="SaveDeliveryOptionDetails();" />
+                            </div>
+                        </div>
+
+                </div>
+            </fieldset>
+        </div>
+    }
+}

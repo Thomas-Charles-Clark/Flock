@@ -1,0 +1,52 @@
+﻿@using Flock.ViewModels
+@model Module_ModuleOptionsViewModel
+
+@{
+
+    var byGroup = Model.ModuleOptions.GroupBy(p => p.ModuleOptionGroupID).ToList();
+
+    var groups = Model.ModuleOptionGroups.OrderBy(p => p.SortOrder).ToList();
+    
+    foreach (var group in byGroup)
+    {
+        var thisGroup = Model.ModuleOptionGroups.Where(p => p.ModuleOptionGroupID == group.Key).SingleOrDefault();
+        if (thisGroup != null)
+        {
+            <div class="module-option-group" data-module-option-group-id="@(thisGroup.ModuleOptionGroupID)">
+                <div class="module-option-group-name">@(thisGroup.Name)</div>
+                <div class="module-option-group-description">@(thisGroup.Description)</div>
+                <div class="module-option-group-sortable">
+                    @foreach (var g in group)
+                    {
+                        <div class="module-option" data-module-option-id="@(g.ModuleOptionID)">
+                            <img class="module-option-image" src="https://flock.designersguild.com/imagelibrary/90/@(g.ModuleOptionImageID).jpeg" />
+                            <span class="module-option-name">@(g.Name)</span>
+                        </div>
+                    }
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="module-option-group">
+                <div class="module-option-group-sortable">
+                    @foreach (var g in group)
+                    {
+                        <div class="module-option" data-module-option-id="@(g.ModuleOptionID)">
+                            <img class="module-option-image" src="https://flock.designersguild.com/imagelibrary/90/@(g.ModuleOptionImageID).jpeg" />
+                            <span class="module-option-name">@(g.Name)</span>
+                        </div>
+                    }
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        }
+
+        <div class="clearfix"></div>
+    }
+}
+
+<script type="text/javascript">
+    initSortables();
+</script>

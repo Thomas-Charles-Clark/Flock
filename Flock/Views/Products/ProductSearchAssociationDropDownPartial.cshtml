@@ -1,0 +1,184 @@
+﻿@Html.DevExpress().DropDownEdit(settings =>
+{
+    settings.Name = "ProductSearchAssociatedDD";
+
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+
+    settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+    settings.Properties.EnableClientSideAPI = true;
+    settings.Text = "Product Page Association";
+// don't forget clientsideevents
+    
+    
+    settings.SetDropDownWindowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div id='status-listbox'>");
+        ViewContext.Writer.Write(Html.DevExpress().ListBox(lbsettings =>
+        {
+            lbsettings.Name = "ProductSearchAssociatedListBox";
+            lbsettings.Properties.Items.Add("Associated", 1);
+            lbsettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            lbsettings.Properties.Items.Add("Not Associated", 0);
+            lbsettings.Properties.NullDisplayText = "Product Page Association";
+            lbsettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                $('#product-searching-icon').fadeIn('fast');
+                ProductSearchAssociatedDD.SetText(s.GetSelectedItem().text);
+                ProductSearchAssociatedDD.HideDropDown();
+                $('#product-searching-icon').fadeIn('fast');
+                var SearchText = ProductSearchNameOrIDTextBox.GetText();
+                if($('#product-search-small-marker').length > 0) {
+                    $.ajax({
+                        url: '" + Url.Action("ProductSearchSmall", "Products") + @"',
+                        traditional: true,
+                        data: { 
+                            ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                            BrandID: ProductSearchBrandListBox.GetValue(),
+                            LaunchID: ProductSearchLaunchListBox.GetValue(),
+                            PatternID: ProductSearchPatternListBox.GetValue(),
+                            Status: ProductSearchStatusListBox.GetValue(),
+                            StatusID: ProductSearchWebStatusListBox.GetValue(),
+                            StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                            CollectionID: ProductSearchCollectionListBox.GetValue(),
+                            ColourID: ProductSearchColourListBox.GetValue(),
+                            SearchString: SearchText,
+                            ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                            PriceListID: ProductSearchPriceListListBox.GetValue()
+                        },
+                        success: function(data) {
+                            $('#product-data-view-container').html(data);
+                            $('#product-searching-icon').fadeOut('slow');
+                        },
+                        error: function(e, s, a) {
+                            $('#product-searching-icon').fadeOut('slow');
+                            alert(e.responseText);
+                        },
+                        timeout: 20000
+                    });
+                }
+                else {
+                    $.ajax({
+                        url: '" + Url.Action("ProductSearch", "Products") + @"',
+                        traditional: true,
+                        data: { 
+                            ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                            BrandID: ProductSearchBrandListBox.GetValue(),
+                            LaunchID: ProductSearchLaunchListBox.GetValue(),
+                            PatternID: ProductSearchPatternListBox.GetValue(),
+                            Status: ProductSearchStatusListBox.GetValue(),
+                            StatusID: ProductSearchWebStatusListBox.GetValue(),
+                            StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                            CollectionID: ProductSearchCollectionListBox.GetValue(),
+                            ColourID: ProductSearchColourListBox.GetValue(),
+                            SearchString: SearchText,
+                            ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                            PriceListID: ProductSearchPriceListListBox.GetValue()
+                        },
+                        success: function(data) {
+                            $('#product-data-view-container').html(data);
+                            $('#product-searching-icon').fadeOut('slow');
+                        },
+                        error: function(e, s, a) {
+                            $('#product-searching-icon').fadeOut('slow');
+                            alert(e.responseText);
+                        },
+                        timeout: 20000
+                    });
+                }
+            }";
+        }).GetHtml());
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+        @Html.DevExpress().Button(
+            buttonSettings =>
+            {
+                buttonSettings.Name = "ProductSearchAssociatedButtonClear";
+                buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                    ProductSearchAssociatedListBox.UnselectAll();
+                    ProductSearchAssociatedDD.HideDropDown();
+                    ProductSearchAssociatedDD.SetText('Product Page Association');
+                    $('#product-searching-icon').fadeIn('fast');
+                    var SearchText = ProductSearchNameOrIDTextBox.GetText();
+                    if($('#product-search-small-marker').length > 0) {
+                        $.ajax({
+                            url: '" + Url.Action("ProductSearchSmall", "Products") + @"',
+                            traditional: true,
+                            data: { 
+                                ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                                BrandID: ProductSearchBrandListBox.GetValue(),
+                                LaunchID: ProductSearchLaunchListBox.GetValue(),
+                                PatternID: ProductSearchPatternListBox.GetValue(),
+                                Status: ProductSearchStatusListBox.GetValue(),
+                                StatusID: ProductSearchWebStatusListBox.GetValue(),
+                                StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                                CollectionID: ProductSearchCollectionListBox.GetValue(),
+                                ColourID: ProductSearchColourListBox.GetValue(),
+                                SearchString: SearchText,
+                                ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                                PriceListID: ProductSearchPriceListListBox.GetValue()
+                            },
+                            success: function(data) {
+                                $('#product-data-view-container').html(data);
+                                $('#product-searching-icon').fadeOut('slow');
+                            },
+                            error: function(e, s, a) {
+                                $('#product-searching-icon').fadeOut('slow');
+                                alert(e.responseText);
+                            },
+                            timeout: 20000
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            url: '" + Url.Action("ProductSearch", "Products") + @"',
+                            traditional: true,
+                            data: { 
+                                ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                                BrandID: ProductSearchBrandListBox.GetValue(),
+                                LaunchID: ProductSearchLaunchListBox.GetValue(),
+                                PatternID: ProductSearchPatternListBox.GetValue(),
+                                Status: ProductSearchStatusListBox.GetValue(),
+                                StatusID: ProductSearchWebStatusListBox.GetValue(),
+                                StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                                CollectionID: ProductSearchCollectionListBox.GetValue(),
+                                ColourID: ProductSearchColourListBox.GetValue(),
+                                SearchString: SearchText,
+                                ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                                PriceListID: ProductSearchPriceListListBox.GetValue()
+                            },
+                            success: function(data) {
+                                $('#product-data-view-container').html(data);
+                                $('#product-searching-icon').fadeOut('slow');
+                            },
+                            error: function(e, s, a) {
+                                $('#product-searching-icon').fadeOut('slow');
+                                alert(e.responseText);
+                            },
+                            timeout: 20000
+                        });
+                    }
+                }";
+                buttonSettings.Text = "Clear";
+                buttonSettings.Style.Add("float", "left");
+            }
+        )
+        .Render();
+        @Html.DevExpress().Button(
+            buttonSettings =>
+            {
+                buttonSettings.Name = "ProductSearchAssociatedButtonClose";
+                buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                    ProductSearchAssociatedDD.HideDropDown();
+                }";
+                buttonSettings.Text = "Close";
+                buttonSettings.Style.Add("float", "right");
+            }
+        )
+        .Render();
+        ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+    });
+}).GetHtml()

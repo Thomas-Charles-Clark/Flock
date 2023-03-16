@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Articles Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/content/articles.css")
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+    </style>
+}
+@section scripts {
+
+}
+
+<h4 class="page-heading">Articles Overview</h4>
+
+@Html.Action("ArticleGridViewPartial")

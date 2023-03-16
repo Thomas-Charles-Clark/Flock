@@ -1,0 +1,262 @@
+﻿@model Flock.ViewModels.AdvertisingImagesViewModel
+@{
+    ViewBag.Title = "Advertising Images | Asset Delivery System";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section lateStyles {
+    @Styles.Render("~/Content/advertising-images.css")
+}
+
+<h4 class="page-heading">
+    Advertising Images
+</h4>
+
+<script type="text/javascript">
+    function AddNewImage() {
+        NewImageName.Validate();
+        NewImageDescription.Validate();
+
+        if (NewImageName.GetIsValid() && NewImageDescription.GetIsValid()) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '/assetdeliverysystem/addnewimage',
+                type: 'POST',
+                contentType: 'application/json; charset=utf8',
+                data: JSON.stringify({
+                    Name: NewImageName.GetValue(),
+                    Description: NewImageDescription.GetValue()
+                }),
+                success: function (data) {
+                    AddNewImagePopup.Hide();
+                    RefreshPartial();
+                    LoadingPanel.Hide();
+                },
+                timeout: 30000
+            });
+        }
+    }
+
+    function CancelNewImage() {
+        ResetAddNewImagePopup();
+        AddNewImagePopup.Hide();
+    }
+
+    function ResetAddNewImagePopup(s, e) {
+        NewImageName.SetValue(null);
+        NewImageDescription.SetValue(null);
+    }
+
+    function ValidateNewImageName(s, e) {
+        if (e.value == null) {
+            e.isValid = false;
+        }   
+        else {
+            if (e.value.length < 3) {
+                e.errorText = "Name must be a minimum of 3 characters";
+                e.isValid = false;
+            } else if (e.value.length > 50) {
+                e.errorText = "Name must be a maximum of 50 characters";
+                e.isValid = false;
+            }
+        }
+        return e;
+    }
+
+    function ValidateNewImageDescription(s, e) {
+        if (e.value == null) {
+            e.isValid = false;
+        }
+        else {
+            if (e.value.length < 5) {
+                e.errorText = "Description must be a minimum of 5 characters";
+                e.isValid = false;
+            } else if (e.value.length > 4000) {
+                e.errorText = "Name must be a maximum of 4000 characters";
+                e.isValid = false;
+            }
+        }
+        return e;
+    }
+
+    function OpenImageDeleteConfirmation(advertisingImageId) {
+        $.confirm(function (id) {
+            DeleteAdvertisingImage(id);
+        }, function (id) {
+
+        }, advertisingImageId);
+    }
+
+    function DeleteAdvertisingImage(id) {
+        $.ajax({
+            url: '/assetdeliverysystem/deleteimage',
+            type: 'POST',
+            data: {
+                AdvertisingImageID: id
+            },
+            success: function() {
+                RefreshPartial();
+            }
+        });
+    }
+
+    function OpenImageEditor(advertisingImageId) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '/assetdeliverysystem/ImageEditFormPartial',
+            type: 'GET',
+            data: {
+                AdvertisingImageID: advertisingImageId
+            },
+            dataType: 'html',
+            success: function (data) {
+                $("#image-edit-form-container").html(data);
+                ImageEditPopup.Show();
+                LoadingPanel.Hide();
+            }
+        });
+    }
+    
+    function RefreshPartial() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '/assetdeliverysystem/imagespartial',
+            type: 'GET',
+            dataType: 'html',
+            success: function (data) {
+                $("#image-container").html(data);
+                LoadingPanel.Hide();
+            }
+        });
+    }
+
+    function UpdateImage(advertisingImageID) {
+
+        var onDate = OnDate.GetValue();
+
+        if (onDate != null)
+            onDate = new Date(onDate.getFullYear(), onDate.getMonth(), onDate.getDate()).toUTCString();
+
+        var offDate = OffDate.GetValue();
+
+        if (offDate != null)
+            offDate = new Date(offDate.getFullYear(), offDate.getMonth(), offDate.getDate()).toUTCString();
+
+        $.ajax({
+            url: '/assetdeliverysystem/updateimage',
+            type: 'POST',
+            data: {
+                AdvertisingImageID: advertisingImageID,
+                Name: Name.GetValue(),
+                Description: Description.GetValue(),
+                OnDate: onDate,
+                OffDate: offDate
+            },
+            success: function (data) {
+                ImageEditPopup.Hide();
+                RefreshPartial();
+            },
+            error: function(e, s, a) { 
+                $("#image-edit-form-container").html(e.responseText);
+            },
+            timeout: 30000
+        });
+    }
+
+    function CancelEdit() {
+        $("#image-edit-form-container").empty();
+        ImageEditPopup.Hide();
+    }
+
+    function UpdateSortOrders() {
+        var images = new Array();
+        $("#images").children("tr").each(function (index) {
+            images.push({ AdvertisingImageID: $(this).data("advertising-image-id"), SortOrder: index });
+        });
+        
+        $.ajax({
+            url: '/assetdeliverysystem/updatesortorders',
+            type: 'POST',
+            data: {
+                AdvertisingImages: images
+            },
+            success: function (data) {
+
+            },
+            timeout: 30000
+        });
+    }
+</script>
+
+<div id="image-container">
+    @Html.Partial("_ImagesPartial", Model.Images)
+</div>
+
+@Html.DevExpress().PopupControl(settings => {
+    settings.Name = "AddNewImagePopup";
+    settings.Modal = true;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.HeaderText = "Add New Image";
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.ClientSideEvents.Shown = "ResetAddNewImagePopup";
+    settings.SetContent(() => {
+        Html.DevExpress().TextBox(tbSettings => {
+            tbSettings.Name = "NewImageName";
+            tbSettings.Properties.MaxLength = 50;
+            tbSettings.Properties.Caption = "Name";
+            tbSettings.Properties.CaptionSettings.Position = EditorCaptionPosition.Top;
+            tbSettings.Properties.ValidationSettings.ErrorText = "Name must be between 3 and 50 characters";
+            tbSettings.Properties.ClientSideEvents.Validation = "ValidateNewImageName";
+            tbSettings.Width = 300;
+            tbSettings.Style.Add("margin-bottom", "15px");
+        }).Render();
+
+        Html.DevExpress().Memo(mSettings => {
+            mSettings.Name = "NewImageDescription";
+            mSettings.Properties.Rows = 10;
+            mSettings.Properties.MaxLength = 4000;
+            mSettings.Properties.Caption = "Description";
+            mSettings.Properties.CaptionSettings.Position = EditorCaptionPosition.Top;
+            mSettings.Properties.ValidationSettings.ErrorText = "Description must be between 5 and 4000 characters";
+            mSettings.Properties.ClientSideEvents.Validation = "ValidateNewImageDescription";
+            mSettings.Width = 500;
+            mSettings.Style.Add("margin-bottom", "15px");
+        }).Render();
+
+        ViewContext.Writer.Write("<div class='popup-button-container'>");
+        ViewContext.Writer.Write("<button class='btn btn-success' onclick='AddNewImage();'><span class='glyphicon glyphicon-check'></span>Ok</button>");
+        ViewContext.Writer.Write("<button class='btn btn-danger' onclick='CancelNewImage();'><span class='glyphicon glyphicon-remove-circle'></span>Cancel</button>");
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("<div class='clearfix'></div>");
+    });
+}).GetHtml()
+
+@Html.DevExpress().PopupControl(settings => {
+    settings.Name = "ImageEditPopup";
+    settings.Modal = true;
+    settings.Width = 800;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.HeaderText = "Edit Form";
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.SetContent(() => {
+        ViewContext.Writer.Write("<div id='image-edit-form-container'></div>");
+    });
+}).GetHtml()
+
+@*
+    Right, they need to...
+
+    CRUD ads.AdvertisingImage
+
+    Name 50
+    Description MAX (html?)
+    OnDate
+    OffDate
+
+    -- Both necessary to be visible on site
+    - Upload Web Quality (from which generate a thumbnail)
+    - Upload Print Quality
+
+    Shuffle SortOrder (drag drop)
+*@

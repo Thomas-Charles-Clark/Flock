@@ -1,0 +1,81 @@
+﻿@using Flock.ViewModels
+@model MailingListMergeResultViewModel
+
+@if (Model.Returned != null) 
+{ 
+    <h5>Inserted: @(Model.Returned.Count.ToString())</h5>
+    <table id="merged-rows-table" class="custom">
+        <tbody>
+            <tr>
+                <th>
+                    Email
+                </th>
+            </tr>
+        </tbody>
+        <tbody>
+            @for (int i = 0; i < Model.AllRecords.Count; i++ )
+            {
+                if(Model.InsertedRecords.Where(p => p.EMAIL == Model.AllRecords[i].EMAIL).SingleOrDefault() == null) 
+                { 
+                    <tr class="invalid-email">
+                        <td>
+                            &nbsp;
+                        </td>
+                    </tr>
+                }
+                else if (Model.Returned.Where(p => p.EMAIL == Model.AllRecords[i].EMAIL).SingleOrDefault() == null)
+                { 
+                    <tr class="duplicate-email">
+                        <td>
+                            @(Model.AllRecords[i].EMAIL.ToString())
+                        </td>
+                    </tr>   
+                }
+                else
+                {
+                    <tr>
+
+                        <td>
+                            @(Model.AllRecords[i].EMAIL.ToString())
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+
+    <h5 class="key">
+        Key
+    </h5>
+    <table class="custom">
+        <thead>
+            <tr>
+                <th>
+                    Colour
+                </th>
+                <th>
+                    Meaning
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="duplicate-email">
+                    Orange
+                </td>
+                <td>
+                    Duplicate Email
+                </td>
+            </tr>
+            <tr>
+                <td class="invalid-email">
+                    Red
+                </td>
+                <td>
+                    Invalid Email
+                </td>
+            </tr>
+        </tbody>
+    </table>
+}

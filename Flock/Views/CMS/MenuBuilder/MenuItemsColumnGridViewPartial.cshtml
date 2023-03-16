@@ -1,0 +1,608 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var tree = Html.DevExpress().GridView(
+        settings =>
+        {
+        settings.ClientSideEvents.Init = @"function(s, e) { 
+            InitalizejQuery();
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+            InitalizejQuery();
+
+            if(window.ForceUpdate) {
+                window[window.ForceUpdateGridView].Refresh();
+                window.ForceUpdate = undefined;
+                window.ForceUpdateGridView = undefined;
+            }
+        }";
+
+        var MenuID = ViewBag.MenuID;
+        var Column = ViewBag.Column;
+
+        settings.Attributes.Add("data-grid-view-name", "Menu" + MenuID + "Column" + Column + "GridView");
+
+        settings.KeyFieldName = "MenuItemID";
+
+        var UoW = new UnitOfWork<FlockDataContext>();
+
+        var FontClasses = UoW.GetRepository<FontClass>().GetAll().ToList();
+
+        settings.Styles.Row.CssClass = "draggable";
+
+        settings.Name = "Menu"+MenuID+"Column"+Column+"GridView";
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "MenuItemsColumnGridViewPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "CMS", Action = "AddNewMenuItem" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "CMS", Action = "UpdateMenuItem" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "CMS", Action = "DeleteMenuItem" };
+        settings.CustomActionRouteValues = new { Controller = "CMS", Action = "MenuItemsColumnGridViewCustomCommand" };
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.SettingsBehavior.AllowDragDrop = true;
+
+        settings.Styles.EmptyDataRow.CssClass = "draggable";
+
+        settings.HtmlRowPrepared = (sender, e) => {
+            if(e.RowType == GridViewRowType.Data)
+            {
+                e.Row.Attributes.Add("data-menu-item-id", e.KeyValue.ToString());
+                e.Row.Attributes.Add("data-sort-order", e.GetValue("SortOrder").ToString());
+            }
+        };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['MenuID'] = "+MenuID+@";
+            e.customArgs['Column'] = " + Column + @";
+            
+            if(typeof(MenuBuilderPageSelectorGrid) == 'object')
+            {
+                if((MenuBuilderPageSelectorGrid.GetFocusedRowIndex() != -1 || $('#page-id-hidden').val() != 'nothing'))
+                    e.customArgs['PageID'] = $('#page-id-hidden').val();
+
+                if((MenuBuilderProductPageSelectorGrid.GetFocusedRowIndex() != -1 || $('#product-page-id-hidden').val() != 'nothing'))
+                    e.customArgs['ProductPageID'] = $('#product-page-id-hidden').val();
+
+                if((MenuBuilderCollectionSelectorGrid.GetFocusedRowIndex() != -1 || $('#collection-id-hidden').val() != 'nothing'))
+                    e.customArgs['CollectionID'] = $('#collection-id-hidden').val(); 
+    
+                if((MenuBuilderArticleSelectorGrid.GetFocusedRowIndex() != -1 || $('#article-id-hidden').val() != 'nothing'))
+                    e.customArgs['ArticleID'] = $('#article-id-hidden').val();
+
+                if(LinkTypeComboBox.GetValue() == 5 && ExternalURL.GetInputElement() != null) {
+                    e.customArgs['ExternalURL'] = ExternalURL.GetValue();
+                    e.customArgs['PageID'] = null;
+                    e.customArgs['ProductPageID'] = null;
+                    e.customArgs['CollectionID'] = null;
+                    e.customArgs['ArticleID'] = null;
+                }
+
+                if(NewWindow.GetStateInput() != null)
+                    e.customArgs['NewWindow'] = NewWindow.GetValue();
+
+                if(LinkTypeComboBox.GetValue() == 0)
+                {
+                    delete e.customArgs['PageID'];
+                    delete e.customArgs['ProductPageID'];
+                    delete e.customArgs['CollectionID'];
+                    delete e.customArgs['ArticleID'];
+                    delete e.customArgs['ExternalURL'];
+                    e.customArgs['NewWindow'] = false;
+                }
+            }
+        }";
+
+        settings.Styles.Header.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+        settings.Styles.HeaderPanel.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+        settings.Styles.Header.Paddings.PaddingTop = 0;
+        settings.Styles.Header.Paddings.PaddingBottom = 0;
+        settings.EnableCallbackAnimation = false;
+
+        settings.Style.Add("float", "left");
+
+        settings.Styles.Cell.Paddings.PaddingTop = 0;
+        settings.Styles.Cell.Paddings.PaddingBottom = 0;
+        settings.Style.Add("font-family", "'GillSansLight', 'Gill Sans', 'Gill Sans MT', GillSans, Calibri, 'Trebuchet MS', sans-serif !important;");
+
+        settings.Styles.Table.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+        settings.Styles.Cell.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+        settings.Styles.CommandColumn.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+        settings.Style.Add("border", "0");
+        settings.Styles.CommandColumn.Paddings.PaddingTop = 0;
+        settings.Styles.CommandColumn.Paddings.PaddingBottom = 0;
+        settings.Styles.CommandColumn.Paddings.PaddingLeft = 6;
+        settings.Styles.CommandColumn.Paddings.PaddingRight = 12;
+
+        settings.Styles.HeaderPanel.Cursor = "default";
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 3;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+
+        settings.SettingsBehavior.AllowSort = false;
+
+
+        settings.SettingsCommandButton.NewButton.ButtonType = GridCommandButtonRenderMode.Image;
+        settings.SettingsCommandButton.NewButton.Image.Url = "/images/icons/24/edit.png";
+        settings.SettingsCommandButton.NewButton.Image.ToolTip = "New";
+        settings.SettingsCommandButton.NewButton.Image.Width = 16;
+        settings.CommandColumn.ButtonType = GridCommandButtonRenderMode.Button;
+
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.SettingsCommandButton.DeleteButton.ButtonType = GridCommandButtonRenderMode.Image;
+        settings.SettingsCommandButton.DeleteButton.Image.Url = "/images/icons/24/delete.png";
+        settings.SettingsCommandButton.DeleteButton.Image.Width = 12;
+        settings.SettingsCommandButton.DeleteButton.Image.ToolTip = "Delete";
+
+        settings.CommandColumn.ShowEditButton = true;
+        settings.SettingsCommandButton.EditButton.ButtonType = GridCommandButtonRenderMode.Image;
+        settings.SettingsCommandButton.EditButton.Image.Url = "/images/icons/24/edit.png";
+        settings.SettingsCommandButton.EditButton.Image.Width = 12;
+        settings.SettingsCommandButton.EditButton.Image.ToolTip = "Edit";
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.Styles.Cell.Wrap = DefaultBoolean.False;
+
+        settings.KeyFieldName = "MenuItemID";
+
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+        //settings.SettingsPopup.EditForm.Modal = true;
+
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+
+        settings.Columns.Add(
+    column =>
+    {
+        column.FieldName = "Name";
+        column.Width = System.Web.UI.WebControls.Unit.Percentage(60);
+        column.SetHeaderCaptionTemplateContent(c => { });
+
+        column.SetDataItemTemplateContent(c =>
+        {
+            string fontClass = FontClasses.Where(p => p.FontClassID == Convert.ToInt16(DataBinder.Eval(c.DataItem, "FontClassID"))).Select(p => p.FontClass1).SingleOrDefault();
+            var title = "";
+            var PageID = (int?)DataBinder.Eval(c.DataItem, "PageID");
+            if (PageID != null)
+            {
+                title = "MenuItemID: " + DataBinder.Eval(c.DataItem, "MenuItemID").ToString() + " - Page ID: " + PageID.ToString() + " - " + UoW.GetRepository<Flock.Models.Page>().GetAll().Where(p => p.PageID == PageID).Select(p => p.Name).Single();
+                ViewContext.Writer.Write("<a class='" + fontClass + "' href='/admin/cms/compose/" + PageID.ToString() + "' title='" + title + "'>" + c.Text + "</a>");
+            }
+            var CollectionID = (short?)DataBinder.Eval(c.DataItem, "CollectionID");
+            if (CollectionID != null)
+            {
+                title = "MenuItemID: " + DataBinder.Eval(c.DataItem, "MenuItemID").ToString() + " - Collection ID: " + CollectionID.ToString() + " - " + UoW.GetRepository<Flock.Models.Collection>().GetAll().Where(p => p.CollectionID == CollectionID).Select(p => p.Name).Single();
+                ViewContext.Writer.Write("<a class='" + fontClass + "' href='/admin/collections/compose/" + CollectionID.ToString() + "' title='" + title + "'>" + c.Text + "</a>");
+            }
+            var ProductPageID = (int?)DataBinder.Eval(c.DataItem, "ProductPageID");
+            if (ProductPageID != null)
+            {
+                title = "MenuItemID: " + DataBinder.Eval(c.DataItem, "MenuItemID").ToString() + " - Product Page ID: " + ProductPageID.ToString() + " - " + UoW.GetRepository<ProductPage>().GetAll().Where(p => p.ProductPageID == ProductPageID).Select(p => p.Name).Single();
+                ViewContext.Writer.Write("<a class='" + fontClass + "' href='/admin/productpages/compose/" + ProductPageID.ToString() + "' title='" + title + "'>" + c.Text + "</a>");
+            }
+            var ArticleID = (int?)DataBinder.Eval(c.DataItem, "ArticleID");
+            if (ArticleID != null)
+            {
+                title = "MenuItemID: " + DataBinder.Eval(c.DataItem, "MenuItemID").ToString() + " - Article ID: " + ArticleID.ToString() + " - " + UoW.GetRepository<Article>().GetAll().Where(p => p.ArticleID == ArticleID).Select(p => p.Name).Single();
+                ViewContext.Writer.Write("<a class='" + fontClass + "' href='/admin/articles/compose/" + ArticleID.ToString() + "' title='" + title + "'>" + c.Text + "</a>");
+            }
+            var ExternalURL = DataBinder.Eval(c.DataItem, "ExternalURL");
+            if (ExternalURL != null)
+            {
+                title = "MenuItemID: " + DataBinder.Eval(c.DataItem, "MenuItemID").ToString() + " - External URL";
+                ViewContext.Writer.Write("<a class='" + fontClass + "' href='" + ExternalURL.ToString() + "' title='" + title + "'>" + c.Text + "</a>");
+            }
+            var BannerLocationID = DataBinder.Eval(c.DataItem, "BannerLocationID");
+            if(BannerLocationID != null)
+            {
+                title = "Banner Location " + BannerLocationID.ToString();
+                ViewContext.Writer.Write("<div style='width: 156px; height: 156px; text-align: center; border: 1px solid #ccc; background: white !important;'><span style='line-height: 156px;'>" + title + "</span></div>");
+            }
+            if(PageID == null && CollectionID == null && ProductPageID == null && ArticleID == null && BannerLocationID == null && ExternalURL == null)
+            {
+                ViewContext.Writer.Write("<span class='" + fontClass + "' title='MenuItemID: "+DataBinder.Eval(c.DataItem, "MenuItemID").ToString()+"'>" + (fontClass == "menu-spacer" || fontClass == "menu-heading-spacer" ? fontClass : c.Text ) + "</span>");
+            }
+        });
+    });
+
+        @* Add checkbox for MenuItem.TrackExternalURL *@
+
+            settings.SetEditFormTemplateContent(c => {
+                ViewContext.Writer.Write("<div id='edit-form' style='min-width: 300px;'>");
+                ViewContext.Writer.Write("<div style='width: 100%; padding: 0 0.5em;'>");
+                Html.DevExpress().Label(lblSettings => {
+                    lblSettings.Name = "NameLbl";
+                    lblSettings.Text = "Name";
+                    lblSettings.Width = 45;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "22px");
+                    lblSettings.Style.Add("margin-right", "1em");
+                    lblSettings.AssociatedControlName = "Name";
+                }).Render();
+                Html.DevExpress().TextBox(tbSettings => {
+                    tbSettings.Name = "Name";
+                    tbSettings.Style.Add("float", "left");
+                    tbSettings.Style.Add("margin-bottom", "5px");
+                    tbSettings.Style.Add("margin-right", "1em");
+                    tbSettings.ShowModelErrors = true;
+                    tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                }).Bind(DataBinder.Eval(c.DataItem, "Name")).Render();
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Name = "ClassLbl";
+                    lblSettings.Text = "Font Style";
+                    lblSettings.Width = 89;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "22px");
+                    lblSettings.Style.Add("margin-right", "1em");
+                    lblSettings.AssociatedControlName = "FontClassID";
+                }).Render();
+                Html.DevExpress().ComboBox(cbSettings =>
+                {
+                    cbSettings.Name = "FontClassID";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Style.Add("margin-right", "1em");
+                    cbSettings.ShowModelErrors = true;
+                    var cbProp = cbSettings.Properties as ComboBoxProperties;
+                    cbProp.ValueField = "FontClassID";
+                    cbProp.ValueType = typeof(short);
+                    cbProp.TextField = "Name";
+                    cbProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetFontClasses("menu")).Bind(DataBinder.Eval(c.DataItem, "FontClassID") == null ? (short)1 : DataBinder.Eval(c.DataItem, "FontClassID")).Render();
+
+                ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+                var Linkage = "Nothing";
+                var LinkTypeID = 0;
+                var LinkID = 0;
+                char? TypeChar = 'x';
+
+                if (DataBinder.Eval(c.DataItem, "PageID") != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.Page>().GetAll()
+                        .Where(p => p.PageID == Convert.ToInt32(DataBinder.Eval(c.DataItem, "PageID"))).Select(p => p.Name).Single();
+                    TypeChar = 'l';
+                    LinkID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "PageID"));
+                    LinkTypeID = 1;
+                }
+                else if (DataBinder.Eval(c.DataItem, "ProductPageID") != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.ProductPage>().GetAll()
+                        .Where(p => p.ProductPageID == Convert.ToInt32(DataBinder.Eval(c.DataItem, "ProductPageID"))).Select(p => p.Name).Single();
+                    TypeChar = 'p';
+                    LinkID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "ProductPageID"));
+                    LinkTypeID = 2;
+                }
+                else if (DataBinder.Eval(c.DataItem, "CollectionID") != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.Collection>().GetAll()
+                        .Where(p => p.CollectionID == Convert.ToInt16(DataBinder.Eval(c.DataItem, "CollectionID"))).Select(p => p.Name).Single();
+                    TypeChar = 'c';
+                    LinkID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "CollectionID"));
+                    LinkTypeID = 3;
+                }
+                else if (DataBinder.Eval(c.DataItem, "ArticleID") != null)
+                {
+                    Linkage = UoW.GetRepository<Flock.Models.Article>().GetAll()
+                        .Where(p => p.ArticleID == Convert.ToInt16(DataBinder.Eval(c.DataItem, "ArticleID"))).Select(p => p.Name).Single();
+                    TypeChar = 'a';
+                    LinkID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "ArticleID"));
+                    LinkTypeID = 4;
+                }
+                else if (DataBinder.Eval(c.DataItem, "ExternalURL") != null)
+                {
+                    Linkage = "External: " + Convert.ToString(DataBinder.Eval(c.DataItem, "ExternalURL"));
+                    TypeChar = null;
+                    LinkTypeID = 5;
+                }
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Name = "LinkLbl";
+                    lblSettings.Text = "Links to: ";
+                    lblSettings.Width = 45;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "22px");
+                    lblSettings.Style.Add("margin-right", "1em");
+                    lblSettings.AssociatedControlName = "Name";
+                }).Render();
+
+                var source = new List<object> {
+                        new { SName = "Nothing", SID = (byte)0 },
+                        new { SName = "Page", SID = (byte)1 },
+                        new { SName = "Product Page", SID = (byte)2 },
+                        new { SName = "Collection", SID = (byte)3 },
+                        new { SName = "Article", SID = (byte)4 },
+                        new { SName = "External URL", SID = (byte)5 } };
+
+                Html.DevExpress().ComboBox(cbSettings =>
+                {
+                    cbSettings.Name = "LinkTypeComboBox";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Properties.TextField = "SName";
+                    cbSettings.Properties.ValueField = "SID";
+                    cbSettings.Properties.ValueType = typeof(byte);
+                    cbSettings.Style.Add("margin-right", "1em");
+                    cbSettings.SelectedIndex = LinkTypeID;
+                    cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+                        RevealLinkSelector(s.GetSelectedItem().value);
+                        if(s.GetSelectedItem().value == 0 || s.GetSelectedItem().value == 5)
+                            $('#link-test').hide();
+                        else
+                            $('#link-test').show();
+                    }";
+                    cbSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+                        $('#link-selector-" + LinkTypeID + @"').show();
+                        if(s.GetSelectedItem().value != 0 && s.GetSelectedItem().value != 5)
+                            $('#link-test').show();
+                        else
+                            $('#link-test').hide();
+                    }";
+                }).BindList(source).Render();
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Name = "BannerLocLbl";
+                    lblSettings.Text = "Banner Location";
+                    lblSettings.Width = 90;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "22px");
+                    lblSettings.Style.Add("margin-right", "1em");
+                    lblSettings.Style.Add("margin-left", "25px");
+                    lblSettings.AssociatedControlName = "BannerLocationID";
+                }).Render();
+                Html.DevExpress().ComboBox(cbSettings =>
+                {
+                    cbSettings.Name = "BannerLocationID";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Style.Add("margin-right", "1em");
+                    cbSettings.ShowModelErrors = true;
+                    var cbProp = cbSettings.Properties as ComboBoxProperties;
+                    cbProp.ValueField = "BannerLocationID";
+                    cbProp.ValueType = typeof(byte);
+                    cbProp.TextField = "Name";
+                    cbProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetBannerLocationsForMenuBuilder()).Bind(DataBinder.Eval(c.DataItem, "BannerLocationID")).Render();
+
+
+                ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Text = "Query String";
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("margin-right", "1em");
+                    lblSettings.Style.Add("line-height", "22px");
+                }).Render();
+                Html.DevExpress().TextBox(tbSettings =>
+                {
+                    tbSettings.Name = "QueryStringParameters";
+                    tbSettings.Width = 149;
+                    tbSettings.Style.Add("float", "left");
+                    tbSettings.Properties.MaxLength = 50;
+                }).Bind(DataBinder.Eval(c.DataItem, "QueryStringParameters")).Render();
+
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Name = "ColumnTextAlignLbl";
+                    lblSettings.Text = "Column Text Align";
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "22px");
+                    lblSettings.Style.Add("margin-right", "1em");
+                    lblSettings.Style.Add("margin-left", "31px");
+                    lblSettings.AssociatedControlName = "TextAlign";
+                }).Render();
+                Html.DevExpress().ComboBox(cbSettings =>
+                {
+                    cbSettings.Name = "TextAlign";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Style.Add("margin-right", "1em");
+                    cbSettings.ShowModelErrors = true;
+                    var cbProp = cbSettings.Properties as ComboBoxProperties;
+
+                    cbProp.Items.Add("left", "left");
+                    cbProp.Items.Add("center", "center");
+                    cbProp.Items.Add("right", "right");
+
+                }).Bind(DataBinder.Eval(c.DataItem, "TextAlign")).Render();
+
+
+                ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Name = "TradeLbl";
+                    lblSettings.Text = "Trade / Retail";
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "22px");
+                    lblSettings.Style.Add("margin-right", "0.5em");
+                    lblSettings.AssociatedControlName = "Name";
+                }).Render();
+
+                var tradeSource = new List<object> {
+                        new { name = "Both", value = (bool?)null },
+                        new { name = "Retail", value = (bool?)false },
+                        new { name = "Trade", value = (bool?)true } };
+
+                var tradeSwitchIndex = 0;
+
+                var tradeSwitchValue = (bool?)DataBinder.Eval(c.DataItem, "TradeSwitch");
+
+                switch (tradeSwitchValue)
+                {
+                    case true:
+                        tradeSwitchIndex = 2;
+                        break;
+                    case false:
+                        tradeSwitchIndex = 1;
+                        break;
+                    default:
+                        tradeSwitchIndex = 0;
+                        break;
+                }
+
+                Html.DevExpress().ComboBox(cbSettings =>
+                {
+                    cbSettings.Name = "TradeSwitch";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Properties.TextField = "name";
+                    cbSettings.Properties.ValueField = "value";
+                    cbSettings.Properties.ValueType = typeof(bool?);
+                    cbSettings.Style.Add("margin-right", "1em");
+                    cbSettings.SelectedIndex = tradeSwitchIndex;
+                    cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    cbSettings.ShowModelErrors = true;
+                    cbSettings.Width = 152;
+                }).BindList(tradeSource).Render();
+
+                ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+
+
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Text = "Track External URL";
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("margin-right", "0.5em");
+                    lblSettings.Style.Add("line-height", "22px");
+                }).Render();
+                Html.DevExpress().CheckBox(cbSettings =>
+                {
+                    cbSettings.Name = "TrackExternalURL";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Style.Add("line-height", "20px");
+                    cbSettings.Style.Add("margin-right", "2em");
+                }).Bind(Convert.ToBoolean(DataBinder.Eval(c.DataItem, "TrackExternalURL"))).Render();
+
+                ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Text = "New Window";
+                    lblSettings.Width = 75;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "22px");
+                }).Render();
+                Html.DevExpress().CheckBox(cbSettings =>
+                {
+                    cbSettings.Name = "NewWindow";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Style.Add("line-height", "20px");
+                    cbSettings.Style.Add("margin-right", "2em");
+                }).Bind(Convert.ToBoolean(DataBinder.Eval(c.DataItem, "NewWindow"))).Render();
+
+                ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+                Html.DevExpress().Label(lblSettings =>
+                {
+                    lblSettings.Text = "No Follow";
+                    lblSettings.Width = 60;
+                    lblSettings.Style.Add("float", "left");
+                    lblSettings.Style.Add("line-height", "22px");
+                }).Render();
+                Html.DevExpress().CheckBox(cbSettings =>
+                {
+                    cbSettings.Name = "NoFollow";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Style.Add("line-height", "20px");
+                    cbSettings.Style.Add("margin-right", "2em");
+                }).Bind(Convert.ToBoolean(DataBinder.Eval(c.DataItem, "NoFollow"))).Render();
+
+
+                ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+
+                if (LinkTypeID == 1 || LinkTypeID == 2 || LinkTypeID == 3 || LinkTypeID == 4)
+                    ViewContext.Writer.Write("<a id='link-test' style='font-size: 15px; line-height: 22px; margin-bottom: 7px;' target='_blank' href='http://www.designersguild.com/uk/" + TypeChar + LinkID + "' >" + Linkage + "</a>");
+
+                ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+                ViewContext.Writer.Write(@"
+                        <div id='link-selector-0' class='link-selector'>
+                            <input type='hidden' id='page-id-hidden' value='" + (DataBinder.Eval(c.DataItem, "PageID") == null ? "nothing" : DataBinder.Eval(c.DataItem, "PageID").ToString()) + @"' />
+                            <input type='hidden' id='product-page-id-hidden' value='" + (DataBinder.Eval(c.DataItem, "ProductPageID") == null ? "nothing" : DataBinder.Eval(c.DataItem, "ProductPageID").ToString()) + @"' />
+                            <input type='hidden' id='collection-id-hidden' value='" + (DataBinder.Eval(c.DataItem, "CollectionID") == null ? "nothing" : DataBinder.Eval(c.DataItem, "CollectionID").ToString()) + @"' />
+                            <input type='hidden' id='article-id-hidden' value='" + (DataBinder.Eval(c.DataItem, "ArticleID") == null ? "nothing" : DataBinder.Eval(c.DataItem, "ArticleID").ToString()) + @"' />
+                        </div>
+                    ");
+
+                ViewContext.Writer.Write(@"
+                        <div id='link-selector-1' class='link-selector'>
+                            " + Html.Partial("MenuBuilderPageSelectorGridPartial", "") + @"
+                        </div>
+                    ");
+
+                ViewContext.Writer.Write(@"
+                        <div id='link-selector-2' class='link-selector'>
+                            " + Html.Partial("MenuBuilderProductPageSelectorGridPartial", "") + @"
+                        </div>
+                    ");
+
+                ViewContext.Writer.Write(@"
+                        <div id='link-selector-3' class='link-selector'>
+                            " + Html.Partial("MenuBuilderCollectionSelectorGridPartial", "") + @"
+                        </div>
+                    ");
+
+                ViewContext.Writer.Write(@"
+                        <div id='link-selector-4' class='link-selector'>
+                            " + Html.Partial("MenuBuilderArticleSelectorGridPartial", "") + @"
+                        </div>
+                    ");
+
+                ViewContext.Writer.Write("<div id='link-selector-5' class='link-selector'>");
+                Html.DevExpress().TextBox(tbSettings =>
+                {
+                    tbSettings.Name = "ExternalURL";
+                    tbSettings.Properties.ClientInstanceName = "ExternalURL";
+                    tbSettings.Properties.NullText = "External URL";
+                    tbSettings.Properties.NullDisplayText = "External URL";
+                    tbSettings.Properties.MaxLength = 255;
+                    tbSettings.Text = DataBinder.Eval(c.DataItem, "ExternalURL") == null ? "" : DataBinder.Eval(c.DataItem, "ExternalURL").ToString();
+                }).Render();
+                ViewContext.Writer.Write("</div>");
+
+                ViewContext.Writer.Write("</div>");
+
+                ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+                ViewContext.Writer.Write("<div style='text-align: right; margin-top: 1em;'>");
+                Html.DevExpress().Button(btnSettings =>
+                {
+                    btnSettings.Name = "btnUpdate";
+                    btnSettings.ControlStyle.CssClass = "button";
+                    btnSettings.Text = "Update";
+                    btnSettings.Style.Add("margin-right", "1em");
+                    btnSettings.ClientSideEvents.Click = "function(s, e){ Menu" + MenuID + "Column" + Column + "GridView.UpdateEdit(); }";
+                }).Render();
+                Html.DevExpress().Button(btnSettings =>
+                {
+                    btnSettings.Name = "btnCancel";
+                    btnSettings.ControlStyle.CssClass = "button";
+                    btnSettings.Text = "Cancel";
+                    btnSettings.ClientSideEvents.Click = "function(s, e){ Menu" + MenuID + "Column" + Column + "GridView.CancelEdit(); }";
+                }).Render();
+
+                ViewContext.Writer.Write("</div>");
+                ViewContext.Writer.Write("</div>");
+            });
+        });
+
+if (ViewData["EditError"] != null)
+{
+    tree.SetEditErrorText((string)ViewData["NodeEditError"]);
+}
+
+tree.Bind(Model).GetHtml();
+}

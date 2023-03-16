@@ -1,0 +1,79 @@
+﻿@{
+    ViewBag.Title = "Image Version Checker";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@model Flock.ViewModels.ImageVersionCheckerViewModel
+@section styles{
+    <style type="text/css">
+        #container { 
+            width: 1366px;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        function Replace(CandidateID, IncumbentID) {
+            $.ajax({
+                url: '@Url.Action("ConfirmReplacement", "Images")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    CandidateID: CandidateID,
+                    IncumbentID: IncumbentID
+                },
+                success: function (data) {
+                    $("#row-" + CandidateID + "-" + IncumbentID).remove();
+                    var t = Number($("#total-counter").html());
+                    var r = t - 1;
+                    $("#total-counter").html(r.toString());
+                }
+            });
+        }
+    </script>
+}
+
+<h4 class="page-heading">Version Checker</h4>
+
+<div id="display-container">
+    <table style="width: 100%; margin: 0 auto;">
+        <thead>
+            <tr>
+                <th style="width: 38%; font-size: 2em; text-align: center;">
+                    New
+                </th>
+                <th style="text-align: center;">
+                    Total: <span id="total-counter">@(Model.Images.Count)</span>
+                </th>
+                <th style="width: 38%; font-size: 2em; text-align: center;">
+                    Existing
+                </th>
+            </tr>
+        </thead>
+        @foreach (var p in Model.Images)
+        {
+            <tbody id="row-@(p.NewestVersionImageID)-@(p.OldVersionImageID)">
+                <tr>
+                    <td class="left-image" style="padding: 1em; text-align: center;">
+                        <img title="@(p.NewestVersionImageID)" src="https://flock.designersguild.com/imagelibrary/488/@(p.NewestVersionImageID).jpeg">
+                    </td>
+                    <td class="mid" style="padding: 2em; text-align: center;">
+                        @Html.DevExpress().Button(settings =>
+                        {
+                            settings.Name = "btn-" + p.NewestVersionImageID.ToString() + "-" + p.OldVersionImageID.ToString();
+                            settings.ClientSideEvents.Click = @"function(s, e) {
+                                Replace(" + p.NewestVersionImageID.ToString() + ", " + p.OldVersionImageID.ToString() + @");
+                            }";
+                            settings.Text = "Replace";
+                            settings.Width = 120;
+                            settings.Style.Add("margin", "0 auto");
+                        }).GetHtml()
+                    </td>
+                    <td class="right-image" style="padding: 1em; text-align: center;">
+                        @*imagelibrary/654/14225.jpeg*@
+                        <img title="@(p.OldVersionImageID)" src="https://flock.designersguild.com/imagelibrary/488/@(p.OldVersionImageID).jpeg">
+                    </td>
+                </tr>
+            </tbody>
+        }
+    </table>
+</div>

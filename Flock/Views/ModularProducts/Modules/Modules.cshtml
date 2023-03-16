@@ -1,0 +1,171 @@
+﻿
+@{
+    ViewBag.Title = "Modules";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    @Styles.Render("~/bundles/composer")
+
+    <style type="text/css">
+        #module-grid-container {
+            margin-bottom: 2em;
+        }
+
+        #module-options-grid-container {
+            margin-bottom: 2em;
+        }
+
+        #module-option-group-grid-container {
+            margin-bottom: 2em;
+        }
+
+        .drop-hover {
+            background-color: rgba(42, 200, 63, 0.1);
+        }
+
+        #container {
+            width: 100%;
+        }
+
+        #module-options-sorter {
+            width: 50%;
+        }
+
+        .module-option-group-placeholder {
+            background-color: rgba(149, 250, 96, 0.30);
+            border: 1px solid rgba(149, 250, 96, 0.60);
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .module-option {
+            float: left;
+            margin: 0 5px 5px 0;
+            width: 90px;
+            height: 116px;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            border: 1px solid transparent;
+        }
+
+        .module-option-group-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        .module-option-group-description {
+            margin-bottom: 3px;
+        }
+
+        .module-option-group {
+            margin-bottom: 10px;
+        }
+
+        .module-option img.module-option-image {
+            display: block;
+        }
+
+        .module-option span.module-option-name {
+            display: block;
+        }
+
+        .module-image-placeholder {
+            /*width: 90px;
+            height: 116px;*/
+            margin: 0 5px 5px 0;
+            background-color: rgba(149, 250, 96, 0.30);
+            border: 1px solid rgba(149, 250, 96, 0.60);
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            float: left;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Modules</h4>
+<div class="page-subheading"></div>
+
+<div id="module-grid-container">
+    @Html.Action("ModuleGridViewPartial")
+</div>
+
+<div id="module-detail-container">
+
+</div>
+
+<script type="text/javascript">
+    function initDragDrop() {
+        $('.ar1').draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }
+        });
+    }
+
+    function initSortables() {
+        $("#module-options-sorter").sortable({
+            placeholder: 'module-option-group-placeholder',
+            forcePlaceHolderSize: true,
+            start: function (e, ui) {
+                ui.placeholder.height(ui.item.height());
+                ui.placeholder.width(ui.item.width());
+            },
+            update: function (event, ui) {
+                var toUpdate = new Array();
+                $(event.target).find("div.module-option-group").each(function (index) {
+                    var thisModuleOption = new Object();
+                    thisModuleOption.ModuleOptionGroupID = $(this).data("module-option-group-id");
+                    thisModuleOption.SortOrder = index.toString();
+                    toUpdate.push(thisModuleOption);
+                });
+                //console.log(toUpdate);
+
+                $.ajax({
+                    url: '@Url.Action("ModuleOptionGroupSort", "ModularProducts")',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({ items: toUpdate }),
+                    success: function (data) {
+
+                    }
+                })
+            }
+        });
+
+        $(".module-option-group-sortable").sortable({
+            placeholder: 'module-image-placeholder',
+            forcePlaceHolderSize: true,
+            start: function(e, ui){
+                ui.placeholder.height(ui.item.height());
+                ui.placeholder.width(ui.item.width());
+            },
+            update: function (event, ui) {
+                var toUpdate = new Array();
+                $(event.target).find("div.module-option").each(function (index) {
+                    var thisModuleOption = new Object();
+                    thisModuleOption.ModuleOptionID = $(this).data("module-option-id");
+                    thisModuleOption.SortOrder = index.toString();
+                    toUpdate.push(thisModuleOption);
+                });
+                //console.log(toUpdate);
+
+                $.ajax({
+                    url: '@Url.Action("ModuleOptionSort", "ModularProducts")',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({ items: toUpdate }),
+                    success: function(data) {
+
+                    }
+                })
+            }
+        });
+    }
+</script>

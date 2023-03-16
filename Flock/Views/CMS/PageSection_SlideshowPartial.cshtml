@@ -1,0 +1,109 @@
+﻿@using Flock.ViewModels
+@using Flock.Models
+@model Slideshow_PageSection
+<fieldset>
+    <legend style="color: black; border-bottom-color: #929292; width: 100%;" onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + Model.PageSectionID + "-contents').slideToggle('fast');")">
+        @(Model.ARDescription) Slideshow @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
+        <span style="margin: 0 12px;">Slideshow ID: @(Model.SlideshowID)</span>
+        <span style="margin: 0 4px;">Page Section ID: @(Model.PageSectionID)</span>
+
+        <img id="page-section-@(Model.PageSectionID)-remove" title="Remove" class="pagesection-remove-icon" src="/images/systemicons/remove-icon.png" onclick="event.stopPropagation(); RemovePageSection(@(Model.PageSectionID));" />
+        <img id="page-section-@(Model.PageSectionID)-save" title="Save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="event.stopPropagation(); SavePageSectionDetails(@(Model.PageSectionID), @(Model.PageSectionTypeID));" />
+        <img id="page-section-@(Model.PageSectionID)-advanced" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="event.stopPropagation(); ShowAdvancedSettings(@(Model.PageSectionID), @(Model.PageSectionTypeID));" />
+        <img id="pagesection-@(Model.PageSectionID)-clone" src="~/Images/icons/32/o_collection/element_copy.png" class="pagesection-clone-icon" title="Clone Page Section" onclick="event.stopPropagation(); $('#clone-popup-page-section-id').val(@(Model.PageSectionID)); ClonePageSectionPopup.Show();" />
+        <img id="page-section-@(Model.PageSectionID)-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+    </legend>
+    <div id="page-section-@(Model.PageSectionID)-header-details" class="pagesection-header">
+        @Html.Partial("PageSectionHeaderDetails", Model)
+    </div>
+    <div id="page-section-@(Model.PageSectionID)-contents" style="background-color: white; padding: 0; width: 980px; @(ViewBag.IsUserShuffling ? "display: none;" : "" )" class="page-section-hideable">
+        <div id="page-section-@(Model.PageSectionID)-slideshow" style="height: 1px; width: 100%; position: relative;">
+            @*@(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Partial("PageSectionSlideshow", Model))*@
+        </div>
+        <div class="fieldset-inner">
+            <div id="page-section-@(Model.PageSectionID)-slideshow-images" data-slideshow-accepts="@(Model.ARID)" data-images-count="@(Model.Images.Count)" data-slideshow-id="@(Model.SlideshowID)" data-pagesection-id="@(Model.PageSectionID)" class="slideshow-list-@(Model.ARID) horizontal-slideshow-images-container">
+                @for (int i = 0; i < Model.Images.Count; i++)
+                {
+                    <div class="horizontal-slideshow-images-sortable" style="position: relative; cursor: pointer"
+                         data-image-id="@(Model.Images[i].Record.ImageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({ opacity: 0.0 }, 300);">
+                        <span class="v1-image-id-display">V1 ImageID @(Model.Images[i].Record.Image.IntranetImageID)</span>
+                        <img src="https://flock.designersguild.com/imagelibrary/239/@(Model.Images[i].Record.ImageID).jpeg" />
+                        <img src="/images/systemicons/remove-icon.png" title="Remove" class="image-remove-icon" onclick="RemoveImageFromSlideshow(@(Model.PageSectionID), @(Model.SlideshowID), @(Model.Images[i].Record.ImageID))" />
+                        @if (Model.Images[i].Record.Image.DeletedDT != null)
+                        {
+                            <span class="pod-image-deleted-strip"></span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <div data-slideshow-id="@(Model.SlideshowID)" data-page-section-id="@(Model.PageSectionID)" style="padding: 1em; padding-top: 0;">
+            @Html.Partial("CountryLanguageRestrictionPartial", Model.CountryLanguageRestrictions)
+        </div>
+    </div>
+</fieldset>
+
+
+<div id="page-section-@(Model.PageSectionID)-advanced-settings" class="page-section-advanced-container">
+@{
+    if (Model.Images.Count > 0)
+    { 
+        <div id="slideshow-image-@(Model.PageSectionID)-overlay-container" style="width: 800px;">
+            <i style='display: block; text-align: center;'>Loading</i>
+        </div>
+    }
+    else
+    {
+        <h6>No images in Slideshow.</h6> 
+    }       
+}
+</div>
+
+<script type="text/javascript">
+    if (typeof (InitSlideshowDragDrop) == "function")
+        InitSlideshowDragDrop();
+</script>
+    @{
+        if (Model.Images.Count > 0) 
+        {
+            <script type="text/javascript">
+                if (document.readyState === "complete" || document.readyState === "interactive")
+                {
+                    $.ajax({
+                        url: '@Url.Action("SlideshowImageOverlayPartial", "CMS")',
+                        type: 'GET',
+                        traditional: true,
+                        data: {
+                            slideShowID: '@(Model.Images[0].Record.SlideShowID)',
+                            pageSectionID: '@(Model.PageSectionID)',
+                            arID: '@(Model.ARID)',
+                            imageID: '@(Model.Images[0].Record.ImageID)'
+                        },
+                        success: function (data) {
+                            $('#slideshow-image-@(Model.PageSectionID)-overlay-container').html(data);
+                        },
+                        timeout: 20000
+                    });
+                }
+                else{
+                    $(window).bind("load", function() {
+                        $.ajax({
+                            url: '@Url.Action("SlideshowImageOverlayPartial", "CMS")',
+                            type: 'GET',
+                            traditional: true,
+                            data: {
+                                slideShowID: '@(Model.Images[0].Record.SlideShowID)',
+                                pageSectionID: '@(Model.PageSectionID)',
+                                arID: '@(Model.ARID)',
+                                imageID: '@(Model.Images[0].Record.ImageID)'
+                            },
+                            success: function (data) {
+                                $('#slideshow-image-@(Model.PageSectionID)-overlay-container').html(data);
+                            },
+                            timeout: 20000
+                        });
+                    });
+                }
+            </script>
+        }
+    }

@@ -1,0 +1,15 @@
+﻿@model List<Flock.Models.Employee>
+@Html.DevExpress().ListBox(settings =>
+{
+    settings.Name = "Available_Employees";
+    settings.Width = 370;
+    settings.Height = 505;
+    settings.ControlStyle.CssClass = "listBoxRight";
+    settings.Properties.ItemStyle.CssClass = "lbItem";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "EmployeeID";
+    settings.Properties.ValueType = typeof(Int16);
+    settings.Properties.Caption = "Employees";
+    settings.Properties.ClientInstanceName = "lbAvailable";
+    settings.Properties.CaptionCellStyle.Width = 74;
+}).BindList(Model.OrderBy(p => p.Name)).GetHtml()

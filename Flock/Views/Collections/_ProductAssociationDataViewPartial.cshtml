@@ -1,0 +1,48 @@
+@model List<Flock.Models.Product_SearchResult>
+<script type="text/javascript">
+    window.productsInCollection = new Array();
+</script>
+@for (int i = 0; i < Model.Count(); i++)
+{
+    <script type="text/javascript">window.productsInCollection.push(@Model[i].ProductID)</script>
+    var statusColour = "black";
+    switch(Model[i].Status)
+    {
+        case 'C':
+            statusColour = "green";
+            break;
+        case 'Y':
+            statusColour = "yellow";
+            break;
+        case 'L':
+            statusColour = "yellow";
+            break;
+        case 'D':
+            statusColour = "red";
+            break;
+        default: break;
+    }
+    <div style='border-bottom: 2px solid @(statusColour)' data-product-id='@(Model[i].ProductID)'>" +
+        <div style="height: 156px;">
+            <img src="https://flock.designersguild.com/ImageLibrary/156/@(Model[i].ImageID).jpeg" alt="" />
+        </div>
+        <label>@(Model[i].Name)</label>
+    </div>
+}
+<script type="text/javascript">
+    if ($("#collection-contents").length > 0) {
+        $("#collection-contents").sortable({
+            connectWith: '.draggable',
+            stop: function (ev, ui) {
+
+                $("#collection-contents").sortable("refresh");
+                window.products = new Array();
+                $("#collection-contents").children("div").each(function (index) {
+                    products.push({ ProductID: $(this).data("product-id"), SortOrder: index });
+                });
+                UpdateCollection();
+            }
+        });
+        initDragDrop();
+    }
+</script>

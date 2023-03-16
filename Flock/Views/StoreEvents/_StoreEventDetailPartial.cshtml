@@ -1,0 +1,129 @@
+﻿@using Flock.Models
+@model Flock.ViewModels.StoreEventViewModel
+
+<div id="store-event-locations-wrapper">
+    <h3>@(Model.Name)</h3>
+
+    <div id="store-event-locations-container">
+        @foreach (var sl in Model.SelectedStoreEventLocations)
+        {
+            var thisLocation = Model.SelectedStoreEventLocations.Where(p => p.StoreEventLocationID == sl.StoreEventLocationID).SingleOrDefault();
+
+            <div id="store-event-location-@(sl.StoreEventLocationID)" class="store-event-location @(thisLocation == null ? "location-unselected" : "location-selected")">
+                <h4 class="center-text">@(sl.StoreEventLocation.Name)</h4>
+
+                @*<table class="event-date-time-table">
+                    <thead>
+                        <tr>
+                            <th>Event Date</th>
+                            <th>Event Times</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dt in thisLocation.StoreEvent_Dates)
+                        {
+                            <tr>
+                                <td>
+                                    @dt.EventDate.ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    <div id="date-times-container-@(sl.StoreEventLocationID)" data-storeevent_dateid="@(dt.StoreEvent_DateID)">
+                                        @Html.Action("EventDateTimePartial", "StoreEvents", new { StoreEvent_DateID = dt.StoreEvent_DateID })
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                    <tr></tr>
+                </table>*@
+
+                <table>
+                    <tr>
+                        <td>
+                            @Html.Action("StoreEventLocationCalendarPartial", "StoreEvents", new { StoreEventID = Model.StoreEventID, StoreEventLocationID = sl.StoreEventLocationID })
+
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "Location-" + sl.StoreEventLocationID + "-AddDaysButton";
+                                settings.Text = "Add Day(s)";
+                                settings.ControlStyle.CssClass = "add-days-button";
+                                settings.Width = 100;
+                                settings.ClientSideEvents.Click = @"function(s, e) {
+                                    LoadingPanel.Show();
+                                    var dateArray = [];
+                                    var controlDateArray = Location" + sl.StoreEventLocationID + @"Calendar.GetSelectedDates();
+                                    for(var i = 0; i < controlDateArray.length; i++)
+                                        dateArray.push(controlDateArray[i].toISOString());
+                                    $.ajax({
+                                        url: '/admin/storeevents/addDaysToStoreEventLocation',
+                                        type: 'POST',
+                                        traditional: true,
+                                        data: {
+                                            StoreEventID: " + Model.StoreEventID + @",
+                                            StoreEventLocationID: " + sl.StoreEventLocationID + @",
+                                            SelectedDates: dateArray
+                                        },
+                                        success: function(data) {
+                                            LoadingPanel.Hide();
+                                            $('#store-events-detail-container').html(data);
+                                        },
+                                        timeout: 30000
+                                    });
+                                }";
+                            }).GetHtml()
+
+                            @Html.DevExpress().Button(settings =>
+                            {
+                                settings.Name = "Location-" + sl.StoreEventLocationID + "-RemoveDaysButton";
+                                settings.Text = "Remove Day(s)";
+
+                                settings.Width = 100;
+                                settings.ControlStyle.CssClass = "remove-days-button";
+                                settings.ClientSideEvents.Click = @"function(s, e) {
+                                    $.confirm(function() {
+                                        LoadingPanel.Show();
+                                        var dateArray = [];
+                                        var controlDateArray = Location" + sl.StoreEventLocationID + @"Calendar.GetSelectedDates();
+                                        for(var i = 0; i < controlDateArray.length; i++)
+                                            dateArray.push(controlDateArray[i].toISOString());
+                                        $.ajax({
+                                            url: '/admin/storeevents/removeDaysFromStoreEventLocation',
+                                            type: 'POST',
+                                            traditional: true,
+                                            data: {
+                                                StoreEventID: " + Model.StoreEventID + @",
+                                                StoreEventLocationID: " + sl.StoreEventLocationID + @",
+                                                SelectedDates: dateArray
+                                            },
+                                            success: function(data) {
+                                                LoadingPanel.Hide();
+                                                $('#store-events-detail-container').html(data);
+                                            },
+                                            timeout: 30000
+                                        });
+                                    }, function() {
+
+                                    });
+                                }";
+                            }).GetHtml()
+                        </td>
+
+                        <td>
+                            <h5 class="center-text"><span id="date-placeholder-@(sl.StoreEventLocationID)"></span></h5>
+                            <div id="date-times-container-@(sl.StoreEventLocationID)" data-storeevent_dateid=""></div>
+                        </td>
+                    </tr>
+                </table>
+
+                @*<div class="lefty-col">
+                    
+                </div>
+                <div class="lefty-col">
+                </div>*@
+                <div class="clearfix"></div>
+            </div>
+        }
+    </div>
+
+</div>

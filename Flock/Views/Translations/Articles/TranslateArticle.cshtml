@@ -1,0 +1,162 @@
+﻿@model Flock.ViewModels.TranslateArticleViewModel
+@{
+    ViewBag.Title = "Translate Article";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/translations.css")
+
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+        /*.dxgvFooter_MetropolisBlue .dxgv {
+            border-top: 1px solid #c0c0c0;
+        }*/
+        fieldset {
+            padding: 2px;
+        }
+        input {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        .buttons-table {
+            border: 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .buttons-table td {
+            width: 25%;
+            text-align: center;
+        }
+        .translation-subheading-label {
+            display: none;
+            line-height: 35px;
+            font-size: 12px;
+            font-weight: normal;
+            float: right;
+            margin-right: 2em;
+        }
+    </style>
+}
+<script type="text/javascript">
+    function LoadTranslator(RowKey, completeFunction) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("LoadArticleTranslator", "Translations")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ArticleID: RowKey,
+                TargetLanguage: TranslationTargetLanguageListBox.GetSelectedItem().text,
+                TargetLanguageID: TranslationTargetLanguageListBox.GetValue()
+            },
+            success: function (data) {
+                if (typeof completeFunction === 'function')
+                    completeFunction();
+                $('#ajax-container').html(data);
+                $('#translator-container').fadeIn('fast');
+                LoadingPanel.Hide();
+            },
+            timeout: 20000
+        });
+    }
+
+    function DetectUnsavedChanges()
+    {
+        return (window.HeadingChanged || window.SubHeadingChanged || window.ContentsChanged || window.TitleTagChanged || window.MetaDescriptionChanged);
+    }
+
+    function SaveTranslation(completeFunction) {
+        LoadingPanel.Show();
+
+        var EnglishHeading = window["EnglishHeading"].GetText() != null ? window["EnglishHeading"].GetText() : undefined;
+        var EnglishSubHeading = window["EnglishSubHeading"].GetText() != null ? window["EnglishSubHeading"].GetText() : undefined;
+        var EnglishContents = window["EnglishContents"].GetText() != null ? window["EnglishContents"].GetText() : undefined;
+        var EnglishTitleTag = window["EnglishTitleTag"].GetText() != null ? window["EnglishTitleTag"].GetText() : undefined;
+        var EnglishMetaDescription = window["EnglishMetaDescription"].GetText() != null ? window["EnglishMetaDescription"].GetText() : undefined;
+
+        var TranslatedHeading = window["TranslationHeading"].GetValue() != null ? window["TranslationHeading"].GetText() == "" ? undefined : window["TranslationHeading"].GetText() : undefined;
+        var TranslatedSubHeading = window["TranslationSubHeading"].GetValue() != null ? window["TranslationSubHeading"].GetText() == "" ? undefined : window["TranslationSubHeading"].GetText() : undefined;
+        var TranslatedContents = window["TranslationContents"].GetValue() != null ? window["TranslationContents"].GetText() == "" ? undefined : window["TranslationContents"].GetText() : undefined;
+        var TranslatedTitleTag = window["TranslationTitleTag"].GetValue() != null ? window["TranslationTitleTag"].GetText() == "" ? undefined : window["TranslationTitleTag"].GetText() : undefined;
+        var TranslatedMetaDescription = window["TranslationMetaDescription"].GetValue() != null ? window["TranslationMetaDescription"].GetText() == "" ? undefined : window["TranslationMetaDescription"].GetText() : undefined;
+
+        $.ajax({
+            url: '@Url.Action("Save_Article", "Translations")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ArticleID: $("#article-id-hidden").val(),
+                LanguageID: TranslationTargetLanguageListBox.GetValue(),
+                Heading: EnglishHeading,
+                SubHeading: EnglishSubHeading,
+                Contents: EnglishContents,
+                TitleTag: EnglishTitleTag,
+                MetaDescription: EnglishMetaDescription,
+                TranslatedHeading: TranslatedHeading,
+                TranslatedSubHeading: TranslatedSubHeading,
+                TranslatedContents: TranslatedContents,
+                TranslatedTitleTag: TranslatedTitleTag,
+                TranslatedMetaDescription: TranslatedMetaDescription
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                if (typeof completeFunction === 'function') {
+                    completeFunction();
+                }
+            },
+            timeout: 120000
+        });
+    }
+
+    $.extend({
+        unsavedWarning: function (yesCallback, noCallback, args) {
+            $("<div></div>").dialog({
+                title: "Warning",
+                width: 250,
+                height: "auto",
+                buttons: [{
+                    text: "Yes",
+                    click: function () {
+                        yesCallback(args);
+                        $(this).remove();
+                    }
+                },
+                {
+                    text: "No",
+                    click: function () {
+                        noCallback(args);
+                        $(this).remove();
+                    }
+                }
+                ],
+                close: function (event, ui) { $(this).remove(); },
+                resizable: false,
+                modal: true
+            }).html("<p style='margin-top: 10px;'>You have unsaved changes.</p><p>Are you sure you wish to proceed?</p>").parent().addClass("alert");
+        }
+    });
+</script>
+
+<h4 class="page-heading">
+    Translate Articles
+</h4>
+<div class="page-subheading">
+    @Html.ValidationSummary()
+    @Html.Action("TranslateArticleTargetLanguageDropDown", "Translations", new { TargetLanguageID = Model.TargetLanguageID })
+    <label class="translation-subheading-label">Articles to Translate</label>
+    <label id="to-translate-count" class="translation-subheading-label" style="margin-right: 3px;"></label>
+    <div class="clearfix"></div>
+</div>
+
+<div id="grid-container">
+    @Html.Action("TranslateArticleGridView", "Translations", new { languageId = Model.TargetLanguageID, articleID = Model.ArticleID })
+</div>
+
+<div id="ajax-container">
+
+</div>

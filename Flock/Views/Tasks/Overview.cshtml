@@ -1,0 +1,221 @@
+﻿@{
+    ViewBag.Title = "Tasks";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/content/tasks.css")
+} 
+
+<h4 class="page-heading">Tasks</h4>
+
+<div class="page-subheading">
+</div>
+
+<div id="ajax-container">
+    @Html.Action("TaskGeneratePartial")
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/js/knockout")
+
+    @Scripts.Render("~/bundles/nested-sortable")
+
+    <script type="text/javascript">
+        $().ready(function () {
+            InitialiseTaskList();
+        });
+
+        function performSearch() {
+            //LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("TaskSearchPartial")',
+                type: 'GET',
+                traditional: true,
+                data: {
+                    SearchTerm: SearchTerm.GetValue(),
+                    Active: Active.GetChecked(),
+                    Queued: Queued.GetChecked(),
+                    Closed: Closed.GetChecked()
+                },
+                success: function (data) {
+                    //LoadingPanel.Hide();
+                    $("#task-search-container").html(data);
+                    InitialiseTaskList();
+                },
+                timeout: 30000
+            });
+        }
+
+        function InitialiseTaskList() {
+            var ns = $('ol.sortable').nestedSortable({
+                forcePlaceholderSize: true,
+                doNotClear: false,
+                handle: '.task-row',
+                helper: 'clone',
+                items: 'li:not(li.bug)',
+                opacity: .6,
+                placeholder: 'placeholder',
+                revert: 250,
+                tabSize: 25,
+                tolerance: 'pointer',
+                toleranceElement: '> div',
+                maxLevels: 4,
+                isTree: true,
+                expandOnHover: 700,
+                startCollapsed: false,
+                relocate: function (event, ui) {
+                    if (event.originalEvent.type == "mouseup") {
+                        var res = $('ol.sortable').nestedSortable('toArray', { startDepthCount: 0, excludeRoot: true });
+                        var s = JSON.stringify(res);
+
+                        $.ajax({
+                            url: '@Url.Action("TaskShuffle")',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                Tasks: res,
+                                SearchTerm: SearchTerm.GetValue(),
+                                Active: Active.GetChecked(),
+                                Queued: Queued.GetChecked(),
+                                Closed: Closed.GetChecked()
+                            }),
+                            success: function (data) {
+                                $("#task-search-container").html(data);
+                                InitialiseTaskList();
+                            },
+                            timeout: 30000
+                        });
+                    }
+                }
+            });
+
+            $(".new-task-btn").draggable({
+                helper: function () {
+                    return $("<div style='width: 115px; padding-right: 0.5em; position: relative;'><div class='new-task-btn'><span title='Click and Drag to create new Task' class='bug-add ui-icon-blue ui-icon-plus' style='margin-right: 4px;'><span></span></span>New Task</div></div>")
+                },
+                revert: "invalid",
+                connectToSortable: $('ol.sortable')
+            });
+
+            $('.expandEditor').attr('title', 'Click to show/hide item editor');
+            $('.disclose').attr('title', 'Click to show/hide children');
+            $('.deleteMenu').attr('title', 'Click to delete item.');
+
+            $('.disclose').on('click', function () {
+                $(this).closest('li').toggleClass('mjs-nestedSortable-collapsed').toggleClass('mjs-nestedSortable-expanded');
+                $(this).toggleClass('ui-icon-plusthick').toggleClass('ui-icon-minusthick');
+            });
+
+            $('.reveal').on('click', function () {
+                $(this).nextAll('.task-details').slideToggle("fast").toggleClass('task-details-closed').toggleClass('task-details-opened');
+                $(this).toggleClass('ui-icon-carat-1-s').toggleClass('ui-icon-carat-1-n');
+            });
+
+            $('.description-edit-icon').on('click', function () {
+                $('#task-description-editor').remove();
+                var ele = $(this);
+                $.ajax({
+                    url: '@Url.Action("TaskDescriptionEditorPartial")',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        taskID: $(this).closest('.task-row').data("task-id")
+                    },
+                    success: function (data) {
+                        $(ele).closest('.task-row-inner').html(data);
+                    },
+                    timeout: 30000
+                });
+            });
+
+            $('.expandEditor, .itemTitle').click(function () {
+                var id = $(this).attr('data-id');
+                $('#menuEdit' + id).toggle();
+                $(this).toggleClass('ui-icon-triangle-1-n').toggleClass('ui-icon-triangle-1-s');
+            });
+
+            $('.deleteMenu').click(function () {
+                var id = $(this).attr('data-id');
+                $('#menuItem_' + id).remove();
+            });
+
+            $('#serialize').click(function () {
+                serialized = $('ol.sortable').nestedSortable('serialize');
+                $('#serializeOutput').text(serialized + '\n\n');
+            })
+
+            $('#toHierarchy').click(function (e) {
+                hiered = $('ol.sortable').nestedSortable('toHierarchy', { startDepthCount: 0 });
+                hiered = dump(hiered);
+                (typeof ($('#toHierarchyOutput')[0].textContent) != 'undefined') ?
+                $('#toHierarchyOutput')[0].textContent = hiered : $('#toHierarchyOutput')[0].innerText = hiered;
+            })
+
+            $('#toArray').click(function (e) {
+                arraied = $('ol.sortable').nestedSortable('toArray', { startDepthCount: 0 });
+                arraied = dump(arraied);
+                (typeof ($('#toArrayOutput')[0].textContent) != 'undefined') ?
+                $('#toArrayOutput')[0].textContent = arraied : $('#toArrayOutput')[0].innerText = arraied;
+            });
+
+            /* Other stuff */
+        }
+
+        function dump(arr, level) {
+            var dumped_text = "";
+            if (!level) level = 0;
+
+            //The padding given at the beginning of the line.
+            var level_padding = "";
+            for (var j = 0; j < level + 1; j++) level_padding += "    ";
+
+            if (typeof (arr) == 'object') { //Array/Hashes/Objects
+                for (var item in arr) {
+                    var value = arr[item];
+
+                    if (typeof (value) == 'object') { //If it is an array,
+                        dumped_text += level_padding + "'" + item + "' ...\n";
+                        dumped_text += dump(value, level + 1);
+                    } else {
+                        dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
+                    }
+                }
+            } else { //Strings/Chars/Numbers etc.
+                dumped_text = "===>" + arr + "<===(" + typeof (arr) + ")";
+            }
+            return dumped_text;
+        }
+
+        function searchPanelToggle(ele, parent) {
+            $(parent).find(".task-search-panel-inner").slideToggle("fast", function () {
+                if ($(parent).find(".task-search-panel-inner").css("display") == "none") {
+                    $(ele).html("[<span class='task-search-plus-sign'>+</span>]");
+                }
+                else {
+                    $(ele).html("[<span class='task-search-minus-sign'>-</span>]");
+                }
+            });
+        }
+
+        function deleteNote(taskNoteID) {
+            $.ajax({
+                url: '@Url.Action("DeleteNote")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    taskNoteID: taskNoteID,
+                    note: NewNote.GetValue(),
+                    SearchTerm: SearchTerm.GetValue(),
+                    Active: Active.GetChecked(),
+                    Queued: Queued.GetChecked(),
+                    Closed: Closed.GetChecked()
+                },
+                success: function (data) {
+                    $("#ajax-container").html(data);
+                    InitialiseTaskList();
+                },
+                timeout: 30000
+            });
+        }
+    </script>
+}

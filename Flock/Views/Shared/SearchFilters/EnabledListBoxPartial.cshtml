@@ -1,0 +1,53 @@
+﻿@model bool?
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "CollectionOverviewEnabledDropDownPartial")
+    {
+        listBoxSettings.Name = "CollectionOverviewEnabledListBox";
+        
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            CollectionOverviewEnabledDD.SetText(s.GetSelectedItem().text);
+            CollectionOverviewEnabledDD.HideDropDown();
+            $('#CollectionGridView_DXEditor5_I').val(s.GetSelectedItem().value);
+        }";
+
+        if (Model != null)
+        {
+            listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+                s.SetSelectedItem(s.FindItemByValue('" + Model + @"'));
+                if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                    CollectionOverviewEnabledDD.SetText(s.GetSelectedItem().text);
+            }";
+        }
+        else
+        {
+            listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+                s.SetSelectedItem(s.FindItemByValue('False'));
+                if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                    CollectionOverviewEnabledDD.SetText(s.GetSelectedItem().text);
+                $('#CollectionGridView_DXEditor6_I').val(s.GetSelectedItem().value);
+            }";
+        }
+    }
+    else
+    {
+        listBoxSettings.Name = "EnabledListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            alert('Not Implemented');
+        }";
+    }
+
+    listBoxSettings.Properties.Items.Add("Enabled", true);
+    listBoxSettings.Properties.Items.Add("Disabled", false);
+    
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+}
+).GetHtml()

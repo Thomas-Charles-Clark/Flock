@@ -1,0 +1,98 @@
+﻿@Html.DevExpress().GridView(settings => {
+    settings.Name = "OrderGridView";
+
+    settings.SettingsBehavior.AllowSelectByRowClick = true;
+    settings.SettingsBehavior.AllowSelectSingleRowOnly = false;
+    settings.CommandColumn.ShowSelectCheckbox = true;
+    settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.VisibleIndex = 0;
+    
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+
+    settings.CallbackRouteValues = new { Controller = ViewContext.RouteData.Values["controller"] as string, Action = "OrderGrid" };
+
+    settings.KeyFieldName = "OrderHeadID";
+
+    var OrderHeadID = new MVCxGridViewColumn();
+    OrderHeadID.Name = "OrderHeadID";
+    OrderHeadID.FieldName = "OrderHeadID";
+    OrderHeadID.Caption = "Order Head ID";
+    OrderHeadID.Settings.AllowAutoFilter = DefaultBoolean.True;
+    OrderHeadID.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(OrderHeadID);
+
+    var CreatedDT = new MVCxGridViewColumn();
+    CreatedDT.Name = "CreatedDT";
+    CreatedDT.FieldName = "CreatedDT";
+    CreatedDT.Caption = "Date Created";
+    CreatedDT.Settings.AllowAutoFilter = DefaultBoolean.True;
+    CreatedDT.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    CreatedDT.ColumnType = MVCxGridViewColumnType.DateEdit;
+    settings.Columns.Add(CreatedDT);
+
+    var TotalInc = new MVCxGridViewColumn();
+    TotalInc.Name = "TotalInc";
+    TotalInc.FieldName = "TotalInc";
+    TotalInc.Caption = "Total Inc. GST";
+    TotalInc.Settings.AllowAutoFilter = DefaultBoolean.True;
+    TotalInc.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    TotalInc.PropertiesEdit.DisplayFormatString = "N2";
+    settings.Columns.Add(TotalInc);
+
+    var TotalEx = new MVCxGridViewColumn();
+    TotalEx.Name = "TotalEx";
+    TotalEx.FieldName = "TotalEx";
+    TotalEx.Caption = "Total Ex. GST";
+    TotalEx.Settings.AllowAutoFilter = DefaultBoolean.True;
+    TotalEx.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    TotalEx.PropertiesEdit.DisplayFormatString = "N2";
+    settings.Columns.Add(TotalEx);
+
+    var FullName = new MVCxGridViewColumn();
+    FullName.Name = "FullName";
+    FullName.FieldName = "FullName";
+    FullName.Caption = "Name";
+    FullName.Settings.AllowAutoFilter = DefaultBoolean.True;
+    FullName.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(FullName);
+
+    var Email = new MVCxGridViewColumn();
+    Email.Name = "Email";
+    Email.FieldName = "Email";
+    Email.Caption = "Email";
+    Email.Settings.AllowAutoFilter = DefaultBoolean.True;
+    Email.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(Email);
+
+    var ExportedDT = new MVCxGridViewColumn();
+    ExportedDT.Name = "ExportedDT";
+    ExportedDT.FieldName = "ExportedDT";
+    ExportedDT.Caption = "Date Exported";
+    ExportedDT.Settings.AllowAutoFilter = DefaultBoolean.True;
+    ExportedDT.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    ExportedDT.SettingsHeaderFilter.Mode = GridHeaderFilterMode.List;
+    ExportedDT.ColumnType = MVCxGridViewColumnType.DateEdit;
+    
+    settings.Columns.Add(ExportedDT);
+
+    settings.HeaderFilterFillItems = (s, e) => {
+        var grid = (MVCxGridView)s;
+
+        switch (e.Column.Name)
+        {
+            case "ExportedDT":
+                e.Values.Clear();
+                e.Values.Add(FilterValue.CreateShowBlanksValue(ExportedDT, "Not Exported"));
+                e.Values.Add(FilterValue.CreateShowNonBlanksValue(ExportedDT, "Exported"));
+                e.AddShowAll();
+                break;
+            default: break;
+        }
+    };
+
+    settings.ClientSideEvents.Init = @"function(s, e) { 
+        s.ApplyFilter('[ExportedDT] Is Null');
+    }";
+}).Bind(Model).GetHtml()

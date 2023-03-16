@@ -1,0 +1,15 @@
+﻿@using Flock.ViewModels
+@model MailingListImportViewModel
+@Html.DevExpress().ComboBoxFor(m => Model.ThirdParty, settings => { 
+
+    settings.Name = "ThirdPartyComboBox";
+    settings.Properties.ValueField = "ThirdPartyID";
+    settings.CallbackRouteValues = new { Controller = "MailingListImport", Action = "ThirdPartyComboBoxPartial" };
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Style.Add("padding", "4px 5px 5px 5px");
+    settings.Properties.ValueType = typeof(short);
+    settings.Properties.TextField = "Name";
+    settings.Style.Add("float", "left");
+    settings.SelectedIndex = 0;
+    settings.Properties.DropDownWidth = System.Web.UI.WebControls.Unit.Percentage(100);
+}).BindList(LargeDatabaseDataProvider.GetMailingListThirdParties()).GetHtml()

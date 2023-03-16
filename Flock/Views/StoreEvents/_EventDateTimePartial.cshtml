@@ -1,0 +1,6 @@
+﻿@using Flock.ViewModels
+@model StoreEvent_Date_ViewModel
+@Html.Partial("_StoreEventDateTimeSlotGridViewPartial", Model)
+<button class="btn btn-primary btn-med" onclick="copyTimesToSelectedDates(@(Model.StoreEvent_DateID), @(Model.StoreEventLocationID))" style="display: block; width: 100%;">Copy Times to Selected Dates</button>
+
+<button class="btn btn-danger btn-sm" onclick="removeEventLocationDate(@(Model.StoreEventID), @(Model.StoreEventLocationID), @(Model.StoreEvent_DateID))"><span class="glyphicon glyphicon-remove"></span> Remove Date</button>

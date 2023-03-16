@@ -1,0 +1,238 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Flock.ViewModels;
+using NLog;
+using Flock.DAL;
+using Flock.Models;
+using DevExpress.Web.ASPxEditors;
+using System.Web.Script.Serialization;
+using DevExpress.Web.Mvc;
+using LinqToExcel;
+using System.IO;
+using System.Data.SqlClient;
+
+namespace Flock.Controllers
+{
+    public partial class TranslationsController : Controller
+    {
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
+        private UnitOfWork<FlockDataContext> UnitOfWork = new UnitOfWork<FlockDataContext>();
+
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (!UnitOfWork.Disposed)
+        //        UnitOfWork.Dispose();
+        //    base.Dispose(disposing);
+        //}
+
+        public ActionResult Index()
+        {
+            return RedirectToAction("Overview");
+        }
+
+        public ActionResult Overview(string targetLanguage)
+        {
+            if(targetLanguage != null)
+            {
+                if(targetLanguage.Length > 2 || targetLanguage.Length < 2)
+                {
+                    ModelState.AddModelError("TargetLanguage", "Invalid language code detected");
+                }
+                else
+                {
+                    var lang = UnitOfWork.GetRepository<Language>().GetAll().Where(p => p.Code == targetLanguage).SingleOrDefault();
+
+                    if (lang == null)
+                    {
+                        ModelState.AddModelError("TargetLanguage", "Invalid language code detected");
+                    }
+                    else
+                    {
+                        ViewBag.SelectedTargetLanguage = lang.LanguageID;
+                    }
+                }
+            }
+
+            return View();
+        }
+
+        public ActionResult TranslationOverviewLanguageDropDownPartial(short? TargetCountryID, byte? TargetLanguageID)
+        {
+            List<Country_Language> Model = UnitOfWork.GetRepository<Country_Language>().GetAll().Where(p => (p.OffDate == null) || (p.OffDate > DateTime.Now)).OrderBy(p => p.CountryID).ToList();
+
+            List<Language> Languages = UnitOfWork.GetRepository<Language>().GetAll().Where(p => p.LanguageID != 1 && Model.Select(q => q.LanguageID).ToList().Contains(p.LanguageID)).ToList();
+
+            foreach (var m in Model)
+            {
+                m.CountryLanguageText = m.Language.Name + " - " + m.Country.Code;
+            }
+
+            if(TargetCountryID == null && TargetLanguageID == null)
+            {
+                ViewBag.TargetCountryLanguageID = 2;
+            }
+
+            return PartialView("_TargetLanguageDropDown", Model);
+        }
+
+        public ActionResult TranslationOverviewGridView(byte? TargetCountryLanguageID)
+        {
+            if (TargetCountryLanguageID == null)
+                TargetCountryLanguageID = 2;
+
+            var Model = UnitOfWork.Context.Translation_Overview(TargetCountryLanguageID).ToList();
+
+            ViewBag.TargetCountryLanguageID = TargetCountryLanguageID;
+
+            return PartialView("_TranslationOverviewGridView", Model);
+        }
+
+        public ActionResult DrilldownDetailGridViewPartial(byte TargetCountryLanguageID, string DrilldownSP)
+        {
+            ViewBag.DrilldownSp = DrilldownSP;
+
+            var Model = new List<Translation_OverviewResult>();
+
+            using (SqlConnection conn = new SqlConnection(UnitOfWork.Context.Connection.ConnectionString))
+            {
+                SqlCommand comm = new SqlCommand(DrilldownSP, conn);
+                comm.CommandType = System.Data.CommandType.StoredProcedure;
+                comm.Parameters.AddWithValue("@Country_Language_ID", TargetCountryLanguageID);
+
+                conn.Open();
+
+                SqlDataReader reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+                    Model.Add(new Translation_OverviewResult()
+                    {
+                        ContentType = reader[0].ToString(),
+                        DrilldownSP = reader[1].ToString(),
+                        Language = reader[2].ToString(),
+                        GoogleTranslate = (bool?)reader[3],
+                        LanguageID = (byte)reader[4],
+                        Code = reader[5].ToString(),
+                        Total = (int?)reader[6],
+                        PreLaunch = (int?)reader[7],
+                        On = (int?)reader[8],
+                        Off = (int?)reader[9],
+                        NotTranslated = (int?)reader[10],
+                        GoogleTranslated = (int?)reader[11],
+                        ManualTranslated = (int?)reader[12],
+                        Review = (int?)reader[13]
+                    });
+                }
+
+                conn.Close();
+            }
+
+            return PartialView("_DrilldownDetailGridViewPartial", Model);
+        }
+
+        [HttpPost]
+        public ActionResult GoogleTranslate(byte TargetLanguageID, string Table)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString))
+                {
+                    SqlCommand comm = new SqlCommand("adm."+Table+"_Language_GoogleTranslate", conn);
+                    comm.CommandType = System.Data.CommandType.StoredProcedure;
+                    comm.CommandTimeout = 3000000;
+                    comm.Parameters.AddWithValue("@LanguageID", TargetLanguageID);
+                    conn.Open();
+                    comm.ExecuteNonQuery();
+                    conn.Close();
+                }
+            }
+            catch(Exception ex)
+            {
+                Logger.ErrorException(System.Reflection.MethodInfo.GetCurrentMethod().Name, ex);
+                Response.StatusCode = 400;
+                return Content(ex.Message);
+            }
+            return Content("ok");
+        }
+
+        #region Spreadsheet Upload
+        public ActionResult UploadSpreadsheet()
+        {
+            return View();
+        }
+
+        public ActionResult TranslationUploadLanguageDropDown()
+        {
+            List<Language> Model = UnitOfWork.GetRepository<Language>().GetAll().Where(p => p.LanguageID != 1 && p.LanguageID != 2).OrderByDescending(p => p.Name).ToList();
+
+            return PartialView("TranslationUploadLanguageListBoxPartial", Model);
+        }
+
+        public ActionResult TranslationUploadLanguageTableDropDown()
+        {
+            List<LanguageTable> Model = UnitOfWork.GetRepository<LanguageTable>().GetAll().ToList();
+
+            return PartialView("TranslationUploadLanguageTableListBoxPartial", Model);
+        }
+
+        public ActionResult UploadControlUpload()
+        {
+            UploadControlExtension.GetUploadedFiles("UploadControl", TranslationsControllerUploadControlSettings.ValidationSettings, TranslationsControllerUploadControlSettings.FileUploadComplete);
+            return null;
+        }
+        #endregion
+    }
+
+    public class TranslationsControllerUploadControlSettings
+    {
+        public static DevExpress.Web.ASPxUploadControl.ValidationSettings ValidationSettings = new DevExpress.Web.ASPxUploadControl.ValidationSettings()
+        {
+            AllowedFileExtensions = new string[] { ".xlsx" },
+            MaxFileSize = 4000000
+        };
+
+        public static void FileUploadComplete(object sender, DevExpress.Web.ASPxUploadControl.FileUploadCompleteEventArgs e)
+        {
+            if (e.UploadedFile.IsValid)
+            {
+                var lIDs = ListBoxExtension.GetSelectedValues<byte>("TranslationTargetLanguageListBox");
+                var tIDs = ListBoxExtension.GetSelectedValues<byte>("TranslationTargetLanguageTableListBox");
+
+                var responseString = "";
+                if (lIDs == null)
+                    responseString += "Select at least one Language.";
+                if (tIDs == null)
+                    responseString += "<br/>Select at least one Table.";
+
+                if (lIDs != null && tIDs != null)
+                {   
+                    var preserveNulls = CheckBoxExtension.GetValue<bool>("PreserveNulls");
+
+                    string fileName = System.Web.HttpRuntime.AppDomainAppPath + "//UploadedTranslationSpreadsheets//" + e.UploadedFile.FileName + "-" + DateTime.Now.ToString("dd-MM-yyyy") + "-.xlsx";
+
+                    e.UploadedFile.SaveAs(fileName);
+
+                    File.Copy(fileName, "\\\\rs-db\\c$\\import\\flock\\Translations.xlsx", true);
+
+                    var UoW = new UnitOfWork<FlockDataContext>();
+                    
+                    // DO NOT CALL THIS YET BECAUSE OF DANGER!
+                    // UoW.Context.TranslationImport(lIDs, tIDs, preserveNulls);
+
+                    e.CallbackData = "Upload successful. Import procedure executing.";
+                }
+                else
+                {
+                    e.CallbackData = responseString;
+                }
+            }
+        }
+    }
+
+    public class TranslationUploadExcelRow
+    {
+        public string FieldName { get; set; }
+    }
+}

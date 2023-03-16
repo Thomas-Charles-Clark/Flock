@@ -1,0 +1,22 @@
+﻿@model string
+
+<textarea id="htmlEditor">@(Model)</textarea>
+
+<script type="text/javascript">
+    window["HTMLEditor"] = CodeMirror.fromTextArea(document.getElementById('htmlEditor'), {
+        lineNumbers: true,
+        autoCloseTags: true,
+        mode: "htmlmixed"
+    });
+</script>
+
+@*@Html.DevExpress().HtmlEditor(settings =>
+{
+    settings.Name = "HtmlEditor";
+    settings.CallbackRouteValues = new { Controller = "CMS", Action = "SnippetHTMLEditorPartial" };
+    settings.SettingsImageUpload.UploadCallbackRouteValues = new { Controller = "CMS", Action = "SnippetsImageUpload" };
+    settings.SettingsImageUpload.UploadImageFolder = "/images/snippetimages/";
+    settings.Html = Model;
+    settings.Settings.AllowScriptExecutionInPreview = true;
+    settings.SettingsHtmlEditing.AllowScripts = true;
+}).GetHtml()*@

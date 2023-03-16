@@ -1,0 +1,352 @@
+﻿
+@using Flock.ViewModels;
+@using Flock.Models;
+@model QualityOverviewViewModel
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "QualityOverviewGridView";
+        settings.CallbackRouteValues = new { Controller = "Qualities", Action = "QualityOverviewGridViewPartial" };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+if($('#quality-id-hidden').length > 0) {
+            e.customArgs['QualityID'] = $('#quality-id-hidden').val();
+            e.customArgs['ProductTypeID'] = $('#product-type-id-hidden').val();
+            e.customArgs['MetaDescription'] = ProductPageMetaDescription.GetValue() == null ? '' : ProductPageMetaDescription.GetValue();
+            e.customArgs['Description'] = ProductPageDescription.GetValue() == null ? '' : ProductPageDescription.GetValue();
+            e.customArgs['SubHeading'] = ProductPageSubHeading.GetValue() == null ? '' : ProductPageSubHeading.GetValue();
+}
+        }";
+        
+        settings.ClientSideEvents.EndCallback = @"function(s, e) {
+              $('.further-info-panel').tooltip({
+                content: function() { 
+                    var res = $(this).parent().find('.content').html();
+                    $(res).css('display', 'block');
+                    return res; 
+                },
+                items: 'img',
+                tooltipClass: 'info-tooltip',
+                position: { my: 'left top', at: 'right middle' }
+            });
+        }";
+        settings.ClientSideEvents.CallbackError = @"function(s, e) {
+            alert(e.message);
+            e.handled = true;
+        }";
+
+        settings.ClientSideEvents.DetailRowExpanding = @"function(s, e) {
+        }";
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Qualities", Action = "QualityOverviewGridPartialUpdate" };
+        
+        settings.Style.Add("width", "100%");
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) { 
+            s.StartEditRow(e.visibleIndex)
+        }";
+
+        settings.CommandColumn.Visible = false;
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            settings.CommandColumn.ShowSelectCheckbox = true;
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+        });
+        settings.KeyFieldName = "QualityID;ProductTypeID";
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.SettingsBehavior.AllowSelectSingleRowOnly = true;
+        settings.SettingsBehavior.AllowFocusedRow = false;
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(Html.Action("ChangeQuality", "Qualities", new { QualityID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "QualityID")), ProductTypeID = Convert.ToByte(DataBinder.Eval(c.DataItem, "ProductTypeID")) }).ToHtmlString());
+        });
+
+        settings.Styles.Row.Cursor = "pointer";
+        
+        settings.ClientSideEvents.Init = @"function(s, e) { 
+              $('.further-info-panel').tooltip({
+                content: function() { 
+                    var res = $(this).parent().find('.content').html();
+                    $(res).css('display', 'block');
+                    return res; 
+                },
+                items: 'img',
+                tooltipClass: 'info-tooltip',
+                position: { my: 'left top', at: 'right middle' }
+            });
+        }";
+        
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "QualityID";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Width = 80;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Name";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Width = 180;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Code";
+            column.Name = "Code";
+            column.Caption = "Code";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Width = 80;
+        });
+
+        settings.Columns.Add(column => {
+            column.FieldName = "Collections";
+            column.Name = "Collections";
+            column.Caption = "Collections";
+            column.Width = 180;
+            column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c => {
+                var cols = Model.QualitiesCollections.Where(p => p.QualityID == Convert.ToInt16(DataBinder.Eval(c.DataItem, "QualityID"))).ToList();
+
+                if (cols.Count > 0)
+                {
+                    foreach(var collection in cols)
+                    {
+                        ViewContext.Writer.Write(collection.Name);
+                        ViewContext.Writer.Write("\r\n");
+                    }
+                }
+            });
+        });
+
+        MVCxGridViewColumn BrandColumn = new MVCxGridViewColumn();
+        BrandColumn.FieldName = "BrandID";
+        BrandColumn.Name = "BrandID";
+        BrandColumn.Caption = "Brand";
+        BrandColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        BrandColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        BrandColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        BrandColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        BrandColumn.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<span style='width: 200px; color: black'>" + DataBinder.Eval(c.DataItem, "BrandName").ToString() + "</span>");
+        });
+        settings.Columns.Add(BrandColumn);
+
+        MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+        ProductTypeColumn.FieldName = "ProductTypeID";
+        ProductTypeColumn.Name = "ProductTypeID";
+        ProductTypeColumn.Caption = "Product Type";
+        ProductTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ProductTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        ProductTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        ProductTypeColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        ProductTypeColumn.Width = 60;
+        ProductTypeColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        ProductTypeColumn.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<span style='color: black'>" + DataBinder.Eval(c.DataItem, "ProductTypeName").ToString() + "</span>");
+        });
+        settings.Columns.Add(ProductTypeColumn);
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Width";
+            column.Name = "Width";
+            column.Caption = "Width";
+            column.Width = 60;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Weight";
+            column.Name = "Weight";
+            column.Caption = "Weight";
+            column.Width = 60;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "HorizontalPatternRepeat";
+            column.Name = "HorizontalPatternRepeat";
+            column.Caption = "Horizontal Pattern Repeat";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = System.Web.UI.WebControls.Unit.Pixel(100);
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "VerticalPatternRepeat";
+            column.Name = "VerticalPatternRepeat";
+            column.Caption = "Vertical Pattern Repeat";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = System.Web.UI.WebControls.Unit.Pixel(100);
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Martindale";
+            column.Name = "Martindale";
+            column.Caption = "Martindale";
+            column.Width = 30;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Composition";
+            column.Name = "Composition";
+            column.Caption = "Composition";
+            column.Width = 60;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+        
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ProductCount";
+            column.Name = "ProductCount";
+            column.Caption = "Product Associations";
+            column.Width = 60;
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "CollectionCount";
+            column.Name = "CollectionCount";
+            column.Caption = "Collection Associations";
+            column.Width = 60;
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "FirstLaunchID";
+            column.Name = "FirstLaunchID";
+            column.Caption = "First Launched";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.SetDataItemTemplateContent(c => {
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "FirstLaunchName").ToString());
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "LastLaunchID";
+            column.Name = "LastLaunchID";
+            column.Caption = "Last Launched";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "LastLaunchName").ToString());
+            });
+        });
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "ProductTypeID":
+                    e.Values.Clear();
+                    foreach (var pt in Model.ProductTypes.OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.ProductTypeID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "BrandID":
+                    e.Values.Clear();
+                    foreach (var pt in Model.Brands.OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.BrandID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "LastLaunchID":
+                    e.Values.Clear();
+                    foreach (var l in Model.Launches.OrderByDescending(p => p.LaunchID))
+                    {
+                        e.AddValue(l.Name, l.LaunchID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                    
+                case "FirstLaunchID":
+                    e.Values.Clear();
+                    foreach(var l in Model.Launches.OrderByDescending(p => p.LaunchID))
+                    {
+                        e.AddValue(l.Name, l.LaunchID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+            }
+        };
+
+        settings.Settings.ShowHeaderFilterButton = true;
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model.Records).GetHtml()

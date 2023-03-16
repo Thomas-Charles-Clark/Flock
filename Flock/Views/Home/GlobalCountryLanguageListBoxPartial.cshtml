@@ -1,0 +1,55 @@
+﻿@model List<Flock.Models.Country_Language>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Name = "GlobalCountryLanguageListBox";
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        GlobalCountryLanguageDD.SetText(s.GetSelectedItem().text);
+        GlobalCountryLanguageDD.HideDropDown();
+        $.ajax({
+            url: '" + Url.Action("SetGlobalCountryLanguageID", "Home") + @"',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CountryLanguageID: GlobalCountryLanguageListBox.GetValue() 
+            },
+            success: function(data) {
+                if (typeof ReloadSectionsForEdit === 'function') {
+                    LoadingPanel.Show();
+                    ReloadSectionsForEdit();
+                }
+                else
+                    window.location.reload(true);
+            },
+            timeout: 20000
+        });
+    }";
+
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    listBoxSettings.Height = 300;
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "Country_Language_ID";
+
+    if (Session["GlobalCountryLanguageID"] != null)
+    {
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + Session["GlobalCountryLanguageID"] + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                GlobalCountryLanguageDD.SetText(s.GetSelectedItem().text);
+        }";    
+    }
+    else
+    {
+        listBoxSettings.SelectedIndex = 7;
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                GlobalCountryLanguageDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+}).BindList(Model).GetHtml()

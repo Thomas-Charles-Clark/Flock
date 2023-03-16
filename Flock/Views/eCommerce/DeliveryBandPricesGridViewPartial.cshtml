@@ -1,0 +1,222 @@
+@using Flock.DAL
+@using Flock.Models
+@{
+    using (var UoW = new UnitOfWork<FlockDataContext>())
+    {
+        var grid = Html.DevExpress().GridView(settings => {
+            settings.Name = "DeliveryPricesGridView";
+            settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartial" };
+
+            settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartialAddNew" };
+            settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartialUpdate" };
+            settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartialDelete" };
+            settings.SettingsEditing.BatchUpdateRouteValues = new { Controller = "eCommerce", Action = "DeliveryBandPricesGridViewPartialUpdate" }; 
+        
+            settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+            settings.SettingsBehavior.ConfirmDelete = true;
+            settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Cell;
+        
+            settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+                e.customArgs['DeliveryBandID'] = $('#selected-delivery-band-id').val();
+            }";
+
+            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+            settings.CellEditorInitialize = (s, e) =>
+            {
+                ASPxEdit editor = (ASPxEdit)e.Editor;
+                editor.ValidationSettings.Display = Display.Dynamic;
+            };
+
+            settings.InitNewRow = (s, e) => {
+                e.NewValues["PerItem"] = false;
+            };
+            
+	        settings.CommandColumn.Visible = true;
+            settings.CommandColumn.ShowNewButtonInHeader = true;
+            settings.CommandColumn.ShowDeleteButton = true;
+            settings.CommandColumn.ShowEditButton = false;
+
+	        settings.KeyFieldName = "DeliveryPriceID";
+
+	        settings.SettingsPager.Visible = true;
+	        settings.Settings.ShowGroupPanel = false;
+	        settings.Settings.ShowFilterRow = false;
+            settings.SettingsBehavior.AllowSelectByRowClick = false;
+            settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+            MVCxGridViewColumn DeliveryPriceIDColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn PriceIncColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn PriceExColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn PerItemColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn MinThresholdColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn MaxThresholdColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+            MVCxGridViewColumn TradeColumn = new MVCxGridViewColumn();
+
+            DeliveryPriceIDColumn.Name = "DeliveryPriceID";
+            DeliveryPriceIDColumn.FieldName = "DeliveryPriceID";
+            DeliveryPriceIDColumn.Caption = "ID";
+            DeliveryPriceIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+            DeliveryPriceIDColumn.ReadOnly = true;
+            settings.Columns.Add(DeliveryPriceIDColumn);
+            
+            PriceIncColumn.Name = "PriceInc";
+            PriceIncColumn.FieldName = "PriceInc";
+            PriceIncColumn.Caption = "Price Inc";
+            PriceIncColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            PriceIncColumn.CellStyle.Paddings.PaddingTop = 10;
+            PriceIncColumn.CellStyle.Paddings.PaddingBottom = 10;
+            var priceIncProp = PriceIncColumn.PropertiesEdit as SpinEditProperties;
+            priceIncProp.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            priceIncProp.NullDisplayText = "-----";
+            priceIncProp.NumberFormat = SpinEditNumberFormat.Number;
+            priceIncProp.DisplayFormatString = "F2";
+            priceIncProp.LargeIncrement = 10;
+            priceIncProp.Increment = 1;
+            priceIncProp.MinValue = 0;
+            priceIncProp.MaxValue = 99999999;
+            PriceIncColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            settings.Columns.Add(PriceIncColumn);
+
+            PriceExColumn.Name = "PriceEx";
+            PriceExColumn.FieldName = "PriceEx";
+            PriceExColumn.Caption = "Price Ex";
+            PriceExColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            var priceExProp = PriceExColumn.PropertiesEdit as SpinEditProperties;
+            priceExProp.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            priceExProp.NullDisplayText = "-----";
+            priceExProp.NumberFormat = SpinEditNumberFormat.Number;
+            priceExProp.DisplayFormatString = "F2";
+            priceExProp.LargeIncrement = 10;
+            priceExProp.Increment = 1;
+            priceExProp.MinValue = 0;
+            priceExProp.MaxValue = 99999999;
+            PriceExColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            settings.Columns.Add(PriceExColumn);
+
+            PerItemColumn.Name = "PerItem";
+            PerItemColumn.FieldName = "PerItem";
+            PerItemColumn.Caption = "Per Item";
+            PerItemColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+            var piProp = PerItemColumn.PropertiesEdit as CheckBoxProperties;
+            piProp.ValueUnchecked = false;
+            piProp.ValueType = typeof(bool);
+            settings.Columns.Add(PerItemColumn);
+            
+            MinThresholdColumn.Name = "MinThreshold";
+            MinThresholdColumn.FieldName = "MinThreshold";
+            MinThresholdColumn.Caption = "Min Threshold";
+            MinThresholdColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            var minThresProp = MinThresholdColumn.PropertiesEdit as SpinEditProperties;
+            minThresProp.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            minThresProp.NullDisplayText = "-----";
+            minThresProp.NullTextStyle.Font.Italic = true;
+            minThresProp.NumberFormat = SpinEditNumberFormat.Number;
+            minThresProp.DisplayFormatString = "F2";
+            minThresProp.LargeIncrement = 10;
+            minThresProp.Increment = 1;
+            minThresProp.MinValue = 0;
+            minThresProp.MaxValue = 99999999;
+            MinThresholdColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            settings.Columns.Add(MinThresholdColumn);
+
+            MaxThresholdColumn.Name = "MaxThreshold";
+            MaxThresholdColumn.FieldName = "MaxThreshold";
+            MaxThresholdColumn.Caption = "Max Threshold";
+            MaxThresholdColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+            var maxThresProp = MaxThresholdColumn.PropertiesEdit as SpinEditProperties;
+            maxThresProp.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            maxThresProp.NullDisplayText = "-----";
+            maxThresProp.NumberFormat = SpinEditNumberFormat.Number;
+            maxThresProp.DisplayFormatString = "F2";
+            maxThresProp.LargeIncrement = 10;
+            maxThresProp.Increment = 1;
+            maxThresProp.MinValue = 0;
+            maxThresProp.MaxValue = 99999999;
+            MaxThresholdColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            settings.Columns.Add(MaxThresholdColumn);
+
+            OnDateColumn.Name = "OnDate";
+            OnDateColumn.FieldName = "OnDate";
+            OnDateColumn.Caption = "On Date";
+            OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+            var onDateProp = OnDateColumn.PropertiesEdit as DateEditProperties;
+            onDateProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            settings.Columns.Add(OnDateColumn);
+
+            OffDateColumn.Name = "OffDate";
+            OffDateColumn.FieldName = "OffDate";
+            OffDateColumn.Caption = "Off Date";
+            OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+            var offDateProp = OnDateColumn.PropertiesEdit as DateEditProperties;
+            offDateProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            settings.Columns.Add(OffDateColumn);
+
+            WebStatusColumn.Name = "WebStatus";
+            WebStatusColumn.FieldName = "WebStatus";
+            WebStatusColumn.Caption = "Web Status";
+            WebStatusColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+            WebStatusColumn.ReadOnly = true;
+            WebStatusColumn.SetDataItemTemplateContent(c => { 
+                var WebStatusID = UoW.Context.fnc_Status((DateTime?)DataBinder.Eval(c.DataItem, "OnDate"), (DateTime?)DataBinder.Eval(c.DataItem, "OffDate"));
+                var WebStatus = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == WebStatusID).Select(p => p.Name).Single();
+                var colour = "black";
+                switch (WebStatusID)
+                {
+                    case 0:
+                        colour = "green";
+                        break;
+                    case 1:
+                        colour = "orange";
+                        break;
+                    case 2:
+                        colour = "orange";
+                        break;
+                    case 3:
+                        colour = "green";
+                        break;
+                    case 4:
+                        colour = "red";
+                        break;
+                    default: break;
+                }
+                ViewContext.Writer.Write("<span style='color: "+colour+"'>"+WebStatus+"</span>");
+            });
+            settings.Columns.Add(WebStatusColumn);
+
+            
+            
+            TradeColumn.Name = "Trade";
+            TradeColumn.FieldName = "Trade";
+            TradeColumn.Caption = "Trade";
+            TradeColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+            
+            var tcProp = TradeColumn.PropertiesEdit as ComboBoxProperties;
+            tcProp.Items.Clear();
+            tcProp.Items.Add("Retail", false);
+            tcProp.Items.Add("Trade", true);
+            tcProp.ValueType = typeof(bool);
+            
+            settings.Columns.Add(TradeColumn);
+
+            settings.HtmlRowPrepared = (s, e) => {
+                MVCxGridView g = (MVCxGridView)s;
+
+                if (e.RowType == GridViewRowType.Data)
+                {
+                    if (Convert.ToBoolean(e.GetValue("Trade")) == true)
+                    {
+                        e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFF1BD");
+                    }
+                }
+            };
+        });
+	if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+    @grid.Bind(Model).GetHtml()
+}
+}

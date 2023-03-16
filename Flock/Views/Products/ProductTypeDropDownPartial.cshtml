@@ -1,0 +1,82 @@
+﻿@{
+    Layout = null;
+}
+@model List<Flock.Models.ProductType>
+
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+        settings.Name = "ProductTypeDD";
+        settings.Text = "Product Type";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(30);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        
+        settings.Properties.EnableClientSideAPI = true;
+        
+        settings.Properties.ClientSideEvents.CloseUp = @"function(s, e) {
+            s.SetText('Product Type');
+        }";
+        
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='product-type-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("ProductTypeListBoxPartial", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Name = "ProductTypeButtonClear";
+                    buttonSettings.Text = "Clear";
+                    buttonSettings.Style.Add("float", "left");
+                    buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                        ProductTypeCheckComboBox.UnselectAll(); 
+                        ProductTypeDD.HideDropDown(); 
+                        ProductTypeDD.SetText('Product Type');
+                        var textSearch = '';
+                        if(ProductCollectionFreeTextSearchBox.GetValue() != null)                
+                            textSearch = ProductCollectionFreeTextSearchBox.GetValue();
+                        $('#searching-icon').fadeIn('fast');
+                        if($('#product-data-view-container').length > 0) {
+                            $.ajax({
+                                url: '" + @Url.Action("ProductToCollection_ProductDataViewFilter", "Products") + @"',
+                                data: { Brands: BrandCheckComboBox.GetSelectedValues().toString(), Launches: LaunchCheckComboBox.GetSelectedValues().toString(), ProductTypes: ProductTypeCheckComboBox.GetSelectedValues().toString(), TextSearch: textSearch.toString() },
+                                success: function(data) { 
+                                    $('#searching-icon').fadeOut('fast');
+                                    $('#product-data-view-container').html(data);
+                                },
+                                error: function(e, s, a) { 
+                                    $('#searching-icon').fadeOut('fast');
+                                    alert(e.responseText); 
+                                },
+                                timeout: 30000
+                             });
+                        }
+                    }";
+                }
+            )
+            .Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Name = "ProductTypeButtonClose";
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                    buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                        ProductTypeDD.HideDropDown(); 
+                        ProductTypeDD.SetText('Product Type');
+                    }";
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+        settings.Properties.ClientSideEvents.TextChanged = "";
+        settings.Properties.ClientSideEvents.DropDown = "";
+    }
+).GetHtml()

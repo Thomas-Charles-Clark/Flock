@@ -1,0 +1,117 @@
+﻿@Html.DevExpress().DropDownEdit(settings =>
+{
+    settings.Name = "ResolutionDD";
+    settings.Text = "Resolution";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+    settings.Properties.AnimationType = AnimationType.Slide;
+    settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+    settings.SetDropDownWindowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div id='resolution-listbox'>");
+        Html.DevExpress().ListBox(lbSettings =>
+        {
+            lbSettings.Name = "ResolutionListBox";
+            lbSettings.SelectedIndex = -1;
+            lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            lbSettings.Properties.Items.Add("Low", "L");
+            lbSettings.Properties.Items.Add("Medium", "M");
+            lbSettings.Properties.Items.Add("High", "H");
+            lbSettings.ControlStyle.Border.BorderWidth = 0;
+            lbSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+            lbSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+            lbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                ResolutionDD.SetText(s.GetSelectedItem().text);
+                ResolutionDD.HideDropDown();
+                $('#image-searching-icon').fadeIn('fast');
+                    $.ajax({
+                        url: '" + Url.Action("ImageSearch", "Images") + @"',
+                        traditional: true,
+                        data: {
+                            ProductType: ImageSearchProductTypeListBox.GetValue(),
+                            Brand: ImageSearchBrandListBox.GetValue(),
+                            Launch: ImageSearchLaunchListBox.GetValue(),
+                            Collection: ImageSearchCollectionListBox.GetValue(),
+                            AspectRatio: ImageSearchAspectRatioListBox.GetValue(),
+                            ImageType: ImageSearchImageTypeListBox.GetValue(),
+                            Perspective: ImageSearchPerspectiveListBox.GetValue(),
+                            HotspotStatus: ImageSearchHotspotStatusListBox.GetValue(),
+                            Colour: ImageSearchColourListBox.GetValue(),
+                            Room: ImageSearchRoomListBox.GetValue(),
+                            Style: ImageSearchStyleListBox.GetValue(),
+                            NameOrID: ImageSearchNameOrIDTextBox.GetValue(),
+                            SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue(),
+                            Resolution: ResolutionListBox.GetValue()
+                        },
+                        success: function(data) {
+                            $('#image-data-view-container').html(data);
+                            $('#image-searching-icon').fadeOut('slow');
+                        },
+                        error: function(e, s, a) {
+                            $('#image-searching-icon').fadeOut('slow');
+                            alert(e.responseText);
+                        },
+                        timeout: 60000
+                    });
+            }";
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+        Html.DevExpress().Button(
+            buttonSettings =>
+            {
+                buttonSettings.Name = "ResolutionButtonClear";
+                buttonSettings.Text = "Clear";
+                buttonSettings.Style.Add("float", "left");
+                buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                    ResolutionDD.SetText('Resolution');
+                    ResolutionDD.HideDropDown();
+                    ResolutionListBox.UnselectAll();
+                    $('#image-searching-icon').fadeIn('fast');
+                    $.ajax({
+                        url: '" + Url.Action("ImageSearch", "Images") + @"',
+                        traditional: true,
+                        data: {
+                            ProductType: ImageSearchProductTypeListBox.GetValue(),
+                            Brand: ImageSearchBrandListBox.GetValue(),
+                            Launch: ImageSearchLaunchListBox.GetValue(),
+                            Collection: ImageSearchCollectionListBox.GetValue(),
+                            AspectRatio: ImageSearchAspectRatioListBox.GetValue(),
+                            ImageType: ImageSearchImageTypeListBox.GetValue(),
+                            Perspective: ImageSearchPerspectiveListBox.GetValue(),
+                            HotspotStatus: ImageSearchHotspotStatusListBox.GetValue(),
+                            Colour: ImageSearchColourListBox.GetValue(),
+                            Room: ImageSearchRoomListBox.GetValue(),
+                            Style: ImageSearchStyleListBox.GetValue(),
+                            NameOrID: ImageSearchNameOrIDTextBox.GetValue(),
+                            SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue(),
+                            Resolution: ResolutionListBox.GetValue()
+                        },
+                        success: function(data) {
+                            $('#image-data-view-container').html(data);
+                            $('#image-searching-icon').fadeOut('slow');
+                        },
+                        error: function(e, s, a) {
+                            $('#image-searching-icon').fadeOut('slow');
+                            alert(e.responseText);
+                        },
+                        timeout: 60000
+                    });
+                }";
+            }).Render();
+        Html.DevExpress().Button(
+            buttonSettings =>
+            {
+                buttonSettings.Name = "ResolutionButtonClose";
+                buttonSettings.Text = "Close";
+                buttonSettings.Style.Add("float", "right");
+                buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                    ResolutionDD.HideDropDown();
+                }";
+            }).Render();
+        ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+    });
+}).GetHtml()

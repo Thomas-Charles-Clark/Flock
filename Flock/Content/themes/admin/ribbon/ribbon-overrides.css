@@ -1,0 +1,125 @@
+﻿.tabs {
+
+    min-width: 800px;
+}
+
+#OfficeControls {
+    overflow: visible;
+}
+
+#OfficeControls .ribbon .ribbon_contents .controls {
+    border-bottom: 1px solid #D4D4D4;
+    height: auto;
+    min-width: 1320px !important;
+    padding: 5px;
+}
+
+.group  {
+    min-width: 132px;
+    padding: 5px;
+}
+
+div.sections span {
+    display: block;
+    text-align: center;
+    margin-bottom: 0.65em;
+}
+
+span.dx-vam {
+    margin-bottom: 0 !important;
+}
+
+ul.vertical-list {
+    float: left;
+}
+
+ul.vertical-list li {
+    margin-bottom: 0.5em;
+    text-align: center;  
+    line-height: 1.3em;
+}
+
+ul.vertical-list li:last-child {
+    margin-bottom: 0;
+}
+
+#OfficeControls .ribbon .ribbon_contents .controls .groupHolder .group {
+    height: auto;
+    margin: 5px 0;
+    /*box-shadow:
+		inset 10px 0px 10px -7px rgba(0,0,0,0.5),
+		inset -10px 0px 10px -7px rgba(0,0,0,0.5);*/
+
+    /*box-shadow: 0px 4px 0px 0px white, 0px -4px 0px 0px white, 10px 0px 10px -11px rgba(0, 0, 0, 0.506), -10px 0px 10px -11px rgba(0, 0, 0, 0.506);*/
+}
+
+#OfficeControls .ribbon .ribbon_contents .controls .groupHolder .group .sections {
+    padding: 0;
+    height: 90px;
+}
+
+#OfficeControls .ribbon .header {
+    height: 40px;
+    /*background: url("/Images/admin/FlockLogo_right.png") 100% 0px no-repeat #8BBFE5;*/
+    background-color: #8bbfe5;
+    color: #666666 !important;
+}
+
+#OfficeControls {
+    -webkit-box-shadow: 0 1px 5px #E1E1E1;
+    -moz-box-shadow: 0 1px 5px #E1E1E1;
+    box-shadow: 0 1px 5px #E1E1E1;
+    height: auto;
+    margin-bottom: 0;
+    overflow: hidden;
+    min-width: 800px;
+}
+
+#OfficeControls .ribbon .ribbon_contents .tabs .tab {
+    height: 26px;
+    line-height: 26px;
+    -webkit-border-top-left-radius: 5px;
+    border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-box-shadow: inset 0 -2px 5px #E1E1E1;
+    -moz-box-shadow: inset 0 -2px 5px #E1E1E1;
+    box-shadow: inset 0 -2px 5px #E1E1E1;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+    #OfficeControls .ribbon .ribbon_contents .tabs .active {
+        -webkit-box-shadow: none !important;
+        -moz-box-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+.sections ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0 !important;
+}
+
+.ribbon_contents {
+    padding-bottom: 0; 
+    border-bottom: 0;
+}
+
+#OfficeControls .tabs .tab {
+    color: #2B579A;
+    cursor: pointer;
+}
+
+.active {
+    background-color: white !important;
+}
+    .active .title {
+        color: #2B579A !important;
+        border-bottom: 1px solid #2B579A;
+        padding-bottom: 1px;
+    }
+
+#OfficeControls .ribbon .ribbon_contents .tabs { 
+    top: 14px !important;
+}

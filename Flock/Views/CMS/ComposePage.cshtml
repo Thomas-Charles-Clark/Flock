@@ -1,0 +1,539 @@
+﻿@using Flock.ViewModels
+@model PageComposeViewModel
+@{
+    ViewBag.Title = "Compose Page";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/colorpicker.css")
+
+    @Styles.Render("~/bundles/composer")
+
+    @Styles.Render("~/Content/cms-page-composition.css")
+
+    @Styles.Render("~/Content/animation.css")
+    <style type="text/css">
+        #container {
+            width: 2030px !important;
+        }
+
+        #ComposePageGridSelector_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+
+        .dxgvFooter_MetropolisBlue td.dxgv {
+            border-top: 1px solid #c0c0c0 !important;
+        }
+
+        .dxb-hb {
+            font-size: 0 !important;
+        }
+    </style>
+    <link rel="stylesheet" href="~/Content/codemirror.css" />
+}
+@section scripts {
+    @Scripts.Render("~/Scripts/colorpicker/colorpicker.js")
+    @Scripts.Render("~/bundles/cms-compose-page")
+    @*@Scripts.Render("~/Scripts/jquery-ui-1.10.2.js")*@
+}
+@section afterDevExpressScripts {
+    @Scripts.Render("~/bundles/js/codemirror-htmleditor")
+}
+
+<script type="text/javascript">
+
+    const pagePodViewModel = ((pageSectionId, pageId) => {
+        var self = {
+            pageSectionId: pageSectionId,
+            pageId: pageId
+        };
+
+        self.attributeGroups = ko.observableArray(getAttributeGroups().map(ag => attributeGroupViewModel(ag)));
+
+        self.getAttributeGroup = (id) => {
+            return self.attributeGroups().filter(ag => ag.AttributeGroupID == id)[0];
+        }
+
+        self.selectedAttributes = ko.pureComputed(() => {
+            let attributeIds = ko.unwrap(self.attributeGroups()).flatMap(ag => ag.attributeId() ? [ag.attributeId()] : []);
+            return getAttributes().filter(at => attributeIds.indexOf(at.AttributeID) > -1);
+        }, self);
+
+        self.attributeIds = ko.pureComputed(() => {
+            return self.selectedAttributes().map(a => {
+                return {
+                    id: a.AttributeID
+                }
+            });
+        }, self);
+
+        self.nameDisplay = ko.pureComputed(() => {
+            let attributes = self.selectedAttributes();
+
+            let names = [];
+
+            attributes.forEach(a => {
+                names.push(a.Name);
+            });
+
+            let name = `${names.join(' ')} ${getProductTypeNamePlural()}`;
+
+            document.querySelector(`#pagesection-${self.pageSectionId}-page-${self.pageId}-name`).innerHTML = name
+                
+            return name;
+        })
+
+        self.urlDisplay = ko.pureComputed(() => {
+            let attributes = self.selectedAttributes();
+
+            let urlSegments = [];
+
+            attributes.forEach(a => {
+                urlSegments.push(a.FormValue);
+            });
+
+            urlSegments.push(getProductTypeURLKeywords());
+
+            let url = urlSegments.join('-');
+
+            return `${decodeURI(url)}/l${self.pageId}`;
+
+        }, self);
+
+        self.save = () => {
+            $.ajax({
+                url: '/api/CMS_GeneralAPI/SavePagePodAttributes',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    pageSectionId: self.pageSectionId,
+                    pageId: self.pageId,
+                    attributeIds: self.attributeIds()
+                },
+                success: () => {
+                    $('#page-pod-advanced-settings-modal').modal('hide');
+                    $.info('Ok', 'Saved successfully', null);
+                },
+                error: (x, s, a) => {
+                    $.showError(x, s, a);
+                }
+            });
+        }
+
+        return self;
+    });
+
+    
+    const canonicalPagePodViewModel = ((pageId, parentPageId) => {
+        var self = {
+            pageId: pageId,
+            parentPageId: parentPageId
+        };
+
+        self.attributeGroups = ko.observableArray(getAttributeGroups().map(ag => attributeGroupViewModel(ag)));
+
+        self.getAttributeGroup = (id) => {
+            return self.attributeGroups().filter(ag => ag.AttributeGroupID == id)[0];
+        }
+
+        self.selectedAttributes = ko.pureComputed(() => {
+            let attributeIds = ko.unwrap(self.attributeGroups()).flatMap(ag => ag.attributeId() ? [ag.attributeId()] : []);
+            return getAttributes().filter(at => attributeIds.indexOf(at.AttributeID) > -1);
+        }, self);
+
+        self.attributeIds = ko.pureComputed(() => {
+            return self.selectedAttributes().map(a => {
+                return {
+                    id: a.AttributeID
+                }
+            });
+        }, self);
+
+        self.nameDisplay = ko.pureComputed(() => {
+            let attributes = self.selectedAttributes();
+
+            let names = [];
+
+            attributes.forEach(a => {
+                names.push(a.Name);
+            });
+
+            let name = `${names.join(' ')} ${getProductTypeNamePlural()}`;
+
+            document.querySelector(`#page-${self.parentPageId}-canonical-name`).innerHTML = name;
+
+            return name;
+        })
+
+        self.urlDisplay = ko.pureComputed(() => {
+            let attributes = self.selectedAttributes();
+
+            let urlSegments = [];
+
+            attributes.forEach(a => {
+                urlSegments.push(a.FormValue);
+            });
+
+            urlSegments.push(getProductTypeURLKeywords());
+
+            let url = urlSegments.join('-');
+
+            return `${decodeURI(url)}/l${self.pageId}`;
+
+        }, self);
+
+        self.save = () => {
+            $.ajax({
+                url: '/api/CMS_CanonicalAPI/SaveCanonicalPageAttributes',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    pageId: self.parentPageId,
+                    destinationPageId: self.pageId,
+                    attributeIds: self.attributeIds()
+                },
+                success: () => {
+                    $('#page-pod-advanced-settings-modal').modal('hide');
+                    $.info('Ok', 'Saved successfully', null);
+                },
+                error: (x, s, a) => {
+                    $.showError(x, s, a);
+                }
+            });
+        }
+
+        return self;
+    });
+
+    const attributeGroupViewModel = ((data) => {
+        let self = Object.assign(data, {
+
+        });
+
+        self.attributeId = ko.observable();
+
+        self.attributeId.subscribe(nv => {
+            console.log('attributeId changed', nv);
+        });
+
+        return self;
+    });
+</script>
+
+<script type="text/javascript">
+    window.isCloningPageSection = false;
+</script>
+
+<input type="hidden" id="selected-page-id" value="@(Model.PageID)" />
+
+<h4 class="page-heading">
+    Compose Page
+</h4>
+
+<div id="resource-panels" style="float: right; width: 986px;">
+    @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+    @Html.Partial("~/Views/ProductPages/ProductPageSearchPartial.cshtml")
+    @Html.Partial("~/Views/Collections/CollectionSearchPartial.cshtml")
+    @Html.Partial("~/Views/Pages/PageSearchPartial.cshtml")
+    @Html.Partial("~/Views/Articles/ArticleSearchPartial.cshtml")
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+    @Html.Partial("~/Views/Video/VideoSearchPartial.cshtml")
+</div>
+
+<div id="page-compose-section" data-page-id="@Model.PageID" style="float: left; width: 986px;">
+    <div id="page-select-header-container">
+        <div class="content-panel-container">
+            <fieldset id="page-select-header">
+                <legend onclick="$('#select-header-inner').slideToggle('fast');">
+                    Compose Page - Page Selector (click to expand / contract)
+                    <img id="page-select-header-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+                </legend>
+                <div id="select-header-inner">
+                    <div id="page-header-page-drop-down-container">
+                        @Html.Action("ComposePageHeaderPageGridSelectorPartial", "CMS")
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div id="page-compose-container">
+        @if (ViewData["InvalidPageIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidPageIDError"])</h5>
+        }
+        @if (Model.PageID != null)
+        {
+            @Html.Partial("PageComposePartial", Model)
+        }
+    </div>
+</div>
+<div style="clear: both;"></div>
+
+<div id="add-page-section-type-dialog" style="width: 250px; height: 45px">
+    <select id="page-section-type-select" style="display: block;" onchange="ShowSecondarySelect()">
+        <option value="0">Select...</option>
+        <option value="1">HTML</option>
+        <option value="12">Animation</option>
+        <option value="2">Slideshow</option>
+        <option value="10">Video</option>
+        <option value="3">Form</option>
+        <option value="4">Product Page Grid</option>
+        <option value="5">Collection Grid</option>
+        <option value="6">Page Grid</option>
+        <option value="9">Article Grid</option>
+        <option value="11">Masonry</option>
+        <option value="7">Brochure</option>
+        <option value="8">Banner Location Group</option>
+        <option value="13">Bespoke Content</option>
+    </select>
+
+    <select id="animation-height-select" class="secondary-select" style="display: none; margin-top: 1em;">
+        <option value="0" selected="selected">Select Height...</option>
+        <option value="1">Square</option>
+        <option value="1.636">Landscape (Feature)</option>
+        <option value="2.0">Landscape (Shallow)</option>
+        <option value="2.6">Landscape (Full Width Banner)</option>
+        <option value="4.0">Landscape (Slim Header)</option>
+        <option value="1.778">Widescreen</option>
+        <option value="1.5">35mm Landscape</option>
+        <option value="0.667">35mm Portrait</option>
+        <option value="1.869">Landscape - 3/4 Header</option>
+        <option value="3.000">Landscape - 3/4 Slim Header</option>
+    </select>
+
+    <select id="slideshow-height-select" class="secondary-select" style="display: none; margin-top: 1em;">
+        <option value="0" selected="selected">Select Height...</option>
+        <option value="1">Square</option>
+        <option value="1.636">Landscape (Feature)</option>
+        <option value="2.0">Landscape (Shallow)</option>
+        <option value="2.6">Landscape (Full Width Banner)</option>
+        <option value="4.0">Landscape (Slim Header)</option>
+        <option value="1.778">Widescreen</option>
+        <option value="1.5">35mm Landscape</option>
+        <option value="0.667">35mm Portrait</option>
+    </select>
+
+    <select id="add-page-section-position" style="margin-top: 1em;">
+        <option value="0" selected="selected">Top</option>
+        <option value="1">Bottom</option>
+    </select>
+
+    <select id="banner-location-group" class="secondary-select" style="margin-top: 1em;">
+        <option value="0">Number of Locations...</option>
+        <option value="1">Single Banner Location</option>
+        <option value="9">Second Single Banner Location</option>
+        <option value="2">Two Banner Locations</option>
+        <option value="14">Second set of Two Banner Locations</option>
+        <option value="3">Three Banner Locations</option>
+        <option value="15">Second set of Three Banner Locations</option>
+        <option value="16">Third set of Three Banner Locations</option>
+        <option value="4">Four Banner Locations</option>
+        <option value="11">Second set of Four Banner Locations</option>
+        <option value="13">Third set of Four Banner Locations</option>
+    </select>
+
+    @*
+        Need a DevExpress Brochure Picker - would be great to have a combobox which permits text searching
+    *@
+    <div id="brochure-select-container" style="display: none; height: 120px;">
+        removed
+        @*@Html.Action("ComposePageBrochureSelectPartial", "CMS")*@
+    </div>
+</div>
+
+<div id="product-page-section-selector-dialog" style="width: 250px; height: 45px; padding-top: 1em;">
+    <select id="product-page-section-select">
+        <option value="0" selected="selected">Select...</option>
+    </select>
+    <select id="add-where-select">
+        <option value="0" selected="selected">Prepend</option>
+        <option value="1">Append</option>
+    </select>
+</div>
+
+<div id="collection-section-selector-dialog" style="width: 250px; height: 45px;">
+    <select id="collection-section-select">
+        <option value="0" selected="selected">Select...</option>
+    </select>
+    <select id="collection-add-where-select" style="margin-top: 1em;">
+        <option value="0" selected="selected">Prepend</option>
+        <option value="1">Append</option>
+    </select>
+</div>
+
+<div id="page-section-selector-dialog" style="width: 250px; height: 45px;">
+    <select id="page-section-select">
+        <option value="0" selected="selected">Select...</option>
+    </select>
+    <select id="page-add-where-select" style="margin-top: 1em;">
+        <option value="0" selected="selected">Prepend</option>
+        <option value="1">Append</option>
+    </select>
+</div>
+
+
+@Html.DevExpress().PopupControl(settings =>
+{
+    settings.Name = "ClonePageSectionPopup";
+
+    settings.PopupElementID = "pagesection-clone-icon";
+
+    settings.Width = 400;
+    settings.ShowFooter = false;
+    settings.HeaderText = "Clone Page Section";
+    settings.Modal = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    
+    settings.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<label style='float: left; margin: 0; line-height: 22px;'>Target Page (Name or ID) <sub style='bottom: 0;'>(leave blank to copy to this page)</sub></label>");
+
+        ViewContext.Writer.Write(Html.Action("PageSectionClonePageIDComboBoxPartial").ToHtmlString());
+        
+        ViewContext.Writer.Write("<div style='clear: both;'></div>");
+
+        ViewContext.Writer.Write("<label style='margin-top: 10px; margin-bottom: 0; line-height: 22px;'>Clone's On Date</label>");
+
+        Html.DevExpress().DateEdit(deSettings =>
+        {
+            deSettings.Name = "PageSectionCloneOnDate";
+        }).Render();
+
+        ViewContext.Writer.Write("<div style='clear: both;'></div>");
+
+        ViewContext.Writer.Write("<label style='margin-top: 10px; margin-bottom: 0; line-height: 22px;'>Copy Contents?</label>");
+
+        Html.DevExpress().CheckBox(cbSettings =>
+        {
+            cbSettings.Name = "PageSectionCloneCopyContents";
+            cbSettings.Properties.ValueType = typeof(bool);
+            cbSettings.Properties.ValueChecked = true;
+            cbSettings.Properties.ValueUnchecked = false;
+
+        }).Render();
+
+        ViewContext.Writer.Write("<input type='hidden' id='clone-popup-page-section-id' />");
+
+        ViewContext.Writer.Write("<div style='clear: both;'></div>");
+
+        Html.DevExpress().Button(bSettings => {
+            bSettings.Name = "PageSectionCloneOKButton";
+            bSettings.Text = "Clone";
+            bSettings.Style.Add("margin-top", "10px");
+            bSettings.ClientSideEvents.Click = @"function(s, e) { 
+                ClonePageSection($('#clone-popup-page-section-id').val());
+            }";
+        }).Render();
+    });
+}).GetHtml()
+
+@Html.DevExpress().PopupControl(settings => {
+    settings.Name = "MergeGridPopup";
+
+    settings.Width = 400;
+    settings.ShowFooter = false;
+    settings.HeaderText = "Merge Products";
+
+    settings.Modal = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    
+    settings.SetContent(() => {
+        Html.DevExpress().Label(lSettings =>
+        {
+            lSettings.Name = "ProductPageMergeLbl";
+            lSettings.Text = "Page Section ID";
+            lSettings.Style.Add("float", "left");
+            lSettings.Style.Add("margin", "0 7px 7px 0");
+            lSettings.Style.Add("line-height", "32px");
+        }).Render();
+
+        Html.DevExpress().TextBox(tbSettings =>
+        {
+            tbSettings.Name = "TargetPageSectionID";
+            tbSettings.Properties.ClientInstanceName = "TargetPageSectionID";
+            tbSettings.Style.Add("float", "left");
+            tbSettings.Style.Add("margin", "0 7px 7px 0");
+            tbSettings.Properties.ClientSideEvents.KeyDown = @"function(s, e) {
+                if (!((e.htmlEvent.keyCode >= 48 && e.htmlEvent.keyCode <= 57) || (e.htmlEvent.keyCode >= 97 && e.htmlEvent.keyCode <= 105) || (e.htmlEvent.keyCode == 8 || e.htmlEvent.keyCode == 46 || e.htmlEvent.keyCode == 37 || e.htmlEvent.keyCode == 39)))
+                    ASPxClientUtils.PreventEventAndBubble(e.htmlEvent);
+            }";
+        }).Render();
+
+        Html.DevExpress().Button(bSettings =>
+        {
+            bSettings.Name = "ProductPageMergeGoBtn";
+            bSettings.Text = "Go";
+            bSettings.Style.Add("float", "left");
+            bSettings.Style.Add("line-height", "32px");
+            bSettings.Height = System.Web.UI.WebControls.Unit.Pixel(34);
+            bSettings.Width = 44;
+            bSettings.ClientSideEvents.Click = @"function(s, e) {
+                PageSectionProductPageMerge($('#merge-productpages-page-section-id').val());
+            }";
+        }).Render();
+
+        ViewContext.Writer.Write("<div class='clearfix'></div>");
+        
+        Html.DevExpress().Label(lSettings =>
+        {
+            lSettings.Name = "ProductPageMergeReplaceLbl";
+            lSettings.Text = "Replace?";
+            lSettings.Style.Add("float", "left");
+            lSettings.Style.Add("margin", "0 7px 7px 0");
+            lSettings.Style.Add("line-height", "30px");
+        }).Render();
+
+        Html.DevExpress().CheckBox(cbSettings =>
+        {
+            cbSettings.Name = "ProductPageMergeReplace";
+            cbSettings.Style.Add("float", "left");
+            cbSettings.Style.Add("margin", "0 7px 7px 0");
+            cbSettings.Style.Add("line-height", "22px");
+            cbSettings.Properties.ValueChecked = true;
+            cbSettings.Properties.ValueUnchecked = false;
+            cbSettings.Checked = false;
+        }).Render();
+
+        ViewContext.Writer.Write("<input type='hidden' id='merge-productpages-page-section-id' />");
+    });
+    
+}).GetHtml()
+
+<div id="pagesection-productpage-merge-source" data-source-page-section-id="-1">
+
+</div>
+
+<div id="page-section-advanced-settings-dialog">
+
+</div>
+
+<div id="dialog-marketingpartner-manage">
+    <div id="dialog-marketingpartner-inner">
+
+    </div>
+</div>
+
+<div id="slideshow-image-dialog" style="width: 1048px; height: auto;">
+    <div id="slideshow-image-dialog-inner">
+
+    </div>
+</div>
+
+<div id="add-all-country-dialog">
+    <button type="button" onclick="AddAllCountriesToPage();">To Page</button>
+</div>
+
+<div id="animation-dialog">
+    <div id="animation-edit-container">
+
+    </div>
+</div>
+
+<div id="call-to-action-grid-dialog" style="display: none;">
+    <div id="call-to-action-grid-dialog-inner">
+        @Html.Action("CallToActionGridViewPartial", "Animations")
+    </div>
+</div>

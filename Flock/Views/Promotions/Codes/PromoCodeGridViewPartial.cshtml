@@ -1,0 +1,491 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@model Flock.ViewModels.PromoCodeViewModel
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "PromotionCodeGridView";
+        settings.CallbackRouteValues = new { Controller = "Promotions", Action = "PromoCodeGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Promotions", Action = "PromoCodeGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Promotions", Action = "PromoCodeGridViewPartialUpdate" };
+
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            if($('#member-restrictions').length > 0) {
+                var memberRestrictions = [];
+                $('#member-restriction-placeholder').remove();
+                $('#member-restrictions > div').each(function() { 
+                    memberRestrictions.push($(this).data('member-id'));
+                });
+                e.customArgs['memberRestrictions'] = memberRestrictions.toString();
+            }
+            if($('#product-restrictions').length > 0) {
+                var productRestrictions = [];
+                $('#product-restriction-placeholder').remove();
+                $('#product-restrictions > div').each(function() { 
+                    productRestrictions.push($(this).data('product-id'));
+                });
+                e.customArgs['productRestrictions'] = productRestrictions.toString();
+            }
+            if (typeof (InitMemberDragDrop) == 'function')
+                InitMemberDragDrop();
+            if (typeof (InitProductDragDrop) == 'function')
+                InitProductDragDrop();
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+            if (typeof (InitMemberDragDrop) == 'function')
+                InitMemberDragDrop();
+            if (typeof (InitProductDragDrop) == 'function')
+                InitProductDragDrop();
+        }";
+
+        settings.ClientSideEvents.Init = @"function(s, e) { 
+            if (typeof (InitMemberDragDrop) == 'function')
+                InitMemberDragDrop();
+            if (typeof (InitProductDragDrop) == 'function')
+                InitProductDragDrop();
+        }";
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.VisibleIndex = 100;
+
+        settings.Settings.ShowFilterRow = true;
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.KeyFieldName = "PromotionCodeID";
+
+        MVCxGridViewColumn PromotionCodeIDColumn = new MVCxGridViewColumn();
+        PromotionCodeIDColumn.Name = "PromotionCodeID";
+        PromotionCodeIDColumn.FieldName = "PromotionCodeID";
+        PromotionCodeIDColumn.Caption = "ID";
+        PromotionCodeIDColumn.Width = 50;
+        PromotionCodeIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PromotionCodeIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        PromotionCodeIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+
+        MVCxGridViewColumn PromotionGroupIDColumn = new MVCxGridViewColumn();
+        PromotionGroupIDColumn.Name = "PromotionGroupID";
+        PromotionGroupIDColumn.FieldName = "PromotionGroupID";
+        PromotionGroupIDColumn.Caption = "Group";
+        PromotionGroupIDColumn.Width =  60;
+        PromotionGroupIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        PromotionGroupIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var pgIDprop = PromotionGroupIDColumn.PropertiesEdit as ComboBoxProperties;
+        pgIDprop.ValueField = "PromotionGroupID";
+        pgIDprop.ValueType = typeof(byte);
+        pgIDprop.TextField = "Name";
+        pgIDprop.DataSource = UoW.GetRepository<PromotionGroup>().GetAll().ToList();
+        PromotionGroupIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        PromotionGroupIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        PromotionGroupIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+
+        MVCxGridViewColumn CodeColumn = new MVCxGridViewColumn();
+        CodeColumn.Name = "Code";
+        CodeColumn.FieldName = "Code";
+        CodeColumn.Caption = "Code";
+        CodeColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CodeColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn DescriptionColumn = new MVCxGridViewColumn();
+        DescriptionColumn.Name = "Description";
+        DescriptionColumn.FieldName = "Description";
+        DescriptionColumn.Caption = "Description";
+        DescriptionColumn.Width = 280;
+        DescriptionColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        DescriptionColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        OnDateColumn.Name = "OnDate";
+        OnDateColumn.FieldName = "OnDate";
+        OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OnDateColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OnDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        OnDateColumn.EditCellStyle.CssClass = "thin-edit-control";
+        OnDateColumn.Caption = "On Date";
+
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+        OffDateColumn.Name = "OffDate";
+        OffDateColumn.FieldName = "OffDate";
+        OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OffDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OffDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        OffDateColumn.Caption = "Off Date";
+
+        MVCxGridViewColumn WebStatusColumn = new MVCxGridViewColumn();
+        WebStatusColumn.Name = "WebStatusID";
+        WebStatusColumn.FieldName = "WebStatusID";
+        WebStatusColumn.Caption = "Web Status";
+        WebStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var WebStatusID = Convert.ToByte(DataBinder.Eval(c.DataItem, "WebStatusID"));
+            var WebStatus = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == WebStatusID).Select(p => p.Name).Single();
+            var colour = "black";
+            switch (WebStatusID)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            ViewContext.Writer.Write("<span style='color: " + colour + "'>" + WebStatus + "</span>");
+        });
+        WebStatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        WebStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        WebStatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        WebStatusColumn.EditFormSettings.Visible = DefaultBoolean.False;
+
+        MVCxGridViewColumn MinimumSpendColumn = new MVCxGridViewColumn();
+        MinimumSpendColumn.Name = "MinimumSpend";
+        MinimumSpendColumn.FieldName = "MinimumSpend";
+        MinimumSpendColumn.Caption = "Min Spend";
+        MinimumSpendColumn.Width = 40;
+        MinimumSpendColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        MinimumSpendColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var minSpendProp = MinimumSpendColumn.PropertiesEdit as SpinEditProperties;
+        minSpendProp.MinValue = 0;
+        minSpendProp.MaxValue = 99999;
+        minSpendProp.NumberFormat = SpinEditNumberFormat.Custom;
+        minSpendProp.DisplayFormatString = "F2";
+        minSpendProp.DisplayFormatInEditMode = true;
+        minSpendProp.DecimalPlaces = 2;
+        MinimumSpendColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        MinimumSpendColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn MaxUsesColumn = new MVCxGridViewColumn();
+        MaxUsesColumn.Name = "MaxUses";
+        MaxUsesColumn.FieldName = "MaxUses";
+        MaxUsesColumn.Caption = "Max Uses";
+        MaxUsesColumn.Width = 40;
+        MaxUsesColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        MaxUsesColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var maxUsesProp = MaxUsesColumn.PropertiesEdit as SpinEditProperties;
+        maxUsesProp.NumberType = SpinEditNumberType.Integer;
+        maxUsesProp.MinValue = 0;
+        maxUsesProp.MaxValue = System.Int32.MaxValue;
+        maxUsesProp.NumberFormat = SpinEditNumberFormat.Custom;
+        MaxUsesColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        MaxUsesColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn MaxUsesPerUserColumn = new MVCxGridViewColumn();
+        MaxUsesPerUserColumn.Name = "MaxUsesPerUser";
+        MaxUsesPerUserColumn.FieldName = "MaxUsesPerUser";
+        MaxUsesPerUserColumn.Caption = "Max Uses per User";
+        MaxUsesPerUserColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        MaxUsesPerUserColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        MaxUsesPerUserColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn TransactionSequenceRestrictionColumn = new MVCxGridViewColumn();
+        TransactionSequenceRestrictionColumn.Name = "TransactionSequenceRestriction";
+        TransactionSequenceRestrictionColumn.FieldName = "TransactionSequenceRestriction";
+        TransactionSequenceRestrictionColumn.Caption = "Transaction Sequence Restriction";
+        TransactionSequenceRestrictionColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        TransactionSequenceRestrictionColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var tsrcProp = TransactionSequenceRestrictionColumn.PropertiesEdit as SpinEditProperties;
+        tsrcProp.MinValue = 0;
+        tsrcProp.MaxValue = 3;
+        TransactionSequenceRestrictionColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        TransactionSequenceRestrictionColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn UsedColumn = new MVCxGridViewColumn();
+        UsedColumn.Name = "Used";
+        UsedColumn.FieldName = "Used";
+        UsedColumn.Caption = "Used";
+        UsedColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        UsedColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        UsedColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        UsedColumn.EditFormSettings.Visible = DefaultBoolean.False;
+
+        MVCxGridViewColumn PriceListIDColumn = new MVCxGridViewColumn();
+        PriceListIDColumn.Name = "PriceListID";
+        PriceListIDColumn.FieldName = "PriceListID";
+        PriceListIDColumn.Caption = "Price List";
+        PriceListIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var plIDprop = PriceListIDColumn.PropertiesEdit as ComboBoxProperties;
+        plIDprop.ValueField = "PriceListID";
+        plIDprop.ValueType = typeof(byte);
+        plIDprop.TextField = "Name";
+        plIDprop.DataSource = UoW.GetRepository<PriceList>().GetAll().ToList();
+        PriceListIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        PriceListIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        PriceListIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+
+        MVCxGridViewColumn DiscountColumn = new MVCxGridViewColumn();
+        DiscountColumn.Name = "Discount";
+        DiscountColumn.FieldName = "Discount";
+        DiscountColumn.Caption = "Discount";
+        DiscountColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var discProp = DiscountColumn.PropertiesEdit as SpinEditProperties;
+        discProp.MinValue = 0;
+        discProp.MaxValue = 99999;
+        discProp.NumberFormat = SpinEditNumberFormat.Custom;
+        discProp.DisplayFormatString = "F2";
+        discProp.DisplayFormatInEditMode = true;
+        discProp.DecimalPlaces = 2;
+        DiscountColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        DiscountColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn DiscountTypeColumn = new MVCxGridViewColumn();
+        DiscountTypeColumn.Name = "DiscountType";
+        DiscountTypeColumn.FieldName = "DiscountType";
+        DiscountTypeColumn.Caption = "Discount Type";
+        DiscountTypeColumn.Width = 60;
+        DiscountTypeColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        DiscountTypeColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        DiscountTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        DiscountTypeColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        DiscountTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        DiscountTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        var dtProp = DiscountTypeColumn.PropertiesEdit as ComboBoxProperties;
+        dtProp.ValueType = typeof(bool);
+        dtProp.Items.Add("Monetary", true);
+        dtProp.Items.Add("Percentage", false);
+
+        MVCxGridViewColumn DiscountFullPriceColumn = new MVCxGridViewColumn();
+        DiscountFullPriceColumn.Name = "ApplyDiscountToFullPrice";
+        DiscountFullPriceColumn.FieldName = "ApplyDiscountToFullPrice";
+        DiscountFullPriceColumn.Caption = "Discount Full Price Products";
+        DiscountFullPriceColumn.Width = 60;
+        DiscountFullPriceColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        DiscountFullPriceColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        DiscountFullPriceColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        DiscountFullPriceColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        DiscountFullPriceColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        DiscountFullPriceColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var discFullProp = DiscountFullPriceColumn.PropertiesEdit as ComboBoxProperties;
+        discFullProp.ValueType = typeof(bool);
+        discFullProp.Items.Add("Yes", true);
+        discFullProp.Items.Add("No", false);
+        DiscountFullPriceColumn.EditFormSettings.VisibleIndex = 100;
+
+        MVCxGridViewColumn DiscountSalePriceColumn = new MVCxGridViewColumn();
+        DiscountSalePriceColumn.Name = "ApplyDiscountToSalePrice";
+        DiscountSalePriceColumn.FieldName = "ApplyDiscountToSalePrice";
+        DiscountSalePriceColumn.Caption = "Discount Sale Priced Products";
+        DiscountSalePriceColumn.Width = 60;
+        DiscountSalePriceColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        DiscountSalePriceColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        DiscountSalePriceColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        DiscountSalePriceColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        DiscountSalePriceColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        DiscountSalePriceColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var discSaleProp = DiscountSalePriceColumn.PropertiesEdit as ComboBoxProperties;
+        discSaleProp.ValueType = typeof(bool);
+        discSaleProp.Items.Add("Yes", true);
+        discSaleProp.Items.Add("No", false);
+        DiscountSalePriceColumn.EditFormSettings.VisibleIndex = 100;
+
+        MVCxGridViewColumn DiscountTradePriceColumn = new MVCxGridViewColumn();
+        DiscountTradePriceColumn.Name = "ApplyDiscountToTradePrice";
+        DiscountTradePriceColumn.FieldName = "ApplyDiscountToTradePrice";
+        DiscountTradePriceColumn.Caption = "Discount Trade Prices";
+        DiscountTradePriceColumn.Width = 60;
+        DiscountTradePriceColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        DiscountTradePriceColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        DiscountTradePriceColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        DiscountTradePriceColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        DiscountTradePriceColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        DiscountTradePriceColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var discTradeProp = DiscountTradePriceColumn.PropertiesEdit as ComboBoxProperties;
+        discTradeProp.ValueType = typeof(bool);
+        discTradeProp.Items.Add("Yes", true);
+        discTradeProp.Items.Add("No", false);
+        DiscountTradePriceColumn.EditFormSettings.VisibleIndex = 100;
+
+
+
+
+
+        MVCxGridViewColumn DiscountBundlesColumn = new MVCxGridViewColumn();
+        DiscountBundlesColumn.Name = "DiscountBundles";
+        DiscountBundlesColumn.FieldName = "DiscountBundles";
+        DiscountBundlesColumn.Caption = "Discount Bundles";
+        DiscountBundlesColumn.Width = 50;
+        DiscountBundlesColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        DiscountBundlesColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        DiscountBundlesColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        DiscountBundlesColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        DiscountBundlesColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        DiscountBundlesColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var discBundProp = DiscountBundlesColumn.PropertiesEdit as ComboBoxProperties;
+        discBundProp.ValueType = typeof(bool);
+        discBundProp.Items.Add("Yes", true);
+        discBundProp.Items.Add("No", false);
+        DiscountBundlesColumn.EditFormSettings.VisibleIndex = 100;
+
+        MVCxGridViewColumn GiftBoxPriceExColumn = new MVCxGridViewColumn();
+        GiftBoxPriceExColumn.Name = "GiftBoxPriceEx";
+        GiftBoxPriceExColumn.FieldName = "GiftBoxPriceEx";
+        GiftBoxPriceExColumn.Caption = "Gift Box Price Ex";
+        GiftBoxPriceExColumn.Width = 40;
+        GiftBoxPriceExColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        GiftBoxPriceExColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var giftBoxPriceExProp = GiftBoxPriceExColumn.PropertiesEdit as SpinEditProperties;
+        giftBoxPriceExProp.MinValue = 0;
+        giftBoxPriceExProp.MaxValue = 99999;
+        giftBoxPriceExProp.NumberFormat = SpinEditNumberFormat.Custom;
+        giftBoxPriceExProp.DisplayFormatString = "F2";
+        giftBoxPriceExProp.DisplayFormatInEditMode = true;
+        giftBoxPriceExProp.DecimalPlaces = 2;
+        GiftBoxPriceExColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        GiftBoxPriceExColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn GiftBoxPriceIncColumn = new MVCxGridViewColumn();
+        GiftBoxPriceIncColumn.Name = "GiftBoxPriceInc";
+        GiftBoxPriceIncColumn.FieldName = "GiftBoxPriceInc";
+        GiftBoxPriceIncColumn.Caption = "Gift Box Price Inc";
+        GiftBoxPriceIncColumn.Width = 40;
+        GiftBoxPriceIncColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        GiftBoxPriceIncColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var giftBoxPriceIncProp = GiftBoxPriceIncColumn.PropertiesEdit as SpinEditProperties;
+        giftBoxPriceIncProp.MinValue = 0;
+        giftBoxPriceIncProp.MaxValue = 99999;
+        giftBoxPriceIncProp.NumberFormat = SpinEditNumberFormat.Custom;
+        giftBoxPriceIncProp.DisplayFormatString = "F2";
+        giftBoxPriceIncProp.DisplayFormatInEditMode = true;
+        giftBoxPriceIncProp.DecimalPlaces = 2;
+        GiftBoxPriceIncColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        GiftBoxPriceIncColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+
+        MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+        CreatedDTColumn.Name = "CreatedDT";
+        CreatedDTColumn.FieldName = "CreatedDT";
+        CreatedDTColumn.Caption = "Created";
+        CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        CreatedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CreatedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CreatedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        CreatedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+
+        settings.Columns.Add(PromotionCodeIDColumn);
+        settings.Columns.Add(PromotionGroupIDColumn);
+        settings.Columns.Add(CodeColumn);
+        settings.Columns.Add(DescriptionColumn);
+        settings.Columns.Add(MinimumSpendColumn);
+        settings.Columns.Add(MaxUsesColumn);
+        settings.Columns.Add(TransactionSequenceRestrictionColumn);
+        settings.Columns.Add(UsedColumn);
+        settings.Columns.Add(PriceListIDColumn);
+        settings.Columns.Add(DiscountColumn);
+        settings.Columns.Add(DiscountTypeColumn);
+        settings.Columns.Add(DiscountFullPriceColumn);
+        settings.Columns.Add(DiscountSalePriceColumn);
+        settings.Columns.Add(DiscountTradePriceColumn);
+        settings.Columns.Add(DiscountBundlesColumn);
+        settings.Columns.Add(GiftBoxPriceIncColumn);
+        settings.Columns.Add(GiftBoxPriceExColumn);
+        //settings.Columns.Add(CreatedDTColumn);
+        settings.Columns.Add(OnDateColumn);
+        settings.Columns.Add(OffDateColumn);
+        settings.Columns.Add(WebStatusColumn);
+
+        settings.SetEditFormTemplateContent(c => {
+            if (Model == null)
+                ViewContext.Writer.Write(Html.Action("PromoCodeEditFormPartial", "Promotions", new { promotionCodeID = c.KeyValue }));
+            else
+                ViewContext.Writer.Write(Html.Partial("Codes/PromoCodeEditFormPartial", Model));
+
+            Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "CancelEditBtn";
+                btnSettings.Text = "Cancel";
+                btnSettings.Style.Add("float", "right");
+                btnSettings.ClientSideEvents.Click = @"function(s, e) { 
+                    if($('#product-panel-target').children().length > 0) {
+                        var d = $('#product-panel').detach();
+                        $('#product-panel-start-marker').append(d);
+                    }
+                    PromotionCodeGridView.CancelEdit();
+                }";
+            }).Render();
+            Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "UpdateBtn";
+                btnSettings.Text = "Update";
+                btnSettings.Style.Add("float", "right");
+                btnSettings.Style.Add("margin-right", "10px");
+                btnSettings.ClientSideEvents.Click = @"function(s, e) {
+                    if($('#product-panel-target').children().length > 0) {
+                        var d = $('#product-panel').detach();
+                        $('#product-panel-start-marker').append(d);
+                    }
+                    PromotionCodeGridView.UpdateEdit();
+                }";
+            }).Render();
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "WebStatusID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+            }
+        };
+
+        settings.CellEditorInitialize = (sender, e) =>
+        {
+            if ((sender as MVCxGridView).IsNewRowEditing)
+            {
+                if (e.Column.FieldName == "ApplyDiscountToSalePrice")
+                {
+                    (e.Editor as ASPxCheckBox).Checked = false;
+                }
+                if (e.Column.FieldName == "ApplyDiscountToFullPrice")
+                {
+                    (e.Editor as ASPxCheckBox).Checked = false;
+                }
+                if (e.Column.FieldName == "ApplyDiscountToTradePrice")
+                {
+                    (e.Editor as ASPxCheckBox).Checked = false;
+                }
+                if (e.Column.FieldName == "DiscountBundles")
+                {
+                    (e.Editor as ASPxCheckBox).Checked = true;
+                }
+            }
+        };
+
+        PromotionCodeIDColumn.SortDescending();
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ("", "", (s, e) => {
+    e.KeyExpression = "PromotionCodeID";
+    e.QueryableSource = UoW.GetRepository<vwPromotionCode>().GetAll().OrderByDescending(p => p.PromotionCodeID);
+}).GetHtml()

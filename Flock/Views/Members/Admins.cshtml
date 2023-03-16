@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewBag.Title = "Members: Administrators";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+    #AdminOverviewGridView_tcTitle, .dxgvTitlePanel_MetropolisBlue {
+        color: #6592D4 !important;
+    }
+    </style>
+}
+
+<h4 class="page-heading">Users: Administrators Etc.</h4>
+
+<div class="page-subheading">
+    @Html.Action("AdminOverviewUserRoleDropDownPartial", "Members")
+    <div style="clear: both;"></div>
+</div>
+
+@Html.Action("AdminOverviewGridViewPartial", "Members")

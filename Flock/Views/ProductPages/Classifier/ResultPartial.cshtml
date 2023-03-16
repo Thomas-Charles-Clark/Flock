@@ -1,0 +1,169 @@
+﻿@model Flock.ViewModels.ProductPageClassifierViewModel
+<div class="row">
+    <div class="col-lg-12">
+        <i id="result-count"><span id="result-total">@(Model.ProductPages.Count)</span> results</i>
+    </div>
+</div>
+
+
+
+<div class="row" style="margin-bottom: 30px;">
+    @{
+        for (int i = 0; i < Model.ProductPages.Count; i++)
+        {
+            var pp = Model.ProductPages[i];
+
+            if (Model.IsFullConfiguration)
+            {
+                <div class="col-sm-2 result-cell" data-product-page-id="@(pp.ProductPageID)" onmouseover="$(this).find('.edit-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.edit-icon').stop().animate({opacity: 0.0}, 300)">
+                    @if (pp.ImageID == null)
+                    {
+                        <img src="/images/admin/image-not-set.png" style="width: 100%;" title="Product Page ID: @(pp.ProductPageID) - @(pp.Name)" />
+                    }
+                    else
+                    {
+                        <img src="https://flock.designersguild.com/imagelibrary/322/@(pp.ImageID.ToString()).jpeg" style="width: 100%;" title="Product Page ID: @(pp.ProductPageID) - @(pp.Name)" />
+                    }
+
+                    @if (Model.IsAttributeGroupMultiSelect)
+                    {
+                        <div class="config-wrap edit-icon">
+                            <div class="config-part">
+                                @for (int j = 0; j < Model.AllAttributes.Count; j++)
+                                {
+                                    var a = Model.AllAttributes[j];
+
+                                    var map = Model.Mapping.Where(p => p.ProductPageID == pp.ProductPageID && p.AttributeID == a.AttributeID).SingleOrDefault();
+
+                                    bool isSelected = false;
+
+                                    if (map != null)
+                                    {
+                                        isSelected = true;
+                                    }
+
+                                    <div class="attribute-holder">
+                                        <input type="checkbox" id="@(a.Name)-CheckBox-@(pp.ProductPageID)" value="@(a.AttributeID)" name="@(a.Name)-CheckBox-@(pp.ProductPageID)" style="float: left;" @if (isSelected) { ViewContext.Writer.Write("checked='checked'"); } />
+                                        <label style="cursor: pointer;" onclick="ToggleInput($('#@(a.Name)-CheckBox-@(pp.ProductPageID)'))">@(a.Name)</label>
+                                    </div>
+
+                                    if ((j + 1) % 10 == 0)
+                                    {
+                                        @:</div>
+                                        @:<div class="config-part">
+                                    }
+                                }
+                                <div style="clear: both;"></div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="config-wrap edit-icon">
+                            <div class="full-config">
+                                @for (int j = 0; j < Model.AllAttributes.Count; j++)
+                                {
+                                    var a = Model.AllAttributes[j];
+
+                                    var map = Model.Mapping.Where(p => p.ProductPageID == pp.ProductPageID && p.AttributeID == a.AttributeID).SingleOrDefault();
+
+                                    bool isSelected = false;
+
+                                    if (map != null)
+                                    {
+                                        isSelected = true;
+                                    }
+
+                                    <div class="attribute-holder">
+                                        <label style="cursor: pointer;" @*onclick="ToggleInput($('#@(a.AttributeGroupID)-Radio-@(pp.ProductPageID)'))"*@>
+                                            <input type="radio" id="@(a.Name)-Radio-@(pp.ProductPageID)" value="@(a.AttributeID)" name="@(a.AttributeGroupID)-Radio-@(pp.ProductPageID)" style="float: left;" @if (isSelected) { ViewContext.Writer.Write("checked='checked'"); } />
+                                            @(a.Name)
+                                        </label>
+                                    </div>
+
+                                    if ((j + 1) % 10 == 0)
+                                    {
+                                        @:</div>
+                                        @:<div class="config-part">
+                                    }
+                                }
+                                <div style="clear: both;"></div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="attributes-icon edit-icon">
+                        <a target="_blank" href="/admin/productpages/attributes/@(pp.ProductPageID)">
+                            <img src="/images/admin/attributes-icon.png" />
+                        </a>
+                    </div>
+                    <div class="compose-icon edit-icon">
+                        <a target="_blank" href="/admin/productpages/compose/@(pp.ProductPageID)">
+                            <img src="~/Images/admin/compose-icon.png" />
+                        </a>
+                    </div>
+                    @if (pp.ImageID != null)
+                    {
+                        <div class="image-inspect-icon edit-icon">
+                            <a target="_blank" href="/admin/assets/images/@(pp.ImageID)">
+                                <img src="~/Images/admin/image-inspect-icon.png" />
+                            </a>
+                        </div>
+                    }
+                    <div class="attribute-save-icon edit-icon" onclick="SaveProductPageAttributes(@(pp.ProductPageID), $(this).parent())">
+                        <img src="~/Images/SystemIcons/save-icon.gif" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-sm-2 result-cell" onmouseover="$(this).find('.edit-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.edit-icon').stop().animate({opacity: 0.0}, 300)">
+                    @if (pp.ImageID == null)
+                    {
+                        <img src="/images/admin/image-not-set.png" style="width: 100%;" title="Product Page ID: @(pp.ProductPageID) - @(pp.Name)" />
+                    }
+                    else
+                    {
+                        <img src="https://flock.designersguild.com/imagelibrary/322/@(pp.ImageID.ToString()).jpeg" style="width: 100%;" title="Product Page ID: @(pp.ProductPageID) - @(pp.Name)" />
+                    }
+                    @if (Model.ToggleButtonText != null)
+                    {
+                        <div class="toggle-button edit-icon" onclick="$(this).parent().remove(); ToggleProductPage(@(pp.ProductPageID))">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <span>@(Model.ToggleButtonText.ToUpperInvariant())</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                    <div class="attributes-icon edit-icon">
+                        <a target="_blank" href="/admin/productpages/attributes/@(pp.ProductPageID)">
+                            <img src="/images/admin/attributes-icon.png" />
+                        </a>
+                    </div>
+                    <div class="compose-icon edit-icon">
+                        <a target="_blank" href="/admin/productpages/compose/@(pp.ProductPageID)">
+                            <img src="~/Images/admin/compose-icon.png" />
+                        </a>
+                    </div>
+                    @if (pp.ImageID != null)
+                    {
+                        <div class="image-inspect-icon edit-icon">
+                            <a target="_blank" href="/admin/assets/images/@(pp.ImageID)">
+                                <img src="~/Images/admin/image-inspect-icon.png" />
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    }
+    @if (Model.ProductPages.Count == 0)
+    {
+        <div class="col-lg-12">
+            <h4>No results.</h4>
+        </div>
+    }
+</div>

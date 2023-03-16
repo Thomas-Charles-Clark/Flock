@@ -1,0 +1,49 @@
+﻿@model Flock.ViewModels.TaskSearchViewModel
+@{
+    var t = Model.Tasks.Where(p => p.TaskID == ViewBag.CurrentRecursionTaskID).Single();
+}
+<li id="task-id-@(t.TaskID)" class="@(t.TaskTypeID == 1 ? "bug" : "task")">
+    <div class="task-row @(t.TaskTypeID == 1 ? "bug bug-border" : "task task-border")" data-task-id="@(t.TaskID)">
+        @if (Model.Tasks.Where(p => p.ParentTaskID == t.TaskID).Count() > 0)
+        {
+            <span title="Click to Show/Hide Children" class="disclose ui-icon ui-icon-minusthick">
+                <span></span>
+            </span>
+        }
+        <span title="Click to Reveal/Hide Details" class="reveal ui-icon ui-icon-carat-1-s">
+            <span></span>
+        </span>
+        TaskID: @(t.TaskID) - @(t.Name) - This is a <span class="task-type-binder" data-task-type-id="@(t.TaskTypeID)"></span>
+
+        <div class="task-details task-details-closed">
+            <h5>
+                Notes
+            </h5>
+            @Html.DevExpress().Memo(mSettings =>
+            {
+                mSettings.Name = "Task-" + t.TaskID.ToString() + "-Note";
+                mSettings.Properties.NullText = "Add Note...";
+                mSettings.Properties.NullTextStyle.Font.Italic = true;
+                mSettings.Properties.Rows = 2;
+                mSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                mSettings.ControlStyle.Border.BorderColor = System.Drawing.ColorTranslator.FromHtml("#ababab");
+                mSettings.Properties.FocusedStyle.Border.BorderColor = System.Drawing.ColorTranslator.FromHtml("#c0c0c0");
+                mSettings.Properties.ConvertEmptyStringToNull = true;
+            }).GetHtml()
+            <span title="Click to Add Note" class="add-note-control ui-icon ui-icon-plusthick" onclick="addNote(@(t.TaskID), '@(t.Name)')"></span>
+            <div class="task-details clearfix"></div>
+        </div>
+    </div>
+
+    @if (t.TaskTypeID == 2)
+    {
+        <ol>
+            @foreach (var st in Model.Tasks.Where(p => p.ParentTaskID == t.TaskID))
+            {
+                ViewBag.CurrentRecursionTaskID = st.TaskID;
+                @Html.Partial("_TaskPartial", Model)
+            }
+        </ol>
+    }
+</li>
+

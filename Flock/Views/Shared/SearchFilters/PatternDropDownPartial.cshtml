@@ -1,0 +1,295 @@
+﻿@model List<Flock.Models.Pattern>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+        settings.Text = "Pattern";
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        if (action == "ProductSearchPatternDropDownPartial")
+        {
+            settings.Name = "ProductSearchPatternDD";
+        }
+        else if (action == "ProductPageSearchPatternDropDownPartial")
+        {
+            settings.Name = "ProductPageSearchPatternDD";
+        }
+        else if (action == "ProductPageComposePatternDropDownPartial")
+        {
+            settings.Name = "ProductPageComposePatternDD";
+        }
+        else if (action == "ProductOverviewPatternDropDownPartial")
+        {
+            settings.Name = "ProductOverviewPatternDD";
+            settings.Text = "Patterns";
+            settings.Style.Remove("margin");
+            settings.Style.Add("margin", "0px 7px 0px 0px");
+        }
+        else if (action == "ProductDimensionsPatternDropDownPartial")
+        {
+            settings.Name = "ProductDimensionsPatternDD";
+            settings.Text = "Patterns";
+            settings.Style.Remove("margin");
+            settings.Style.Add("margin", "0px 7px 0px 0px");
+        }
+        else if (action == "ProductReviewsPatternDropDownPartial")
+        {
+            settings.Name = "ProductReviewsPatternDD";
+            settings.Text = "Patterns";
+        }
+        else if (action == "AttributePatternDropDown")
+            settings.Name = "AttributeDetailPatternDD";
+        else
+            settings.Name = "PatternDD";
+
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        if (action == "AttributePatternDropDown")
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(100);
+
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='pattern-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/PatternListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            if (action != "ProductPageComposePatternDropDownPartial" && action != "AttributePatternDropDown")
+            {
+                @Html.DevExpress().Button(
+                    buttonSettings =>
+                    {
+                        if (action == "ProductSearchPatternDropDownPartial")
+                        {
+                            buttonSettings.Name = "ProductSearchPatternButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ProductSearchPatternListBox.UnselectAll();
+                            ProductSearchPatternDD.HideDropDown(); 
+                            ProductSearchPatternDD.SetText('Pattern');
+                            $('#product-searching-icon').fadeIn('fast');
+                            var SearchText = ProductSearchNameOrIDTextBox.GetText();
+                            if($('#product-search-small-marker').length > 0) {
+                                $.ajax({
+                                    url: '" + Url.Action("ProductSearchSmall", "Products") + @"',
+                                    traditional: true,
+                                    data: { 
+                                        ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                                        BrandID: ProductSearchBrandListBox.GetValue(),
+                                        LaunchID: ProductSearchLaunchListBox.GetValue(),
+                                        PatternID: ProductSearchPatternListBox.GetValue(),
+                                        Status: ProductSearchStatusListBox.GetValue(),
+                                        StatusID: ProductSearchWebStatusListBox.GetValue(),
+                                        StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                                        CollectionID: ProductSearchCollectionListBox.GetValue(),
+                                        ColourID: ProductSearchColourListBox.GetValue(),
+                                        SearchString: SearchText,
+                                        ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                                        PriceListID: ProductSearchPriceListListBox.GetValue()
+                                    },
+                                    success: function(data) {
+                                        $('#product-data-view-container').html(data);
+                                        $('#product-searching-icon').fadeOut('slow');
+                                    },
+                                    error: function(e, s, a) {
+                                        $('#product-searching-icon').fadeOut('slow');
+                                        alert(e.responseText);
+                                    },
+                                    timeout: 60000
+                                });
+                            }
+                            else {
+                                $.ajax({
+                                    url: '" + Url.Action("ProductSearch", "Products") + @"',
+                                    traditional: true,
+                                    data: { 
+                                        ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                                        BrandID: ProductSearchBrandListBox.GetValue(),
+                                        LaunchID: ProductSearchLaunchListBox.GetValue(),
+                                        PatternID: ProductSearchPatternListBox.GetValue(),
+                                        Status: ProductSearchStatusListBox.GetValue(),
+                                        StatusID: ProductSearchWebStatusListBox.GetValue(),
+                                        StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                                        CollectionID: ProductSearchCollectionListBox.GetValue(),
+                                        ColourID: ProductSearchColourListBox.GetValue(),
+                                        SearchString: SearchText,
+                                        ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                                        PriceListID: ProductSearchPriceListListBox.GetValue()
+                                    },
+                                    success: function(data) {
+                                        $('#product-data-view-container').html(data);
+                                        $('#product-searching-icon').fadeOut('slow');
+                                    },
+                                    error: function(e, s, a) {
+                                        $('#product-searching-icon').fadeOut('slow');
+                                        alert(e.responseText);
+                                    },
+                                    timeout: 60000
+                                });
+                            }
+
+                        }";
+                        }
+                        else if (action == "ProductPageSearchPatternDropDownPartial")
+                        {
+                            buttonSettings.Name = "ProductPageSearchPatternButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ProductPageSearchPatternListBox.UnselectAll();
+                            ProductPageSearchPatternDD.HideDropDown(); 
+                            ProductPageSearchPatternDD.SetText('Patterns');
+                            $('#product-page-searching-icon').fadeIn('fast');
+                            $.ajax({
+	                            url: '" + Url.Action("ProductPageSearch", "ProductPages") + @"',
+	                            traditional: true,
+	                            data: {
+		                            ProductTypeID: ProductPageSearchProductTypeListBox.GetValue(),
+		                            BrandID: ProductPageSearchBrandListBox.GetValue(),
+		                            LaunchID: ProductPageSearchLaunchListBox.GetValue(),
+		                            CollectionID: ProductPageSearchCollectionListBox.GetValue(),
+		                            PatternID: ProductPageSearchPatternListBox.GetValue(),
+		                            ColourID: ProductPageSearchColourListBox.GetValue(),
+                                    StatusID: ProductPageSearchStatusListBox.GetValue(),
+                                    TemplateID: ProductPageSearchTemplateListBox.GetValue(),
+		                            SearchString: ProductPageSearchNameTextBox.GetValue()
+	                            },
+	                            success: function(data) {
+		                            $('#product-page-searching-icon').fadeOut('fast');
+		                            $('#product-page-data-view-container').html(data);
+	                            },
+	                            error: function(e, s, a) { 
+		                            $('#product-page-searching-icon').fadeOut('fast');
+		                            alert(e.responseText);
+	                            },
+	                            timeout: 60000
+                            });
+                        }";
+                        }
+                        else if (action == "ProductOverviewPatternDropDownPartial")
+                        {
+                            buttonSettings.Name = "ProductOverviewPatternButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                                ProductOverviewPatternListBox.UnselectAll();
+                                ProductOverviewPatternDD.HideDropDown(); 
+                                ProductOverviewPatternDD.SetText('Pattern');
+                                ProductOverviewGridView.Refresh();
+                            }";
+                        }
+                        else if (action == "ProductDimensionsPatternDropDownPartial")
+                        {
+                            buttonSettings.Name = "ProductDimensionsPatternButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                                ProductDimensionsPatternListBox.UnselectAll();
+                                ProductDimensionsPatternDD.HideDropDown(); 
+                                ProductDimensionsPatternDD.SetText('Pattern');
+                                ProductDimensionsGridView.Refresh();
+                            }";
+                        }
+                        else if (action == "ProductReviewsPatternDropDownPartial")
+                        {
+                            buttonSettings.Name = "ProductReviewsPatternButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                                ProductReviewsPatternListBox.UnselectAll();
+                                ProductReviewsPatternDD.HideDropDown(); 
+                                ProductReviewsPatternDD.SetText('Pattern');
+                                $.ajax({
+                                    url: '" + Url.Action("ProductReviewsPatternListBoxSetSessionVariable", "Reviews") + @"',
+                                    type: 'POST',
+                                    traditional: true,
+                                    data: { PatternIDs: ProductReviewsPatternListBox.GetSelectedValues() },
+                                    success: function(data) { 
+                                        ProductReviewsGridView.Refresh(); 
+                                    },
+                                    error: function(e, s, a) { 
+                                        alert(e.responseText);
+                                    },
+                                    timeout: 60000
+                                });
+                            }";
+                        }
+                        else
+                        {
+                            buttonSettings.Name = "PatternButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            alert('Not Implemented');
+                        }";
+                        }
+                        buttonSettings.Text = "Clear";
+                        buttonSettings.Style.Add("float", "left");
+                    }
+                )
+                .Render();
+            }
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "ProductSearchPatternDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductSearchPatternButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ProductSearchPatternDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ProductPageSearchPatternDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductPageSearchPatternButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ProductPageSearchPatternDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ProductPageComposePatternDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductPageComposePatternButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ProductPageComposePatternDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ProductOverviewPatternDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductOverviewPatternButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            ProductOverviewPatternDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ProductDimensionsPatternDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductDimensionsPatternButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            ProductDimensionsPatternDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ProductReviewsPatternDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductReviewsPatternButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            ProductReviewsPatternDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "AttributePatternDropDown")
+                    {
+                        buttonSettings.Name = "AttributePatternButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            AttributeDetailPatternDD.HideDropDown();
+                        }";
+                    }
+                    else
+                    {
+                        buttonSettings.Name = "PatternButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            alert('Not Implemented.');
+                        }";
+                    }
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

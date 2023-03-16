@@ -1,0 +1,89 @@
+﻿@model Flock.Classes.SmartFocus.SFDynamicContentBlock
+@Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewDCBNameLbl";
+        settings.Text = "Name";
+        settings.AssociatedControlName = "NewDCBName";
+    }).GetHtml()
+@Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+    {
+        //settings.Name = "NewDCBName";
+        settings.Properties.ClientInstanceName = "NewDCBName";
+        settings.Properties.NullText = "Name";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    }).GetHtml()
+
+@Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "NewDCBDescriptionLbl";
+        settings.Text = "Description";
+        settings.AssociatedControlName = "NewDCBDescription";
+    }).GetHtml()
+@Html.DevExpress().TextBoxFor(m => Model.Description, settings =>
+    {
+        //settings.Name = "NewDCBDescription";
+        settings.Properties.ClientInstanceName = "NewDCBDescription";
+        settings.Properties.NullText = "Description";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    }).GetHtml()
+
+@Html.DevExpress().Label(settings =>
+{
+    settings.Name = "NewDCBContentTypeLbl";
+    settings.Text = "Content Type";
+    settings.AssociatedControlName = "NewDCBContentTypeDD";
+}).GetHtml()
+
+@Html.DevExpress().DropDownEditFor(m => Model.ContentType, settings =>
+{
+    settings.Name = "NewDCBContentTypeDD";
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    settings.SetDropDownWindowTemplateContent(c =>
+    {
+        Html.DevExpress().ListBox(lbSettings =>
+        {
+            lbSettings.Name = "NewDCBContentType";
+            lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            lbSettings.Properties.Items.Add("Select", null);
+            lbSettings.Properties.Items.Add("Text", "TEXT");
+            lbSettings.Properties.Items.Add("Html", "HTML");
+            lbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                NewDCBContentTypeDD.SetText(s.GetSelectedItem().text);
+                NewDCBContentTypeDD.HideDropDown();
+            }";
+            lbSettings.SelectedIndex = 0;
+        }).Render();
+    });
+    settings.Text = "Select";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+    {
+        settings.Name = "NewDCBCreateButton";
+        settings.Text = "Create New DCB";
+        settings.ClientSideEvents.Click = @"function(s, e) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("CreateNewDynamicContentBlock", "SmartFocus") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    Name: NewDCBName.GetValue(),
+                    Description: NewDCBDescription.GetValue(),
+                    ContentType: NewDCBContentType.GetValue()
+                },
+                success: function(data) {
+                    $('#templates-list-container').html(data);
+                },
+                error: function(e, s, a) {
+                    LoadingPanel.Hide();
+                    $('#create-dynamic-content-block-form-container').html(e.responseText);
+                },
+                timeout: 30000
+            });
+        }";
+    }).GetHtml()
+

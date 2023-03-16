@@ -1,0 +1,650 @@
+﻿@model Flock.ViewModels.MenuBuilderGridViewModel
+
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var statuses = UoW.GetRepository<Flock.Models.Status>().GetAll().ToList();
+}
+
+@Html.DevExpress().GridView(settings => {
+settings.Name = "MenuBuilderGridView";
+settings.CallbackRouteValues = new { Action = "MenuBuilderGridViewPartial", Controller = "CMS" };
+settings.CustomActionRouteValues = new {  Action = "MenuBuilderGridViewCustomCommand", Controller = "CMS" };
+settings.SettingsEditing.DeleteRowRouteValues = new {  Action = "MenuBuilderGridViewDelete", Controller = "CMS" };
+
+settings.KeyFieldName = "MenuID";
+
+settings.SettingsBehavior.AllowDragDrop = true;
+
+settings.Styles.EmptyDataRow.CssClass = "draggable";
+
+settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+settings.HtmlRowPrepared = (sender, e) =>
+{
+    if (e.RowType == GridViewRowType.Data)
+    {
+        e.Row.Attributes.Add("data-menu-id", e.KeyValue.ToString());
+        e.Row.Attributes.Add("data-sort-order", e.GetValue("SortOrder").ToString());
+    }
+};
+
+settings.Styles.Row.CssClass = "draggable";
+settings.Attributes.Add("data-grid-view-name", "MenuBuilderGridView");
+
+settings.ClientSideEvents.Init = @"function(s, e) { 
+        InitalizejQuery();
+    }";
+
+settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        if(e.command == 'STARTEDIT') {
+            
+            $('.dxgvDataRow_MetropolisBlue.ui-draggable').draggable('destroy');
+            window.editing = true;
+        }
+    }";
+
+settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+        if(!window.editing) {
+            InitalizejQuery();
+        }
+        else {
+            window.editing = false;   
+        }
+        if (typeof InitCountryDragDrop == 'function')
+            InitCountryDragDrop();
+    }";
+
+    @* Add checkbox for Menu.TrackExternalURL *@
+
+    settings.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div id='edit-form' style='min-width: 300px;'>");
+        ViewContext.Writer.Write("<div style='width: 100%; padding: 0 0.5em;'>");
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "NameLbl";
+            lblSettings.Text = "Heading";
+            lblSettings.Width = 54;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "22px");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.AssociatedControlName = "Name";
+        }).Render();
+        Html.DevExpress().TextBox(tbSettings =>
+        {
+            tbSettings.Name = "Name";
+            tbSettings.Style.Add("float", "left");
+            tbSettings.Style.Add("margin-bottom", "5px");
+            tbSettings.Style.Add("margin-right", "1em");
+            tbSettings.Width = 170;
+            tbSettings.ShowModelErrors = true;
+            tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(DataBinder.Eval(c.DataItem, "Name")).Render();
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Text = "New Window";
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "22px");
+            lblSettings.Style.Add("margin-right", "0.5em");
+        }).Render();
+        Html.DevExpress().CheckBox(cbSettings =>
+        {
+            cbSettings.Name = "NewWindow";
+            cbSettings.Style.Add("line-height", "20px");
+        }).Bind(Convert.ToBoolean(DataBinder.Eval(c.DataItem, "NewWindow"))).Render();
+
+
+        ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "LocalNameLbl";
+            lblSettings.Text = "Local Name";
+            lblSettings.Width = 54;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "22px");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.AssociatedControlName = "LocalName";
+        }).Render();
+        Html.DevExpress().TextBox(tbSettings =>
+        {
+            tbSettings.Name = "LocalName";
+            tbSettings.Style.Add("float", "left");
+            tbSettings.Style.Add("margin-bottom", "5px");
+            tbSettings.Style.Add("margin-right", "1em");
+            tbSettings.Width = 170;
+            tbSettings.ShowModelErrors = true;
+            tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).Bind(DataBinder.Eval(c.DataItem, "LocalName")).Render();
+
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Text = "No Follow";
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.Style.Add("line-height", "22px");
+        }).Render();
+        Html.DevExpress().CheckBox(cbSettings =>
+        {
+            cbSettings.Name = "NoFollow";
+            cbSettings.Style.Add("float", "left");
+            cbSettings.Style.Add("line-height", "20px");
+            cbSettings.Style.Add("margin-right", "2em");
+        }).Bind(Convert.ToBoolean(DataBinder.Eval(c.DataItem, "NoFollow"))).Render();
+
+        ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+
+        var Linkage = "Nothing";
+        var LinkTypeID = 0;
+        var LinkID = 0;
+        char? TypeChar = 'x';
+
+        if (DataBinder.Eval(c.DataItem, "PageID") != null)
+        {
+            Linkage = UoW.GetRepository<Flock.Models.Page>().GetAll()
+                .Where(p => p.PageID == Convert.ToInt32(DataBinder.Eval(c.DataItem, "PageID"))).Select(p => p.Name).Single();
+            TypeChar = 'l';
+            LinkID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "PageID"));
+            LinkTypeID = 1;
+        }
+        else if (DataBinder.Eval(c.DataItem, "ExternalURL") != null)
+        {
+            Linkage = "External: " + Convert.ToString(DataBinder.Eval(c.DataItem, "ExternalURL"));
+            TypeChar = null;
+            LinkTypeID = 5;
+        }
+
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "ClassLbl";
+            lblSettings.Text = "Font Style";
+            lblSettings.Width = 54;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "22px");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.AssociatedControlName = "FontClassID";
+        }).Render();
+        Html.DevExpress().ComboBox(cbSettings =>
+        {
+            cbSettings.Name = "FontClassID";
+            cbSettings.Style.Add("float", "left");
+            cbSettings.Style.Add("margin-right", "1em");
+            cbSettings.ShowModelErrors = true;
+            cbSettings.Width = 170;
+            var cbProp = cbSettings.Properties as ComboBoxProperties;
+            cbProp.ValueField = "FontClassID";
+            cbProp.ValueType = typeof(short);
+            cbProp.TextField = "Name";
+            cbProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetFontClasses("menu")).Bind(DataBinder.Eval(c.DataItem, "FontClassID") == null ? (short)1 : DataBinder.Eval(c.DataItem, "FontClassID")).Render();
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Text = "Query String";
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.Style.Add("line-height", "22px");
+        }).Render();
+        Html.DevExpress().TextBox(tbSettings =>
+        {
+            tbSettings.Name = "QueryStringParameters";
+            tbSettings.Style.Add("float", "left");
+            tbSettings.Properties.MaxLength = 50;
+        }).Bind(DataBinder.Eval(c.DataItem, "QueryStringParameters")).Render();
+
+
+        ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "LinkLbl";
+            lblSettings.Text = "Links to";
+            lblSettings.Width = 54;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "22px");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.AssociatedControlName = "Name";
+        }).Render();
+
+        var source = new List<object> {
+                        new { SName = "Nothing", SID = (byte)0 },
+                        new { SName = "Page", SID = (byte)1 },
+                        new { SName = "External URL", SID = (byte)5 } };
+
+        Html.DevExpress().ComboBox(cbSettings =>
+        {
+            cbSettings.Name = "LinkTypeComboBox";
+            cbSettings.Style.Add("float", "left");
+            cbSettings.Properties.TextField = "SName";
+            cbSettings.Properties.ValueField = "SID";
+            cbSettings.Properties.ValueType = typeof(byte);
+            cbSettings.Style.Add("margin-right", "1em");
+            cbSettings.SelectedIndex = LinkTypeID;
+            cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            cbSettings.ShowModelErrors = true;
+            cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+                        RevealLinkSelector(s.GetSelectedItem().value);
+                        if(s.GetSelectedItem().value == 0 || s.GetSelectedItem().value == 5)
+                            $('#link-test').hide();
+                        else
+                            $('#link-test').show();
+                    }";
+            cbSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+                        $('#link-selector-" + LinkTypeID + @"').show();
+                        if(s.GetSelectedItem().value != 0 && s.GetSelectedItem().value != 5)
+                            $('#link-test').show();
+                        else
+                            $('#link-test').hide();
+                    }";
+        }).BindList(source).Render();
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Name = "TradeLbl";
+            lblSettings.Text = "Trade / Retail";
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("line-height", "22px");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.AssociatedControlName = "Name";
+        }).Render();
+
+        var tradeSource = new List<object> {
+                        new { name = "Both", value = (bool?)null },
+                        new { name = "Retail", value = (bool?)false },
+                        new { name = "Trade", value = (bool?)true } };
+
+        var tradeSwitchIndex = 0;
+
+        var tradeSwitchValue = (bool?)DataBinder.Eval(c.DataItem, "TradeSwitch");
+
+        switch (tradeSwitchValue)
+        {
+            case true:
+                tradeSwitchIndex = 2;
+                break;
+            case false:
+                tradeSwitchIndex = 1;
+                break;
+            default:
+                tradeSwitchIndex = 0;
+                break;
+        }
+
+        Html.DevExpress().ComboBox(cbSettings =>
+        {
+            cbSettings.Name = "TradeSwitch";
+            cbSettings.Style.Add("float", "left");
+            cbSettings.Properties.TextField = "name";
+            cbSettings.Properties.ValueField = "value";
+            cbSettings.Properties.ValueType = typeof(bool?);
+            cbSettings.Style.Add("margin-right", "1em");
+            cbSettings.SelectedIndex = tradeSwitchIndex;
+            cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            cbSettings.ShowModelErrors = true;
+            cbSettings.Width = 167;
+        }).BindList(tradeSource).Render();
+
+        ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Text = "On Date";
+            lblSettings.Width = 54;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.Style.Add("line-height", "22px");
+            lblSettings.AssociatedControlName = "OnDate";
+        }).Render();
+
+        Html.DevExpress().DateEdit(deSettings => {
+            deSettings.Name = "OnDate";
+            deSettings.Style.Add("margin-right", "1em");
+            deSettings.ShowModelErrors = true;
+            deSettings.Style.Add("float", "left");
+        }).Bind(DataBinder.Eval(c.DataItem, "OnDate")).Render();
+
+        ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Text = "Off Date";
+            lblSettings.Width = 54;
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.Style.Add("line-height", "22px");
+            lblSettings.AssociatedControlName = "OffDate";
+        }).Render();
+        Html.DevExpress().DateEdit(deSettings =>
+        {
+            deSettings.Name = "OffDate";
+            deSettings.Style.Add("float", "left");
+            deSettings.Style.Add("margin-right", "1em");
+            deSettings.ShowModelErrors = true;
+        }).Bind(DataBinder.Eval(c.DataItem, "OffDate")).Render();
+
+        ViewContext.Writer.Write("<div class='clearfix'></div>");
+
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Text = "Track External URL";
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.Style.Add("line-height", "22px");
+        }).Render();
+        Html.DevExpress().CheckBox(cbSettings =>
+        {
+            cbSettings.Name = "TrackExternalURL";
+            cbSettings.Style.Add("float", "left");
+            cbSettings.Style.Add("line-height", "20px");
+            cbSettings.Style.Add("margin-right", "2em");
+        }).Bind(Convert.ToBoolean(DataBinder.Eval(c.DataItem, "TrackExternalURL"))).Render();
+        ViewContext.Writer.Write("<div class='clearfix'></div>");
+        ViewContext.Writer.Write("</div>");
+
+        if (LinkTypeID == 1 || LinkTypeID == 2 || LinkTypeID == 3 || LinkTypeID == 4)
+            ViewContext.Writer.Write("<a id='link-test' style='font-size: 15px; line-height: 32px; margin-bottom: 7px;' target='_blank' href='http://www.designersguild.com/uk/" + TypeChar + LinkID + "' >" + Linkage + "</a>");
+
+        ViewContext.Writer.Write("<div style='clear: both'></div>");
+        ViewContext.Writer.Write("<input type='hidden' id='page-id-hidden' name='PageID' value='" + (DataBinder.Eval(c.DataItem, "PageID") == null ? "" : DataBinder.Eval(c.DataItem, "PageID").ToString()) + @"' />");
+
+        ViewContext.Writer.Write(@"
+                    <div id='link-selector-1' class='link-selector'>
+                        " + Html.Partial("MenuBuilderPageSelectorGridPartial", "") + @"
+                    </div>
+                ");
+
+        ViewContext.Writer.Write("<div id='link-selector-5' class='link-selector'>");
+        Html.DevExpress().TextBox(tbSettings =>
+        {
+            tbSettings.Name = "ExternalURL";
+            tbSettings.Properties.ClientInstanceName = "ExternalURL";
+            tbSettings.Properties.NullText = "External URL";
+            tbSettings.Properties.NullDisplayText = "External URL";
+            tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            tbSettings.Text = DataBinder.Eval(c.DataItem, "ExternalURL") == null ? "" : DataBinder.Eval(c.DataItem, "ExternalURL").ToString();
+        }).Render();
+
+
+        ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+        ViewContext.Writer.Write("</div>");
+
+        ViewContext.Writer.Write(Html.Action("MenuBuilderDetailPartial", "CMS", new { MenuID = Convert.ToByte(c.KeyValue) }));
+
+
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Text = "Retail HTML Message";
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("margin-top", "1.5em");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.Style.Add("line-height", "22px");
+        }).Render();
+        Html.DevExpress().HtmlEditor(h =>
+        {
+            h.Name = "MessageHTML";
+
+            h.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            h.Height = System.Web.UI.WebControls.Unit.Pixel(100);
+
+
+
+            h.SettingsHtmlEditing.AllowScripts = true;
+            h.SettingsHtmlEditing.AllowIFrames = true;
+            h.SettingsHtmlEditing.AllowFormElements = true;
+            h.SettingsHtmlEditing.UpdateDeprecatedElements = true;
+            h.SettingsHtmlEditing.UpdateBoldItalic = true;
+            h.SettingsHtmlEditing.EnterMode = HtmlEditorEnterMode.BR;
+            h.Settings.AllowContextMenu = DefaultBoolean.True;
+            h.Settings.AllowDesignView = false;
+            h.Settings.AllowHtmlView = true;
+            h.Settings.AllowPreview = false;
+            h.ActiveView = HtmlEditorView.Html;
+
+            h.Toolbars.CreateDefaultToolbars();
+
+            h.Html = Convert.ToString(DataBinder.Eval(c.DataItem, "MessageHTML"));
+
+        }).Render();
+        ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+
+        Html.DevExpress().Label(lblSettings =>
+        {
+            lblSettings.Text = "Trade HTML Message";
+            lblSettings.Style.Add("float", "left");
+            lblSettings.Style.Add("margin-top", "1.5em");
+            lblSettings.Style.Add("margin-right", "0.5em");
+            lblSettings.Style.Add("line-height", "22px");
+        }).Render();
+        Html.DevExpress().HtmlEditor(h =>
+        {
+            h.Name = "TradeMessageHTML";
+
+            h.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            h.Height = System.Web.UI.WebControls.Unit.Pixel(100);
+
+
+
+            h.SettingsHtmlEditing.AllowScripts = true;
+            h.SettingsHtmlEditing.AllowIFrames = true;
+            h.SettingsHtmlEditing.AllowFormElements = true;
+            h.SettingsHtmlEditing.UpdateDeprecatedElements = true;
+            h.SettingsHtmlEditing.UpdateBoldItalic = true;
+            h.SettingsHtmlEditing.EnterMode = HtmlEditorEnterMode.BR;
+            h.Settings.AllowContextMenu = DefaultBoolean.True;
+            h.Settings.AllowDesignView = false;
+            h.Settings.AllowHtmlView = true;
+            h.Settings.AllowPreview = false;
+            h.ActiveView = HtmlEditorView.Html;
+
+            h.Toolbars.CreateDefaultToolbars();
+
+            h.Html = Convert.ToString(DataBinder.Eval(c.DataItem, "TradeMessageHTML"));
+
+        }).Render();
+        ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+        ViewContext.Writer.Write("<div style='text-align: right; margin-top: 1em;'>");
+
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Update";
+            btnSettings.Style.Add("margin-right", "1em");
+            btnSettings.ClientSideEvents.Click = "function(s, e){ MenuBuilderGridView.UpdateEdit(); }";
+        }).Render();
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Cancel";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ MenuBuilderGridView.CancelEdit(); }";
+        }).Render();
+
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</div>");
+
+
+    });
+
+    //settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+    //settings.SettingsDetail.ShowDetailButtons = true;
+    //settings.SettingsDetail.ShowDetailRow = true;
+
+    settings.SettingsEditing.AddNewRowRouteValues = new { Action = "MenuBuilderGridViewPartialAddNew", Controller = "CMS" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Action = "MenuBuilderGridViewPartialUpdate", Controller = "CMS" };
+
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.VisibleIndex = 100;
+
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.ShowDeleteButton = true;
+    settings.SettingsBehavior.ConfirmDelete = true;
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+
+    MVCxGridViewColumn MenuIDColumn = new MVCxGridViewColumn();
+    MenuIDColumn.Name = "MenuID";
+    MenuIDColumn.FieldName = "MenuID";
+    MenuIDColumn.Caption = "Menu ID";
+    MenuIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    MenuIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    MenuIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    MenuIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    MenuIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+    MenuIDColumn.Width = 40;
+    settings.Columns.Add(MenuIDColumn);
+
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Heading";
+    NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    NameColumn.HeaderStyle.Wrap = DefaultBoolean.False;
+    NameColumn.Width = 160;
+    settings.Columns.Add(NameColumn);
+
+    MVCxGridViewColumn LocalNameColumn = new MVCxGridViewColumn();
+    LocalNameColumn.Name = "LocalName";
+    LocalNameColumn.FieldName = "LocalName";
+    LocalNameColumn.Caption = "Local Name";
+    LocalNameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    LocalNameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    LocalNameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    LocalNameColumn.HeaderStyle.Wrap = DefaultBoolean.False;
+    LocalNameColumn.Width = 160;
+    LocalNameColumn.SortAscending();
+    settings.Columns.Add(LocalNameColumn);
+
+    MVCxGridViewColumn CountryRestrictionsColumn = new MVCxGridViewColumn();
+    CountryRestrictionsColumn.Name = "CountryRestricions";
+    CountryRestrictionsColumn.FieldName = "CountryRestrictions";
+    CountryRestrictionsColumn.Caption = "Countries";
+    CountryRestrictionsColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+    CountryRestrictionsColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    CountryRestrictionsColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    CountryRestrictionsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    CountryRestrictionsColumn.SetDataItemTemplateContent(c => {
+
+        var countries = Model.CountryRestrictions.Where(p => p.MenuID == Convert.ToByte(c.KeyValue));
+
+        foreach(var co in countries)
+        {
+            ViewContext.Writer.Write("<img style='float: left; margin-right: 3px;' src='/Images/Icons/CountryFlags/22px/" + co.CountryID.ToString() + ".png' title='" + co.Name + "' />");
+        }
+
+    });
+    settings.Columns.Add(CountryRestrictionsColumn);
+
+    MVCxGridViewColumn SortOrderColumn = new MVCxGridViewColumn();
+    SortOrderColumn.Name = "SortOrder";
+    SortOrderColumn.FieldName = "SortOrder";
+    SortOrderColumn.Caption = "Sort Order";
+    SortOrderColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    SortOrderColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    SortOrderColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    SortOrderColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    SortOrderColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+    SortOrderColumn.Width = 40;
+    settings.Columns.Add(SortOrderColumn);
+
+    MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+    OnDateColumn.Name = "OnDate";
+    OnDateColumn.FieldName = "OnDate";
+    OnDateColumn.Caption = "On Date";
+    OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    var onProp = OnDateColumn.PropertiesEdit as DateEditProperties;
+    onProp.Width = 150;
+    settings.Columns.Add(OnDateColumn);
+
+    MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+    OffDateColumn.Name = "OffDate";
+    OffDateColumn.FieldName = "OffDate";
+    OffDateColumn.Caption = "Off Date";
+    OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    var offProp = OffDateColumn.PropertiesEdit as DateEditProperties;
+    offProp.Width = 150;
+    settings.Columns.Add(OffDateColumn);
+
+    MVCxGridViewColumn StatusColumn = new MVCxGridViewColumn();
+    StatusColumn.Name = "StatusID";
+    StatusColumn.FieldName = "StatusID";
+    StatusColumn.Caption = "Status";
+    StatusColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    StatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    StatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    StatusColumn.SetDataItemTemplateContent(c =>
+    {
+        var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+        string colour = "black";
+        string statusText = "unknown";
+        statusText = statuses.Where(p => p.StatusID == i).Select(p => p.Name).Single();
+        switch (i)
+        {
+            case 0:
+                colour = "green";
+                break;
+            case 1:
+                colour = "orange";
+                break;
+            case 2:
+                colour = "orange";
+                break;
+            case 3:
+                colour = "green";
+                break;
+            case 4:
+                colour = "red";
+                break;
+            default: break;
+        }
+        string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+        ViewContext.Writer.Write(res);
+    });
+    settings.Columns.Add(StatusColumn);
+
+
+    MVCxGridViewColumn TradeColumn = new MVCxGridViewColumn();
+    TradeColumn.Name = "TradeSwitch";
+    TradeColumn.FieldName = "TradeSwitch";
+    TradeColumn.Caption = "Trade / Retail";
+    TradeColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    TradeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    TradeColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    TradeColumn.SetDataItemTemplateContent(c =>
+    {
+        var i = (bool?)(DataBinder.Eval(c.DataItem, "TradeSwitch"));
+
+        switch (i)
+        {
+            case true:
+                ViewContext.Writer.Write("Trade");
+                break;
+            case false:
+                ViewContext.Writer.Write("Retail");
+                break;
+            default:
+                ViewContext.Writer.Write("Both");
+                break;
+        }
+
+    });
+    settings.Columns.Add(TradeColumn);
+
+}).Bind(Model.Menus).GetHtml()
+
+@* Select, sort & move procedures. *@

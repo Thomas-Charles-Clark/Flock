@@ -1,0 +1,31 @@
+﻿@model Flock.ViewModels.BannerComposeViewModel
+@{
+    ViewBag.Title = "BannersCompose";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section Styles{
+    @Styles.Render("~/Content/product-page-composition.css")
+    @Styles.Render("~/Content/banner-composition.css")
+    @Styles.Render("~/Content/jquery-fileupload-ui.css")
+    @Styles.Render("~/bundles/composer")
+}
+@section Scripts
+{
+    
+    @Scripts.Render("~/Scripts/jquery.ui-widget.js")
+    @Scripts.Render("~/Scripts/jquery.iframe-transport.js")
+    @Scripts.Render("~/Scripts/jquery.fileupload.js")
+}
+
+<h4 class="page-heading">
+    Compose Banner
+</h4>
+
+
+<div id="banner-compose-section" style="float: left; width: 986px;">
+    <div id="banner-select-header-container">
+        @Html.Partial("BannersComposeBannerSelectHeaderPartial", Model.HeaderFilters)
+    </div>
+    <h4>Please select a Banner.</h4>
+</div>
+<div style="clear: both"></div>

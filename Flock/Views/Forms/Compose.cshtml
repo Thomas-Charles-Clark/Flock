@@ -1,0 +1,143 @@
+﻿@using Flock.Models
+@model Flock.ViewModels.FormViewModel
+
+@{
+    ViewBag.Title = "ComposeForm";
+    Layout = "~/Views/CMS/Compose/_ComposerLayout.cshtml";
+}
+
+@section Styles {
+    <link href="@Url.Content("~/Content/composeform.css")" rel="stylesheet" type="text/css" />
+}
+
+<h2>Compose Form</h2>
+
+<div class="pure-g">
+    <div class="pure-u-1-5">
+        <div class="section-inner">
+        </div>
+    </div>
+    <div class="pure-u-4-5">
+        <div id="update-target" class="section-inner">
+            <table id="form-details-table">
+                <tr>
+                    <td>
+                        <label>Internal Name</label>
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(m => Model.Name, new { id = "FormInternalName" })
+                        @Html.HiddenFor(m => Model.FormID, new { id = "FormID" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Display Title</label>
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(m => Model.DisplayTitle, new { id = "FormTitle" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Form Description</label>
+                    </td>
+                    <td>
+                        @Html.TextAreaFor(m => Model.DescriptionText, new { cols = "45", rows = "3", id = "FormDescription" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Form Type</label>
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(m => Model.FormType, new[] { new SelectListItem() { Text = "Newsletter", Value = "1" }, new SelectListItem { Text = "Competition", Value = "2" } }, 
+                            new { id = "form-type-select", onclick = "ToggleAffiliateSegment();" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        &nbsp;
+                    </td>
+                </tr>
+                <tbody id="affiliate-segment" style="display: none;">
+                    <tr>
+                        <td>
+                            <label>Affiliate</label>
+                        </td>
+                        <td>
+                            @Html.DropDownList("MarketingPartnerID", new SelectList(Model.MarketingPartners, "MarketingPartnerID", "MarketingPartnerName"), "No Partner Selected")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <Label>
+                                Affiliate Text
+                            </Label>
+                        </td>
+                        <td>
+                            @Html.TextAreaFor(m => Model.MarketingPartnerText, new { cols = "45", rows = "3", id = "MarketingPartnerText" })
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+             <input type="submit" style="margin-top: 2em;" value="Save" name="save-form-button" onclick="SaveForm(); return false;" />
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+        if ($("#form-type-select").val() == "2")
+            $("#affiliate-segment").show();
+    });
+
+    function SaveForm() {
+        $.ajax({
+            url: '@Url.Action("SaveForm", "Forms")',
+            contentType: 'application/json; charset=utf-8',
+            type: 'POST',
+            traditional: true,
+            data: JSON.stringify({
+                FormID: $("#FormID").val(),
+                InternalName: $("#FormInternalName").val(),
+                Title: $("#FormTitle").val(),
+                Description: $("#FormDescription").val(),
+                FormType: $("#form-type-select").val(),
+                MarketingPartnerID: $("#MarketingPartnerID").val(),
+                MarketingPartnerText: $("#MarketingPartnerText").val()
+            }),
+            success: function () {
+                alert("Success.");
+                ReloadForm();
+            },
+            error: function (event, settings, args) {
+                alert(event.responseText);
+            }
+        });
+    }
+
+    function ReloadForm() {
+        $.ajax({
+            url: '@Url.Action("ReloadForm", "Forms")',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({ 'FormID': '@Model.FormID' }),
+            type: 'POST',
+            success: function (data) {
+                $("#update-target").html("");
+                $("#update-target").append(data);
+            },
+            error: function (e, u, s) {
+                alert(e.responseText);
+            }
+        });
+    }
+
+    function ToggleAffiliateSegment() {
+        if ($("#form-type-select").val() == "2") {
+            $("#affiliate-segment").show();
+        }
+        else
+            $("#affiliate-segment").hide();
+    }
+</script>

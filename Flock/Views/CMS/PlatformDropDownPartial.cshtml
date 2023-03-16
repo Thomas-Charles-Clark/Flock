@@ -1,0 +1,81 @@
+﻿@model List<Flock.Models.PageSectionType>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 0 0");
+
+        settings.Name = "PageSectionPlatformDD";
+        settings.Text = "Platform";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(145);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+        @Html.DevExpress().ListBox(
+            listBoxSettings =>
+            {
+                listBoxSettings.Name = "PageSectionPlatformListBox";
+                listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+                listBoxSettings.Height = 200;
+                listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function (s, e) {
+                    filterPageSections();
+                    PageSectionPlatformDD.HideDropDown();
+                    PageSectionPlatformDD.SetText(s.GetSelectedItem().text);
+                }";
+
+                listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+                listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+                listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+                listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+
+                listBoxSettings.Properties.TextField = "Name";
+                listBoxSettings.Properties.ValueField = "PlatformID";
+            }).BindList(new []
+            {
+                new {
+                    Name = "Both", 
+                    PlatformID = (byte?)0
+                }, 
+                new {
+                    Name = "Desktop",
+                    PlatformID = (byte?)1
+                }, 
+                new {
+                    Name = "Mobile",
+                    PlatformID = (byte?)2
+                }
+            }.ToList()).Render();
+
+        ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+
+        @Html.DevExpress().Button(buttonSettings => {
+            buttonSettings.Name = "PageSectionPlatformButtonClear";
+            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                    PageSectionPlatformListBox.UnselectAll();
+                    PageSectionPlatformDD.HideDropDown(); 
+                    PageSectionPlatformDD.SetText('Platform');
+                    filterPageSections();
+                }";
+            buttonSettings.Text = "Clear";
+            buttonSettings.Style.Add("float", "left");
+        }).Render();
+
+        @Html.DevExpress().Button(buttonSettings => {
+            buttonSettings.Name = "PageSectionPlatformButtonClose";
+            buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                    PageSectionPlatformDD.HideDropDown();
+                }";
+            buttonSettings.Text = "Close";
+            buttonSettings.Style.Add("float", "right");
+        }).Render();
+        ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+    });
+    settings.Properties.AnimationType = AnimationType.None;
+}
+).GetHtml()

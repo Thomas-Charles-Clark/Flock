@@ -1,0 +1,936 @@
+﻿@model Flock.ViewModels.ProductPageComposeViewModel
+<script type="text/javascript">
+
+    function CopyPodToSlideshow() {
+        $.confirm(function () { ConfirmedCopyPodToSlideshow(); }, function () { })
+    }
+
+    function ConfirmedCopyPodToSlideshow() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("CopyImages", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ProductPageID: $("#selected-product-page-id").val(),
+                Direction: "PodSlideshow"
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#product-page-slideshow-container").html(data);
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }
+
+    function CopySlideshowToPod() {
+        $.confirm(function () { ConfirmedCopySlideshowToPod(); }, function () { })
+    }
+
+    function ConfirmedCopySlideshowToPod() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("CopyImages", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ProductPageID: $("#selected-product-page-id").val(),
+                Direction: "SlideshowPod"
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#pod-list").html(data);
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }
+
+
+    function BulkAddProductPages() {
+
+        var productPages = new Array();
+
+        var bulkPagesToAdd = new Array();
+        $('.productpage').each(function (index) {
+            bulkPagesToAdd.push({ ID: $(this).data('product-page-id'), SortOrder: index });
+        });
+
+        $("#related-products").find(".related-product-page-placeholder").remove();
+
+        $("#related-products").children("div").each(function (index) {
+            productPages.push({ ID: $(this).data("product-page-id"), SortOrder: index });
+        });
+
+        var insertionPoint = $("#add-where-select").val();
+        if (insertionPoint == 0) {
+            var appendSortOrder = bulkPagesToAdd.length; // + index
+
+            for (var i = 0; i < productPages.length; i++) {
+                productPages[i].SortOrder = productPages[i].SortOrder + appendSortOrder;
+            }
+        }
+        else {
+            var appendSortOrder = productPages.length; // + index
+
+            for (var i = 0; i < bulkPagesToAdd.length; i++) {
+                bulkPagesToAdd[i].SortOrder = bulkPagesToAdd[i].SortOrder + appendSortOrder;
+            }
+        }
+
+        
+        productPages = productPages.concat(bulkPagesToAdd);
+
+        window.RelatedProductPages = productPages;
+
+        UpdateRelatedProductPages();
+    }
+
+
+    function InitPodDragDrop() {
+        $('.draggable').draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }//,
+            //connectToSortable: ".sortable-list"
+        });
+
+        $('.ar1').draggable({
+            helper: 'clone',
+            connectToSortable: '.sortable-list',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }
+        });
+
+        $("#pod-list").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-pod",
+            connectWith: '.ar1',
+            update: function (ev, ui) {
+                //if ($(ui.item).hasClass("draggable")) {
+                $("#pod-list").sortable("refresh");
+                window.podImages = new Array();
+                if ($("#product-page-pod-placeholder").length > 0)
+                    $("#product-page-pod-placeholder").remove();
+                $("#pod-list").children("div").each(function (index) {
+                    window.podImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                });
+                UpdateProductPageImageArea(1);
+                //}
+            }
+        });
+    }
+
+    function InitSlideshowDragDrop() {
+        $("#slideshow-list").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-slideshow",
+            connectWith: '.ar1',
+            update: function (ev, ui) {
+                //if ($(ui.item).hasClass("draggable")) {
+                $("#slideshow-list").sortable("refresh");
+                window.slideshowImages = new Array();
+                $(".product-page-slideshow-placeholder").remove();
+                $("#slideshow-list").children("div").each(function (index) {
+                    window.slideshowImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                });
+                UpdateProductPageImageArea(2);
+                //}
+            }
+        });
+    }
+
+    function InitSlideshowDragDropFurn() {
+        $("#slideshow-list").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-slideshow-furniture",
+            connectWith: '.ar7',
+            update: function (ev, ui) {
+                //if ($(ui.item).hasClass("draggable")) {
+                $("#slideshow-list").sortable("refresh");
+                window.slideshowImages = new Array();
+                $(".product-page-slideshow-placeholder").remove();
+                $("#slideshow-list").children("div").each(function (index) {
+                    window.slideshowImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                });
+                UpdateProductPageImageArea(2);
+                //}
+            }
+        });
+
+        $('.ar7').draggable({
+            helper: 'clone',
+            connectToSortable: '#slideshow-list',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }
+        });
+
+        $("#furniture-page-cutout-image-target").droppable({
+            accept: '.ar2',
+            drop: function (ev, ui) {
+                UpdateProductPageImageArea(4, ui);
+            }
+        });
+    }
+
+    function UpdateProductPageImageArea(TemplateImageID, ui) {
+        switch (TemplateImageID) {
+            case 1:
+                $("#product-page-pod-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateProductPageImageArea", "ProductPages")',
+                    traditional: true,
+                    type: "POST",
+                    data: { ProductPageID: Number($("#selected-product-page-id").val()), Images: JSON.stringify(window.podImages), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#product-page-pod-busy").fadeOut("fast");
+                        $('#pod-list').html(data)
+                        return false;
+                    },
+                    error: function (e, s, a) {
+                        $("#product-page-pod-busy").fadeOut("fast");
+                        alert(e.responseText);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 2:
+                $("#product-page-slideshow-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateProductPageImageArea", "ProductPages")',
+                    traditional: true,
+                    type: "POST",
+                    data: { ProductPageID: Number($("#selected-product-page-id").val()), Images: JSON.stringify(window.slideshowImages), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#product-page-slideshow-busy").fadeOut("fast");
+                        if ($("#slideshow-images-container").length > 0)
+                            $("#slideshow-images-container").html(data);
+                        else
+                            $("#product-page-slideshow-container").html(data)
+                        return false;
+                    },
+                    error: function (e, s, a) {
+                        $("#product-page-slideshow-busy").fadeOut("fast");
+                        alert(e.responseText);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 3:
+                //$("#product-page-slideshow-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateProductPageImageArea", "ProductPages")',
+                    traditional: true,
+                    type: "POST",
+                    data: { ProductPageID: Number($("#selected-product-page-id").val()), Images: JSON.stringify(window.slideshowImages), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        //$("#product-page-slideshow-busy").fadeOut("fast");
+                        if ($("#details-and-pod-images-container").length > 0)
+                            $("#details-and-pod-images-container").html(data);
+                        return false;
+                    },
+                    error: function (e, s, a) {
+                        //$("#product-page-slideshow-busy").fadeOut("fast");
+                        alert(e.responseText);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 4:
+                $.ajax({
+                    url: '@Url.Action("UpdateProductPageImageArea", "ProductPages")',
+                    traditional: true,
+                    type: 'post',
+                    data: {
+                        ProductPageID: Number($("#selected-product-page-id").val()),
+                        Images: JSON.stringify([{
+                            ID: $(ui.draggable).data("image-id"),
+                            SortOrder: 0
+                        }]),
+                        TemplateImageID: 3
+                    },
+                    success: function (data) {
+                        $("#furniture-page-cutout-image-target").html(data);
+                    },
+                    error: function (e, s, a) {
+                        alert(e.responseText);
+                    },
+                    timeout: 20000
+                });
+                break;
+
+            default: break;
+        }
+    }
+
+    function RemoveImageFromProductPageArea(TemplateImageID, ImageID) {
+        switch (TemplateImageID) {
+            case 1: $("#product-page-pod-busy").fadeIn("fast"); break;
+            case 2: $("#product-page-slideshow-busy").fadeIn("fast"); break;
+            case 3: $("#product-page-cutout-busy").fadeIn("fast"); break;
+            default: return;
+        }
+        $.confirm(function () {
+            switch (TemplateImageID) {
+                case 1:
+                    $("#product-page-pod-busy").fadeIn("fast");
+                    $('#pod-list').find("[data-image-id='" + ImageID + "']").remove();
+                    $('#pod-list').sortable('refresh');
+                    window.podImages = new Array();
+                    if ($("#product-page-pod-placeholder").length > 0)
+                        $("#product-page-pod-placeholder").remove();
+                    $("#pod-list").children("div").each(function (index) {
+                        window.podImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                    });
+                    UpdateProductPageImageArea(1);
+                    break;
+                case 2:
+                    $("#product-page-slideshow-busy").fadeIn("fast");
+                    $('#slideshow-list').find("[data-image-id='" + ImageID + "']").remove();
+                    $("#slideshow-list").sortable("refresh");
+                    window.slideshowImages = new Array();
+                    $(".product-page-slideshow-placeholder").remove();
+                    $("#slideshow-list").children("div").each(function (index) {
+                        window.slideshowImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                    });
+                    UpdateProductPageImageArea(2);
+                    break;
+                case 3:
+                    $("#product-page-cutout-busy").fadeIn("fast");
+                    $.ajax({
+                        url: '@Url.Action("RemoveImageFromProductPageArea", "ProductPages")',
+                        traditional: true,
+                        type: "POST",
+                        data: { ProductPageID: Number($("#selected-product-page-id").val()), TemplateImageID: TemplateImageID, ImageID: ImageID },
+                        success: function (data) {
+                            switch (TemplateImageID) {
+                                case 3:
+                                    $("#product-page-cutout-busy").fadeOut("fast");
+                                    $("#furniture-page-cutout-image-target").html(data);
+                                    break;
+                                default:
+                                    return false;
+                            }
+                            return false;
+                        },
+                        error: function (e, s, a) {
+                            $.showError(e, s, a, function () {
+                                $("#product-page-cutout-busy").fadeOut("fast");
+                            });      
+                            return false;
+                        },
+                        timeout: 20000
+                    });
+                    break;
+                default: return;
+            }
+            @*else
+            {
+                $.ajax({
+                    url: '@Url.Action("RemoveImageFromProductPageArea", "ProductPages")',
+                    traditional: true,
+                    type: "POST",
+                    data: { ProductPageID: Number($("#selected-product-page-id").val()), TemplateImageID: TemplateImageID, ImageID: ImageID },
+                    success: function (data) {
+                        switch (TemplateImageID) {
+                            case 1: $("#product-page-pod-busy").fadeOut("fast"); $('#pod-list').html(data); break;
+                            case 2: $("#product-page-slideshow-busy").fadeOut("fast"); $("#slideshow-images-container").html(data); $('#product-page-slideshow-container').html(data); break;
+                            case 3: $("#product-page-cutout-busy").fadeOut("fast"); $("#product-page-cutout-container").html(data); break;
+                            default: return false;
+                        }
+                        return false;
+                    },
+                    error: function (e, s, a) {
+                        switch (TemplateImageID) {
+                            case 1: $("#product-page-pod-busy").fadeOut("fast"); break;
+                            case 2: $("#product-page-slideshow-busy").fadeOut("fast"); break;
+                            case 3: $("#product-page-cutout-busy").fadeOut("fast"); break;
+                            default: return false;
+                        }
+                        alert(e.responseText);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+            }*@
+        }, function () { 
+            switch (TemplateImageID) {
+                case 1: $("#product-page-pod-busy").fadeOut("fast"); break;
+                case 2: $("#product-page-slideshow-busy").fadeOut("fast"); break;
+                case 3: $("#product-page-cutout-busy").fadeOut("fast"); break;
+                default: return false;
+            }
+        });
+    }
+
+    function InitCountryDragDrop() {
+        $("#country-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".country-restriction-flag",
+            placeholder: ".ui-state-highlight-country-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('country-flag')) {
+                    $("#country-restriction-section").sortable("refresh");
+                    window.CountryRestrictions = new Array();
+                    if ($("#country-restriction-placeholder").length > 0)
+                        $("#country-restriction-placeholder").remove();
+                    $("#country-restriction-section").children("div").each(function (index) {
+                        window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                    });
+                    UpdateCountryRestrictions();
+                }
+            }
+        });
+        $(".country-flag").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#country-restriction-section"
+        });
+    }
+
+    function UpdateCountryRestrictions() {
+        $("#country-restriction-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("UpdateProductPageCountryRestrictions", "ProductPages")',
+            type: "POST",
+            traditional: true,
+            data: { ProductPageID: Number($("#selected-product-page-id").val()), Countries: JSON.stringify(window.CountryRestrictions) },
+            success: function (data) {
+                $("#country-restriction-busy").fadeOut("fast");
+                $("#country-restriction-container").html(data);
+            },
+            error: function (e, s, a) {
+                $("#country-restriction-busy").fadeOut("fast");
+                alert(e.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveCountryFromRestriction() {
+        $("#country-restriction-section").sortable("refresh");
+        window.CountryRestrictions = new Array();
+        if ($("#country-restriction-placeholder").length > 0)
+            $("#country-restriction-placeholder").remove();
+        $("#country-restriction-section").children("div").each(function (index) {
+            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+        });
+        UpdateCountryRestrictions();
+    }
+
+    function RemoveAllCountryRestrictions() {
+        var confirm = window.confirm("Are you sure?");
+        if (confirm) {
+            window.CountryRestrictions = new Array();
+            UpdateCountryRestrictions();
+        }
+    }
+
+    function InitPrimaryProductDragDrop() {
+        
+        var fixHelper = function (e, ui) {
+            ui.children().each(function () {
+                $(this).width($(this).width());
+            });
+            return ui;
+        };
+
+        $("#primary-products-table > tbody").sortable({
+            helper: fixHelper,
+            connectWith: '.product',
+            placeholder: 'products-table-row-placeholder',
+            beforeStop: function (event, ui) {
+                if ($(ui.item).data("associated-product-page") != null && $(ui.item).data("associated-product-page") != "null") {
+                    var confirm = window.confirm("Warning! This action will remove the existing Primary association this Product has to Product Page " + $(ui.item).data("associated-product-page") + ". Continue?");
+                    if (!confirm) {
+                        $(ui.helper).remove();
+                        $(ui.item).remove();
+                        window.cancelPrimaryDrop = true;
+                    }
+                }
+            },
+            receive: function (event, ui) {
+                if (window.cancelPrimaryDrop) {
+                    window.cancelPrimaryDrop = false;
+                    $(ui.sender).sortable("cancel");
+                }
+                var newItem = $(this).data("ui-sortable").currentItem;
+                //if ($("#primary-products-placeholder").length > 0) {
+                //$("#primary-products-placeholder").remove();
+                var tr = $("<tr data-product-id='" + $(ui.item).data("product-id") + "'><td colspan='8'>" + $(ui.item).find('label').html() + "</td></tr>");//.append("<td colspan='8'>" + $(ui.item).find('label').clone() + "</td>");
+                $(newItem).replaceWith($(tr));
+                //}
+                //else {
+                //    var tr = $("<tr data-product-id='" + $(ui.item).data("product-id") + "'><td colspan='8'>" + $(ui.item).find('label').html() + "</td></tr>");//.append("<td colspan='8'>" + $(ui.item).find('label').clone() + "</td>");
+                //    $(newItem).replaceWith($(tr));
+                //}
+
+                //ui.helper.html(newItem);
+            },
+            update: function (ev, ui) {
+                //if ($(ui.item).hasClass('product')) {
+                window.PrimaryProducts = new Array();
+                //if ($("#primary-products-placeholder").length > 0)
+                $("#primary-products-placeholder").remove();
+                $("#primary-products-table > tbody").sortable("refresh");
+                $("#primary-products-table > tbody > tr ").each(function (index) {
+                    window.PrimaryProducts.push({ ID: $(this).data("product-id"), SortOrder: index });
+                });
+                UpdatePrimaryProducts();
+                //}
+            }
+        }).disableSelection();
+
+        $(".product").draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#primary-product-sortable, #secondary-product-sortable"
+        });
+    }
+
+    function RemovePrimaryProduct(ProductID) {
+        $.ajax({
+            url: '@Url.Action("RemoveProductPagePrimaryProduct", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: { ProductPageID: Number($("#selected-product-page-id").val()), ProductID: ProductID },
+            success: function (data) {
+                if (data == "success") {
+                    $("#primary-products-table > tbody").find("[data-product-id='" + ProductID + "']").remove();
+
+                    window.PrimaryProducts = new Array();
+                    $("#primary-product-sortable > tr").each(function (index) {
+                        window.PrimaryProducts.push({ ID: $(this).data("product-id"), SortOrder: index });
+                    });
+
+                    UpdatePrimaryProducts();
+                }
+                else {
+                    alert(data)
+                }
+            },
+            error: function (e, s, a) {
+                alert(e.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function UpdatePrimaryProducts() {
+        $.ajax({
+            url: '@Url.Action("UpdateProductPagePrimaryProducts", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: { ProductPageID: Number($("#selected-product-page-id").val()), Products: JSON.stringify(window.PrimaryProducts) },
+            success: function (data) {
+                $("#primary-products-container").html(data);
+            },
+            timeout: 20000
+        });
+    }
+
+    function InitSecondaryProductDragDrop() {
+        var fixHelper = function (e, ui) {
+            ui.children().each(function () {
+                $(this).width($(this).width());
+            });
+            return ui;
+        };
+
+        $("#secondary-products-table > tbody").sortable({
+            helper: fixHelper,
+            connectWith: '.product',
+            placeholder: 'products-table-row-placeholder',
+            receive: function (event, ui) {
+                var newItem = $(this).data("ui-sortable").currentItem;
+                var tr = $("<tr data-product-id='" + $(ui.item).data("product-id") + "'><td colspan='8'><i>Loading...</i></td></tr>");//.append("<td colspan='8'>" + $(ui.item).find('label').clone() + "</td>");
+                $(newItem).replaceWith($(tr));
+            },
+            update: function (ev, ui) {
+                window.SecondaryProducts = new Array();
+                $("#secondary-products-placeholder").remove();
+                $("#secondary-products-table > tbody").sortable("refresh");
+                $("#secondary-product-sortable > tr").each(function (index) {
+                    window.SecondaryProducts.push({ ID: $(this).data("product-id"), SortOrder: index });
+                });
+                UpdateSecondaryProducts();
+            }
+        }).disableSelection();
+
+        $(".product").draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#primary-product-sortable, #secondary-product-sortable"
+        });
+    }
+
+    function RemoveSecondaryProduct(ProductID) {
+        $.ajax({
+            url: '@Url.Action("RemoveProductPageSecondaryProduct", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: { ProductPageID: Number($("#selected-product-page-id").val()), ProductID: ProductID },
+            success: function (data) {
+                if (data == "success") {
+                    $("#secondary-product-sortable").find("[data-product-id='" + ProductID + "']").remove();
+
+                    window.SecondaryProducts = new Array();
+                    $("#secondary-product-sortable").children("tr").each(function (index) {
+                        window.SecondaryProducts.push({ ID: $(this).data("product-id"), SortOrder: index });
+                    });
+
+                    UpdateSecondaryProducts();
+                }
+                else {
+                    alert(data)
+                }
+            },
+            error: function (e, s, a) {
+                alert(e.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function UpdateSecondaryProducts() {
+        $.ajax({
+            url: '@Url.Action("UpdateProductPageSecondaryProducts", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: { ProductPageID: Number($("#selected-product-page-id").val()), Products: JSON.stringify(window.SecondaryProducts) },
+            success: function (data) {
+                $("#secondary-products-container").html(data);
+            },
+            timeout: 20000
+        });
+    }
+
+    function InitRelatedProductPagesDragDrop() {
+        $("#related-products").sortable({
+            placeholder: 'related-product-placeholder',
+            helper: 'clone',
+            connectWith: '.productpage',
+            beforeStop: function (event, ui) {
+                var productpageid = ui.item.data("product-page-id");
+                if (productpageid == $("#selected-product-page-id").val()) {
+                    $(ui.helper).remove();
+                    $(ui.item).remove();
+                    window.cancelRelatedDrop = true;
+                }
+            },
+            receive: function (event, ui) {
+                if (window.cancelRelatedDrop) {
+                    window.cancelRelatedDrop = false;
+                    $(ui.sortable).sortable("cancel");
+                }
+            },
+            update: function (ev, ui) {
+                window.RelatedProductPages = new Array();
+                $("#related-product-page-placeholder").remove();
+                $("#related-products").sortable("refresh");
+                $("#related-products").children("div").each(function (index) {
+                    window.RelatedProductPages.push({ ID: $(this).data("product-page-id"), SortOrder: index });
+                });
+                UpdateRelatedProductPages();
+            }
+        });
+
+        $(".productpage").draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#related-products"
+        });
+    }
+
+    function UpdateRelatedProductPages() {
+        $.ajax({
+            url: '@Url.Action("UpdateRelatedProductPages", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: { BaseProductPageID: Number($("#selected-product-page-id").val()), ProductPages: JSON.stringify(window.RelatedProductPages) },
+            success: function (data) {
+                $("#related-product-pages-container").html(data);
+            },
+            error: function (e, s, a) {
+                alert(e.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveRelatedProductPage(ProductPageID) {
+        $.ajax({
+            url: '@Url.Action("RemoveRelatedProductPage", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: { BaseProductPageID: Number($("#selected-product-page-id").val()), ProductPageID: ProductPageID },
+            success: function (data) {
+                $("#related-products").find("[data-product-page-id='" + ProductPageID + "']").remove();
+
+                window.RelatedProductPages = new Array();
+                $("#related-products").children("div").each(function (index) {
+                    window.RelatedProductPages.push({ ID: $(this).data("product-page-id"), SortOrder: index });
+                });
+
+                UpdateRelatedProductPages();
+            },
+            error: function (e, v, a) { alert(e.responseText); },
+            timeout: 20000
+        });
+    }
+
+    function htmlEncode(value) {
+        return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+    }
+
+    function htmlDecode(value) {
+        return String(value)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+    }
+
+    //$(document).ready(function () {
+        
+
+        //$("#resource-panels").sortable({
+        //    helper: 'clone',
+        //    placeholder: 'ui-state-highlight-resource-panel'
+        //});
+    //});
+
+    function SaveProductPageInfo() {
+        var id = Number($("#selected-product-page-id").val());
+        $.ajax({
+            url: '@Url.Action("SaveProductPageInfo", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ProductPageID: id,
+                Name: Name.GetValue(),
+                OnDate: $("input[name='OnDate']").val(),
+                OffDate: $("input[name='OffDate']").val(),
+                New: New.GetValue(),
+                BrochureID: BrochureID.GetSelectedItem().value,
+                TradeSwitch: TradeSwitch.GetValue()
+            },
+            success: function (data) {
+                $("#product-page-info-container").html(data);
+                SuccessFade($("#product-page-info-save"));
+            },
+            error: function (e, s, a) {
+                $("#product-page-info-container").html(e.responseText);
+                FailureFade($("#product-page-info-save"));
+            },
+            timeout: 20000
+        });
+    }
+
+    function SaveProductPageDetails() {
+        URLKeywords.Validate();
+        if (URLKeywords.GetIsValid()) {
+            $.ajax({
+                url: '@Url.Action("SaveProductPageDetails", "ProductPages")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductPageID: Number($("#selected-product-page-id").val()),
+                    Name: Name.GetValue(),
+                    TitleTag: TitleTag.GetValue(),
+                    URLKeywords: URLKeywords.GetValue(),
+                    MetaDescription: MetaDescription.GetValue()
+                },
+                success: function (data) {
+                    $("#product-page-details-container").html(data);
+                    SuccessFade($("#product-page-details-save"));
+                },
+                error: function (e, s, a) {
+                    $("#product-page-details-container").html(e.responseText);
+                    FailureFade($("#product-page-details-save"));
+                },
+                timeout: 20000
+            });
+        }
+    }
+
+    function SaveProductPageText() {
+
+        var ffo = null;
+        var flo = null;
+        var fls = null;
+        var flf = null;
+        var fso = null;
+
+        if (typeof FurnitureFabricOptions == "object") {
+            ffo = FurnitureFabricOptions.GetValue();
+            flo = FurnitureLeatherOptions.GetValue();
+            fls = FurnitureLegStyles.GetValue();
+            flf = FurnitureLegFinishes.GetValue();
+            fso = FurnitureStitchingOptions.GetValue();
+        }
+
+        $.ajax({
+            url: '@Url.Action("SaveProductPageText", "ProductPages")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ProductPageID: Number($("#selected-product-page-id").val()),
+                Name: Name.GetValue(),
+                Heading: ProductPageHeading.GetValue(),
+                SubHeading: ProductPageSubHeading.GetValue(),
+                Description: ProductPageHtmlEditor.GetValue(),
+                FurnitureFabricOptions: ffo,
+                FurnitureLeatherOptions: flo,
+                FurnitureLegStyles: fls,
+                FurnitureLegFinishes: flf,
+                FurnitureStitchingOptions: fso
+            },
+            success: function (data) {
+                if ($("#text-and-cutout-image-container").length > 0) {
+                    $("#text-and-cutout-image-container").html(data);
+                    window.setTimeout(function () { SuccessFade($("#product-page-text-save")); }, 1000);
+                }
+                else {
+                    $("#slideshow-and-html-editor-container").html(data);
+                    SuccessFade($("#product-page-text-save"));
+                }
+            },
+            error: function (e, s, a) {
+                if ($("#text-and-cutout-image-container").length > 0) {
+                    $("#text-and-cutout-image-container").html(e.responseText);
+                    FailureFade($("#product-page-text-save"));
+                }
+                else {
+                    $("#slideshow-and-html-editor-container").html(e.responseText);
+                    FailureFade($("#product-page-text-save"));
+                }
+            },
+            timeout: 20000
+        });
+    }
+
+
+    function ExpandLHS() {
+        $('#product-select-header-inner').slideDown('fast');
+        $('#product-page-info-inner').slideDown('fast');
+        $('#product-page-details-inner').slideDown('fast');
+        $('#product-page-text-slideshow-inner').slideDown('fast');
+        $('#primary-products').slideDown('fast');
+        if ($('#slideshow-list').length > 0)
+            $('#slideshow-list').slideDown('fast');
+        if ($('#product-page-cutout-inner').length > 0)
+            $('#product-page-cutout-inner').slideDown('fast');
+        if ($('#secondary-products').length > 0)
+            $('#secondary-products').slideDown('fast');
+        $('#related-products').slideDown('fast');
+        $('#country-restriction-section').slideDown('fast');
+    }
+
+    function CollapseLHS() {
+        $('#product-select-header-inner').slideUp('fast');
+        $('#product-page-info-inner').slideUp('fast');
+        $('#product-page-details-inner').slideUp('fast');
+        $('#product-page-text-slideshow-inner').slideUp('fast');
+        if ($('#slideshow-list').length > 0)
+            $('#slideshow-list').slideUp('fast');
+        $('#primary-products').slideUp('fast');
+        if ($('#product-page-cutout-inner').length > 0)
+            $('#product-page-cutout-inner').slideUp('fast');
+        if ($('#secondary-products').length > 0)
+            $('#secondary-products').slideUp('fast');
+        $('#related-products').slideUp('fast');
+        $('#country-restriction-section').slideUp('fast');
+    }
+
+</script>
+
+<div id="product-page-info-container">
+    @Html.Partial("ProductPageInfoPartial", Model)
+</div>
+
+<div id="product-page-details-container">
+    @Html.Partial("ProductPageDetailsPartial", Model)
+</div>
+
+@if (Model.TemplateID != 4)
+{
+    <div id="slideshow-and-html-editor-container">
+        @Html.Partial("ProductPageSlideshowPartial", Model)
+    </div>
+}
+else
+{
+    <div id="slideshow-images-container">
+        @Html.Partial("ProductPageFurnitureSlideshowImagesPartial", Model.Images.Where(p => p.TemplateImageID == 2).ToList())
+    </div>   
+    
+    <div id="text-and-cutout-image-container" class="content-panel-container">
+        @Html.Partial("ProductPageFurnitureCutOutImagePartial", Model)
+    </div>
+}
+
+<div id="primary-products-container">
+    @Html.Partial("ProductPagePrimaryProductsPartial", Model.PrimaryProducts)
+</div>
+
+@if (Model.TemplateID != 4)
+{
+    <div id="secondary-products-container">
+        @Html.Partial("ProductPageSecondaryProductsPartial", Model.SecondaryProducts)
+    </div>
+}
+
+<div id="related-product-pages-container">
+    @Html.Partial("ProductPageRelatedProductPagesPartial", Model.RelatedProductPages)
+</div>
+
+<div id="country-restriction-container">
+    @Html.Partial("ProductPageCountryRestrictionPartial", Model.CountryRestrictions)
+</div>
+
+@Html.HiddenFor(m => Model.ProductPageID)
+@Html.HiddenFor(m => Model.TemplateID)
+
+<div id="expand-all-button" style="float: left;" class="expando-all-button" onclick="ExpandLHS();">
+    <fieldset>
+        <legend id="expand-label">
+            Expand All
+        </legend>
+    </fieldset>
+</div>
+
+<div id="collapse-all-button" style="float: right;" class="expando-all-button" onclick="CollapseLHS();">
+    <fieldset>
+        <legend id="collapse-label">
+            Collapse All
+        </legend>
+    </fieldset>
+</div>

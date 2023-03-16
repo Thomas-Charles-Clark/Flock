@@ -1,0 +1,7 @@
+﻿@using Flock.ViewModels
+@model BundlePriceMergeResultViewModel
+
+@if (Model.Returned != null)
+{
+    <h5>Processed: @(Model.Returned.Count.ToString()) records.</h5>
+}

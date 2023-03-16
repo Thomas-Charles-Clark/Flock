@@ -1,0 +1,205 @@
+﻿@using Flock.Classes.SmartFocus
+@model Flock.ViewModels.SmartFocusTestViewModel
+
+<div id="top-panel">
+    <p>
+        TestGroupResponse @(Model.TestGroupCollection == null ? " was null." : " found groups: ")
+
+        @if (Model.TestGroupCollection != null)
+        {
+            <table>
+                <tr>
+                    <th>
+                        TestGroupID
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Members
+                    </th>
+                </tr>
+                @{
+            foreach (TestGroup tg in Model.TestGroupCollection.Groups)
+            {
+                <tr>
+                    <td>
+                        @(tg.ID)
+                    </td>
+                    <td>
+                        @(tg.Name)
+                    </td>
+                    <td>
+                        @{
+                if (tg.Members != null)
+                {
+                    foreach (long m in tg.Members)
+                    {
+                        <span style="display: block;">MemberID: @(m)</span>
+                    }
+                    if (tg.Members.Count == 0)
+                    {
+                        <span style="display: block;">No Members Found!</span>
+                    }
+                }
+                else
+                {
+                    <span style="display: block;">No Members Found!</span>
+                }
+                        }
+                    </td>
+                </tr>
+            }
+                }
+            </table>
+        }
+    </p>
+
+
+    <p>
+        SegmentsList @(Model.Segments == null ? " was null." : " found segments: ")
+
+        @if (Model.Segments != null)
+        {
+            <table>
+                <tr>
+                    <th>
+                        SegmentID
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Date Created
+                    </th>
+                    <th>
+                        Date Modified
+                    </th>
+                    <th>
+                        Sample Rate
+                    </th>
+                    <th>
+                        Sample Type
+                    </th>
+                    <th>
+                        Distinct Members
+                    </th>
+                </tr>
+                @{
+            foreach (Segment s in Model.Segments)
+            {
+                <tr>
+                    <td>
+                        @(s.ID)
+                    </td>
+                    <td>
+                        @(s.Name)
+                    </td>
+                    <td>
+                        @(s.CreatedDT)
+                    </td>
+                    <td>
+                        @(s.ModifiedDT)
+                    </td>
+                    <td>
+                        @(s.SampleRate)
+                    </td>
+                    <td>
+                        @(s.SampleType)
+                    </td>
+                    <td>
+                        <a href="javascript:;" data-segment-id="@(s.ID)" onclick="GetDistinctMemberCountForSegment($(this))">Get Distinct Member Count...</a>
+                    </td>
+                </tr>
+            }
+                }
+            </table>
+        }
+    </p>
+
+
+
+
+    <p>
+        TestMemberList @(Model.TestMembers == null ? " was null." : " found members: ")
+
+        @if (Model.TestMembers != null)
+        {
+            <table id="test-group-table">
+                <tr>
+                    <th>
+                        MemberID
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        DateJoined
+                    </th>
+                    <th>
+                        ClientID
+                    </th>
+                    <th></th>
+                </tr>
+                @{
+            foreach (TestMember m in Model.TestMembers)
+            {
+                <tr>
+                    <td>
+                        @(m.ID)
+                    </td>
+                    <td>
+                        @(m.Email)
+                    </td>
+                    <td>
+                        @(m.DateJoined)
+                    </td>
+                    <td>
+                        @(m.ClientID)
+                    </td>
+                    <td>
+                        <a href="javascript:;" onclick="AddTestMemberToGroup(@(m))">Add to Group ID</a>
+                    </td>
+                </tr>
+            }
+            if (Model.TestMembers.Count == 0)
+            {
+                <tr>
+                    <td>No Test Members Found!</td>
+                </tr>
+            }
+                }
+            </table>
+        }
+    </p>
+
+    @if (ViewBag.CreateTestGroupResult != null)
+    {
+        <h6 class="info">New Test Group Created: @ViewBag.CreateTestGroupResult</h6>
+    }
+
+    @if (ViewBag.NewTestMember != null)
+    {
+        <h6 class="info">New Test Member Created: @ViewBag.NewTestMember.ID</h6>
+    }
+
+    @if (ViewBag.AddResult != null)
+    {
+        <h6 class="info">Test Member added to Test Group: @ViewBag.AddResult</h6>
+    }
+
+    @if (ViewBag.CreateSegmentResult != null)
+    {
+        <h6 class="info">Segment Created: @ViewBag.CreateSegmentResult</h6>
+    }
+
+    @if (ViewBag.UploadingResult != null)
+    {
+        <h6 class="info">Upload Created: @ViewBag.UploadingResult</h6>
+    }
+
+    @if (ViewBag.UpdateResult != null)
+    {
+        <h6 class="info">Updated: @ViewBag.UpdateResult</h6>
+    }
+</div>

@@ -1,0 +1,25 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "CanonicalPageID";
+    settings.CallbackRouteValues = new { Controller = "CMS", Action = "CanonicalPageIDComboBoxPartial" };
+    settings.Properties.ClientSideEvents.BeginCallback = @"function (s, e) { 
+        e.customArgs['CanonicalPageID'] = '" + ViewBag.CanonicalPageID + @"';
+    }";
+    settings.Properties.ClientSideEvents.ValueChanged = @"function (s, e) {
+        LoadCanonicalPageAttributeSettings(s.GetValue(), document.querySelector('#current-page-id').value);
+    }";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "PageID";
+    settings.Properties.ValueType = typeof(int);
+    settings.Style.Add("float", "left");
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.IncrementalFilteringDelay = 500;
+    settings.Properties.FilterMinLength = 1;
+    settings.Properties.NullText = "Type to search...";
+    settings.Width = 226;
+    settings.Properties.DropDownWidth = 290;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.Properties.Columns.Add("PageID", "Page ID", 90);
+    settings.Properties.Columns.Add("Name", "Name", 200);
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.PageSectionCloneGetPageIDs, Flock.ViewModels.LargeDatabaseDataProvider.PageSectionCloneGetPageByID).Bind(ViewBag.CanonicalPageID).GetHtml()

@@ -1,0 +1,255 @@
+﻿@using Flock.ViewModels;
+@using Flock.Models;
+@model BundleEditModel
+
+@{ 
+    Html.DevExpress().TextBoxFor(m => Model.BundleID, tbSettings => {
+        tbSettings.ClientVisible = false;
+    }).Render();
+
+    Html.DevExpress().TextBoxFor(m => Model.Code, tbSettings =>
+    {
+        //tbSettings.Name = "Code";
+        tbSettings.Properties.MaxLength = 50;
+        tbSettings.Properties.Caption = "Code";
+        tbSettings.Properties.CaptionCellStyle.Width = 112;
+        tbSettings.Style.Add("margin", "4px 0px");
+        tbSettings.Properties.ClientSideEvents.KeyDown = @"function(s,e) {
+            OnCodeKeyDown(e.htmlEvent, s.GetInputElement(), s);
+        }";
+        if (Model.Code == null || Model.Code == "")
+        {
+            tbSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                s.SetText('BUND')
+            }";
+        }
+        tbSettings.ShowModelErrors = true;
+    }).Render();
+
+    Html.DevExpress().ComboBoxFor(m => Model.BrandID, cbSettings =>
+    {
+        //cbSettings.Name = "BrandID";
+        cbSettings.Properties.Caption = "Brand";
+        cbSettings.Properties.CaptionCellStyle.Width = 112;
+        cbSettings.Style.Add("margin", "4px 0px");
+        cbSettings.Properties.ValueType = typeof(byte);
+        cbSettings.Properties.ValueField = "BrandID";
+        cbSettings.Properties.TextField = "Name";
+        cbSettings.ShowModelErrors = true;
+    }).BindList(Model.Brands).Render();
+
+    Html.DevExpress().ComboBoxFor(m => Model.LaunchID, cbSettings =>
+    {
+        //cbSettings.Name = "LaunchID";
+        cbSettings.Properties.Caption = "Launch";
+        cbSettings.Properties.CaptionCellStyle.Width = 112;
+        cbSettings.Style.Add("margin", "4px 0px");
+        cbSettings.Properties.ValueType = typeof(short);
+        cbSettings.Properties.ValueField = "LaunchID";
+        cbSettings.Properties.TextField = "Name";
+        cbSettings.ShowModelErrors = true;
+    }).BindList(Model.Launches).Render();
+
+    Html.DevExpress().ComboBoxFor(m => Model.ProductTypeID, cbSettings =>
+    {
+        //cbSettings.Name = "ProductTypeID";
+        cbSettings.Properties.Caption = "Product Type";
+        cbSettings.Properties.CaptionCellStyle.Width = 112;
+        cbSettings.Style.Add("margin", "4px 0px");
+        cbSettings.Properties.ValueType = typeof(byte);
+        cbSettings.Properties.ValueField = "ProductTypeID";
+        cbSettings.Properties.TextField = "Name";
+        cbSettings.ShowModelErrors = true;
+    }).BindList(Model.ProductTypes).Render();
+
+    Html.DevExpress().TextBoxFor(m => Model.OrderFormName, tbSettings =>
+    {
+        //tbSettings.Name = "OrderFormName";
+        tbSettings.Properties.CaptionCellStyle.Width = 112;
+        tbSettings.Style.Add("margin", "4px 0px");
+        tbSettings.Width = 300;
+        tbSettings.Properties.MaxLength = 100;
+        tbSettings.Properties.Caption = "Order Form Name";
+        tbSettings.ShowModelErrors = true;
+    }).Render();
+
+    Html.DevExpress().TextBoxFor(m => Model.BasketName, tbSettings =>
+    {
+        //tbSettings.Name = "BasketName";
+        tbSettings.Properties.CaptionCellStyle.Width = 112;
+        tbSettings.Style.Add("margin", "4px 0px");
+        tbSettings.Width = 300;
+        tbSettings.Properties.MaxLength = 100;
+        tbSettings.Properties.Caption = "Basket Name";
+        tbSettings.ShowModelErrors = true;
+    }).Render();
+
+    Html.DevExpress().TextBoxFor(m => Model.ProductBundle, tbSettings => {
+        tbSettings.ClientVisible = false;
+        tbSettings.ShowModelErrors = true;
+    }).Render();
+}
+
+<div class="clearfix"></div>
+
+<div id="autocomplete-container">
+    <div style="display: inline-flex; align-items: center; justify-content: space-between; gap: 1rem;">
+        <label style="display: block;">Product Search</label>
+        <input id="product-search" placeholder="Code / Name..."/>
+        @{
+
+//m => Model.BundledProducts, cbSettings =>
+//{
+//    cbSettings.Properties.ClientInstanceName = "bundledbastards";
+//    cbSettings.ShowModelErrors = true;
+//    cbSettings.Width = 0;
+//    cbSettings.Properties.TextField = "Name";
+//    cbSettings.Properties.ValueType = typeof(int);
+//    cbSettings.Properties.ValueField = "ProductID";
+//    cbSettings.Style.Add("padding", "0");
+//    cbSettings.Style.Add("display", "none");
+//}).BindList(new List<ProductBundle>()).Render();
+        } 
+    </div>
+</div>
+
+<div class="clearfix"></div>
+
+<table class="bundled-products">
+    <thead>
+        <tr>
+            <th style="width: 50px;">
+
+            </th>
+            <th colspan="2" style="width: auto">
+                Qty
+            </th>
+            <th>
+                Code
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody id="products-list" data-bundle-product-id="@(Model.BundleID)">
+        @foreach (var p in Model.BundledProducts)
+        {
+            long? imgId = p.Product.Product_Images.Where(q => q.PerspectiveID == 1).Select(q => q.ImageID).SingleOrDefault();
+
+            <tr data-product-id="@p.ProductID">
+                <td>
+                    @if (imgId != null)
+                    {
+                        <img src="https://flock.designersguild.com/imagelibrary/32/@(imgId).jpeg" />
+                    }
+                </td>
+                <td class="qty quantity">
+                    @p.Quantity
+                </td>
+                <td class="quantity">
+                    <div class="bundle-qty">
+                        <span class="qty-inc-icon glyphicon glyphicon-plus" onclick="increaseQty($(this))" title="Add One"></span>
+                        <span class="qty-dec-icon glyphicon glyphicon-minus" onclick="decreaseQty($(this))" title="Remove One"></span>
+                    </div>
+                </td>
+                <td>
+                    @p.Product.Code
+                </td>
+                <td>
+                    @p.Product.OrderFormName
+                </td>
+                <td class="quantity">
+                    <span class="glyphicon glyphicon-remove" onclick="$(this).closest('tr').remove()"></span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div style="display: flex; justify-content: space-between; align-items: center">
+    @{
+        Html.DevExpress().ValidationSummary().Render();
+    }
+    <div style="text-align: right; margin-left: auto">
+        @{
+            Html.DevExpress().Button(bSettings =>
+            {
+                bSettings.Name = "UpdateBtn";
+                bSettings.Text = "Update";
+                bSettings.ControlStyle.CssClass = "btn btn-success";
+                bSettings.ClientSideEvents.Click = @"function(s, e) {
+                BundleGridView.UpdateEdit();
+            }";
+                bSettings.Style.Add("margin-right", "12px");
+            }).Render();
+
+            Html.DevExpress().Button(bSettings =>
+            {
+                bSettings.Name = "CancelBtn";
+                bSettings.Text = "Cancel";
+                bSettings.ControlStyle.CssClass = "btn btn-danger";
+                bSettings.ClientSideEvents.Click = @"function(s, e) {
+                BundleGridView.CancelEdit();
+            }";
+            }).Render();
+        }
+    </div>
+</div>
+
+
+<script id="dxss_bundleAutocomplete" type="text/javascript">
+    $("#product-search").autocomplete({
+        //classes: {
+        //    'account-no': 'account-no'
+        //},
+        appendTo: '#autocomplete-container',
+        source: function (request, response) {
+            $.ajax({
+                url: "/Admin/Bundles/ProductCodeAutocomplete",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    term: request.term
+                },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return {
+                            label: item.Code + " - " + item.OrderFormName,
+                            value: item.Code,
+                            imageId: item.ImageID || -1,
+                            quantity: 1,
+                            orderFormName: item.OrderFormName,
+                            productId: item.ProductID
+                        };
+                    }));
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $.showError(xhr, textStatus, errorThrown);
+                }
+            });
+        },
+        minLength: 1,
+        select: function (event, ui) {
+            $("#products-list").append("<tr data-product-id='" + ui.item.productId + "'>" +
+                "<td><img src='https://flock.designersguild.com/imagelibrary/32/" + ui.item.imageId + ".jpeg' /></td>" +
+                "<td class='qty quantity'>" + ui.item.quantity + "</td>" +
+                "<td class='quantity'>" +
+                    "<div class='bundle-qty'>" +
+                        "<span class='qty-inc-icon glyphicon glyphicon-plus' onclick='increaseQty($(this))' title='Add One'></span>" +
+                        "<span class='qty-dec-icon glyphicon glyphicon-minus'  onclick='decreaseQty($(this))' title='Remove One'></span>" +
+                    "</div>" +
+                "</td>" +
+                "<td>" + ui.item.value + "</td>" +
+                "<td>" + ui.item.orderFormName + "</td>" +
+                "<td class='quantity'><span class='glyphicon glyphicon-remove' onclick='$(this).closest(\"tr\").remove()'></span></td>" +
+                "</tr>");
+
+            return false;
+        },
+        autoFocus: true,
+    });
+</script>

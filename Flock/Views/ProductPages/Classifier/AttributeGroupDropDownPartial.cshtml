@@ -1,0 +1,102 @@
+﻿@model List<Flock.Models.AttributeGroup_ProductType>
+@Html.DevExpress().DropDownEdit(ddSettings =>
+{
+    ddSettings.Name = "AttributeGroupDD";
+    ddSettings.Text = "Attribute Group";
+    ddSettings.Style.Add("float", "left");
+    ddSettings.Style.Add("margin", "0 7px 7px 0");
+    ddSettings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+    ddSettings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+    ddSettings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+    
+    ddSettings.SetDropDownWindowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div id='attribute-group-listbox'>");
+        Html.DevExpress().ListBox(lbSettings =>
+        {
+            lbSettings.Name = "AttributeGroupListBox";
+            lbSettings.Properties.TextField = "AttributeGroup.Name";
+            lbSettings.Properties.ValueType = typeof(byte);
+            lbSettings.Properties.ValueField = "AttributeGroup.AttributeGroupID";
+            lbSettings.ControlStyle.Border.BorderWidth = 0;
+            lbSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+            lbSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+            lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            lbSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+            lbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                AttributeGroupDD.SetText(s.GetSelectedItem().text);
+                AttributeGroupDD.HideDropDown();
+
+                var ProductTypeID = ClassifierProductTypeListBox.GetSelectedItem() == null ? null : ClassifierProductTypeListBox.GetSelectedItem().value;
+                var AttributeGroupID = AttributeGroupListBox.GetSelectedItem() ==  null ? null : AttributeGroupListBox.GetSelectedItem().value;
+                var AttributeID = null;
+                if (typeof AttributeListBox === 'object')
+                    AttributeID = AttributeListBox.GetSelectedItem() == null ? null : AttributeListBox.GetSelectedItem().value;
+                var ToggleState = ToggleListBox.GetSelectedItem() == null ? null : ToggleListBox.GetSelectedItem().value;
+
+                if(ProductTypeID == null || AttributeGroupID == null)
+                    return;
+
+                $.ajax({
+                    url: '" + Url.Action("ClassifierHeader", "ProductPages") + @"',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        ProductTypeID: ProductTypeID,
+                        AttributeGroupID: AttributeGroupID,
+                        AttributeID: AttributeID,
+                        Toggle: ToggleState
+                    },
+                    success: function(data) {
+                        $('#page-subheading').html(data);
+                            
+                        var ProductTypeID = ClassifierProductTypeListBox.GetSelectedItem() == null ? null : ClassifierProductTypeListBox.GetSelectedItem().value;
+                        var AttributeGroupID = AttributeGroupListBox.GetSelectedItem() ==  null ? null : AttributeGroupListBox.GetSelectedItem().value;
+                        var AttributeID = null;
+                        if (AttributeDD.IsVisible())
+                            AttributeID = AttributeListBox.GetSelectedItem() == null ? null : AttributeListBox.GetSelectedItem().value;
+                        var ToggleState = ToggleListBox.GetSelectedItem() == null ? null : ToggleListBox.GetSelectedItem().value;
+
+                        if(AttributeID != null || ToggleState == 2) {
+                            LoadingPanel.Show();                        
+
+                            $.ajax({
+                                url: '" + Url.Action("ClassificationResultsPartial", "ProductPages") + @"',
+                                type: 'POST',
+                                traditional: true,
+                                data: { 
+                                    ProductTypeID: ProductTypeID,
+                                    AttributeGroupID: AttributeGroupID,
+                                    AttributeID: AttributeID,
+                                    Toggle: ToggleState
+                                },
+                                success: function(data) {
+                                    $('#ajax-target').html(data);
+                                    LoadingPanel.Hide();
+                                }
+                            });
+                        }
+                    }
+                });
+            }";
+            lbSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+                s.SetSelectedItem(s.FindItemByValue(" + ViewBag.SelectedAttributeGroupID + @"));
+                if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                    AttributeGroupDD.SetText(s.GetSelectedItem().text);
+            }";
+        }).BindList(Model).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+        @Html.DevExpress().Button(
+            buttonSettings =>
+            {
+                buttonSettings.Text = "Close";
+                buttonSettings.Style.Add("float", "right");
+                buttonSettings.Name = "ProductTypeButtonClose";
+                buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                        AttributeGroupDD.HideDropDown();
+                    }";
+            }).Render();
+        ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+    });
+}).GetHtml()

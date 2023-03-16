@@ -1,0 +1,154 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "DeliveryZoneGridView";
+        settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "DeliveryZoneGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryZoneGridViewPartialAddNew" };
+        
+        settings.ClientSideEvents.RowClick = @"function(s, e) { 
+            var id = s.GetRowKey(e.visibleIndex);
+            $('#selected-delivery-zone-id').val(id);
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("ChangeDeliveryZone", "eCommerce") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    DeliveryZoneID: id
+                },
+                success: function(data) { 
+                    $('#delivery-zone-compose-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }";
+            
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "DeliveryZoneID").DisplayFormat = "Total: {0:n0}";
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.Styles.Row.Cursor = "pointer";
+            
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.CommandColumn.Width = 40;
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowClearFilterButton = true;
+            
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsPager.Mode = GridViewPagerMode.EndlessPaging;
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 280;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsPager.PageSizeItemSettings.Visible = false;
+        settings.SettingsPager.PageSize = 10;
+        settings.SettingsBehavior.AllowFocusedRow = true;
+
+        settings.KeyFieldName = "DeliveryZoneID";
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+            
+        MVCxGridViewColumn DeliveryZoneIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CountryIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CourierIDColumn = new MVCxGridViewColumn();
+        
+
+        DeliveryZoneIDColumn.Name = "DeliveryZoneID";
+        DeliveryZoneIDColumn.FieldName = "DeliveryZoneID";
+        DeliveryZoneIDColumn.Caption = "Delivery Zone ID";
+        DeliveryZoneIDColumn.Width = 160;
+        DeliveryZoneIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        DeliveryZoneIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        DeliveryZoneIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(DeliveryZoneIDColumn);
+        
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        NameColumn.Width = 280;
+        NameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        var nProp = NameColumn.PropertiesEdit as TextBoxProperties;
+        nProp.MaxLength = 50;
+        nProp.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Columns.Add(NameColumn);
+
+        CountryIDColumn.Name = "CountryID";
+        CountryIDColumn.FieldName = "CountryID";
+        CountryIDColumn.Caption = "Country";
+        CountryIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        CountryIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        CountryIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        CountryIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        var countryProp = CountryIDColumn.PropertiesEdit as ComboBoxProperties;
+        var countryLinker = UoW.GetRepository<PriceList>().GetAll().Select(p => p.PriceListID).ToList().ConvertAll(p => (byte?)p).ToList();
+        countryProp.DataSource = UoW.GetRepository<Country>().GetAll().Where(p => countryLinker.Contains(p.PriceListID));
+        countryProp.ValueField = "CountryID";
+        countryProp.TextField = "Name";
+        countryProp.ValueType = typeof(short);
+        CountryIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        settings.Columns.Add(CountryIDColumn);
+
+        CourierIDColumn.Name = "CourierID";
+        CourierIDColumn.FieldName = "CourierID";
+        CourierIDColumn.Caption = "Courier";
+        CourierIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        CourierIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        CourierIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        CourierIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        var courierProp = CourierIDColumn.PropertiesEdit as ComboBoxProperties;
+        courierProp.ValueField = "CourierID";
+        courierProp.TextField = "Name";
+        courierProp.ValueType = typeof(byte);
+        courierProp.DataSource = UoW.GetRepository<Courier>().GetAll().ToList();
+        CourierIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        settings.Columns.Add(CourierIDColumn);
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "CountryID":
+                    e.Values.Clear();
+                    var cL = UoW.GetRepository<PriceList>().GetAll().Select(p => p.PriceListID).ToList().ConvertAll(p => (byte?)p).ToList();
+                    foreach(var v in UoW.GetRepository<Country>().GetAll().Where(p => cL.Contains(p.PriceListID)))
+                    {
+                        e.AddValue(v.Name, v.CountryID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                case "CourierID":
+                    e.Values.Clear();
+                    foreach (var v in UoW.GetRepository<Courier>().GetAll().OrderBy(p => p.CourierID))
+                    {
+                        e.AddValue(v.Name, v.CourierID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+    });
+}
+@grid.BindToLINQ("", "", (s, e) =>
+{
+    var source = UoW.GetRepository<DeliveryZone>().GetAll();
+
+    e.KeyExpression = "DeliveryZoneID";
+    e.QueryableSource = source;
+}).GetHtml()

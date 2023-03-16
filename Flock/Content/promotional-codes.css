@@ -1,0 +1,145 @@
+﻿.thin-edit-control {
+    max-width: 180px;
+}
+
+.detail-input {
+    float: left;
+    line-height: 32px;
+}
+
+.detail-label {
+    float: left;
+    line-height: 16px !important;
+}
+
+#promo-code-edit-table {
+    float: left;
+    width: 49%;
+}
+
+#promo-code-edit-table > tbody > tr > td {
+    padding: 2px 4px;
+}
+
+#promo-code-product-type-table {
+    width: 100%;
+}
+
+#promo-code-product-type-table > tbody > tr > td {
+    padding: 2px 4px;
+}
+
+#promo-code-delivery-band-table {
+    float: left;
+    width: 55%;
+}
+
+#promo-code-delivery-band-table > tbody > tr > td {
+    padding: 2px 4px;
+}
+
+#promo-code-member-segment-table {
+    float: left;
+    width: 51%;
+}
+
+#promo-code-member-segment-table > tbody > tr > td {
+    padding: 2px 4px;
+}
+
+#promo-code-member-restriction-table {
+    float: left;
+    width: 49%;
+}
+
+#promo-code-member-restriction-table > tbody > tr > td {
+    padding: 2px 4px;
+}
+
+#promo-code-product-restriction-table {
+    width: 100%;
+    margin-top: 8px;
+}
+
+#promo-code-product-restriction-table > tbody > tr > td {
+    padding: 2px 4px;
+}
+
+#product-restrictions {
+    width: 100%;
+    height: 616px;
+    border: 1px solid #c0c0c0;
+    padding: 7px 5px 6px 11px;
+    overflow-y: scroll;
+}
+
+#member-restrictions {
+    min-width: 250px;
+    min-height: 200px;
+    border: 1px solid #c0c0c0;
+    padding: 7px 5px 6px 11px;
+    overflow-y: auto;
+}
+
+.member-restriction-icon {
+    float: left;
+    position: relative;
+    width: 70px;
+    height: 90px;
+    margin-right: 4px;
+}
+
+.product-restriction-icon {
+    float: left;
+    position: relative;
+    width: 70px;
+    height: 90px;
+    margin-bottom: 8px;
+    margin-right: 8px;
+}
+
+#primary-tab-container-wrapper {
+    height: 20px;
+    /*overflow: hidden;*/
+    width: 100%;
+}
+
+#primary-tab-container {
+    opacity: 0.0;
+    border: 0 !important;
+}
+
+.dxb-hb {
+    font-size: 0!important;
+}
+
+
+#product-search-dataview .dxeButtonEditSys {
+    width: 100px !important;
+}
+
+#product-search-dataview .dxpcDropDown_MetropolisBlue {
+    width: 200px !important;
+}
+
+#free-gift-table {
+
+}
+
+#free-gift-table > tbody > tr > td {
+    padding: 4px 2px;
+}
+
+#gift-box-table {
+
+}
+
+#gift-box-table > tbody > tr > td {
+    padding: 4px 2px;
+}
+
+.val-icon {
+    width: 14px;
+    height: 14px;
+    background: url("http://localhost:65123/DXR.axd?r=0_1742-lOGN8") no-repeat -155px -25px;
+}

@@ -1,0 +1,50 @@
+﻿@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "MemberSearch_DataView";
+
+    settings.CallbackRouteValues = new { Controller = "Members", Action = "Search" };
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        e.customArgs['SearchString'] =  SearchBox.GetValue();
+        e.customArgs['MemberSegmentID'] = MemberSegmentBox.GetValue();
+    }";
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) {
+        if (typeof (InitMemberDragDrop) == 'function')
+            InitMemberDragDrop();
+    }";
+
+    settings.ClientSideEvents.Init = @"function(s, e) { 
+        if (typeof (InitMemberDragDrop) == 'function')
+            InitMemberDragDrop();
+    }";
+
+    settings.Style.Add("background-color", "white");
+    settings.Style.Add("width", "100%");
+    settings.Style.Add("margin", "0");
+
+    settings.CustomActionRouteValues = new { Controller = "Members", Action = "Search" };
+    settings.AllowPaging = true;
+    settings.AlwaysShowPager = true;
+    settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    settings.PagerSettings.PageSizeItemSettings.Visible = true;
+    settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+    settings.SettingsTableLayout.RowsPerPage = 4;
+    settings.SettingsTableLayout.ColumnCount = 4;
+    settings.Styles.Item.Height = 60;
+    settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(8);
+    settings.EmptyDataText = "<h4>No results</h4>";
+    settings.SetItemTemplateContent(
+    c =>
+    {
+        ViewContext.Writer.Write(
+            "<div id='member-box-" + DataBinder.Eval(c.DataItem, "MemberID") + "' class='draggable member-icon' data-member-id='" + DataBinder.Eval(c.DataItem, "MemberID") + "'>" +
+            "<div style=\"height: 50px;\">" +
+                "<img style='width: 30px; height: 30px;' title=\"Member ID: " + DataBinder.Eval(c.DataItem, "MemberID") + "\" src=\"" + Url.Content("~/images/admin/member_sml.png") + "\" />" +
+            "</div>" +
+            "<div class=\"DataViewItemTitle\">" + (String.IsNullOrEmpty((string)DataBinder.Eval(c.DataItem, "FullName")) ? "MemberID: " + DataBinder.Eval(c.DataItem, "MemberID").ToString() : DataBinder.Eval(c.DataItem, "FullName").ToString()) + "</div>" +
+            "</div>"
+        );
+    }
+
+);
+}).Bind(Model).GetHtml()

@@ -1,0 +1,14 @@
+﻿@Html.DevExpress().ComboBox(
+    settings => {
+        settings.Name = "SiteSectionListComboBox";
+        //settings.Width = 180;
+        settings.SelectedIndex = 0;
+        settings.CallbackRouteValues = new { Controller = "cms", Action = "SiteSectionComboBoxPartial" };
+        settings.Properties.EnableClientSideAPI = true;
+        settings.Properties.ClientSideEvents.Init = "function(s, e) { $('#pages-tree-list-wrapper').load('" + Url.Action("PageTreeListDataBindingPartial") + "', { 'marketID' : MarketListComboBox.GetValue(), 'siteSectionID' : SiteSectionListComboBox.GetValue() }); }";
+        settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { $('#pages-tree-list-wrapper').load('" + Url.Action("PageTreeListDataBindingPartial") + "', { 'marketID' : MarketListComboBox.GetValue(), 'siteSectionID' : SiteSectionListComboBox.GetValue() }); }";
+        settings.Properties.CallbackPageSize = 15;
+        settings.Properties.TextField = "Name";
+        settings.Properties.ValueField = "SiteSectionID";
+    }
+).BindList(ViewData["SiteSections"]).GetHtml()

@@ -1,0 +1,29 @@
+﻿@model string
+@Html.DevExpress().Memo(
+settings =>
+{
+    settings.Name = "CollectionHtmlEditor";
+//    settings.ClientSideEvents.BeginCallback = @"function OnBeginCallback(s, e) {
+//        e.customArgs['CollectionID'] = $('#collection-slideshow-container').data('collection-id');
+//        e.customArgs['Html'] = CollectionHtmlEditor.GetHtml(); 
+//    }";
+
+//    settings.ClientSideEvents.EndCallback = @"function OnEndCallback(s, e) {
+//        if(window.wasSaveButtonHit == true) {
+//            window.wasSaveButtonHit = false;
+//            return false;
+//        }
+//        else
+//            return false;
+//    }";
+        
+//    settings.CallbackRouteValues = new { Controller = "Collections", Action = "CollectionHtmlEditorSavePartial" };
+//    settings.CustomDataActionRouteValues = new { Controller = "Collections", Action = "CollectionHtmlEditorSavePartial" };
+
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(450);
+        
+         
+    settings.Text = Model;
+}).GetHtml()

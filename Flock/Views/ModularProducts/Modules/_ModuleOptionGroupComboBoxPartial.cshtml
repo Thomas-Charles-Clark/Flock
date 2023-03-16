@@ -1,0 +1,13 @@
+﻿@model Int16?
+@Html.DevExpress().ComboBox(settings => { 
+    settings.Name = "ModuleOptionGroupID";
+    settings.CallbackRouteValues = new { Controller = "ModularProducts", Action = "ModuleOptionGroupComboBoxPartial" };
+    settings.Properties.ClientSideEvents.EndCallback = @"function(s, e) { 
+        s.SetValue(" + Model + @");
+    }";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "ModuleOptionGroupID";
+    settings.Properties.ValueType = typeof(Int16);
+}).BindList(args => { 
+    return Flock.ViewModels.LargeDatabaseDataProvider.GetModuleOptionGroups(args); 
+}, Flock.ViewModels.LargeDatabaseDataProvider.GetModuleOptionGroupByID).Bind(Model).GetHtml()

@@ -1,0 +1,65 @@
+@{
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ModularProductGridView";
+        settings.CallbackRouteValues = new { Controller = "ModularProducts", Action = "ModularProductGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ModularProducts", Action = "ModularProductGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ModularProducts", Action = "ModularProductGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ModularProducts", Action = "ModularProductGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) { 
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("ModularProduct_ModuleOptionsPartial", "ModularProducts") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    ModularProductID: s.GetRowKey(e.visibleIndex) 
+                },
+                success: function(data) {
+                    $('#modular-products-options-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 30000
+            });
+        }";
+        
+        settings.Styles.Row.Cursor = "pointer";
+        
+		settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+		settings.KeyFieldName = "ModularProductID";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = true;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Columns.Add("ModularProductID").EditFormSettings.Visible = DefaultBoolean.False;
+        (settings.Columns["ModularProductID"] as MVCxGridViewColumn).Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        NameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        var cProp = NameColumn.PropertiesEdit as TextBoxProperties;
+        cProp.MaxLength = 50;
+        
+        settings.Columns.Add(NameColumn);
+        
+	});
+	if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

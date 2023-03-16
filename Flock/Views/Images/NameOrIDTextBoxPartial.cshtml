@@ -1,0 +1,83 @@
+﻿@Html.DevExpress().TextBox(settings => {
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ImageSearchNameOrIDTextBoxPartial")
+    {
+        settings.Name = "NameOrIDTextBox";
+        settings.Properties.ClientSideEvents.KeyUp = @"function(s, e) {
+            if(e.htmlEvent.keyCode == 13) {
+                $('#searching-icon').fadeIn('fast');
+                $.ajax({
+                    url: '" + Url.Action("ImageSearch", "Images") + @"',
+                    traditional: true,
+                    data: { 
+                        ProductType: ProductTypeListBox.GetValue(),
+                        Brand: BrandListBox.GetValue(),
+                        Launch: LaunchListBox.GetValue(),
+                        Collection: CollectionListBox.GetValue(),
+                        AspectRatio: AspectRatioListBox.GetValue(),
+                        ImageType: ImageTypeListBox.GetValue(),
+                        Perspective: PerspectiveListBox.GetValue(),
+                        HotspotStatus: HotspotStatusListBox.GetValue(),
+                        Colour: ColourListBox.GetValue(),
+                        Room: RoomListBox.GetValue(),
+                        Style: StyleListBox.GetValue(),
+                        NameOrID: NameOrIDTextBox.GetValue(),
+                        SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue() 
+                    },
+                    success: function(data) {
+                        $('#image-data-view-container').html(data);
+                        $('#searching-icon').fadeOut('slow');
+                    },
+                    error: function(e, s, a) {
+                        $('#searching-icon').fadeOut('slow');
+                        alert(e.responseText);
+                    },
+                    timeout: 20000
+                });
+            }
+        }";
+    }
+    else
+    {
+        settings.Name = "CollectionNameOrIDTextBox";
+        settings.Properties.ClientSideEvents.KeyUp = @"function(s, e) {
+            if(e.htmlEvent.keyCode == 13) {
+                $('#collection-searching-icon').fadeIn('fast');
+                $.ajax({
+                    url: '" + Url.Action("CollectionSearch", "Images") + @"',
+                    traditional: true,
+                    data: { 
+                        ProductType: CollectionProductTypeListBox.GetValue(),
+                        Brand: CollectionBrandListBox.GetValue(),
+                        Launch: CollectionLaunchListBox.GetValue(),
+                        NameOrID: CollectionNameOrIDTextBox.GetValue()
+                    },
+                    success: function(data) {
+                        $('#collection-data-view-container').html(data);
+                        $('#collection-searching-icon').fadeOut('slow');
+                    },
+                    error: function(e, s, a) {
+                        $('#collection-searching-icon').fadeOut('slow');
+                        alert(e.responseText);
+                    },
+                    timeout: 20000
+                });
+            }
+        }";
+    }
+    settings.Text = "Name, Code or ID";
+    settings.Properties.ClientSideEvents.GotFocus = @"function(s, e) {
+        if(s.GetValue() == 'Name, Code or ID')
+            s.SetText('');
+    }";
+    settings.Properties.ClientSideEvents.LostFocus = @"function(s, e) {
+        if(s.GetValue() == '' || s.GetValue() == null || s.GetValue() == false)
+            s.SetText('Name, Code or ID');
+    }";
+}).GetHtml()

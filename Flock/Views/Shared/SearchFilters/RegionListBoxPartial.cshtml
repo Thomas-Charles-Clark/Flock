@@ -1,0 +1,46 @@
+﻿@model List<Flock.Models.Region>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Name = "CountrySearchRegionListBox";
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        $('#country-searching-icon').fadeIn('fast');
+        CountrySearchRegionDD.SetText(s.GetSelectedItem().text);
+        CountrySearchRegionDD.HideDropDown();
+        $.ajax({
+            url: '" + Url.Action("Search", "CountrySearch") + @"',
+            traditional: true,
+            data: { 
+                MarketID: CountrySearchMarketListBox.GetValue(),
+                ContinentID: CountrySearchContinentListBox.GetValue(),
+                RegionID: CountrySearchRegionListBox.GetValue(),
+                LanguageID: CountrySearchLanguageListBox.GetValue(),
+                SearchString: CountrySearchNameTextBox.GetText(),
+                TableLock: CountrySearchCLTableLock.GetValue()
+            },
+            success: function(data) {
+                $('#country-search-data-view-container').html(data);
+                $('#country-searching-icon').fadeOut('slow');
+                if (typeof (InitCountryDragDrop) == 'function')
+                    InitCountryDragDrop();
+            },
+            error: function(e, s, a) {
+                $('#country-searching-icon').fadeOut('slow');
+                alert(e.responseText);
+            },
+            timeout: 60000
+        });
+    }";
+    
+    
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "RegionID";
+}
+).BindList(Model).GetHtml()

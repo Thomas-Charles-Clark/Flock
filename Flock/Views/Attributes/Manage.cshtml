@@ -1,0 +1,17 @@
+﻿@model Flock.ViewModels.AttributeManageViewModel
+@{
+    Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewBag.Title = "Manage Attribute";
+}
+@section styles {
+    <style type="text/css">
+        #container { 
+            width: 1275px !important;
+        }
+    </style>
+}
+<h4 class="page-heading">Manage Attributes</h4>
+
+<div style="width: 650px; margin: 0 auto;">
+@Html.Partial("AttributeGroupGridViewPartial")
+</div>

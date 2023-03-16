@@ -1,0 +1,231 @@
+﻿@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "DesignOverviewGridView";
+        settings.CallbackRouteValues = new { Controller = "Designs", Action = "DesignOverviewGridViewPartial" };
+        //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Designs", Action = "ProductPagesOverviewGridViewPartialAddNew" };
+        //settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Designs", Action = "ProductPagesOverviewGridViewPartialUpdate" };
+        //settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Designs", Action = "ProductPagesOverviewGridViewPartialDelete" };
+        settings.CustomActionRouteValues = new { Controller = "Designs", Action = "DesignOverviewGridViewPartialCustomCommand" };
+
+        settings.SettingsDetail.ShowDetailButtons = true;
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+//            e.customArgs['CollectionID'] = DesignOverviewCollectionListBox.GetValue();
+//            e.customArgs['ColourID'] = DesignOverviewColourListBox.GetValue();
+//            e.customArgs['CountryID'] = DesignOverviewCountryListBox.GetValue();
+        }";
+
+        settings.ClientSideEvents.CallbackError = @"function(s, e) {
+            alert(e.message);
+            e.handled = true;
+            s.Refresh();
+        }";
+
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+
+        settings.SetDetailRowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(Html.Action("DesignOverviewDetailGridViewPartial", "Designs", new { DesignID = c.KeyValue }));
+        });
+
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(975);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+        });
+        
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.SettingsPager.PageSizeItemSettings.ShowAllItem = false;
+
+
+        settings.KeyFieldName = "DesignID";
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "DesignID";
+            column.FieldName = "DesignID";
+            column.Caption = "Design ID";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Width = 60;
+            //column.EditFormCaptionStyle.CssClass = "hidden-input-field";
+            //column.EditCellStyle.CssClass = "hidden-input-field";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Name";
+            column.FieldName = "Name";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.EditCellStyle.CssClass = "editform-cell";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Family";
+            column.FieldName = "Family";
+            column.Caption = "Family";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormCaptionStyle.CssClass = "hidden-input-field";
+            column.EditCellStyle.CssClass = "hidden-input-field";
+            //column.EditFormSettings.Visible = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ProductAssociations";
+            column.FieldName = "ProductAssociations";
+            column.Caption = "Product Associations";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = 60;
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ProductTypeAssociations";
+            column.FieldName = "ProductTypeAssociations";
+            column.Caption = "Product Type Associations";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = 60;
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+        settings.Columns.Add(column =>
+        {
+            column.Name = "BrandAssociations";
+            column.FieldName = "BrandAssociations";
+            column.Caption = "Brand Associations";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = 60;
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        }); 
+        
+        settings.Columns.Add(column =>
+        {
+            column.Name = "PatternAssociations";
+            column.FieldName = "PatternAssociations";
+            column.Caption = "Pattern Associations";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = 60;
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "CollectionAssociations";
+            column.FieldName = "CollectionAssociations";
+            column.Caption = "Collection Associations";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = 60;
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        });
+
+        settings.Columns.Add(column => {
+            column.Name = "FirstLaunched";
+            column.FieldName = "FirstLaunched";
+            column.Caption = "First Launched";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = 60;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        
+        settings.Columns.Add(column =>
+        {
+            column.Name = "LastLaunched";
+            column.FieldName = "LastLaunched";
+            column.Caption = "Last Launched";
+            column.HeaderStyle.Wrap = DefaultBoolean.True;
+            column.Width = 60;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                //case "StatusID":
+                //    e.Values.Clear();
+                //    e.AddValue("On", "0");
+                //    e.AddValue("Pending Off (On)", "1");
+                //    e.AddValue("Pending On (Off)", "2");
+                //    e.AddValue("Pre-Launch", "3");
+                //    e.AddValue("Off", "4");
+                //    e.AddShowAll();
+                //    break;
+                default: break;
+            }
+        };
+    });
+    
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ(string.Empty, string.Empty, (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    var source = dataContext.GetRepository<Flock.Models.vwDesignOverview>().GetAll();
+
+    //if (Session["ProductOverviewCollectionID"] != null)
+    //{
+    //    var x = Convert.ToInt16(Session["ProductOverviewCollectionID"]);
+    //    var t = dataContext.GetRepository<Flock.Models.Product_Collection>().GetAll().Where(q => q.CollectionID == x).Select(q => q.ProductID).Distinct();
+    //    source = source.Where(p => t.Contains(p.ProductID));
+    //}
+    //if (Session["ProductOverviewColourID"] != null)
+    //{
+    //    var x = Convert.ToByte(Session["ProductOverviewColourID"]);
+    //    var t = dataContext.GetRepository<Flock.Models.Product_Colour>().GetAll().Where(q => q.ColourID == x).Select(q => q.ProductID).Distinct();
+    //    source = source.Where(p => t.Contains(p.ProductID));
+    //}
+
+    e.KeyExpression = "DesignID";
+    e.QueryableSource = source;
+}).GetHtml()

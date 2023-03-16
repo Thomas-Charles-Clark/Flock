@@ -1,0 +1,64 @@
+@using Flock.ViewModels
+@model FormGridViewModel
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "FormGridView";
+        settings.CallbackRouteValues = new { Controller = "Form", Action = "FormGridViewPartial" };
+
+        settings.ClientSideEvents.CustomButtonClick = @"function(s,e) { 
+            OpenComposer(s.GetRowKey(e.visibleIndex));
+            return false; 
+        }";
+
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Form", Action = "FormGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Form", Action = "FormGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Form", Action = "FormGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.NewButton.Visible = true;
+        settings.CommandColumn.DeleteButton.Visible = true;
+        settings.CommandColumn.EditButton.Visible = true;
+
+        settings.KeyFieldName = "FormID";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Columns.Add("Name");
+        settings.Columns.Add("DisplayTitle");
+
+        
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.NewButton.Visible = true;
+        settings.CommandColumn.DeleteButton.Visible = true;
+        settings.CommandColumn.EditButton.Visible = true;
+        
+        GridViewCommandColumnCustomButton composebutton = new GridViewCommandColumnCustomButton();
+        
+        composebutton.Text = "Compose";
+
+        settings.CommandColumn.CustomButtons.Add(composebutton);
+     
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model.Forms).GetHtml()
+
+
+<script type="text/javascript">
+    function OpenComposer(formID) {
+        var url = '@Url.Action("compose", "forms", new { id = -1 })';
+        url = url.replace(-1, formID);
+
+        //window.open('/admin/cms/compose/page/'+e.nodeKey);  
+        window.location.href = url;
+    }
+</script>

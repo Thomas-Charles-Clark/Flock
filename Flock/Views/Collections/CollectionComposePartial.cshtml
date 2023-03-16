@@ -1,0 +1,26 @@
+﻿@using Flock.ViewModels
+@model CollectionViewModel
+
+<div id="collection-country-restrictions-container">
+    @Html.Partial("CollectionCountryRestrictionsPartial", Model.CountryRestrictions)
+</div>
+
+<div id="collection-info-container" class="content-panel-container">
+    @Html.Partial("CollectionInfoPartial", Model)
+</div>
+
+<div id="details-and-pod-images-container" class="content-panel-container">
+    @Html.Partial("CollectionDetailsPartial", Model)
+</div>
+
+<div id="collection-description-container" class="content-panel-container">
+    @Html.Partial("CollectionDescriptionPartial", Model)
+</div>
+
+<div id="collection-video-target">
+    @Html.Partial("CollectionVideoPartial", Model)
+</div>
+
+<div id="related-collections">
+    @Html.Partial("RelatedCollections", Model.RelatedCollections)
+</div>

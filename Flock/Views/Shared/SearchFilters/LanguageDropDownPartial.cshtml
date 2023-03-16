@@ -1,0 +1,162 @@
+﻿@model List<Flock.Models.Language>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        if (action == "CountrySearchLanguageDropDownPartial")
+            settings.Name = "CountrySearchLanguageDD";
+        else if (action == "BannerOverviewLanguageDropDownPartial")
+            settings.Name = "BannerOverviewLanguageDD";
+        else if (action == "ComposeBannerHeaderLanguageDropDownPartial")
+            settings.Name = "ComposeBannerHeaderLanguageDD";
+        else if (action == "ComposeBannerLanguageDropDownPartial")
+        {
+            settings.Name = "ComposeBannerLanguageDD";
+            settings.Style.Remove("margin");
+        }
+        settings.Text = "Language";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='language-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/LanguageListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "CountrySearchLanguageDropDownPartial")
+                    {
+                        buttonSettings.Name = "CountrySearchLanguageButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            CountrySearchLanguageListBox.UnselectAll();
+                            CountrySearchLanguageDD.HideDropDown(); 
+                            CountrySearchLanguageDD.SetText('Continent');
+                            $('#country-searching-icon').fadeIn('fast');
+                            $.ajax({
+                                url: '" + Url.Action("Search", "CountrySearch") + @"',
+                                traditional: true,
+                                data: { 
+                                    MarketID: CountrySearchMarketListBox.GetValue(),
+                                    ContinentID: CountrySearchContinentListBox.GetValue(),
+                                    RegionID: CountrySearchRegionListBox.GetValue(),
+                                    LanguageID: CountrySearchLanguageListBox.GetValue(),
+                                    SearchString: CountrySearchNameTextBox.GetText(),
+                                    TableLock: CountrySearchCLTableLock.GetValue()
+                                },
+                                success: function(data) {
+                                    $('#country-search-data-view-container').html(data);
+                                    $('#country-searching-icon').fadeOut('slow');
+                                    if (typeof (InitCountryDragDrop) == 'function')
+                                        InitCountryDragDrop();
+                                },
+                                error: function(e, s, a) {
+                                    $.showError(e, s, a, function() { $('#country-searching-icon').fadeOut('slow'); });
+                                },
+                                timeout: 60000
+                            });
+                        }";
+                    }
+                    else if (action == "BannerOverviewLanguageDropDownPartial")
+                    {
+                        buttonSettings.Name = "BannerOverviewLanguageButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            BannerOverviewLanguageListBox.UnselectAll();
+                            BannerOverviewLanguageDD.HideDropDown();
+                            BannerOverviewLanguageDD.SetText('Language');
+                            BannerOverviewGridView.PerformCallback();
+                        }";
+                    }
+                    else if (action == "ComposeBannerHeaderLanguageDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposeBannerHeaderLanguageButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            ComposeBannerHeaderLanguageListBox.UnselectAll();
+                            ComposeBannerHeaderLanguageDD.HideDropDown();
+                            ComposeBannerHeaderLanguageDD.SetText('Language');
+                            $('#banner-select-header-busy').fadeIn('fast');
+                            $.ajax({ 
+                                url: '" + Url.Action("ComposeBannerHeaderBannerDropDownPartial", "Banners") + @"',
+                                type: 'POST',
+                                traditional: true,
+                                data: {
+                                    SelectedBannerID: $('#banner-compose-section').data('banner-id'),
+                                    SelectedBannerLocationID: ComposeBannerHeaderLocationListBox.GetValue(),
+                                    SelectedSiteSectionID: ComposeBannerHeaderSiteSectionListBox.GetValue(), 
+                                    SelectedCountryID: ComposeBannerHeaderCountryListBox.GetValue(), 
+                                    SelectedLanguageID: ComposeBannerHeaderLanguageListBox.GetValue(),
+                                    SelectedStatusID: ComposeBannerHeaderWebStatusListBox.GetValue()
+                                },
+                                success: function(data) { 
+                                    $('#banner-select-header-busy').fadeOut('fast');
+                                    $('#banner-header-banner-drop-down-container').html(data);
+                                },
+                                error: function(e, s, a) {
+                                    $.showError(e, s, a, function() { $('#banner-select-header-busy').fadeOut('fast'); });
+                                },
+                                timeout: 60000
+                            });   
+                        }";
+                    }
+                    else if (action == "ComposeBannerLanguageDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposeBannerLanguageLanguageButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            ComposeBannerLanguageListBox.UnselectAll();
+                            ComposeBannerLanguageDD.HideDropDown();
+                            ComposeBannerLanguageDD.SetText('Language');
+                        }";
+                    }
+                    buttonSettings.Text = "Clear";
+                    buttonSettings.Style.Add("float", "left");
+                }).Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "CountrySearchLanguageDropDownPartial")
+                    {
+                        buttonSettings.Name = "CountrySearchLanguageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            CountrySearchLanguageDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "BannerOverviewLanguageDropDownPartial")
+                    {
+                        buttonSettings.Name = "BannerOverviewLanguageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            BannerOverviewLanguageDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ComposeBannerHeaderLanguageDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposeBannerHeaderLanguageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ComposeBannerHeaderLanguageDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ComposeBannerLanguageDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposeBannerLanguageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ComposeBannerLanguageDD.HideDropDown();
+                        }";
+                    }
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }).Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

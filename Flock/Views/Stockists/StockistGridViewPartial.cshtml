@@ -1,0 +1,21 @@
+﻿@using Flock.Models
+@using Flock.DAL
+@model string
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "StockistGridView";
+        settings.CallbackRouteValues = new { Controller = "Stockists", Action = "StockistGridViewPartial"};
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            e.customArgs['CountryCode'] = StockistCountryComboBox.GetSelectedItem().value;
+        }";
+
+        MVCxGridViewColumn StockistIDColumn = new MVCxGridViewColumn();
+        StockistIDColumn.Name = "StockistID";
+        StockistIDColumn.FieldName = "StockistID";
+        StockistIDColumn.Caption = "ID";
+        StockistIDColumn.Width = 80;
+        
+    });               
+}

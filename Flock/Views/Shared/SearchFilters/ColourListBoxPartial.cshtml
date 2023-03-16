@@ -1,0 +1,254 @@
+﻿@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ProductSearchColourDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductSearchColourListBox";
+
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            $('#product-searching-icon').fadeIn('fast');
+            ProductSearchColourDD.SetText(s.GetSelectedItem().text);
+            ProductSearchColourDD.HideDropDown();
+            $('#product-searching-icon').fadeIn('fast');
+            var SearchText = ProductSearchNameOrIDTextBox.GetText();
+            $.ajax({
+                url: '" + Url.Action("ProductSearch", "Products") + @"',
+                traditional: true,
+                data: { 
+                    ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                    BrandID: ProductSearchBrandListBox.GetValue(),
+                    LaunchID: ProductSearchLaunchListBox.GetValue(),
+                    PatternID: ProductSearchPatternListBox.GetValue(),
+                    Status: ProductSearchStatusListBox.GetValue(),
+                    StatusID: ProductSearchWebStatusListBox.GetValue(),
+                    StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                    CollectionID: ProductSearchCollectionListBox.GetValue(),
+                    ColourID: ProductSearchColourListBox.GetValue(),
+                    SearchString: SearchText,
+                    ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                    PriceListID: ProductSearchPriceListListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#product-data-view-container').html(data);
+                    $('#product-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function(){ $('#product-searching-icon').fadeOut('slow'); });
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else if (action == "ImageSearchColourDropDownPartial")
+    {
+        listBoxSettings.Name = "ImageSearchColourListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#image-searching-icon').fadeIn('fast');
+            ImageSearchColourDD.SetText(s.GetSelectedItem().text);
+            ImageSearchColourDD.HideDropDown();
+            $.ajax({
+                url: '" + Url.Action("ImageSearch", "Images") + @"',
+                traditional: true,
+                data: { 
+                    ProductType: ImageSearchProductTypeListBox.GetValue(),
+                    Brand: ImageSearchBrandListBox.GetValue(),
+                    Launch: ImageSearchLaunchListBox.GetValue(),
+                    Collection: ImageSearchCollectionListBox.GetValue(),
+                    AspectRatio: ImageSearchAspectRatioListBox.GetValue(),
+                    ImageType: ImageSearchImageTypeListBox.GetValue(),
+                    Perspective: ImageSearchPerspectiveListBox.GetValue(),
+                    HotspotStatus: ImageSearchHotspotStatusListBox.GetValue(),
+                    Colour: ImageSearchColourListBox.GetValue(),
+                    Room: ImageSearchRoomListBox.GetValue(),
+                    Style: ImageSearchStyleListBox.GetValue(),
+                    NameOrID: ImageSearchNameOrIDTextBox.GetValue(),
+                    SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue(),
+                    Resolution: ResolutionListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#image-data-view-container').html(data);
+                    $('#image-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function(){ $('#image-searching-icon').fadeOut('slow'); });
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else if (action == "ProductPageSearchColourDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductPageSearchColourListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#product-page-searching-icon').fadeIn('fast');
+            ProductPageSearchColourDD.SetText(s.GetSelectedItem().text);
+            ProductPageSearchColourDD.HideDropDown();
+            $.ajax({
+	            url: '" + Url.Action("ProductPageSearch", "ProductPages") + @"',
+	            traditional: true,
+	            data: {
+		            ProductTypeID: ProductPageSearchProductTypeListBox.GetValue(),
+		            BrandID: ProductPageSearchBrandListBox.GetValue(),
+		            LaunchID: ProductPageSearchLaunchListBox.GetValue(),
+		            CollectionID: ProductPageSearchCollectionListBox.GetValue(),
+		            PatternID: ProductPageSearchPatternListBox.GetValue(),
+		            ColourID: ProductPageSearchColourListBox.GetValue(),
+		            StatusID: ProductPageSearchStatusListBox.GetValue(),
+                    TemplateID: ProductPageSearchTemplateListBox.GetValue(),
+		            SearchString: ProductPageSearchNameTextBox.GetValue()
+	            },
+	            success: function(data) {
+		            $('#product-page-searching-icon').fadeOut('fast');
+		            $('#product-page-data-view-container').html(data);
+	            },
+	            error: function(e, s, a) { 
+		            $.showError(e, s, a, function(){ $('#product-page-searching-icon').fadeOut('fast'); });
+	            },
+	            timeout: 60000
+            });
+        }";
+    }
+    else if (action == "ProductImagesOverviewColourDropDownPartial")
+    {
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        
+        listBoxSettings.Name = "ProductImagesOverviewColourCheckComboBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ProductImagesOverviewColourDD.HideDropDown(); 
+
+            var items = s.GetSelectedItems();
+            var text = 'Colours';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Colours Selected)';
+            else if(items.length == 1)
+                text = items[0].text;    
+            ProductImagesOverviewColourDD.SetText(text);
+            ProductImagesOverviewGridView.Refresh(); 
+        }";
+    }
+    else if (action == "ProductPagesOverviewColourDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductPagesOverviewColourListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ProductPagesOverviewColourDD.HideDropDown();
+            ProductPagesOverviewColourDD.SetText(s.GetSelectedItem().text);
+            ProductPagesOverviewGridView.Refresh();
+        }";
+    }
+    else if (action == "ProductOverviewColourDropDownPartial")
+    {
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        listBoxSettings.Name = "ProductOverviewColourListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ProductOverviewColourDD.HideDropDown(); 
+
+            var items = s.GetSelectedItems();
+            var text = 'Colours';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Colours Selected)';
+            else if(items.length == 1)
+                text = items[0].text;    
+
+            ProductOverviewColourDD.SetText(text);
+            ProductOverviewGridView.Refresh();
+        }";
+    }
+    else if (action == "ProductDimensionsColourDropDownPartial")
+    {
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        listBoxSettings.Name = "ProductDimensionsColourListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ProductDimensionsColourDD.HideDropDown(); 
+
+            var items = s.GetSelectedItems();
+            var text = 'Colours';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Colours Selected)';
+            else if(items.length == 1)
+                text = items[0].text;    
+
+            ProductDimensionsColourDD.SetText(text);
+            ProductDimensionsGridView.Refresh();
+        }";
+    }
+    else if (action == "ProductReviewsColourDropDownPartial")
+    {
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+        listBoxSettings.Name = "ProductReviewsColourListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ProductReviewsColourDD.HideDropDown(); 
+
+            var items = s.GetSelectedItems();
+            var text = '';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Colours Selected)';
+            else
+                text = items[0].text;    
+
+            ProductReviewsColourDD.SetText(text);
+
+            $.ajax({
+                url: '" + Url.Action("ProductReviewsColourListBoxSetSessionVariable", "Reviews") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { ColourIDs: ProductReviewsColourListBox.GetSelectedValues().toString() },
+                success: function(data) { 
+                    ProductReviewsGridView.Refresh(); 
+                },
+                error: function(e, s, a) { 
+                    $.showError(e, s, a);
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else if (action == "PricesOverviewColourDropDownPartial")
+    {
+        listBoxSettings.Name = "PricesOverviewColourListBox";
+        listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            PricesOverviewColourDD.HideDropDown();
+            var items = s.GetSelectedItems();
+            var text = 'Colours';
+            if(items.length > 1)
+                text = '(' + items.length.toString() + ' Colours Selected)';
+            else if(items.length == 1)
+                text = items[0].text;    
+
+            PricesOverviewColourDD.SetText(text);
+            ProductPricesGridView.Refresh();
+        }";
+    }
+    else if (action == "StockOverviewColourDropDownPartial")
+    {
+        listBoxSettings.Name = "StockOverviewListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            alert('needs implementing');
+        }";
+    }
+    else if (action == "AttributeColourDropDown")
+    {
+        listBoxSettings.Name = "AttributeDetailColourListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            AttributeDetailColourDD.HideDropDown();
+            AttributeDetailColourDD.SetText(s.GetSelectedItem().text);
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.AttributesSelectedColourID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+               AttributeDetailColourDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "ColourID";
+}
+).BindList(Model).GetHtml()

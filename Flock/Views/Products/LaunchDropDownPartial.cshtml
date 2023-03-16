@@ -1,0 +1,93 @@
+﻿@{
+    Layout = null;
+}
+@model List<Flock.Models.Launch>
+
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("margin", "0 7px 7px 0");
+        settings.Name = "LaunchDD";
+        settings.Text = "Launch";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+        
+        settings.Properties.EnableClientSideAPI = true;
+        
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        if (action.ToLower() != "compose")
+        {
+            settings.Width = System.Web.UI.WebControls.Unit.Percentage(30);
+            settings.Style.Add("float", "left");
+            settings.Properties.ClientSideEvents.CloseUp = @"function(s, e) {
+                s.SetText('Launch');
+            }";
+        }
+        else
+        {
+            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        }
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='launch-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Products/LaunchListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            if (action.ToLower() != "compose")
+            {
+                @Html.DevExpress().Button(
+                    buttonSettings =>
+                    {
+                        buttonSettings.Name = "LaunchButtonClear";
+                        buttonSettings.Text = "Clear";
+                        buttonSettings.Style.Add("float", "left");
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                        LaunchCheckComboBox.UnselectAll(); 
+                        LaunchDD.HideDropDown(); 
+                        LaunchDD.SetText('Launch');
+                        var textSearch = '';
+                        if(typeof(ProductCollectionFreeTextSearchBox) != 'undefined' && ProductCollectionFreeTextSearchBox != false)
+                            if(ProductCollectionFreeTextSearchBox.GetValue() != null)                
+                                textSearch = ProductCollectionFreeTextSearchBox.GetValue();
+                        $('#searching-icon').fadeIn('fast');
+                        if($('#product-data-view-container').length > 0) {
+                            $.ajax({
+                                url: '" + @Url.Action("ProductToCollection_ProductDataViewFilter", "Products") + @"',
+                                data: { Brands: BrandCheckComboBox.GetSelectedValues().toString(), Launches: LaunchCheckComboBox.GetSelectedValues().toString(), ProductTypes: ProductTypeCheckComboBox.GetSelectedValues().toString(), TextSearch: textSearch.GetValue().toString() },
+                                success: function(data) { 
+                                    $('#searching-icon').fadeOut('fast');
+                                    $('#product-data-view-container').html(data);
+                                },
+                                error: function(e, s, a) { 
+                                    $('#searching-icon').fadeOut('fast');
+                                    alert(e.responseText); 
+                                },
+                                timeout: 30000
+                             });
+                        }
+                    }";
+                    }
+                ).Render();
+            }
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Name = "LaunchButtonClose";
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                    buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                        LaunchDD.HideDropDown(); 
+                        LaunchDD.SetText('Launch');
+                    }";
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+        settings.Properties.ClientSideEvents.TextChanged = "";
+        settings.Properties.ClientSideEvents.DropDown = "";
+    }
+).GetHtml()

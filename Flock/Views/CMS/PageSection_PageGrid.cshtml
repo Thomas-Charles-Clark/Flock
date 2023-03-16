@@ -1,0 +1,86 @@
+﻿@model List<Flock.Models.PageSection_Page_SelectResult>
+@for (int i = 0; i < Model.Count; i++)
+{
+    if (Model[i].ImageID != null)
+    {
+        <div class="page-cell" data-page-id="@(Model[i].PageID)" data-page-section-id="@(Model[i].PageSectionID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            @if (Model[i].OverrideImageID != null)
+            {
+                <i class="page-advanced-settings material-icons" onclick="LoadPagePodAdvancedSettings(@(Model[i].PageSectionID), @(Model[i].PageID))">
+                    settings
+                </i>
+                <img src="https://flock.designersguild.com/imagelibrary/156/@(Model[i].OverrideImageID).jpeg" />
+                <span>
+                    Page: 
+                    <span id="pagesection-@(Model[i].PageSectionID)-page-@(Model[i].PageID)-name">@(Model[i].PodName ?? Model[i].Name)</span>
+                </span>
+                <br />
+                <span><a href="/admin/cms/compose/@(Model[i].PageID)">Page ID: @(Model[i].PageID)</a></span>
+                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="RemovePageFromGrid(@(Model[i].PageSectionID), @(Model[i].PageID))" />
+                <img src="/images/icons/24/picture.png" style="position: absolute; left: 0; top: 24px;" class="image-remove-icon" title="This is an overriding image. Click this button to remove it." onclick="RemovePageImageOverride(@(Model[i].PageSectionID), @(Model[i].PageID))" />
+            }
+            else
+            {
+                <i class="page-advanced-settings material-icons" onclick="LoadPagePodAdvancedSettings(@(Model[i].PageSectionID), @(Model[i].PageID))">
+                    settings
+                </i>
+                <img src="https://flock.designersguild.com/imagelibrary/156/@(Model[i].ImageID).jpeg" />
+                <span>
+                    Page: 
+                    <span id="pagesection-@(Model[i].PageSectionID)-page-@(Model[i].PageID)-name">@(Model[i].PodName ?? Model[i].Name)</span>
+                </span>
+                <br />
+                <span><a href="/admin/cms/compose/@(Model[i].PageID)">Page ID: @(Model[i].PageID)</a></span>
+                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="RemovePageFromGrid(@(Model[i].PageSectionID), @(Model[i].PageID))" />
+            }
+        </div>
+    }
+    else
+    {
+        <div class="page-cell" data-page-id="@(Model[i].PageID)" data-page-section-id="@(Model[i].PageSectionID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            @if (Model[i].OverrideImageID != null)
+            {
+                <i class="page-advanced-settings material-icons" onclick="LoadPagePodAdvancedSettings(@(Model[i].PageSectionID), @(Model[i].PageID))">
+                    settings
+                </i>
+                <img src="/images/admin/ar2-placeholder.png" style="width: 156px;" />
+                <span>
+                    Page: 
+                    <span id="pagesection-@(Model[i].PageSectionID)-page-@(Model[i].PageID)-name">@(Model[i].PodName ?? Model[i].Name)</span>
+                </span>
+                <br />
+                <span><a href="/admin/cms/compose/@(Model[i].PageID)">Page ID: @(Model[i].PageID)</a></span>
+                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="RemovePageFromGrid(@(Model[i].PageSectionID), @(Model[i].PageID))" />
+                <img src="/images/icons/24/picture.png" style="position: absolute; left: 0; top: 24px;" class="image-remove-icon" title="This is an overriding image. Click this button to remove it." onclick="RemovePageImageOverride(@(Model[i].PageSectionID), @(Model[i].PageID))" />
+            }
+            else
+            {
+                <i class="page-advanced-settings material-icons" onclick="LoadPagePodAdvancedSettings(@(Model[i].PageSectionID), @(Model[i].PageID))">
+                    settings
+                </i>
+                <img src="/images/admin/ar2-placeholder.png" style="width: 156px;" />
+                <span>
+                    Page: 
+                    <span id="pagesection-@(Model[i].PageSectionID)-page-@(Model[i].PageID)-name">@(Model[i].PodName ?? Model[i].Name)</span>
+                </span>
+                <br />
+                <span><a href="/admin/cms/compose/@(Model[i].PageID)">Page ID: @(Model[i].PageID)</a></span>
+                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="RemovePageFromGrid(@(Model[i].PageSectionID), @(Model[i].PageID))" />
+            }
+        </div>
+    }
+}
+@if (Model.Count == 0)
+{
+    <div class="page-cell page-placeholder">
+        <h5>No Pages have been assigned.</h5>
+    </div>
+}
+
+<div style="clear: both" class="page-placeholder"></div>
+
+<script type="text/javascript">
+    //$(".page-section-grid-container").sortable({
+    InitPageDragDrop();
+    //});
+</script>

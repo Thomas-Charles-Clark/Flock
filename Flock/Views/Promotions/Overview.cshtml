@@ -1,0 +1,325 @@
+﻿@{
+    ViewBag.Title = "Promotions Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<h4 class="page-heading">Sale Prices Overview</h4>
+
+@*<div class="page-subheading">
+        @Html.Action("SalePricePriceListDropDownPartial", "Promotions")
+        <div style="clear: both"></div>
+    </div>*@
+
+
+<div id="overview-container">
+    <div id="SalePriceGridContainer" style="width: auto;">
+        <div id="sale-price-grid-real-container" style="float: left;">
+            @Html.Partial("_SalePriceOverviewPartial")
+            <div id="bulk-action-panel" style="width: 5%">
+                <h4>Bulk Action Panel</h4>
+                <ul>
+                    <li style="margin-bottom: 1em;">
+                        <a href="javascript:;" title="Update Selected Sale Prices" onclick="OpenBulkDialogUpdate()">Update</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" title="Delete Selected Sale Prices" onclick="OpenBulkDialogDelete()">Delete</a>
+                    </li>
+                </ul>
+            </div>
+            <div style="clear: both"></div>
+            <div style="clear: both"></div>
+        </div>
+    </div>
+</div>
+
+
+<div id="confirm-dialog">
+    <h5>Are you sure?</h5>
+</div>
+
+<div id="second-confirm">
+    <h5>
+        WARNING:
+    </h5>
+    <p>
+        This will delete Sale Price information.
+    </p>
+</div>
+
+<div id="bad-selection-dialog">
+    <h5>
+        You must select at least one Sale Price record.
+    </h5>
+</div>
+
+<div id="bulk-update-dialog" style="overflow: visible !important; padding-top: 1em;">
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "OnDateLbl";
+            settings.Text = "On Date";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("line-height", "35px");
+            settings.Style.Add("margin", "0 7px 7px 0");
+        }).GetHtml()
+        @Html.DevExpress().DateEdit(settings =>
+        {
+            settings.Name = "OnDate";
+            settings.Properties.NullText = "On Date";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+        }).GetHtml()
+        <div style="clear: both;"></div>    
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "OffDateLbl";
+            settings.Text = "Off Date";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("line-height", "35px");
+            settings.Style.Add("margin", "0 7px 7px 0");
+        }).GetHtml()
+        @Html.DevExpress().DateEdit(settings =>
+        {
+            settings.Name = "OffDate";
+            settings.Properties.NullText = "Off Date";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+        }).GetHtml()
+        <div style="clear: both;"></div>
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "DiscountLbl";
+            settings.Text = "Discount";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("line-height", "35px");
+            settings.Style.Add("margin", "0 7px 7px 0");
+        }).GetHtml()
+        @Html.DevExpress().SpinEdit(settings =>
+        {
+            settings.Name = "Discount";
+            settings.Width = 202;
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.Properties.NullDisplayText = "No Change";
+            settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+            settings.Properties.Increment = 0.01M;
+            settings.Properties.LargeIncrement = 1.0M;
+            settings.Properties.MinValue = 0.01M;
+            settings.Properties.MaxValue = 2147483647;
+            settings.Properties.NumberType = SpinEditNumberType.Float;
+            settings.Properties.DisplayFormatString = "{0:F2}";
+            settings.Properties.DisplayFormatInEditMode = true;
+
+        }).GetHtml()
+        <div style="clear: both;"></div>
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "StockMinimumLbl";
+            settings.Text = "Stock Minimum";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("line-height", "35px");
+            settings.Style.Add("margin", "0 7px 7px 0");
+        }).GetHtml()
+        @Html.DevExpress().SpinEdit(settings =>
+        {
+            settings.Name = "StockMinimum";
+            settings.Width = 166;
+            settings.Properties.NullDisplayText = "No Change";
+            settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+            settings.Properties.Increment = 1;
+            settings.Properties.NumberType = SpinEditNumberType.Integer;
+            settings.Properties.MinValue = 0;
+            settings.Properties.MaxValue = 2147483647;
+            settings.Properties.DisplayFormatString = "{0}";
+            settings.Properties.DisplayFormatInEditMode = true;
+        }).GetHtml()
+        <div style="clear: both"></div>
+        @Html.DevExpress().Label(settings =>
+        {
+            settings.Name = "OverwriteConflictsLbl";
+            settings.Text = "Overwrite Conflicts?";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("line-height", "35px");
+            settings.Style.Add("margin", "0 7px 7px 0");
+        }).GetHtml()
+        @Html.DevExpress().CheckBox(settings =>
+        {
+            settings.Name = "OverwriteConflicts";
+            settings.Checked = false;
+            settings.Properties.ValueUnchecked = false;
+            settings.Properties.ValueChecked = true;
+            settings.Style.Add("float", "left");
+            settings.Style.Add("line-height", "28px");
+        }).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div id="bulk-update-confirm-dialog">
+    <h5>Are you sure?</h5>
+</div>
+
+<div id="bulk-update-second-confirm-dialog">
+    <h5>WARNING:</h5>
+    <p>
+        This will update Sale Price information.
+    </p>
+</div>
+
+<script type="text/javascript">
+
+    function OpenBulkDialogUpdate() {
+        var keys = SalePriceGridView.GetSelectedKeysOnPage();
+        if (typeof keys != "undefined" && keys != false) {
+            $("#bulk-update-dialog").dialog("open");
+        }
+        else {
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+
+    function OpenBulkDialogDelete() {
+        var keys = SalePriceGridView.GetSelectedKeysOnPage();
+        if (typeof (keys) != "undefined" && keys != false) {
+            $("#confirm-dialog").dialog("open");
+        }
+        else {
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+
+    function BulkDelete() {
+        keys = SalePriceGridView.GetSelectedKeysOnPage();
+        SalePriceGridView.PerformCallback({ commandType: 'delete', keyString: keys.toString() });
+    }
+
+    function BulkUpdate() {
+        keys = SalePriceGridView.GetSelectedKeysOnPage();
+
+        var onDate = OnDate.GetDate() == null ? undefined : OnDate.GetDate().toGMTString();
+        var offDate = OffDate.GetDate() == null ? undefined : OffDate.GetDate().toGMTString();
+        var discount = ((Discount.GetValue() == null) || (Discount.GetValue() == 0)) ? undefined : Discount.GetValue();
+        var stockMinimum = ((StockMinimum.GetValue() == null) || (StockMinimum.GetValue() == 0)) ? undefined : StockMinimum.GetValue();
+
+        SalePriceGridView.PerformCallback({
+            commandType: 'update',
+            keyString: keys.toString(),
+            onDate: onDate,
+            offDate: offDate,
+            discount: discount,
+            stockMinimum: stockMinimum,
+            overwriteConflicts: OverwriteConflicts.GetValue()
+        });
+    }
+
+    $(document).ready(function () {
+        $("#second-confirm").dialog({
+            title: "Secondary Confirmation",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                    BulkDelete();
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $("#confirm-dialog").dialog({
+            title: "Confirm Deletion",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                    $("#second-confirm").dialog("open");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+
+        $("#bulk-update-second-confirm-dialog").dialog({
+            title: "Secondary Confirmation",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                    BulkUpdate();
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $("#bulk-update-confirm-dialog").dialog({
+            title: "Confirm Update",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                    $("#bulk-update-second-confirm-dialog").dialog("open");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $("#bulk-update-dialog").dialog({
+            title: "Bulk Update",
+            width: "auto",
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                    $("#bulk-update-confirm-dialog").dialog("open");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $("#bad-selection-dialog").dialog({
+            title: "Invalid Selection.",
+            width: 350,
+            height: "auto",
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                Ok: function () { $(this).dialog("close"); }
+            }
+        });
+    });
+
+</script>
+
+@section styles {
+    <style type="text/css">
+        .ui-dialog {
+            overflow: visible !important;
+        }
+    </style>
+}
+
+@section scripts {
+
+
+}

@@ -1,0 +1,63 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>HtmlEditorTest</title>
+    @Scripts.Render("~/bundles/jquery")
+    @{
+        Html.DevExpress().GetScripts(
+           new Script[] {
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.Editors
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.GridView
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.HtmlEditor
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.NavigationAndLayout
+                },
+                new Script()
+                {
+                    ExtensionSuite = ExtensionSuite.TreeList
+                }
+           }
+       );
+        Html.DevExpress().GetStyleSheets(
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.Editors },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.GridView },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.HtmlEditor },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+            new StyleSheet() { ExtensionSuite = ExtensionSuite.TreeList }
+        );
+        @Styles.Render("~/Content/themes/base/css")
+        @Scripts.Render("~/bundles/jqueryui")
+        @Scripts.Render("~/Scripts/cms-compose-page.js")
+    }
+    <script type="text/javascript">
+        
+    </script>
+</head>
+<body>
+    <div>
+        @Html.Action("HtmlEditorTestPartial")
+    </div>
+
+    <div id="test-dialog">
+
+    </div>
+
+    <button onclick="$('#test-dialog').dialog('open')">Open Dialog</button>
+</body>
+</html>

@@ -1,0 +1,32 @@
+[
+  {
+    "outputFileName": "Scripts/cms/cms-compose-page.min.js",
+    "inputFiles": [
+      "Scripts/cms/cms-compose-page.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/codemirror.min.js",
+    "inputFiles": [
+      "Scripts/codemirror.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/codemirror-xml.min.js",
+    "inputFiles": [
+      "Scripts/codemirror-xml.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/codemirror-javascript.min.js",
+    "inputFiles": [
+      "Scripts/codemirror-javascript.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/codemirror-css.min.js",
+    "inputFiles": [
+      "Scripts/codemirror-css.js"
+    ]
+  }
+]

@@ -1,0 +1,30 @@
+﻿@model List<Flock.Models.UserSource>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+
+    if (action == "MemberOverviewUserSourceDropDownPartial")
+    {
+        listBoxSettings.Name = "MemberOverviewUserSourceListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            if(s.GetSelectedItem() != null)
+                MemberOverviewUserSourceDD.SetText(s.GetSelectedItem().text);
+            else
+                MemberOverviewUserSourceDD.SetText('User Source');
+            MemberOverviewUserSourceDD.HideDropDown();
+            MemberOverviewGridView.PerformCallback();
+        }";
+    }
+
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "UserSourceID";
+}
+).BindList(Model).GetHtml()

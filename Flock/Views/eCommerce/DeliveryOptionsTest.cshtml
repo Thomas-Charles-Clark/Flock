@@ -1,0 +1,159 @@
+﻿@{
+    ViewBag.Title = "Delivery Options Test";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #container {
+            width: 1266px;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        function Test() {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("DeliveryOptionStoredProcedureTest", "eCommerce")',
+                type: 'GET',
+                traditional: true,
+                data: {
+                    CountryID: CountryID.GetValue(),
+                    OrderTotal: OrderTotal.GetValue(),
+                    PostCode: PostCode.GetValue(),
+                    ProductTypeID: ProductTypeID.GEtValue()
+                },
+                success: function (data) {
+                    $("#result-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+    </script>
+}
+
+<h4 class="page-heading">Delivery Options Test</h4>
+
+<div id="delivery-test-controls">
+    @Html.DevExpress().Label(lbl => {
+        lbl.Name = "CountryLbl";
+        lbl.Text = "Country";
+        lbl.Style.Add("margin-right", "1em");
+        lbl.Style.Add("text-align", "right");
+        lbl.Style.Add("float", "left");
+        lbl.Style.Add("line-height", "32px");
+        lbl.Width = 140;
+    }).GetHtml()
+    @Html.DevExpress().ComboBox(settings =>
+    {
+        settings.Name = "CountryID";
+        settings.Properties.NullDisplayText = "Country...";
+        settings.Properties.NullText = "Country...";
+        settings.Style.Add("margin-right", "1em");
+        settings.Style.Add("float", "left");
+        settings.Properties.CallbackPageSize = 15;
+        var prop = settings.Properties as ComboBoxProperties;
+        prop.TextField = "Name";
+        prop.ValueField = "CountryID";
+        prop.ValueType = typeof(short);
+        prop.Buttons.Add("Clear");
+        var b = settings.Properties.Buttons[0] as EditButton;
+        settings.Properties.ClientSideEvents.ButtonClick = @"function(s, e) {
+            if(e.buttonIndex == 0) {
+                s.SetSelectedIndex(-1);
+            }
+        }";
+    }).BindList(args =>
+    {
+        return Flock.ViewModels.LargeDatabaseDataProvider.GetCountries(args);
+    }, Flock.ViewModels.LargeDatabaseDataProvider.GetCountryByID).GetHtml()
+    <div style="clear: both;"></div>
+
+    @Html.DevExpress().Label(lbl =>
+    {
+        lbl.Name = "OrderTotalLbl";
+        lbl.Text = "Order Total";
+        lbl.Style.Add("margin-right", "1em");
+        lbl.Style.Add("text-align", "right");
+        lbl.Width = 140;
+        lbl.Style.Add("line-height", "32px");
+        lbl.Style.Add("float", "left");
+        lbl.AssociatedControlName = "OrderTotal";
+    }).GetHtml()
+    @Html.DevExpress().SpinEdit(settings =>
+    {
+        settings.Name = "OrderTotal";
+        settings.Properties.NullDisplayText = "Order Total...";
+        settings.Properties.NullText = "Order Total...";
+        settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        settings.Properties.DisplayFormatString = "F2";
+        settings.Properties.LargeIncrement = 10;
+        settings.Properties.Increment = 1;
+        settings.Properties.MinValue = 0;
+    }).GetHtml()
+    <div style="clear: both;"></div>
+
+    @Html.DevExpress().Label(lbl =>
+    {
+        lbl.Name = "PostCodeLbl";
+        lbl.Text = "PostCode";
+        lbl.Style.Add("margin-right", "1em");
+        lbl.Style.Add("text-align", "right");
+        lbl.Width = 140;
+        lbl.Style.Add("line-height", "32px");
+        lbl.Style.Add("float", "left");
+        lbl.AssociatedControlName = "PostCode";
+    }).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "PostCode";
+        settings.Properties.NullDisplayText = "PostCode";
+        settings.Properties.NullText = "PostCode";
+        settings.Width = 160;
+        settings.Properties.MaxLength = 10;
+        settings.Style.Add("margin-bottom", "1em");
+        settings.Style.Add("float", "left");
+    }).GetHtml()
+    <div style="clear: both"></div>
+
+    @Html.DevExpress().Label(lbl =>
+    {
+        lbl.Name = "ProductTypeLbl";
+        lbl.Text = "Product Type";
+        lbl.Style.Add("margin-right", "1em");
+        lbl.Style.Add("text-align", "right");
+        lbl.Style.Add("float", "left");
+        lbl.Style.Add("line-height", "32px");
+        lbl.Width = 140;
+    }).GetHtml()
+    @Html.DevExpress().ComboBox(settings =>
+    {
+        settings.Name = "ProductTypeID";
+        settings.Properties.NullDisplayText = "Product Type...";
+        settings.Properties.NullText = "Product Type...";
+        settings.Style.Add("margin-right", "1em");
+        settings.Style.Add("float", "left");
+        settings.Properties.CallbackPageSize = 15;
+        var prop = settings.Properties as ComboBoxProperties;
+        prop.TextField = "Name";
+        prop.ValueField = "ProductTypeID";
+        prop.ValueType = typeof(byte);
+        prop.Buttons.Add("Clear");
+        var b = settings.Properties.Buttons[0] as EditButton;
+        settings.Properties.ClientSideEvents.ButtonClick = @"function(s, e) {
+            if(e.buttonIndex == 0) {
+                s.SetSelectedIndex(-1);
+            }
+        }";
+    }).BindList(args =>
+    {
+        return Flock.ViewModels.LargeDatabaseDataProvider.GetProductTypes(args);
+    }, Flock.ViewModels.LargeDatabaseDataProvider.GetProductTypeByID).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div id="result-container"></div>

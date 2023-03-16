@@ -1,0 +1,301 @@
+﻿@using Flock.ViewModels
+@using Flock.Models
+@using Flock.DAL
+@model MessageViewModel
+
+@{
+    using(var UoW = new UnitOfWork<FlockDataContext>())
+    {
+    <div class="content-panel-container">
+        <fieldset id="message-details-header">
+            <legend style="color: black; border-bottom-color: #929292; cursor: default;">Message Details</legend>
+            <div id="message-details-inner" style="background-color: white; padding: 1em;">
+                <div id="message-details-container">
+                    <div style='width: 60%; float: left'>
+                        
+                        @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "AudienceLbl";
+                            lbl.Text = "Audience";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "TradeSwitch";
+                        }).GetHtml()
+                        @Html.DevExpress().ComboBoxFor(m => Model.TradeSwitch, settings =>
+                        {
+                            settings.Name = "TradeSwitch";
+                            settings.Style.Add("margin-right", "1em");
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("line-height", "32px");
+                            settings.Properties.Items.Add("Everyone", null);
+                            settings.Properties.Items.Add("Retail Only", false);
+                            settings.Properties.Items.Add("Trade Only", true);
+                            settings.Width = 85;
+                            settings.Height = 32;
+                        }).GetHtml()
+                    <div style="clear: both"></div>
+
+                        @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "LanguageLbl";
+                            lbl.Text = "Language";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "LanguageID";
+                        }).GetHtml()
+                        @Html.DevExpress().ComboBoxFor(m => Model.LanguageID, settings =>
+                        {
+                            settings.Name = "LanguageID";
+                            settings.Properties.NullDisplayText = "Language...";
+                            settings.Properties.NullText = "Language...";
+                            settings.Style.Add("margin-right", "1em");
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("line-height", "32px");
+                            settings.Properties.CallbackPageSize = 15;
+                            settings.Height = 32;
+                            var prop = settings.Properties as ComboBoxProperties;
+                            prop.TextField = "Name";
+                            prop.ValueField = "LanguageID";
+                            prop.ValueType = typeof(byte);
+                        }).BindList(args =>
+                        {
+                            return LargeDatabaseDataProvider.GetLanguages(args);
+                        }, LargeDatabaseDataProvider.GetLanguageByID).GetHtml()
+                        <div style="clear: both"></div>
+                        @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "PriceListLbl";
+                            lbl.Text = "Price List";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "PriceListID";
+                        }).GetHtml()
+                        @Html.DevExpress().ComboBoxFor(m => Model.LanguageID, settings =>
+                        {
+                            settings.Name = "PriceListID";
+                            settings.Properties.NullDisplayText = "Price List...";
+                            settings.Properties.NullText = "Price List...";
+                            settings.Style.Add("margin-right", "1em");
+                            settings.Style.Add("float", "left");
+                            settings.Style.Add("line-height", "32px");
+                            settings.Properties.CallbackPageSize = 15;
+                            settings.Height = 32;
+                            var prop = settings.Properties as ComboBoxProperties;
+                            prop.TextField = "Name";
+                            prop.ValueField = "PriceListID";
+                            prop.ValueType = typeof(byte);
+                        }).BindList(args =>
+                        {
+                            return LargeDatabaseDataProvider.GetPriceLists(args);
+                        }, LargeDatabaseDataProvider.GetPriceListByID).GetHtml()
+                        <div style="clear: both"></div>
+                        @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "ThresholdLbl";
+                            lbl.Text = "Threshold";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "Threshold";
+                        }).GetHtml()
+                        @Html.DevExpress().SpinEditFor(m => Model.Threshold, settings =>
+                        {
+                            settings.Name = "Threshold";
+                            settings.Properties.NullDisplayText = "Threshold...";
+                            settings.Properties.NullText = "Threshold...";
+                            settings.Properties.NumberFormat = SpinEditNumberFormat.Number;
+                            settings.Properties.DisplayFormatString = "F2";
+                            settings.Style.Add("line-height", "32px");
+                            settings.Properties.LargeIncrement = 10;
+                            settings.Properties.Increment = 1;
+                            settings.Height = 32;
+                        }).GetHtml()
+                        <div style="clear: both"></div>
+                        @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "BelowThresholdLbl";
+                            lbl.Text = "Below Threshold Message";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "BelowThresholdMessage";
+                        }).GetHtml()
+                        @Html.DevExpress().TextBoxFor(m => Model.BelowThresholdMessage, settings =>
+                        {
+                            settings.Properties.MaxLength = 255;
+                            settings.Width = 400;
+                            settings.Style.Add("line-height", "32px");
+                            settings.Height = 32;
+                        }).GetHtml()
+                        <div style="clear: both"></div>
+                        @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "AboveThresholdLbl";
+                            lbl.Text = "Above Threshold Message";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "AboveThresholdMessage";
+                        }).GetHtml()
+                        @Html.DevExpress().TextBoxFor(m => Model.AboveThresholdMessage, settings =>
+                        {
+                            settings.Properties.MaxLength = 255;
+                            settings.Width = 400;
+                            settings.Style.Add("line-height", "32px");
+                            settings.Height = 32;
+                        }).GetHtml()
+                        <div style="clear: both"></div>
+                        @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "NoThresholdLbl";
+                            lbl.Text = "No Threshold Message";
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("text-align", "right");
+                            lbl.Width = 140;
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.AssociatedControlName = "NoThresholdMessage";
+                        }).GetHtml()
+                        @Html.DevExpress().TextBoxFor(m => Model.NoThresholdMessage, settings =>
+                        {
+                            settings.Properties.MaxLength = 255;
+                            settings.Width = 400;
+                            settings.Style.Add("line-height", "32px");
+                            settings.Height = 32;
+                        }).GetHtml()
+                        <div style="clear: both"></div>
+                        <i style="display: block;">Use the shortcode [CALC] to display the difference between the user's current basket total and the threshold.</i>
+                        @Html.DevExpress().Label(lbl =>
+                        {
+                            lbl.Name = "CountriesLbl";
+                            lbl.Text = "Countries";
+                            lbl.Style.Add("line-height", "32px");
+                            lbl.Style.Add("float", "left");
+                            lbl.Style.Add("margin-right", "1em");
+                            lbl.Style.Add("margin-top", "1em");
+                            lbl.Style.Add("width", "150px");
+                            lbl.Style.Add("text-align", "right");
+                        }).GetHtml()
+                        @Html.DevExpress().HyperLink(lnk =>
+                        {
+                            lnk.Style.Add("line-height", "32px");
+                            lnk.Style.Add("float", "left");
+                            lnk.Style.Add("margin-right", "1em");
+                            lnk.Style.Add("margin-top", "1em");
+                            lnk.Style.Add("width", "150px");
+                            lnk.Style.Add("text-align", "right");
+                            lnk.Name = "RemoveCountriesLnk";
+                            lnk.NavigateUrl = "javascript:;";
+                            lnk.Properties.Text = "Remove All";
+                            lnk.Properties.ClientSideEvents.Click = @"function(s, e) {
+                                    RemoveAllCountryRestrictions();
+                                }";
+                        }).GetHtml()
+                        @{
+                            var CountriesPreModel = UoW.GetRepository<Message_Country>().GetAll().Where(p => p.MessageID == Model.MessageID).Select(p => p.CountryID).ToList();
+                            var CountriesModel = UoW.GetRepository<Country>().GetAll().Where(p => CountriesPreModel.Contains(p.CountryID)).ToList();
+                            ViewContext.Writer.Write("<div id='country-restriction-container' style='border: 1px solid #cdcdcd; margin-top: 0px; float: left; width: 500px;'>");
+                            ViewContext.Writer.Write(Html.Partial("MessageCountryRestrictionsPartial", CountriesModel).ToHtmlString());
+                            ViewContext.Writer.Write("</div>");
+                            ViewContext.Writer.Write("</div>");
+                        }
+                        </div>
+                    <div style='width: 40%; float: left; margin-bottom: 1em;'>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "OnDateLbl";
+                                lbl.Text = "On Date";
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.Style.Add("margin-top", "110px");
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("width", "50px");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.AssociatedControlName = "OnDate";
+                            }).GetHtml()
+                            @Html.DevExpress().CalendarFor(m => Model.OnDate,
+                            edtSettings =>
+                            {
+                                edtSettings.ControlStyle.CssClass = "editor";
+                                edtSettings.ShowModelErrors = true;
+                                edtSettings.Properties.DisplayFormatString = "d";
+                                edtSettings.Properties.NullDisplayText = "Not Set";
+                                edtSettings.Style.Add("margin", "1em auto");
+                            }).GetHtml()
+                            <div style='clear:both'></div>
+                            <div style='width: 100%; height: 20px;'></div>
+                            @Html.DevExpress().Label(lbl =>
+                            {
+                                lbl.Name = "OffDateLbl";
+                                lbl.Text = "Off Date";
+                                lbl.Style.Add("line-height", "32px");
+                                lbl.Style.Add("float", "left");
+                                lbl.Style.Add("margin-top", "110px");
+                                lbl.Style.Add("margin-right", "1em");
+                                lbl.Style.Add("width", "50px");
+                                lbl.Style.Add("text-align", "right");
+                                lbl.AssociatedControlName = "OffDate";
+                            }).GetHtml()
+                            @Html.DevExpress().CalendarFor(m => Model.OffDate,
+                            edtSettings =>
+                            {
+                                edtSettings.ControlStyle.CssClass = "editor";
+                                edtSettings.ShowModelErrors = true;
+                                edtSettings.Properties.DisplayFormatString = "d";
+                                edtSettings.Properties.NullDisplayText = "Not Set";
+                                edtSettings.Style.Add("margin", "1em auto");
+                            }).GetHtml()
+                            <div style='clear:both'></div>
+                            @{
+                                var i = Convert.ToByte(Model.WebStatusID);
+                                string colour = "black";
+                                string statusText = "unknown";
+                                statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+                                switch (i)
+                                {
+                                    case 0:
+                                        colour = "green";
+                                        break;
+                                    case 1:
+                                        colour = "orange";
+                                        break;
+                                    case 2:
+                                        colour = "orange";
+                                        break;
+                                    case 3:
+                                        colour = "green";
+                                        break;
+                                    case 4:
+                                        colour = "red";
+                                        break;
+                                    default: break;
+                                }
+                                string res = "<span style='font-size: 1.1em; margin-top: 2em; display: inline-block;'>Web Status: </span><span style='margin-left: 0.5em; margin-top: 2em; font-size: 1.1em; display: inline-block; color: " + colour + " '>" + statusText + "</span>";
+                                ViewContext.Writer.Write(res);
+                             }
+                        </div>
+                    <div style='clear:both'></div>
+                    <div style='position: relative;'>
+                        <img id="message-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 0px; right: 0px;" onclick="SaveMessageDetails();" />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    }
+}

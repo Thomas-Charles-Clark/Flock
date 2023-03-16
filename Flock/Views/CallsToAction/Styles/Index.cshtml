@@ -1,0 +1,70 @@
+﻿@model Flock.ViewModels.StylesViewModel
+@{
+    ViewBag.Title = "Styles";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/composition-base.css")
+    @Styles.Render("~/Content/CallsToAction_Styles.css")
+    @Styles.Render("~/Content/spectrum.css")
+}
+@section scripts {
+    @Scripts.Render("~/Scripts/spectrum.js")
+
+    <script type="text/javascript">
+        function LoadStyleDetail(s, e) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '/admin/callstoaction/LoadStyleEditForm',
+                type: 'GET',
+                data: {
+                    StyleID: s.GetRowKey(e.visibleIndex)
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#detail-container").html(data);
+                    MVCxClientUtils.FinalizeCallback();
+                }
+            });
+        }
+
+        function SaveStyle(styleId) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '/admin/callstoaction/GridViewPartialUpdate',
+                type: 'POST',
+                data: {
+                    StyleID: styleId,
+                    Name: Name.GetValue(),
+                    FontID: 1,
+                    Margin: Margin.GetValue(),
+                    Padding: Padding.GetValue(),
+                    BackgroundColour: $("#background-colour").val(),
+                    Colour: $("#colour").val(),
+                    BorderColour: $("#border-colour").val(),
+                    BorderWidth: BorderWidth.GetValue(),
+                    BorderStyle: BorderStyle.GetValue(),
+                    Opacity: Opacity.GetValue()
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $.info("Save", "Successful");
+                }
+            });
+        }
+
+        function CancelStyleEdit() {
+            $("#detail-container").empty();
+        }
+    </script>
+}
+
+<h4 class="page-heading">Styles</h4>
+
+<div id="selector-grid-container">
+    @Html.Action("GridViewPartial")
+</div>
+
+<div id="detail-container">
+
+</div>

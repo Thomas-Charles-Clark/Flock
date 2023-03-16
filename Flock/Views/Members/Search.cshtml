@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = "Member Search";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #container {
+            width: 1220px !important;
+        }
+    </style>
+}
+
+<h4 class="page-heading">
+    Member Search
+</h4>
+
+@Html.DevExpress().TextBox(settings => {
+    settings.Name = "SearchBox";
+    settings.Properties.NullDisplayText = "Email or Postcode...";
+    settings.Properties.NullText = "Email or Postcode...";
+    settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) { 
+        if(e.htmlEvent.keyCode == 13) {
+            LoadingPanel.Show();
+            $.ajax({ 
+                url: '"+Url.Action("MemberSearchPartial", "Members")+@"',
+                type: 'GET',
+                traditional: true,
+                data: { 
+                    SearchString: s.GetValue()
+                },
+                success: function(data) {
+                    $('#search-results-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+    }";
+}).GetHtml()
+
+<div id="search-results-container">
+
+</div>

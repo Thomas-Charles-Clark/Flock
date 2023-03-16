@@ -1,0 +1,189 @@
+﻿@model List<Flock.Models.Page>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        if (action == "ComposePageHeaderParentPageDropDownPartial")
+        {
+            settings.Name = "ComposePageHeaderParentPageDD";
+            settings.Text = "Parent Page";
+            settings.Style.Remove("margin");
+            settings.Style.Add("margin", "0 7px 2px 0");
+            
+        }
+        else if (action == "ComposePageHeaderPageDropDownPartial")
+        {
+            settings.Name = "ComposePageHeaderPageDD";
+            settings.Text = "Page";
+            settings.Style.Remove("margin");
+            settings.Style.Add("margin", "0 7px 2px 0");
+            settings.ControlStyle.BackColor = System.Drawing.Color.FromArgb(254, 233, 152);
+        }
+        else if (action == "TranslatePageHeaderParentPageDropDown")
+        {
+            settings.Name = "TranslatePageHeaderParentPageDD";
+            settings.Text = "Parent Page";
+        }
+        else if (action == "TranslatePageHeaderPageDropDown")
+        {
+            settings.Name = "TranslatePageHeaderPageDD";
+            settings.Text = "Page";
+        }
+        else if (action == "ComposeBannerHeaderPageDropDownPartial")
+        {
+            settings.Name = "ComposeBannerHeaderPageDD";
+            settings.Text = "Page";
+        }
+        
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='banner-location-listbox'>");
+            if (action == "TranslatePageHeaderPageDropDown")
+                ViewContext.Writer.Write(@Html.Partial("~/Views/Translations/PageComboBoxPartial.cshtml", Model));
+            else
+                ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/PageListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            if (action != "ComposePageHeaderPageDropDownPartial")// && action != "TranslatePageHeaderPageDropDown")
+            {
+                @Html.DevExpress().Button(
+                    buttonSettings =>
+                    {
+                        if (action == "ComposePageHeaderParentPageDropDownPartial")
+                        {
+                            buttonSettings.Name = "ComposePageHeaderParentPageButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                            ComposePageHeaderParentPageListBox.UnselectAll();
+                            ComposePageHeaderParentPageDD.HideDropDown();
+                            ComposePageHeaderParentPageDD.SetText('Parent Page');
+                            $('#page-select-header-busy').fadeIn('fast');
+                                $.ajax({ 
+                                    url: '" + Url.Action("ComposePageHeaderPageDropDownPartial", "CMS") + @"',
+                                    type: 'POST',
+                                    traditional: true,
+                                    data: {
+                                        SelectedSiteSectionID: ComposePageHeaderSiteSectionListBox.GetValue(),
+                                        SelectedParentPageID: ComposePageHeaderParentPageListBox.GetValue(),
+                                        SelectedPageID: ComposePageHeaderPageListBox.GetValue()
+                                    },
+                                    success: function(data) { 
+                                        $('#page-select-header-busy').fadeOut('fast');
+                                        $('#page-header-page-drop-down-container').html(data);
+                                    },
+                                    error: function(e, s, a) {
+                                        $('#page-select-header-busy').fadeOut('fast');
+                                        alert(e.responseText);
+                                    },
+                                    timeout: 60000
+                                });
+                            }";
+                        }
+                        else if (action == "TranslatePageHeaderParentPageDropDown")
+                        {
+                            buttonSettings.Name = "TranslatePageHeaderParentPageButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            TranslatePageHeaderParentPageListBox.UnselectAll();
+                            TranslatePageHeaderParentPageDD.HideDropDown();
+                            TranslatePageHeaderParentPageDD.SetText('Parent Page');
+                            $.ajax({
+	                            url: '" + Url.Action("TranslatePageHeaderPageDropDown", "Translations") + @"',
+	                            type: 'POST',
+	                            traditional: true,
+	                            data: {
+	                                ID: TranslateHeaderContentListBox.GetValue(),
+	                                SiteSectionID: TranslatePageHeaderSiteSectionListBox.GetValue(),
+	                                ParentPageID: TranslatePageHeaderParentPageListBox.GetValue(),
+	                                TranslationStatusID: TranslatePageHeaderTranslationStatusListBox.GetValue(),
+                                    TargetLanguageID: TranslationTargetLanguageListBox.GetValue()
+	                            },
+	                            success: function(data) { 
+	                                $('#translate-page-page-drop-down-container').html(data);
+                                    if (TranslateHeaderContentListBox.FindItemByValue($('#content-id-label').html()) == null) {
+                                        TranslateHeaderContentListBox.SetSelectedIndex(0);
+                                        var e = new ASPxClientProcessingModeEventArgs();
+                                        if(TranslateHeaderContentListBox.GetItemCount() > 0)
+                                            TranslateHeaderContentListBox.SelectedIndexChanged.FireEvent(TranslateHeaderContentListBox, e);
+                                    }
+	                            },
+	                            error: function(e, s, a) { 
+	                                alert(e.responseText);
+	                            },
+	                            timeout: 60000
+                                });
+                            }";
+                        }
+                        else if (action == "ComposeBannerHeaderPageDropDownPartial")
+                        {
+                            buttonSettings.Name = "ComposeBannerHeaderPageButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ComposeBannerHeaderPageListBox.UnselectAll();
+                            ComposeBannerHeaderPageDD.HideDropDown();
+                            ComposeBannerHeaderPageDD.SetText('Page');
+                            LoadingPanel.Show();
+                            BannerSelectorGridView.Refresh();
+                        }";
+                        }
+
+                        buttonSettings.Text = "Clear";
+                        buttonSettings.Style.Add("float", "left");
+                    }).Render();
+                }
+                @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "ComposePageHeaderParentPageDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposePageHeaderParentPageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ComposePageHeaderParentPageDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ComposePageHeaderPageDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposePageHeaderPageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ComposePageHeaderPageDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "TranslatePageHeaderParentPageDropDown")
+                    {
+                        buttonSettings.Name = "TranslatePageHeaderParentPageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            TranslatePageHeaderParentPageDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "TranslatePageHeaderPageDropDown")
+                    {
+                        buttonSettings.Name = "TranslatePageHeaderPageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            TranslatePageHeaderPageDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ComposeBannerHeaderPageDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposeBannerHeaderPageButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            ComposeBannerHeaderPageDD.HideDropDown();
+                        }";
+                    }
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }
+            )
+            .Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

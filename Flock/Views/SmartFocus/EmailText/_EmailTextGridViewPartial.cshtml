@@ -1,0 +1,104 @@
+﻿@using Flock.ViewModels;
+@using Flock.Models;
+@using Flock.DAL;
+@model EmailTextViewModel
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var EmailTemplates = UoW.GetRepository<SmartFocusEmailTemplate>().GetAll().OrderBy(p => p.TemplateID).ToList();
+}
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "EmailTextGridView";
+    settings.CallbackRouteValues = new { Action = "EmailTextGridViewPartial", Controller = "SmartFocus" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Action = "EmailTextGridViewAddNew", Controller = "SmartFocus" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Action = "EmailTextGridViewUpdate", Controller = "SmartFocus" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Action = "EmailTextGridViewDelete", Controller = "SmartFocus" };
+
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.ShowDeleteButton = true;
+    settings.CommandColumn.VisibleIndex = 4;
+    settings.SettingsBehavior.ConfirmDelete = true;
+
+    settings.Settings.ShowFilterRow = true;
+
+    settings.KeyFieldName = "EmailTextID";
+    
+    MVCxGridViewColumn EmailTextIDColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn EmailTemplateIDColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn TextColumn = new MVCxGridViewColumn();
+
+    settings.SettingsEditing.ShowModelErrorsForEditors = true;
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+    settings.SetEditFormTemplateContent(c => {
+        if(Model == null)
+            ViewContext.Writer.Write(Html.Action("EmailTextGridViewEditFormPartial", "SmartFocus", new { EmailTextID = c.KeyValue }));
+        else
+            ViewContext.Writer.Write(Html.Partial("~/Views/SmartFocus/EmailText/_EmailTextGridViewEditFormPartial.cshtml", Model));    
+    });
+
+    settings.SettingsPager.PageSize = 30;
+    
+    EmailTextIDColumn.Name = "EmailTextID";
+    EmailTextIDColumn.FieldName = "EmailTextID";
+    EmailTextIDColumn.Caption = "Email Text ID";
+    EmailTextIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    EmailTextIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    EmailTextIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    EmailTextIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(EmailTextIDColumn);
+
+    EmailTemplateIDColumn.Name = "EmailTemplateID";
+    EmailTemplateIDColumn.FieldName = "EmailTemplateID";
+    EmailTemplateIDColumn.Caption = "Email Template ID";
+    EmailTemplateIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    EmailTemplateIDColumn.EditCellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    EmailTemplateIDColumn.EditFormSettings.CaptionLocation = ASPxColumnCaptionLocation.Top;
+    EmailTemplateIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    EmailTemplateIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    EmailTemplateIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    EmailTemplateIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+    EmailTemplateIDColumn.SetDataItemTemplateContent(c => {
+        var etID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "EmailTemplateID"));
+
+        var emailTemplate = EmailTemplates.Where(p => p.TemplateID == etID).Select(p => p.Name).SingleOrDefault();
+ 
+        if(emailTemplate != null)
+        {
+            ViewContext.Writer.Write(emailTemplate);
+        }           
+    });
+    settings.Columns.Add(EmailTemplateIDColumn);
+
+    TextColumn.Name = "Text";
+    TextColumn.FieldName = "Text";
+    TextColumn.Caption = "Text";
+    TextColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    TextColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    TextColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(TextColumn);
+    
+    settings.HeaderFilterFillItems = (sender, e) => {
+        var grid = (MVCxGridView)sender;
+        switch (e.Column.Name)
+        {
+            case "EmailTemplateID":
+                e.Values.Clear();
+                foreach (var sfet in EmailTemplates)
+                {
+                    e.AddValue(sfet.Name, sfet.TemplateID.ToString());
+                }
+                e.AddShowAll();
+                break;
+            default: break;
+        }
+    };
+    
+}).BindToLINQ("", "", (s, e) => {
+    var source = UoW.GetRepository<EmailText>().GetAll().Where(p => p.DeletedDT == null);
+
+    e.QueryableSource = source;
+    e.KeyExpression = "EmailTextID";
+}).GetHtml()

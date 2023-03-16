@@ -1,0 +1,298 @@
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+
+        var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+        
+        var statuses = UoW.GetRepository<Flock.Models.Status>().GetAll().ToList();
+        
+        settings.Name = "BannerOverviewGridView";
+        settings.CallbackRouteValues = new { Controller = "Banners", Action = "BannerOverviewGridViewPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Banners", Action = "BannerOverviewGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Banners", Action = "BannerOverviewGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Banners", Action = "BannerOverviewGridViewPartialDelete" };
+        settings.CustomActionRouteValues = new { Controller = "Banners", Action = "BannerOverviewGridViewCustomCommand" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.SettingsText.ConfirmDelete = "Are you sure?";
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            e.customArgs['BannerLocationID'] = BannerOverviewBannerLocationListBox.GetValue();
+            e.customArgs['SiteSectionID'] = BannerOverviewSiteSectionListBox.GetValue();
+            e.customArgs['CountryID'] = BannerOverviewCountryListBox.GetValue();
+            e.customArgs['TradeSwitch'] = ComposeBannerHeaderTradeComboBox.GetValue();
+        }";
+        
+        settings.CellEditorInitialize = (sender, e) =>
+        {
+            // default booleans in the editor
+            var lCbEditor = e.Editor as ASPxCheckBox;
+            if (lCbEditor != null)
+            {
+                lCbEditor.Value = true;
+            }
+        };
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            settings.CommandColumn.ShowSelectCheckbox = true;
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+            ViewContext.Writer.Write("<a class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' style='margin-left: 8px;' href='"+@Url.Action("addnew", "banners")+"'>New</a>");
+        });
+        
+        settings.KeyFieldName = "BannerID";
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Columns.Add(column => {
+            column.Name = "BannerID";
+            column.FieldName = "BannerID";
+            column.Caption = "Banner ID";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Image";
+            column.FieldName = "Image";
+            column.Caption = "Image";
+            column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Width = 75;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<img style='width: 70px;' src='/bannerimages/256/" + c.KeyValue.ToString() + ".jpeg'/>");
+            });
+        });
+
+        
+        settings.Columns.Add(column => {
+            column.Name = "Name";
+            column.FieldName = "Name";
+            column.Caption = "Name";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        MVCxGridViewColumn ImageColumn = new MVCxGridViewColumn();
+        ImageColumn.Name = "ImagePreview";
+        ImageColumn.Caption = "Image";
+        ImageColumn.FieldName = "ImageUnbound";
+        ImageColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+        ImageColumn.Width = System.Web.UI.WebControls.Unit.Pixel(62);
+        ImageColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        ImageColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        ImageColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        ImageColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ImageColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        ImageColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        ImageColumn.SetDataItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "Width") != null)
+                ViewContext.Writer.Write("<img src='https://flock.designersguild.com/bannerimages/156/" + DataBinder.Eval(c.DataItem, "BannerID") +".jpeg' style='width: 50px; height: auto;' style='width: 50px; height: auto;'/>");
+            else
+                ViewContext.Writer.Write("<img src='/images/admin/image-not-set.png' alt='no image!' title='missing image' style='width: 50px; height: auto;'/>");
+        });
+        settings.Columns.Add(ImageColumn);
+
+
+        MVCxGridViewColumn LanguageColumn = new MVCxGridViewColumn();
+        LanguageColumn.Name = "Language";
+        LanguageColumn.FieldName = "LanguageName";
+        LanguageColumn.Caption = "Language";
+        LanguageColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        LanguageColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        LanguageColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        LanguageColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        LanguageColumn.SetDataItemTemplateContent(c => {
+            if (DataBinder.Eval(c.DataItem, "LanguageName") != null)
+                ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "LanguageName").ToString());
+            else
+                ViewContext.Writer.Write("Not Set");
+        });
+        settings.Columns.Add(LanguageColumn);
+        
+        MVCxGridViewColumn LinkColumn = new MVCxGridViewColumn();
+        LinkColumn.Name = "Link";
+        LinkColumn.FieldName = "LinkURL";
+        LinkColumn.Caption = "Link";
+        LinkColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        LinkColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        LinkColumn.SetDataItemTemplateContent(c =>
+        {
+            if (DataBinder.Eval(c.DataItem, "LinkURL") != null)
+                ViewContext.Writer.Write("<a href='http://" + DataBinder.Eval(c.DataItem, "LinkURL") + "' >" + DataBinder.Eval(c.DataItem, "LinkURL") + "</a>");
+            else
+                ViewContext.Writer.Write("No Link Set");
+        });
+        LinkColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(LinkColumn);
+        
+        settings.Columns.Add(column => {
+            column.Name = "PageRestrictions";
+            column.FieldName = "PageRestrictions";
+            column.Caption = "Page Restrictions";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "BannerLocationAssociations";
+            column.FieldName = "BannerLocationAssociations";
+            column.Caption = "Banner Locations";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        OnDateColumn.Name = "OnDate";
+        OnDateColumn.FieldName = "OnDate";
+        OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OnDateColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OnDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        OnDateColumn.Caption = "On Date";
+        settings.Columns.Add(OnDateColumn);
+
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+        OffDateColumn.Name = "OffDate";
+        OffDateColumn.FieldName = "OffDate";
+        OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OffDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OffDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        OffDateColumn.Caption = "Off Date";
+        settings.Columns.Add(OffDateColumn);
+        
+        MVCxGridViewColumn StatusColumn = new MVCxGridViewColumn();
+        StatusColumn.Name = "StatusID";
+        StatusColumn.FieldName = "StatusID";
+        StatusColumn.Caption = "Status";
+        StatusColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        StatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        StatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        StatusColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        StatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "StatusID"));
+            string colour = "black";
+            string statusText = "unknown";
+            statusText = statuses.Where(p => p.StatusID == i).Select(p => p.Name).Single();
+            switch (i)
+            {
+                case 0:
+                    colour = "green";
+                    break;
+                case 1:
+                    colour = "orange";
+                    break;
+                case 2:
+                    colour = "orange";
+                    break;
+                case 3:
+                    colour = "green";
+                    break;
+                case 4:
+                    colour = "red";
+                    break;
+                default: break;
+            }
+            string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+            ViewContext.Writer.Write(res);
+        });
+        settings.Columns.Add(StatusColumn);
+        
+        MVCxGridViewColumn NewWindowColumn = new MVCxGridViewColumn();
+        NewWindowColumn.Name = "NewWindow";
+        NewWindowColumn.FieldName = "NewWindow";
+        NewWindowColumn.Caption = "New Window";
+        NewWindowColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+        NewWindowColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        NewWindowColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        NewWindowColumn.SetDataItemTemplateContent(c => {
+            if (Convert.ToBoolean(DataBinder.Eval(c.DataItem, "NewWindow")) == true)
+                ViewContext.Writer.Write("Yes");
+            else
+                ViewContext.Writer.Write("No");
+        });
+        settings.Columns.Add(NewWindowColumn);
+        
+        settings.Columns.Add(column => {
+            column.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Name = "ComposeColumn";
+            column.SetDataItemTemplateContent(c => {
+                ViewContext.Writer.Write("<a href='" + Url.Action("compose", "banners", new { id = DataBinder.Eval(c.DataItem, "BannerID") }) + "'>Compose</a>");    
+            });
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                //case "ImagePreview":
+                //    e.Values.Clear();
+                //    e.Values.Add(FilterValue.CreateShowNonBlanksValue(ImageColumn, "Has Image"));
+                //    e.Values.Add(FilterValue.CreateShowBlanksValue(ImageColumn, "Doesn't have Image"));
+                //    e.AddShowAll();
+                //    break;
+                case "NewWindow":
+                    e.Values.Clear();
+                    e.AddValue("Yes", "True");
+                    e.AddValue("No", "False");
+                    e.AddShowAll();
+                    break;
+                case "StatusID":
+                    e.Values.Clear();
+                    foreach(var s in statuses)
+                    {
+                        e.AddValue(s.Name, s.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+        foreach (MVCxGridViewColumn c in settings.Columns)
+        {
+            var prop = (c.PropertiesEdit as EditProperties);
+            if (prop != null)
+                prop.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

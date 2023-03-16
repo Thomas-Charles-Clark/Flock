@@ -1,0 +1,404 @@
+﻿@model Flock.ViewModels.ProductPageComposeViewModel
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#product-page-cutout-inner').slideToggle('fast')">
+            Product Page Text & Cut-Out Image (click to expand / contract)
+            <img id="product-cutout-busy" class="busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+        </legend>
+        <div id="product-page-cutout-inner" style="background-color: white; padding: 1em; position: relative;">
+            <div style="clear: both;"></div>
+            <div style="width: 55%; float: right; margin-bottom: 32px;">
+                <label style="font-size: 11px;" for="furniture-page-cutout-image-target">Cut-Out Image (Landscape - Feature only)</label>
+                <div id="furniture-page-cutout-image-target" data-product-page-id="@(Model.ProductPageID)">
+                    @Html.Partial("FurnitureCutOutImagePartial", Model.Images.Where(p => p.TemplateImageID == 3).ToList())
+                </div>
+
+                @*<div id="furniture-page-cutout-image-upload" data-product-page-id="@(Model.ProductPageID)">
+                        @using (Html.BeginForm("FurnitureCutOut", "ProductPages", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.Hidden("ProductPageID", Model.ProductPageID)
+                            @Html.Hidden("source", 0);
+                            <label style="margin-top: 12px; font-size: 12px;" for="file">Cut-Out Image (.jpeg / .jpg only)</label>
+                            <input type="file" id="cutout-fileupload" size="40" style="width: 344px; margin-right: 12px;" name="file" accept="image/jpeg, image/jpg" />
+                            <div style="clear: both;"></div>
+                            <div id="cutout-progress-wrapper" style="display: none;">
+                                <div id="cutout-progress-text" style="width: 100%; position: relative; top: 20px; height: 20px; line-height: 20px; text-align: center; z-index: 1000;">
+
+                                </div>
+                                <div id="cutout-progress" style="height: 20px;">
+                                    <div class="bar" style="height: 20px; background-color: #44CC44; width: 0%">
+                                    </div>
+                                </div>
+                                <span id="cutout-error-span" class="field-validation-error" style="display: none;"></span>
+                            </div>
+                            <div id="cutout-container" style="width: 350px; display: block; position: relative; text-align: center; cursor: pointer; margin-top: 2em; margin-left: auto; margin-right: auto;" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                @if (Model.FurnitureCutOut != null)
+                                {
+                                    <img style="width: 100%;" class="furniture-cutout-image-preview" onclick="$('#cutout-image-dialog').dialog('open');" src="/furnitureimages/cutout/@(Model.FurnitureCutOut).jpeg" />
+                                    <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="$.confirm(function() { RemoveCutOutImage(@(Model.ProductPageID)) }, function() { })" />
+                                }
+                                else
+                                {
+                                    <img style="width: 100%;" class="furniture-cutout-image-preview" onclick="$('#cutout-image-dialog').dialog('open');" src="/images/admin/image-not-set.png" />
+                                }
+                            </div>
+                        }
+                </div>*@
+                <div>
+                    <table id="furniture-options-table">
+                        <tr>
+                            <th colspan="5">Furniture Options</th>
+                        </tr>
+                        <tr>
+                            <th>Fabric</th>
+                            <th>Leather</th>
+                            <th>Leg Styles</th>
+                            <th>Leg Finishes</th>
+                            <th>Stitching</th>
+                        </tr>
+                        <tr>
+                            <td>@Html.DevExpress().CheckBoxFor(m => Model.FurnitureFabricOptions).GetHtml()</td>
+                            <td>@Html.DevExpress().CheckBoxFor(m => Model.FurnitureLeatherOptions).GetHtml()</td>
+                            <td>@Html.DevExpress().CheckBoxFor(m => Model.FurnitureLegStyles).GetHtml()</td>
+                            <td>@Html.DevExpress().CheckBoxFor(m => Model.FurnitureLegFinishes).GetHtml()</td>
+                            <td>@Html.DevExpress().CheckBoxFor(m => Model.FurnitureStitchingOptions).GetHtml()</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div style="width: 44%; float: left;">
+                @Html.DevExpress().LabelFor(m => Model.Heading, settings =>
+                {
+                    settings.Style.Add("margin-bottom", "2px");
+                }).GetHtml()
+                <img id="product-page-heading-busy" class="busy" style="float: right; margin-top: 0.8em; width: 20px;" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                @Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Properties.MaxLength = 70;
+                    settings.Name = "ProductPageHeading";
+                }).GetHtml()
+                @Html.DevExpress().LabelFor(m => Model.SubHeading, settings =>
+                {
+                    settings.Style.Add("margin-top", "1em");
+                    settings.Style.Add("margin-bottom", "2px");
+                }).GetHtml()
+                <img id="product-page-subheading-busy" class="busy" style="float: right; margin-top: 0.8em; width: 20px;" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                @Html.DevExpress().TextBoxFor(m => Model.SubHeading, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Properties.MaxLength = 150;
+                    settings.Name = "ProductPageSubHeading";
+                }).GetHtml()
+                @Html.DevExpress().LabelFor(m => Model.Description, settings =>
+                {
+                    settings.Style.Add("margin-top", "1em");
+                    settings.Style.Add("margin-bottom", "2px");
+                }).GetHtml()
+                <div id="product-page-html-editor-container">
+                    @Html.Partial("ProductPageHTMLEditorPartial", Model.Description, new ViewDataDictionary())
+                </div>
+
+                <div id="furniture-page-popup-image-upload">
+                    @using (Html.BeginForm("FurnitureDimensionsImage", "ProductPages", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        @Html.Hidden("ProductPageID", Model.ProductPageID)
+                        @Html.Hidden("source", 0);
+                        <label style="margin-top: 12px; font-size: 12px;" for="file">Dimensions Image (.jpeg / .jpg only)</label>
+                        <input type="file" id="dimension-fileupload" size="40" style="width: 344px; margin-right: 12px;" name="file" accept="image/jpeg, image/jpg" />
+                        <div style="clear: both;"></div>
+                        <div id="dimension-progress-wrapper" style="display: none;">
+                            <div id="dimension-progress-text" style="width: 100%; position: relative; top: 20px; height: 20px; line-height: 20px; text-align: center; z-index: 1000;">
+
+                            </div>
+                            <div id="dimension-progress" style="height: 20px;">
+                                <div class="bar" style="height: 20px; background-color: #44CC44; width: 0%">
+                                </div>
+                            </div>
+                            <span id="dimension-error-span" class="field-validation-error" style="display: none;"></span>
+                        </div>
+                        <div id="dimension-container" style="width: 350px; display: block; position: relative; text-align: center; cursor: pointer; margin-top: 2em; margin-left: auto; margin-right: auto;" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                            @if (Model.FurnitureDimensions != null)
+                            {
+                                <img style="width: 100%;" class="furniture-dimension-image-preview" onclick="$('#image-dialog').dialog('open');" src="/furnitureimages/dimensions/@(Model.FurnitureDimensions).jpeg" />
+                                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="$.confirm(function() { RemoveDimensionImage(@(Model.ProductPageID)) }, function() { })" />
+                            }
+                            else
+                            {
+                                <img style="width: 100%;" class="furniture-dimension-image-preview" onclick="$('#image-dialog').dialog('open');" src="/images/admin/image-not-set.png" />
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div id="furniture-pdf-upload">
+                    @using (Html.BeginForm("FurniturePDF", "ProductPages", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        @Html.Hidden("ProductPageID", Model.ProductPageID)
+                        @Html.Hidden("source", 0);
+                        <label style="margin-top: 12px; font-size: 12px;" for="file">Furniture PDF (.pdf only)</label>
+                        <input type="file" id="pdf-fileupload" size="40" style="width: 344px; margin-right: 12px;" name="file" accept=".pdf" />
+                        <div style="clear: both;"></div>
+                        <div id="pdf-progress-wrapper" style="display: none;">
+                            <div id="pdf-progress-text" style="width: 100%; position: relative; top: 20px; height: 20px; line-height: 20px; text-align: center; z-index: 1000;">
+
+                            </div>
+                            <div id="pdf-progress" style="height: 20px;">
+                                <div class="bar" style="height: 20px; background-color: #44CC44; width: 0%">
+                                </div>
+                            </div>
+                            <span id="pdf-error-span" class="field-validation-error" style="display: none;"></span>
+                        </div>
+                        <div id="pdf-container" style="margin-top: 2em;">
+                            @if (Model.FurniturePDF != null)
+                            {
+                                <a href="/FurniturePDFs/@Model.FurniturePDF" target="_blank">@(Model.FurniturePDF)</a>
+                            }
+                        </div>
+                    }
+                </div>
+
+
+              </div>
+            <div style="clear: both; margin-top: 3em;"></div>
+            <img id="product-page-text-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; margin-top: 1em; position: absolute; bottom: 10px; right: 10px;" onclick="SaveProductPageText();" />
+        </div>
+    </fieldset>
+
+<div id="dimension-image-dialog">
+    <div id="dimension-image-dialog-inner" style="display: none;">
+        @if (Model.FurnitureDimensions != null)
+        {
+            <img class="furniture-dimension-image-preview" src="/furnitureimages/dimensions/@(Model.FurnitureDimensions).jpeg" />
+        }
+        else
+        {
+            <img class="furniture-dimension-image-preview" src="/images/admin/image-not-set.png" />
+        }
+    </div>
+</div>
+
+<div id="cutout-image-dialog">
+    <div id="cutout-image-dialog-inner" style="display: none;">
+        To be fixed
+        @*@if (Model.FurnitureCutOut != null)
+        {
+            <img class="furniture-cutout-image-preview" src="/furnitureimages/cutout/@(Model.FurnitureCutOut).jpeg" />
+        }
+        else
+        {
+            <img class="furniture-cutout-image-preview" src="/images/admin/image-not-set.png" />
+        }*@
+    </div>
+</div>
+
+<script type="text/javascript">
+    $("#dimension-image-dialog").dialog({
+        title: 'Dimensions Image',
+        autoOpen: false,
+        height: 'auto',
+        width: 'auto',
+        buttons: {
+            Close: function () {
+                $(this).dialog('close');
+            }
+        }
+    });
+
+    $("#dimension-image-dialog-inner").show();
+
+    $("#cutout-image-dialog").dialog({
+        title: 'Cut-Out Image',
+        autoOpen: false,
+        height: 'auto',
+        width: 'auto',
+        buttons: {
+            Close: function () {
+                $(this).dialog('close');
+            }
+        }
+    });
+
+    $("#cutout-image-dialog-inner").show();
+
+
+    //$("#cutout-image-container").droppable({
+    //    accept: ".draggable",
+    //    drop: function (ev, ui) { // ui.draggable
+    //        if ($("#cutout-placeholder").length > 0)
+    //            $("#cutout-placeholder").remove();
+    //        UpdateProductPageImageArea(3, ui);
+    //    }
+    //});
+    var formData = [];
+
+    formData.ProductPageID = '@(Model.ProductPageID)';
+
+    $("#dimension-fileupload").fileupload({
+        url: '@Url.Action("FurnitureDimensionsImage", "ProductPages")',
+        dataType: 'json',
+        maxNumberOfFiles: 1,
+        autoUpload: false,
+        replaceFileInput: false,
+        add: function (e, data) {
+            $("#dimension-upload-button").remove();
+            data.context = $('<button id="dimension-upload-button" type="button" class="upload-injected"/>').text('Upload')
+            .insertAfter($('#dimension-fileupload'))
+            .click(function () {
+                data.context = data.context.replaceAll($(this));
+                data.submit();
+                $("#dimension-upload-button").off("click");
+
+                $('#dimension-progress-wrapper').fadeIn("fast");
+            });
+        },
+        done: function (e, data) {
+            $("#dimension-upload-button").remove();
+            $('#dimension-progress-wrapper').fadeOut("fast");
+            if (data._response.result.files[0].name == "error") {
+                $("#dimension-error-span").html(data._response.result.files[0].error);
+                $("#dimension-error-span").css("color", "red");
+                $("#dimension-error-span").fadeIn("fast");
+                $(".furniture-dimension-image-preview").fadeOut("fast", function () {
+                    $("#dimension-error-span").fadeIn("fast");
+                });
+                window.setTimeout(function () { $("#dimension-error-span").fadeOut("fast"); }, 10000);
+            }
+            else {
+                $("#dimension-error-span").html(data._response.result.files[0].name + " uploaded OK");
+                $("#dimension-error-span").css("color", "green");
+                $("#dimension-error-span").fadeIn("fast");
+                window.setTimeout(function () {
+                    $("#dimension-error-span").fadeOut("fast", function () {
+                        $(".furniture-dimension-image-preview").fadeOut("fast", function () {
+                            $(".furniture-dimension-image-preview").attr("src", data._response.result.files[0].url);
+                        });
+                        window.setTimeout(function () {
+                            $(".furniture-dimension-image-preview").fadeIn("fast");
+                            if($("#dimension-container").find(".image-remove-icon").length == 0)
+                                $("#dimension-container").append("<img src='/images/systemicons/remove-icon.png' class='image-remove-icon' onclick='RemovePopupImage(@(Model.ProductPageID))' />")
+                        });
+                    });
+                });
+            }
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#dimension-progress .bar').css(
+                'width',
+                progress + '%'
+            );
+            $("#dimension-progress-text").html(progress + '%');
+        }
+    });
+
+    $("#cutout-fileupload").fileupload({
+        url: '@Url.Action("FurnitureCutOutImage", "ProductPages")',
+        dataType: 'json',
+        maxNumberOfFiles: 1,
+        autoUpload: false,
+        replaceFileInput: false,
+        add: function (e, data) {
+            $("#cutout-upload-button").remove();
+            data.context = $('<button id="cutout-upload-button" type="button" class="upload-injected"/>').text('Upload')
+            .insertAfter($('#cutout-fileupload'))
+            .click(function () {
+                data.context = data.context.replaceAll($(this));
+                data.submit();
+                $("#cutout-upload-button").off("click");
+
+                $('#cutout-progress-wrapper').fadeIn("fast");
+            });
+        },
+        done: function (e, data) {
+            $("#cutout-upload-button").remove();
+            $('#cutout-progress-wrapper').fadeOut("fast");
+            if (data._response.result.files[0].name == "error") {
+                $("#cutout-error-span").html(data._response.result.files[0].error);
+                $("#cutout-error-span").css("color", "red");
+                $("#cutout-error-span").fadeIn("fast");
+                $(".furniture-cutout-image-preview").fadeOut("fast", function () {
+                    $("#cutout-error-span").fadeIn("fast");
+                });
+                window.setTimeout(function () { $("#cutout-error-span").fadeOut("fast"); }, 10000);
+            }
+            else {
+                $("#cutout-error-span").html(data._response.result.files[0].name + " uploaded OK");
+                $("#cutout-error-span").css("color", "green");
+                $("#cutout-error-span").fadeIn("fast");
+                window.setTimeout(function () {
+                    $("#cutout-error-span").fadeOut("fast", function () {
+                        $(".furniture-cutout-image-preview").fadeOut("fast", function () {
+                            $(".furniture-cutout-image-preview").attr("src", data._response.result.files[0].url);
+                        });
+                        window.setTimeout(function () {
+                            $(".furniture-cutout-image-preview").fadeIn("fast");
+                            if ($("#cutout-container").find(".image-remove-icon").length == 0)
+                                $("#cutout-container").append("<img src='/images/systemicons/remove-icon.png' class='image-remove-icon' onclick='RemoveCutOutImage(@(Model.ProductPageID))' />")
+                        });
+                    });
+                });
+            }
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#cutout-progress .bar').css(
+                'width',
+                progress + '%'
+            );
+            $("#cutout-progress-text").html(progress + '%');
+        }
+    });
+
+
+    $("#pdf-fileupload").fileupload({
+        url: '@Url.Action("FurniturePDF", "ProductPages")',
+        dataType: 'json',
+        maxNumberOfFiles: 1,
+        autoUpload: false,
+        replaceFileInput: false,
+        add: function (e, data) {
+            $("#pdf-upload-button").remove();
+            data.context = $('<button id="pdf-upload-button" type="button" class="upload-injected"/>').text('Upload')
+            .insertAfter($('#pdf-fileupload'))
+            .click(function () {
+                data.context = data.context.replaceAll($(this));
+                data.submit();
+                $("#pdf-upload-button").off("click");
+
+                $('#pdf-progress-wrapper').fadeIn("fast");
+            });
+        },
+        done: function (e, data) {
+            $("#pdf-upload-button").remove();
+            $('#pdf-progress-wrapper').fadeOut("fast");
+            if (data._response.result.files[0].name == "error") {
+                $("#pdf-error-span").html(data._response.result.files[0].error);
+                $("#pdf-error-span").css("color", "red");
+                $("#pdf-error-span").fadeIn("fast");
+                $(".pdf-dimension-image-preview").fadeOut("fast", function () {
+                    $("#pdf-error-span").fadeIn("fast");
+                });
+                window.setTimeout(function () { $("#pdf-error-span").fadeOut("fast"); }, 10000);
+            }
+            else {
+                $("#pdf-error-span").html(data._response.result.files[0].name + " uploaded OK");
+                $("#pdf-error-span").css("color", "green");
+                $("#pdf-error-span").fadeIn("fast");
+                window.setTimeout(function () {
+                    $("#pdf-error-span").fadeOut("fast", function () {
+                        $("#pdf-container").empty();
+                        $("#pdf-container").append('<a href="' + data._response.result.files[0].url + '" target="_blank">' + data._response.result.files[0].name + '</a>')
+                    });
+                });
+            }
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#pdf-progress .bar').css(
+                'width',
+                progress + '%'
+            );
+            $("#pdf-progress-text").html(progress + '%');
+        }
+    });
+</script>

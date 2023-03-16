@@ -1,0 +1,33 @@
+﻿@model List<Flock.Models.Menu>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.CheckColumn;
+    listBoxSettings.Properties.ValueField = "MenuID";
+    listBoxSettings.Properties.TextField = "LocalName";
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ComposeBannerMenuListBoxPartial")
+    {
+        listBoxSettings.Name = "ComposeBannerMenuListBox";
+        listBoxSettings.Style.Add("float", "left");
+        listBoxSettings.Height = 200;
+        listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            
+        }";
+
+        if (ViewBag.MenuAssignmentSelectedMenuIDs != null && ViewBag.MenuAssignmentSelectedMenuIDs != "")
+        {
+            listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                var selectedArray = '" + ViewBag.MenuAssignmentSelectedMenuIDs + @"';
+                selectedArray = selectedArray.split(',');
+                s.SelectValues(selectedArray);
+            }";
+        }
+    }
+}
+).BindList(Model).GetHtml()

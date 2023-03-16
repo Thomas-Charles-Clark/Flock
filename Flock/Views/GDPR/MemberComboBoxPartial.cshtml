@@ -1,0 +1,26 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "Member";
+    settings.CallbackRouteValues = new { Controller = "GDPR", Action = "MemberComboBoxPartial" };
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.ValueField = "Email";
+    settings.Properties.ValueType = typeof(string);
+    settings.Properties.TextField = "Email";
+    settings.Properties.TextFormatString = "{0} - {1} - {2}";
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.IncrementalFilteringDelay = 1000;
+    settings.Height = 35;
+    settings.Width = 280;
+    settings.Properties.DropDownWidth = 600;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.Properties.Columns.Add("MemberID", "ID", 60);
+    settings.Properties.Columns.Add("FullName", "FullName", 140);
+    settings.Properties.Columns.Add("Email", "Email", 260);
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    settings.Properties.ClientSideEvents.ValueChanged = "memberSelected";
+    settings.Properties.ClientSideEvents.KeyUp = @"function(s,e) {
+        if (e.htmlEvent.keyCode == 13) {
+            s.ShowDropDown();
+        }
+    }";
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetMembers, Flock.ViewModels.LargeDatabaseDataProvider.GetMemberByID).GetHtml()

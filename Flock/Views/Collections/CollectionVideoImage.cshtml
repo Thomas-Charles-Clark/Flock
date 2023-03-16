@@ -1,0 +1,12 @@
+﻿@model List<Flock.Models.Collection_Image>
+<div style="height: 100%;" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+    @if(Model == null || Model.Count == 0)
+    {
+        <img id="video-placeholder" src="/Images/admin/ar3-placeholder.png" style="margin-top: 22px; margin-bottom: 1em;" alt="Image not set." title="You must set a spacer image for this collection." /> 
+    } 
+    else 
+    {          
+        <img src="https://flock.designersguild.com/imagelibrary/488/@(Model[0].ImageID).jpeg" alt="@(Model[0].AltText)" title="@(Model[0].TitleText)"/> 
+        <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromCollectionArea(8, @(Model[0].ImageID))" />
+    }
+</div>

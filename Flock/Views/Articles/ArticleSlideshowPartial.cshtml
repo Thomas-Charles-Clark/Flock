@@ -1,0 +1,109 @@
+﻿@model Flock.ViewModels.ArticleComposeViewModel
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292; width: 100%;" onclick="$('#slideshow-contents').slideToggle('fast');">
+            @if (Model.ArticleTemplateID == 2)
+            {
+                @:Slideshow - Landscape (full width banner) only - (click to expand / contract)
+            }
+            else if (Model.ArticleTemplateID == 4)
+            {
+                @:Slideshow - Landscape (feature) only - (click to expand / contract)
+            }
+            <img id="page-section-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+            @*<img id="article-3-advanced" style="width: 24px; float: right; margin: 4px 2px 0 0;" title="Advanced" class="pagesection-advanced-icon" src="/images/admin/gear.png" onclick="ShowSlideshowSettings();">*@
+        </legend>
+        <div id="slideshow-contents" style="background-color: white; padding: 0; width: 980px;" class="page-section-hideable">
+            <div id="article-slideshow" style="height: 1px; width: 100%; position: relative;">
+                @Html.Partial("ArticleSlideshow", Model)
+            </div>
+            <div class="fieldset-inner">
+                <div id="slideshow-list" data-slideshow-accepts="ar7" data-images-count="@(Model.Images.Count)" class="sortable-list horizontal-slideshow-images-container">
+                    @{
+                        var ssImages = Model.Images.Where(p => p.TemplateImageID == 2).ToList();
+                        for (int i = 0; i < ssImages.Count; i++)
+                        {
+                            <div class="horizontal-slideshow-images-sortable" style="cursor: pointer"
+                                 data-image-id="@(ssImages[i].ImageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({ opacity: 0.0 }, 300);">
+                                <img src="https://flock.designersguild.com/imagelibrary/239/@(ssImages[i].ImageID).jpeg" title="Flock ImageID: @(ssImages[i].ImageID), V1 ImageID: @(ssImages[i].Image.IntranetImageID)" />
+                                <img src="/images/systemicons/remove-icon.png" title="Remove" class="image-remove-icon" onclick="RemoveImageFromSlideshow(@(Model.ArticleID), @(ssImages[i].ImageID))" />
+                            </div>
+                        }
+                        if (ssImages.Count == 0)
+                        {
+                            <div class="article-slideshow-placeholder" style="height: 120px; width: 240px;">No Images Associated</div>
+                        }
+                    }
+                </div>
+            </div>
+            @*<div data-slideshow-id="@(Model.SlideshowID)" data-page-section-id="@(Model.PageSectionID)" style="padding: 1em; padding-top: 0;">
+                    @Html.Partial("CountryLanguageRestrictionPartial", Model.CountryRestrictions)
+                </div>*@
+        </div>
+    </fieldset>
+
+
+
+    @*<div id="slideshow-advanced-settings" class="page-section-advanced-container">
+        @{
+            if (Model.Images.Count > 0)
+            {
+                <div id="slideshow-settings-overlay-container" style="width: 800px;">
+                    <i style='display: block; text-align: center;'>Loading</i>
+                </div>
+            }
+            else
+            {
+                <h6>No images in Slideshow.</h6>
+            }
+        }
+    </div>*@
+
+    <script type="text/javascript">
+        if (typeof (InitPodDragDrop) == "function")
+            InitPodDragDrop();
+
+        @*@{
+            if (ssImages.Count > 0) 
+            {
+                <text>
+                    $.ajax({
+                        url: '@Url.Action("SlideshowImageOverlayPartial", "Articles")',
+                        type: 'GET',
+                        traditional: true,
+                        data: {
+                            ArticleID: $('#selected-article-id').val(),
+                            arID: 2,
+                            imageID: '@(ssImages[0].ImageID)'
+                        },
+                        success: function (data) {
+                            $('#slideshow-image-overlay-container').html(data);
+                        },
+                        timeout: 20000
+                    });
+                </text>
+            }
+        }*@
+    </script>
+</div>
+
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292; width: 100%;" onclick="$('#article-contents').slideToggle('fast');">
+            Contents (click to expand / contract)
+            <img id="page-section-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="article-contents" style="background: white; position: relative;">
+            <div id="article-contents-editor-container">
+                @Html.DevExpress().MemoFor(m => Model.Contents, settings =>
+                {
+                    settings.Name = "ArticleText";
+                    settings.Properties.ClientInstanceName = "ArticleText";
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Height = 550;
+                }).GetHtml()
+            </div>
+            <img id="article-text-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveArticleText();" />
+        </div>
+    </fieldset>
+</div>

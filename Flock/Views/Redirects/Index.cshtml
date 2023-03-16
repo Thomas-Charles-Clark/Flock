@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "Redirects";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        function OnPageGridGetRowValues(value)
+        {
+            window["NewURL"].SetText("/" + value[0] + "/l" + value[1]);
+        }
+        function OnProductPageGridGetRowValues(value) {
+            window["NewURL"].SetText("/" + value[0] + "/p" + value[1]);
+        }
+        function OnCollectionGridGetRowValues(value) {
+            window["NewURL"].SetText("/" + value[0] + "/c" + value[1]);
+        }
+    </script>
+}
+<h4 class="page-heading">Redirects</h4>
+
+@Html.Action("RedirectsGridViewPartial")

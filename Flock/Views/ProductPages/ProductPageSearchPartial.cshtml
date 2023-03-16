@@ -1,0 +1,106 @@
+﻿<div class="resource-panel-container">
+    <fieldset id="product-page-search-fieldset">
+        <legend onclick="$('.hideable-dataview').not('#product-page-dataview').slideUp('fast'); $('#product-page-dataview').slideToggle('fast');">Product Page Search (click to expand / contract)</legend>
+        <div id="product-page-dataview" class="hideable-dataview" style="display: none;">
+            <div style="padding: 1em 1em 0px; background-color: white;">
+                @Html.Action("ProductPageSearchProductTypeDropDownPartial", "ProductPages")
+                @Html.Action("ProductPageSearchBrandDropDownPartial", "ProductPages")
+                @Html.Action("ProductPageSearchLaunchDropDownPartial", "ProductPages")
+                @Html.Action("ProductPageSearchCollectionDropDownPartial", "ProductPages")
+                @Html.Action("ProductPageSearchStatusDropDownPartial", "ProductPages")
+                @Html.Action("ProductPageSearchColourDropDownPartial", "ProductPages")
+                @Html.Action("ProductPageSearchPatternDropDownPartial", "ProductPages")
+                @Html.Action("ProductPageSearchTemplateDropDownPartial", "ProductPages")
+                @Html.Action("ProductPageSearchNameTextBox", "ProductPages")
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "ProductPageClearFiltersButton";
+                    settings.Text = "Reset";
+                    settings.Style.Add("line-height", "32px");
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        ProductPageSearchProductTypeListBox.UnselectAll();
+                        ProductPageSearchProductTypeDD.SetText('Product Type');
+                        ProductPageSearchBrandListBox.UnselectAll();
+                        ProductPageSearchBrandDD.SetText('Brand');
+                        ProductPageSearchLaunchListBox.UnselectAll();
+                        ProductPageSearchLaunchDD.SetText('Launch');
+                        ProductPageSearchPatternListBox.UnselectAll();
+                        ProductPageSearchPatternDD.SetText('Pattern');
+                        ProductPageSearchStatusListBox.UnselectAll();
+                        ProductPageSearchStatusDD.SetText('Status');
+                        ProductPageSearchCollectionListBox.UnselectAll();
+                        ProductPageSearchCollectionDD.SetText('Collection');
+                        ProductPageSearchColourListBox.UnselectAll();
+                        ProductPageSearchColourDD.SetText('Colour');
+                        ProductPageSearchTemplateListBox.UnselectAll();
+                        ProductPageSearchTemplateDD.SetText('Template');
+                        ProductPageSearchNameTextBox.SetText('Product Page Name or ID');
+
+                        $('#product-page-searching-icon').fadeIn('fast');
+                        $.ajax({
+	                        url: '" + Url.Action("ProductPageSearch", "ProductPages") + @"',
+	                        traditional: true,
+	                        data: {
+		                        ProductTypeID: ProductPageSearchProductTypeListBox.GetValue(),
+		                        BrandID: ProductPageSearchBrandListBox.GetValue(),
+		                        LaunchID: ProductPageSearchLaunchListBox.GetValue(),
+		                        CollectionID: ProductPageSearchCollectionListBox.GetValue(),
+		                        PatternID: ProductPageSearchPatternListBox.GetValue(),
+		                        ColourID: ProductPageSearchColourListBox.GetValue(),
+		                        StatusID: ProductPageSearchStatusListBox.GetValue(),
+                                TemplateID: ProductPageSearchTemplateListBox.GetValue(),
+		                        SearchString: ProductPageSearchNameTextBox.GetValue()
+	                        },
+	                        success: function(data) {
+		                        $('#product-page-searching-icon').fadeOut('fast');
+		                        $('#product-page-data-view-container').html(data);
+	                        },
+	                        error: function(e, s, a) {
+		                        $.showError(e, s, a, function() { $('#product-page-searching-icon').fadeOut('fast'); });
+	                        },
+	                        timeout: 20000
+                        });
+                    }";
+                }).GetHtml()
+                @Html.DevExpress().Button(button =>
+                {
+                    button.Text = "Add All";
+                    button.Name = "ProductPageAddAllButton";
+                    //button.Style.Add("float", "left");
+                    button.Style.Add("margin-top", "7px");
+                    button.Style.Add("line-height", "32px");
+                    button.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    button.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    button.Style.Add("text-align", "center");
+                    button.ClientSideEvents.Click = @"function(s, e) {
+                            if($('#where-dialog').length > 0) { 
+                                if(ComposeProductPageGridSelector.GetFocusedRowIndex() != -1 && ComposeProductPageGridSelector.GetFocusedRowIndex() != null) {
+                                    $('#add-where-select').val(0);
+                                    $('#where-dialog').dialog('open');
+                                }
+                                else
+                                    $('#bad-selection-dialog').dialog('open');
+                            }
+                            else {
+                                if(typeof(BulkAddProductPages) == 'function') {
+                                    BulkAddProductPages();
+                                }
+                            }
+                        }";
+                }).GetHtml()
+                <img id="product-page-searching-icon" style="display: none;" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both"></div>
+            </div>
+            <div id="product-page-data-view-container" style="background-color: white; position: relative;" class="multidraggable-container">
+                @Html.Action("ProductPageSearch", "ProductPages")
+            </div>
+        </div>
+    </fieldset>
+    <div style="clear: both"></div>
+</div>
+<script type="text/javascript">
+    if (typeof (InitProductPagesDragDrop) == 'function')
+        InitProductPagesDragDrop();
+</script>

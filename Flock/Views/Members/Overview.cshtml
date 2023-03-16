@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Members";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        #container {
+            width: auto !important;
+        }
+    </style>
+}
+<h4 class="page-heading">Members Overview</h4>
+
+<div class="page-subheading">
+    @Html.Action("MemberOverviewSegmentDropDownPartial")
+    <div style="clear: both;"></div>
+</div>
+
+@Html.Partial("_MemberOverviewGridViewPartial", new Flock.Controllers.MemberOverviewSettings())

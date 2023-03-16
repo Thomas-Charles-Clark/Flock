@@ -1,0 +1,383 @@
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "UserGridView";
+        settings.CallbackRouteValues = new { Controller = "AssetDeliverySystem", Action = "UserGridViewPartial" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "AssetDeliverySystem", Action = "UserGridViewPartialUpdate" };
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 0;
+        settings.CommandColumn.ShowEditButton = true;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+        //settings.SetEditFormTemplateContent(c => {
+        //    if(Model == null)
+        //    {
+        //        Html.RenderAction("ApprovalRequestEditFormPartial", new { ApprovalRequestID = Convert.ToInt32(DataBinder.Eval(c.DataItem, "User.ApprovalRequestID")) });
+        //    }
+        //    else
+        //    {
+        //        Html.RenderPartial("_ApprovalRequestEditFormPartial", Model);
+        //    }
+        //});
+
+        settings.KeyFieldName = "Id";
+
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 50;
+
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.ShowDetailButtons = false;
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+        settings.Styles.Header.Wrap = DefaultBoolean.True;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        MVCxGridViewColumn idColumn = new MVCxGridViewColumn();
+        idColumn.Name = "Id";
+        idColumn.FieldName = "Id";
+        idColumn.Caption = "ID";
+        idColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        //settings.Columns.Add(idColumn);
+
+
+        MVCxGridViewColumn approvalRequestIDColumn = new MVCxGridViewColumn();
+        approvalRequestIDColumn.Name = "ApprovalRequestID";
+        approvalRequestIDColumn.FieldName = "ApprovalRequestID";
+        approvalRequestIDColumn.Caption = "ApprovalRequestID";
+        approvalRequestIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        approvalRequestIDColumn.ReadOnly = true;
+        approvalRequestIDColumn.Visible = true;
+        settings.Columns.Add(approvalRequestIDColumn);
+
+
+        MVCxGridViewColumn emailColumn = new MVCxGridViewColumn();
+        emailColumn.Name = "Email";
+        emailColumn.FieldName = "User.Email";
+        emailColumn.Caption = "Email";
+        emailColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        emailColumn.SetDataItemTemplateContent(c => {
+            var em = DataBinder.Eval(c.DataItem, "User.Email") as string;
+            ViewContext.Writer.Write(String.Format("<a href='mailto:{0}'>{0}</a>", em));
+        });
+        emailColumn.ReadOnly = true;
+        emailColumn.SetEditItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "User.Email"));
+        });
+        settings.Columns.Add(emailColumn);
+
+        MVCxGridViewColumn RequestDTColumn = new MVCxGridViewColumn();
+        RequestDTColumn.Name = "RequestDT";
+        RequestDTColumn.FieldName = "RequestDT";
+        RequestDTColumn.Caption = "Request Date";
+        RequestDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        RequestDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        RequestDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        RequestDTColumn.ReadOnly = true;
+        RequestDTColumn.SortDescending();
+        RequestDTColumn.SetEditItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(Convert.ToDateTime(DataBinder.Eval(c.DataItem, "RequestDT")).ToShortDateString());
+        });
+        settings.Columns.Add(RequestDTColumn);
+
+        MVCxGridViewColumn userNameColumn = new MVCxGridViewColumn();
+        userNameColumn.Name = "UserName";
+        userNameColumn.FieldName = "User.UserName";
+        userNameColumn.Caption = "User Name";
+        userNameColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        userNameColumn.ReadOnly = true;
+        userNameColumn.SetEditItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "User.UserName"));
+        });
+        settings.Columns.Add(userNameColumn);
+
+        MVCxGridViewColumn accountNumberColumn = new MVCxGridViewColumn();
+        accountNumberColumn.Name = "AccountNumber";
+        accountNumberColumn.FieldName = "User.AccountNumber";
+        accountNumberColumn.Caption = "Account Number";
+        accountNumberColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        accountNumberColumn.Visible = false;
+        settings.Columns.Add(accountNumberColumn);
+
+        MVCxGridViewColumn mertexCountryColumn = new MVCxGridViewColumn();
+        mertexCountryColumn.Name = "Country";
+        mertexCountryColumn.FieldName = "User.Country";
+        mertexCountryColumn.Caption = "Mertex Country";
+        mertexCountryColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        mertexCountryColumn.Visible = false;
+        settings.Columns.Add(mertexCountryColumn);
+
+        MVCxGridViewColumn marketColumn = new MVCxGridViewColumn();
+        marketColumn.Name = "Market";
+        marketColumn.FieldName = "User.Market";
+        marketColumn.Caption = "Mertex Market";
+        marketColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        marketColumn.ReadOnly = true;
+        marketColumn.SetEditItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "User.Market"));
+        });
+        settings.Columns.Add(marketColumn);
+
+        MVCxGridViewColumn priceListColumn = new MVCxGridViewColumn();
+        priceListColumn.Name = "PriceListCode";
+        priceListColumn.FieldName = "User.PriceListCode";
+        priceListColumn.Caption = "Price List";
+        priceListColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        priceListColumn.ReadOnly = true;
+        priceListColumn.SetEditItemTemplateContent(c => {
+            ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "User.PriceListCode"));
+        });
+        settings.Columns.Add(priceListColumn);
+
+
+
+
+        //MVCxGridViewColumn stockFeedAccessColumn = new MVCxGridViewColumn();
+        //stockFeedAccessColumn.Caption = "Stock Feed Access";
+        //stockFeedAccessColumn.FieldName = "StockFeedAccess";
+        //stockFeedAccessColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+        //settings.Columns.Add(stockFeedAccessColumn);
+
+        MVCxGridViewColumn batchPieceAccessColumn = new MVCxGridViewColumn();
+        batchPieceAccessColumn.Caption = "Batch Piece Access";
+        batchPieceAccessColumn.FieldName = "BatchPieceStockAccess";
+        batchPieceAccessColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+        batchPieceAccessColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        settings.Columns.Add(batchPieceAccessColumn);
+
+        MVCxGridViewColumn upcomingSeasonEarlyAccessColumn = new MVCxGridViewColumn();
+        upcomingSeasonEarlyAccessColumn.Caption = "Upcoming Season Early Access";
+        upcomingSeasonEarlyAccessColumn.FieldName = "UpcomingSeasonEarlyAccess";
+        upcomingSeasonEarlyAccessColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+        upcomingSeasonEarlyAccessColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        settings.Columns.Add(upcomingSeasonEarlyAccessColumn);
+
+
+
+
+        MVCxGridViewColumn customerTypeColumn = new MVCxGridViewColumn();
+        customerTypeColumn.Name = "CustomerType";
+        customerTypeColumn.FieldName = "User.CustomerType";
+        customerTypeColumn.Caption = "Customer Type";
+        customerTypeColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        customerTypeColumn.Visible = false;
+        settings.Columns.Add(customerTypeColumn);
+
+        MVCxGridViewColumn countryIDColumn = new MVCxGridViewColumn();
+        countryIDColumn.Name = "CountryID";
+        countryIDColumn.FieldName = "User.CountryID";
+        countryIDColumn.Caption = "Country ID";
+        countryIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        countryIDColumn.Visible = false;
+        settings.Columns.Add(countryIDColumn);
+
+        MVCxGridViewColumn languageIDColumn = new MVCxGridViewColumn();
+        languageIDColumn.Name = "LanguageID";
+        languageIDColumn.FieldName = "User.LanguageID";
+        languageIDColumn.Caption = "Language ID";
+        languageIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        languageIDColumn.Visible = false;
+        settings.Columns.Add(languageIDColumn);
+
+        MVCxGridViewColumn approvalStatusColumn = new MVCxGridViewColumn();
+        approvalStatusColumn.Name = "ApprovalStatus";
+        approvalStatusColumn.FieldName = "ApprovalStatus";
+        approvalStatusColumn.Caption = "Approval Status";
+        approvalStatusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        approvalStatusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        approvalStatusColumn.SettingsHeaderFilter.Mode = GridHeaderFilterMode.Default;
+        approvalStatusColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        approvalStatusColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        approvalStatusColumn.Width = 130;
+        approvalStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            var text = "";
+
+            var appS = DataBinder.Eval(c.DataItem, "ApprovalStatus") == null ? "2" : DataBinder.Eval(c.DataItem, "ApprovalStatus").ToString();
+
+            switch(appS)
+            {
+                case "False":
+                    text = "Timed Approval";
+                    break;
+                case "True":
+                    text = "Indefinitely Approved";
+                    break;
+                case "2":
+                    text = "Not Approved";
+                    break;
+                case "3":
+                    text = "Approval Expired";
+                    break;
+                default:
+                    break;
+            }
+
+            ViewContext.Writer.Write("<a href='javascript:void(0)' onclick=\"UserGridView.StartEditRowByKey('" + c.KeyValue + "')\">" + text + "</a>");
+        });
+
+        var asProp = approvalStatusColumn.PropertiesEdit as ComboBoxProperties;
+        asProp.ValueType = typeof(string);
+        asProp.Items.Add(new ListEditItem() { Index = 0, Text = "Not Approved", Value = "2" });
+        asProp.Items.Add(new ListEditItem() { Index = 1, Text = "Timed Approval", Value = "False" });
+        asProp.Items.Add(new ListEditItem() { Index = 2, Text = "Approval Expired", Value = "3" });
+        asProp.Items.Add(new ListEditItem() { Index = 3, Text = "Indefinitely Approved", Value = "True" });
+        asProp.TextField = "Text";
+        asProp.ValueField = "Value";
+
+        settings.Columns.Add(approvalStatusColumn);
+
+        MVCxGridViewColumn approvalExpiryDTColumn = new MVCxGridViewColumn();
+        approvalExpiryDTColumn.Name = "ApprovalExpiryDT";
+        approvalExpiryDTColumn.FieldName = "ApprovalExpiryDT";
+        approvalExpiryDTColumn.Caption = "Approval Expires";
+        approvalExpiryDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        approvalExpiryDTColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        settings.Columns.Add(approvalExpiryDTColumn);
+
+        MVCxGridViewColumn createdDTColumn = new MVCxGridViewColumn();
+        createdDTColumn.Name = "CreatedDT";
+        createdDTColumn.FieldName = "User.CreatedDT";
+        createdDTColumn.Caption = "Created";
+        createdDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        createdDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        //settings.Columns.Add(createdDTColumn);
+
+        MVCxGridViewColumn lastVisitDTColumn = new MVCxGridViewColumn();
+        lastVisitDTColumn.Name = "LastVisitDT";
+        lastVisitDTColumn.FieldName = "User.LastVisitDT";
+        lastVisitDTColumn.Caption = "Last Visit";
+        lastVisitDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        lastVisitDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        lastVisitDTColumn.SetEditItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(DataBinder.Eval(c.DataItem, "User.LastVisitDT"));
+        });
+        settings.Columns.Add(lastVisitDTColumn);
+
+        settings.HeaderFilterFillItems += (sender, e) => {
+            var g = (MVCxGridView)sender;
+
+            switch(e.Column.Name)
+            {
+                case "ApprovalStatus":
+                    e.Values.Clear();
+                    e.AddValue("Not Approved", "2");
+                    e.AddValue("Timed Approval", "False");
+                    e.AddValue("Approval Expired", "3");
+                    e.AddValue("Indefinitely Approved", "True");
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+
+        //MVCxGridViewColumn approvedColumn = new MVCxGridViewColumn();
+        //approvedColumn.Name = "Approved";
+        //approvedColumn.FieldName = "Approved";
+        //approvedColumn.Caption = "Approved";
+        //approvedColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        //approvedColumn.ColumnType = MVCxGridViewColumnType.CheckBox;
+        //var aProp = approvedColumn.PropertiesEdit as CheckBoxProperties;
+        //aProp.ValueType = typeof(bool);
+        //aProp.ValueChecked = true;
+        //aProp.ValueUnchecked = false;
+        //aProp.DisplayTextChecked = "Approved";
+        //aProp.DisplayTextUnchecked = "Not Approved";
+        //settings.Columns.Add(approvedColumn);
+
+        settings.HtmlDataCellPrepared += (sender, e) => {
+            var g = sender as MVCxGridView;
+
+            switch(e.DataColumn.Name)
+            {
+                case "ApprovalStatus":
+
+                    if(e.CellValue != null)
+                    {
+                        switch (e.CellValue.ToString())
+                        {
+                            case "False":
+                                e.Cell.BackColor = System.Drawing.ColorTranslator.FromHtml("#76ff76");
+                                break;
+                            case "True":
+                                e.Cell.BackColor = System.Drawing.ColorTranslator.FromHtml("#ffffcc");
+                                break;
+                            case "3":
+                                e.Cell.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFADAD");
+                                e.Cell.ForeColor = System.Drawing.Color.White;
+                                break;
+                            case "2":
+                                e.Cell.BackColor = System.Drawing.ColorTranslator.FromHtml("#ffadad");
+                                break;
+                            default: break;
+                        }
+                    }
+                    break;
+
+                case "ApprovalExpiryDT":
+                    if (e.CellValue != null)
+                    {
+                        var dt = Convert.ToDateTime(e.CellValue);
+
+                        if (dt < DateTime.Now)
+                        {
+                            e.Cell.BackColor = System.Drawing.ColorTranslator.FromHtml("#ffadad");
+                        }
+                        else
+                        {
+                            e.Cell.BackColor = System.Drawing.ColorTranslator.FromHtml("#76ff76");
+                        }
+                    }
+                    break;
+
+                default: break;
+            }
+        };
+    });
+    if (ViewData["EditError"] != null) {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ("", "", (s, e) => {
+
+    var list = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>().GetRepository<Flock.Models.User>().GetAll().Select(c => new Flock.ViewModels.approvalRequestShunt
+    {
+        Id = c.Id,
+        User = c,
+        ApprovalStatus =
+            (c.ApprovalRequest.ApprovalExpiryDT.Value < DateTime.Now && c.ApprovalRequest.ApprovalStatus == false) ?
+                "3" :
+                (c.ApprovalRequest.ApprovalStatus.HasValue ?
+                   c.ApprovalRequest.ApprovalStatus.ToString() :
+                    "2"),
+        ApprovalRequestID = c.ApprovalRequest.ApprovalRequestID,
+        ApprovalExpiryDT = c.ApprovalRequest.ApprovalExpiryDT,
+        RequestDT = c.ApprovalRequest.RequestDT,
+        StockFeedAccess = c.APIKey != null,
+        BatchPieceStockAccess = c.PieceBatchStockAPIKeys.Any(),
+        UpcomingSeasonEarlyAccess = c.UpcomingSeasonEarlyAccess
+    }).OrderBy(p => p.User.CreatedDT).ToList();
+
+    e.QueryableSource = list.AsQueryable();
+    e.KeyExpression = "Id";
+}).GetHtml()

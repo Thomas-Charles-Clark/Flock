@@ -1,0 +1,123 @@
+﻿@model Flock.ViewModels.CallToActionEditModel
+
+<input type="hidden" id="call-to-action-id" value="@(Model.CallToActionID)" />
+
+<table class="edit-form-table">
+    <tbody>
+        <tr>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => Model.Name, settings => {
+                    settings.Name = "Name";
+                    settings.Properties.MaxLength = 100;
+                    settings.Properties.Caption = "Name";
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => Model.Text, settings =>
+                {
+                    settings.Name = "Text";
+                    settings.Properties.MaxLength = 70;
+                    settings.Properties.Caption = "Text";
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().CheckBoxFor(m => Model.NewWindow, settings =>
+                {
+                    settings.Name = "NewWindow";
+                    settings.Properties.ValueType = typeof(bool);
+                    settings.Properties.ValueChecked = true;
+                    settings.Properties.ValueUnchecked = false;
+                    settings.Properties.Caption = "New Window";
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.Partial("_PageIDComboBoxPartial", Model)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.Partial("_ArticleIDComboBoxPartial", Model)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.Partial("_CollectionIDComboBoxPartial", Model)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.Partial("_ProductPageIDComboBoxPartial", Model)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().TextBoxFor(m => Model.CallToActionExternalURL, settings =>
+                {
+                    settings.Name = "CallToActionExternalURL";
+                    settings.Properties.MaxLength = 255;
+                    settings.Width = 226;
+                    settings.Properties.Caption = "External URL";
+                    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+                    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                @Html.Partial("_StyleIDComboBoxPartial", Model)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.Partial("_WidthModeIDComboBoxPartial", Model)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => Model.AppearanceDelay, settings =>
+                {
+                    settings.Name = "AppearanceDelay";
+                    settings.Properties.Caption = "Appearance Delay";
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().SpinEditFor(m => Model.VisibilityDuration, settings =>
+                {
+                    settings.Name = "VisibilityDuration";
+                    settings.Properties.Caption = "Visibility Duration";
+                    settings.ShowModelErrors = true;
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td class="buttons-cell">
+                <button class="btn btn-success" onclick="SaveCallToActionDetails()">Save</button>
+
+                <button class="btn btn-primary" onclick="CancelCallToActionDetails()">Cancel</button>
+            </td>
+        </tr>
+    </tbody>
+</table>

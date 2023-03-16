@@ -1,0 +1,152 @@
+﻿@using Flock.Models
+@model vwImage
+<input type="hidden" id="original-ar" value="@(Model.AspectRatioID)"/>
+
+<div style="width: 1300px;">
+    <div id="content-panel-container" style="float: left; width: 300px;">
+        <div class="content-panel-container">
+            <fieldset id="product-page-swap-fieldset">
+                <legend>Image Swap</legend>
+                <div id="image-swap" style="background-color: white; padding: 1em;">
+                    <table id="swap-table" style="width: 260px; margin: 0 auto; border-collapse: separate;">
+                        <tr>
+                            <th style="padding-bottom: 1em; font-size: 1.0em;">
+                                Original
+                            </th>
+                        </tr>
+                        <tr>
+                            <td id="swap-original" style="width: 260px; height: 260px; border: 1px solid #cdcdcd;"></td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td style="border: 0; padding: 1em 3em;">
+                                @Html.DevExpress().Button(settings =>
+                                {
+                                    settings.Name = "SwapButton";
+                                    settings.Text = "»» Swap »»";
+                                    settings.ClientSideEvents.Init = @"function(s, e) {
+                                        CheckSwapViability();
+                                    }";
+                                    settings.ClientEnabled = false;
+                                    settings.EnableClientSideAPI = true;
+                                    settings.Style.Add("margin", "0.5em");
+                                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                                    settings.ClientSideEvents.Click = @"function(s, e) {
+                                    $.confirm(function() {
+                                        $.ajax({
+                                            url: '" + Url.Action("SwapImage", "Images") + @"',
+                                            type: 'POST',
+                                            traditional: true,
+                                            data: {
+                                                OriginalImage: $('#swap-original').data('image-id'),
+                                                ReplacementImage: $('#swap-replacement').data('image-id')
+                                            },
+                                            success: function(data) {
+                                                $('#swap-complete').dialog('open');
+                                            },
+                                            error: function(e, s, a) {
+                                                $.showError(e, s, a, function() {
+                                                    CheckSwapViability();
+                                                }); // e, s, a, callback, args
+                                            },
+                                            timeout: 10000
+                                        });
+                                    }, function() { });
+                                }";
+                                }).GetHtml()
+                                @Html.DevExpress().Button(settings =>
+                                {
+                                    settings.Name = "SwapClearButton";
+                                    settings.Text = "Reset";
+                                    settings.Style.Add("margin", "0.5em");
+                                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                                    settings.ClientSideEvents.Click = @"function(s, e) {
+                                        $('#swap-replacement').html('');
+                                        $('#swap-replacement').removeData('image-id');
+                                        CheckSwapViability();
+                                    }";
+                                }).GetHtml()
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="padding-bottom: 1em; font-size: 1.0em;">
+                                Replacement
+                            </th>
+                        </tr>
+                        <tr>
+                            <td id="swap-replacement" style="width: 260px; height: 260px; border: 1px solid #cdcdcd;"></td>
+                        </tr>
+                    </table>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div id="resource-panel-container" style="float: right; width: 986px;">
+        @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+    </div>
+
+
+    <div style="clear: both;"></div>
+</div>
+<script type="text/javascript">
+    $("#images-dataview").show();
+
+    function initDragDrop() {
+        $('.image').draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }
+        });
+    }
+
+    //$original.droppable({
+    //    accept: ".image",
+    //    activeClass: "ui-state-highlight-product-page",
+    //    revert: true,
+    //    drop: function (event, ui) {
+    //        //OriginalAccept(ui.draggable);
+    //        $(".original-placeholder").remove();
+    //        $original.append($(ui.draggable).clone().css("margin", "0 auto"));
+    //        $original.data("image-id", $(ui.draggable).data("image-id"));
+    //        CheckSwapViability();
+    //        $("#swap-original").children().each(function () {
+    //            $(this).addClass("original-placeholder");
+    //        });
+    //    }
+    //});
+
+    ConfigureReplacement();
+
+    initDragDrop();
+
+    $(document).ready(function () {
+
+        var $original = $('#swap-original');
+
+        $original.html('');
+
+        $original.data('image-id', @(Model.ImageID));
+
+        $content = $("<div id='image-box-' + id + ' style='position: relative; width: 239px; z-index: 100;' data-image-id='+id+'>" +
+        "<div>"+
+            "<img src='https://flock.designersguild.com/ImageLibrary/239/@(Model.ImageID).jpeg'/>"+
+                "</div>" +
+                "</div>");
+
+
+        $('#large-image-dialog-inner').html('');
+
+        $('#large-image-dialog-inner').html("<img src='https://flock.designersguild.com/imagelibrary/1024/@(Model.ImageID).jpeg'/>");
+
+        $original.append($content.css('margin', '0 auto'));
+        //ImageAssetTabs.SetActiveTab(ImageAssetTabs.GetTab(0));
+
+        //CheckSwapViability();
+    });
+</script>

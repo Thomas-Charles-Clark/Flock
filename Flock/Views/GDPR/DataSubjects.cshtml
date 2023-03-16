@@ -1,0 +1,219 @@
+﻿@model Flock.ViewModels.DataSubjectsViewModel
+@{
+    ViewBag.Title = "GDPR - Data Subjects";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    @Styles.Render("~/Content/data-subjects.css")
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/js/knockout")
+    @Scripts.Render("~/Scripts/moment.js")
+
+    <script type="text/javascript">
+
+        function getCurrentQueue() {
+            return @Html.Raw(Json.Encode(Model.CurrentQueue))
+        }
+
+        function dataSubjectsViewModel() {
+            var self = this;
+
+            self.currentQueue = ko.observableArray(getCurrentQueue());
+
+            self.createDataSourceRequest = function () {
+                var proceed = true;
+
+                if (Member.GetValue()) {
+
+                } else {
+                    $.info('Please Select', 'Please select a member before creating a request.');
+                    proceed = false;
+                    return;
+                }
+
+                if (!Unsubscribe.GetChecked() && !Delete.GetChecked() && !DataAccess.GetChecked()) {
+                    proceed = false;
+                    $.info('Please Select', 'Please select at least one action before creating a request.');
+                    return;
+                }
+
+                if (proceed) {
+                    $.confirm(function () {
+                        LoadingPanel.Show();
+                        $.ajax({
+                            url: '/api/gdprapi/DataSubjectRequest',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                Email: Member.GetValue(),
+                                RequestUnsubscribe: Unsubscribe.GetChecked(),
+                                RequestDelete: Delete.GetChecked(),
+                                RequestDataAccess: DataAccess.GetChecked()
+                            },
+                            success: function (data) {
+                                self.currentQueue(data);
+                                LoadingPanel.Hide();
+                            }
+                        });
+                    }, function () {
+
+                    },
+                    [],
+                    'This will create the specified queue entry.');
+                }
+            }
+        }
+
+        function memberSelected() {
+            Unsubscribe.SetClientVisible(true);
+            CreateRequest.SetClientVisible(true);
+        }
+        function performDataSourceSelect() {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '/api/gdprapi/DataSubjectSelect',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    MemberID: Member.GetValue()
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    console.log('DataSubjectRequest returned', data);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    LoadingPanel.Hide();
+                    $.showError(xhr, textStatus, errorThrown);
+                }
+            });
+        }
+
+        var viewModel = new dataSubjectsViewModel();
+
+        $(document).ready(function () {
+            ko.applyBindings(viewModel, $('#container')[0]);
+        });
+
+    </script>
+}
+
+<script type="text/javascript">
+</script>
+
+<h4 class="page-heading">
+    Data Subjects
+</h4>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="form-group">
+            <label class="col-form-label">
+                Member Search
+            </label>
+            <div class="clearfix"></div>
+            <div style="float: left; margin-right: 12px;">
+                @Html.Partial("MemberComboBoxPartial")
+            </div>
+
+            @Html.DevExpress().CheckBox(s =>
+            {
+                s.Name = "Unsubscribe";
+                s.ClientVisible = true;
+                s.Text = "Unsubscribe";
+                s.Style.Add("margin-top", "6px");
+                s.Style.Add("margin-right", "12px");
+                s.Style.Add("float", "left");
+            }).GetHtml()
+
+            @Html.DevExpress().CheckBox(s =>
+            {
+                s.Name = "Delete";
+                s.ClientVisible = true;
+                s.Text = "Delete";
+                s.Style.Add("margin-top", "6px");
+                s.Style.Add("margin-right", "12px");
+                s.Style.Add("float", "left");
+            }).GetHtml()
+
+            @Html.DevExpress().CheckBox(s =>
+            {
+                s.Name = "DataAccess";
+                s.ClientVisible = true;
+                s.Text = "Data Access";
+                s.Style.Add("margin-top", "6px");
+                s.Style.Add("margin-right", "12px");
+                s.Style.Add("float", "left");
+            }).GetHtml()
+
+            @Html.DevExpress().Button(s =>
+            {
+                s.Name = "CreateRequest";
+                s.ClientVisible = true;
+                s.Text = "Create Request";
+                s.Style.Add("display", "inline-block");
+                s.Height = 35;
+                s.Style.Add("float", "left");
+                s.ClientSideEvents.Click = @"function (s, e) {
+                    viewModel.createDataSourceRequest();
+                }";
+            }).GetHtml()
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered table-condensed table-striped">
+    <colgroup>
+        <col style="width: 60px;"/>
+        <col style="width: 200px;"/>
+        <col style="width: 120px"/>
+        <col style="width: 90px"/>
+        <col style="width: 52px"/>
+        <col style="width: 90px"/>
+        <col style="width: 82px"/>
+        <col style="width: 120px"/>
+        <col style="width: auto;"/>
+        <col style="width: 120px"/>
+        <col style="width: 120px"/>
+    </colgroup>
+    <thead>
+        <tr>
+            <th>DSR ID</th>
+            <th>Email</th>
+            <th>Created</th>
+            <th>Unsubscribe</th>
+            <th>Delete</th>
+            <th>Data Access</th>
+            <th>Member ID</th>
+            <th>Processed</th>
+            <th>Message</th>
+            <th>Erased</th>
+            <th>Unsubscribed</th>
+        </tr>
+    </thead>
+    <tbody data-bind="foreach: currentQueue">
+        <tr>
+            <td data-bind="text: DataSubjectRequestID"></td>
+            <td data-bind="text: Email"></td>
+            <td data-bind="text: CreatedDT ? moment(CreatedDT).format('DD/MM/YYYY HH:mm') : ''"></td>
+            <td data-bind="text: RequestUnsubscribe ? 'Yes': ''"></td>
+            <td data-bind="text: RequestDelete ? 'Yes': ''"></td>
+            <td data-bind="text: RequestDataAccess ? 'Yes' : ''"></td>
+            <td data-bind="text: MemberID"></td>
+            <td data-bind="text: ProcessedDT ? moment(ProcessedDT).format('DD/MM/YYYY HH:mm') : ''"></td>
+            <td data-bind="text: ProcessedMessage"></td>
+            <td data-bind="text: ErasedDT ? moment(ErasedDT).format('DD/MM/YYYY hh:mm') : ''"></td>
+            <td data-bind="text: UnsubscribedDT ? moment(UnsubscribedDT).format('DD/MM/YYYY HH:mm') : ''"></td>
+        </tr>
+    </tbody>
+</table>
+
+@* On load, display queue [select with no parameters] 
+    
+    on specifying a member, you're able to then specify parameters to the request creation procedure and click GO to add the person to the queue
+    
+    *@

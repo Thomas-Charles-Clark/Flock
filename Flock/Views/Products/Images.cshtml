@@ -1,0 +1,216 @@
+﻿@model Flock.ViewModels.ProductImagesViewModel
+
+@{
+    ViewBag.Title = "Product Images";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+    @Styles.Render("~/bundles/composer")
+<style type="text/css">
+    .container {
+        width: 2080px !important;
+    }
+    </style>
+}
+
+<h4 class="page-heading">Product Images</h4>
+
+@using (Html.BeginForm("ProductImagesGridViewExportToXlsx", "Products"))
+{
+    <div class="page-subheading">
+        @Html.Action("ProductImagesOverviewCollectionDropDownPartial", "Products")
+        @Html.Action("ProductImagesOverviewColourDropDownPartial", "Products")
+        <img id="images-overview-busy" src="~/Images/SystemIcons/busy-icon.gif"/>
+
+        <input id="export-button" type="submit" value="Export to Xlsx" title="Please be aware that the Collection and Colour pre-filters will not be taken into account for the exported result set.
+               \r\n\r\nUse the filters in the grid itself to arrive at a result set you wish to export." />
+
+        <div class="clearfix"></div>
+    </div>
+
+    <div id="ProductImagesGridContainer" style="width: 900px; float: left; margin-right: 20px;">
+        @Html.Action("ProductImagesGridViewPartial", new Flock.ViewModels.ProductImagesOverviewSettings())
+    </div>
+}
+<div style="width: 986px; float: right;">
+    @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+</div>
+@*<div id="bulk-action-panel">
+    <h4>Bulk Action Panel</h4>
+    <ul>
+        <li>
+            <a href="javascript:;" title="Enable" onclick="EnableSelectedProducts()">Enable</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Disable" onclick="DisableSelectedProducts()">Disable</a>
+        </li>
+    </ul>
+</div>*@
+<div style="clear: both;"></div>
+
+@section scripts {
+    
+    <script type="text/javascript">
+        function initDragDrop() {
+            $('.ar1').draggable({
+                helper: 'clone',
+                connectToSortable: ".image-list-sortable"
+            });
+        }
+
+        function AddImageToPerspective(ev, ui, listElement) {
+            // take whole list, first is selected, rest are not.
+            var perspectiveID = $(listElement).data("perspective-id");
+            var imageID = $(ui.item).data("image-id") == null ? $(ui.item).children(0).data("image-id") : $(ui.item).data("image-id");
+            var productID = window.DetailRowProductID;
+
+
+            //if (($("#front-image-list").find("img [data-image-id='" + ImageID + "']").length > 0) || 
+            //    ($("#front-image-list").find("img [data-image-id='" + ImageID + "']").length > 0) ||
+            //    ($("#front-image-list").find("img [data-image-id='" + ImageID + "']").length > 0) ||
+            //    ($("#front-image-list").find("img [data-image-id='" + ImageID + "']").length > 0) ||
+            //    {
+            //    RemoveImageFromPerspective(perspectiveID, imageID);
+            //}
+
+            $.ajax({
+                url: '@Url.Action("AddImageToPerspective", "Products")',
+                traditional: true,
+                type: 'POST',
+                data: {
+                    ProductID: productID,
+                    PerspectiveID: perspectiveID,
+                    ImageID: imageID
+                },
+                success: function () {
+                    ProductImagesOverviewGridView.Refresh();
+                },
+                timeout: 20000
+            });
+        }
+
+        function RemoveImageFromPerspective(PerspectiveID, ImageID)
+        {
+            switch(PerspectiveID)
+            {
+                case 1:
+                    $("#front-image-list").find("img [data-image-id='" + ImageID + "']").remove();
+                    break;
+                case 2:
+                    $("#reverse-image-list").find("img [data-image-id='"+ImageID+"']").remove();
+                    break;
+                case 3:
+                    $("#closeup-image-list").find("img [data-image-id='" + ImageID + "']").remove();
+                    break;
+                case 4:
+                    $("#styled-image-list").find("img [data-image-id='" + ImageID + "']").remove();
+                    break;
+                default:
+
+                    break;
+            }
+
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("RemoveImageFromPerspective", "Products")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    productID: $("#selected-product-id").val(),
+                    perspectiveID: PerspectiveID, 
+                    imageID: ImageID
+                },
+                success: function(data)
+                {
+                    LoadingPanel.Hide();
+                }
+            });
+        }
+
+
+        function UpdatePerspectiveImage(listElement)
+        {
+            var perspectiveID = $(listElement).data("perspective-id");
+            var imageID = $(listElement).children("li").first().children("img").first().data("image-id");
+            var productID = window.DetailRowProductID;
+            $.ajax({
+                url: '@Url.Action("UpdatePerspectiveImage", "Products")',
+                traditional: true,
+                type: 'POST',
+                data: {
+                    ProductID: productID,
+                    PerspectiveID: perspectiveID,
+                    ImageID: imageID
+                },
+                success: function () {
+                    ProductImagesOverviewGridView.Refresh();
+                },
+                error: function (e, s, a) {
+                    $.showError(e, s, a, function (args) { ProductImagesOverviewGridView.Refresh(); }, null);//,callback, args);
+                },
+                timeout: 20000
+            });
+        }
+
+        function UnlockProductImages() {
+            $("#front-image-list").sortable({
+                //connectWith: ".image-list",
+                helper: 'clone',
+                connectWith: "#back-image-list, #closeup-image-list, #styled-image-list",
+                start: function (event, ui) { $(ui.helper).show(); },
+                receive: function (ev, ui) {
+                    $("#front-image-list").sortable("refresh");
+                },
+                update: function (ev, ui) {
+                    AddImageToPerspective(ev, ui, $("#front-image-list"));
+                }
+            });
+            $("#back-image-list").sortable({
+                //connectWith: ".image-list",
+                helper: 'clone',
+                connectWith: "#front-image-list, #closeup-image-list, #styled-image-list",
+                start: function (event, ui) { $(ui.helper).show(); },
+                receive: function (ev, ui) {
+                    $("#back-image-list").sortable("refresh");
+                },
+                update: function (ev, ui) {
+                    AddImageToPerspective(ev, ui, $("#back-image-list"));
+                }
+            });
+            $("#closeup-image-list").sortable({
+                //connectWith: ".image-list",
+                helper: 'clone',
+                connectWith: "#front-image-list, #back-image-list, #styled-image-list",
+                start: function (event, ui) { $(ui.helper).show(); },
+                receive: function (ev, ui) {
+                    $("#closeup-image-list").sortable("refresh");
+                },
+                update: function (ev, ui) {
+                    AddImageToPerspective(ev, ui, $("#closeup-image-list"));
+                }
+            });
+            $("#styled-image-list").sortable({
+                //connectWith: ".image-list",
+                helper: 'clone',
+                connectWith: "#front-image-list, #back-image-list, #closeup-image-list",
+                start: function (event, ui) { $(ui.helper).show(); },
+                receive: function (ev, ui) {
+                    $("#styled-image-list").sortable("refresh");
+                },
+                update: function (ev, ui) {
+                    AddImageToPerspective(ev, ui, $("#styled-image-list"));
+                }
+            });
+
+            initDragDrop();
+        }
+
+        function LockProductImages() {
+            $("#front-image-list").sortable("destroy");
+            $("#back-image-list").sortable("destroy");
+            $("#closeup-image-list").sortable("destroy");
+            $("#styled-image-list").sortable("destroy");
+        }
+    </script>
+}
+

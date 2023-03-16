@@ -1,0 +1,197 @@
+﻿@{
+    ViewBag.Title = "ComposeCollection";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles
+{
+    @Styles.Render("~/Content/collections.css")
+    @Styles.Render("~/Content/collection-composition.css")
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #container {
+            width: 2034px !important;
+        }
+    </style>
+}
+@section scripts{
+    
+}
+<h4 class="page-heading">Compose Collection</h4>
+
+<div style="float: right; width: 986px;">
+    <div style="width: 100%; background-color: #0072C6; border-radius: 5px; margin-bottom: 2em;">
+        <fieldset id="image-search-fieldset">
+            <legend>Please select a collection.</legend>
+            <div id="collection-images-dataview" class="hideable-dataview" style="">
+                @*@Html.Partial("ImageSearchPartial", Model)*@
+            </div>
+        </fieldset>
+        <div style="clear: both;"></div>
+    </div>
+    <div style="width: 100%; background-color: #0072C6; border-radius: 5px;">
+        <fieldset id="collection-search-fieldset">
+            <legend>Please select a collection.</legend>
+            <div id="collection-dataview" class="hideable-dataview" style="">
+                @*@Html.Partial("CollectionSearchPartial", Model)*@
+            </div>
+        </fieldset>
+        <div style="clear: both;"></div>
+    </div>
+
+</div>
+<div style="float: left; width: 986px;">
+    @Html.Action("CollectionComposeCollectionSelectHeader", "Collections")
+
+    @using (Html.BeginForm("collectionupdate", "collections"))
+    {
+        @*
+        @Html.HiddenFor(m => Model.BrandID)
+        @Html.HiddenFor(m => Model.LaunchID)
+        @Html.HiddenFor(m => Model.CollectionID, new { id = "collection-id-hidden" })
+        @Html.HiddenFor(m => Model.Name)
+        @Html.HiddenFor(m => Model.Description, new { id = "collection-description-hidden" })
+        @Html.HiddenFor(m => Model.Heading, new { id = "collection-heading-hidden" })
+        @Html.HiddenFor(m => Model.SubHeading, new { id = "collection-subheading-hidden" })
+        *@
+        <div id="page-data" style="height: auto;">
+            <h5 style="width: 100%; margin-bottom: 0; text-align: center;">Please select a collection.</h5>
+            <div style="clear: both;"></div>
+            <div style="width: 66%; float: right">
+                <div id="collection-pod-container" class="droppable" style="display: none;">
+                    <span>Please select a collection.</span>
+                    <img id="collection-pod-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..."/>
+                    <div id="pod-list" class="sortable-list">
+                        @*@Html.Partial("~/Views/CMS/CollectionPodImages.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 1).OrderBy(o => o.SortOrder).ToList())*@
+                    </div>
+                </div>
+            </div>
+            <div style="width: 33.2%; float: left;">
+                @*@Html.DevExpress().TextBoxFor(m => Model.TitleTag, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.URLKeywords, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Style.Add("margin-top", "1em");
+                }).GetHtml()
+                    @Html.DevExpress().MemoFor(m => Model.MetaDescription, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Style.Add("margin-top", "1em");
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(143);
+                }).GetHtml()*@
+            </div>
+        </div>
+
+        <div id="collection-description-and-slideshow" style="display: none;">
+            <div style="float: right; width: 66%;">
+                <span>Please select a collection.</span>
+                <div id="collection-slideshow-container" class="droppable">
+                    <img id="collection-slideshow-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..."/>
+                   @* @Html.Partial("~/Views/CMS/CollectionSlideshowImagesPartial.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 2).ToList())*@
+                </div>
+            </div>
+            <div style="float: left; width: 33.2%;">
+                <div>
+                    @*@Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
+                    {
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Name = "CollectionHeading";
+                    }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.SubHeading, settings =>
+                    {
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Style.Add("margin-top", "1em");
+                        settings.Name = "CollectionSubHeading";
+                    }).GetHtml()*@
+                    <div id="collection-html-editor-container">
+                        @*@Html.Partial("~/Views/CMS/CollectionHTMLEditorPartial.cshtml", Model.Description, new ViewDataDictionary())*@
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+            <div id="slideshow-buttons">
+                <img id="slideshow-play-icon" class="slideshow-button" src="/Images/SystemIcons/slideshow-play-icon.png" />
+                <img id="slideshow-grid-icon" class="slideshow-button" src="/Images/SystemIcons/slideshow-grid-icon.png" />
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+        
+        <div id="video-section" style="display: none;">
+            <fieldset style="padding: 0;">
+                <legend style="color: black; border-top: 1px solid #E1E1E1;" >Please select a collection.</legend>
+                <div id="video-container" style="margin-top: 10px; display: none;">
+                    <div id="video-image" class="video-section-part">
+                        <span style='position: absolute; z-index: 10;'>Video Image: Landscape (shallow) only</span>
+                        <img id="collection-video-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..."/>
+                        <div id="collection-video-container" class="droppable" >
+                            @*@Html.Partial("~/Views/CMS/CollectionVideoImage.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 8).ToList(), new ViewDataDictionary())*@
+                        </div>
+                    </div>
+                    <div id="video-supporting-image" class="video-section-part">
+                        <span style='position: absolute; z-index: 10;'>Supporting Image: Landscape (shallow) only</span>
+                        <img id="collection-sp3-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..."/>
+                        <div id="collection-sp3-container" class="droppable">
+                            @*@Html.Partial("~/Views/CMS/CollectionSP3Image.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 7).ToList(), new ViewDataDictionary())*@
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                    <div id="video-select-container" class="select-container">
+                        @*@Html.DropDownListFor(m => Model.VideoID, new SelectList(Model.Videos, "VideoID", "Name"), "Select Video", new { id="video-selector", style="height: 28px"})*@
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        
+        <div id="bottom-section" style="display: none;">
+            <fieldset style="padding: 0; margin-top: 10px;">
+                <legend style="color: black; border-top: 1px solid #E1E1E1;">Please select a collection.</legend>
+                <div id="lower-container" style="margin-top: 10px; width: 986px; display: none;">
+                    <div class="bottom-item">
+                        <span style='position: absolute; z-index: 10;'>Supporting Image: Square only</span>
+                        <img id="collection-sp1-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..."/>
+                        <div id="collection-sp1-container" class="droppable">
+                            @*@Html.Partial("~/Views/CMS/CollectionSP1Image.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 3).ToList(), new ViewDataDictionary())*@
+                        </div>
+                    </div>
+                    <div class="bottom-item">
+                        <span style='position: absolute; z-index: 10;'>Supporting Image: Square only</span>
+                        <img id="collection-sp2-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..."/>
+                        <div id="collection-sp2-container" class="droppable">
+                            @*@Html.Partial("~/Views/CMS/CollectionSP2Image.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 4).ToList(), new ViewDataDictionary())*@
+                        </div>
+                    </div> 
+                    <div class="bottom-item">
+                        <span style='position: absolute; z-index: 10;'>View All Image: Square only</span>
+                        <img id="collection-viewall-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..."/>
+                        <div id="collection-viewall-container" class="droppable">
+                            @*@Html.Partial("~/Views/CMS/CollectionViewAllImage.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 5).ToList(), new ViewDataDictionary())*@
+                        </div>
+                    </div>
+                    <div class="bottom-item" style="margin-right: 0;">
+                        <span style='position: absolute; z-index: 10;'>Brochure Image: Square only</span>
+                        <img id="collection-brochure-busy" class="collection-busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..."/>
+                        <div id="collection-brochure-container" class="droppable">
+                            @*@Html.Partial("~/Views/CMS/CollectionBrochureImage.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 6).ToList(), new ViewDataDictionary())*@
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                    <div id="brochure-select-container" class="select-container">
+                        @*@Html.DropDownListFor(m => Model.BrochureID, new SelectList(Model.Brochures, "BrochureID", "Name"), "Select Brochure", new { id="brochure-selector", style="height: 28px" })*@
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div style="width: 100%; display: none;">
+            <fieldset style="padding: 0; margin-top: 10px;">
+                <legend style="color: black; border-top: 1px solid #E1E1E1;">Please select a collection.</legend>
+                <div id="related-collections" style="margin-top: 10px; display: none;">
+                    @*@Html.Partial("~/Views/CMS/RelatedCollections.cshtml", Model.CollectionImages.Where(p => p.TemplateImageID == 9).ToList())*@
+                </div>
+            </fieldset>
+        </div>
+        @*<input type="submit" value="Save" style="margin-top: 2em;" onclick="ShiftDXToHidden();"/>*@
+    }
+</div>
+<div style="clear: both;"></div>

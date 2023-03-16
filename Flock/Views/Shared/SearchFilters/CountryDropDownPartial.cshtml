@@ -1,0 +1,152 @@
+﻿@model List<Flock.Models.Country>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        if (action == "ProductPagesOverviewCountryRestrictionsDropDownPartial")
+            settings.Name = "ProductPagesOverviewCountryDD";
+        else if (action == "BannerOverviewCountryDropDownPartial")
+            settings.Name = "BannerOverviewCountryDD";
+        else if (action == "ComposeBannerHeaderCountryDropDownPartial")
+            settings.Name = "ComposeBannerHeaderCountryDD";
+        else if (action == "ProductPagesOverviewNewCountryRestrictionDropDownPartial")
+            settings.Name = "ProductPagesOverviewNewCountryRestrictionDD";
+        else if (action == "DeliveryExceptionsCountryDropDownPartial")
+            settings.Name = "DeliveryExceptionsCountryDD";
+        else if (action == "PageComposePageSectionCountryDropDown")
+            settings.Name = "PageSectionCountryDD";
+
+        settings.Text = "Country";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='continent-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/CountryListBoxPartial.cshtml", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+
+            if(action != "DeliveryExceptionsCountryDropDownPartial")
+            {
+
+                @Html.DevExpress().Button(
+                    buttonSettings =>
+                    {
+                        if (action == "ProductPagesOverviewCountryRestrictionsDropDownPartial")
+                        {
+                            buttonSettings.Name = "ProductPagesOverviewCountryButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                ProductPagesOverviewCountryListBox.UnselectAll();
+                                ProductPagesOverviewCountryDD.HideDropDown(); 
+                                ProductPagesOverviewCountryDD.SetText('Country');
+                                ProductPagesOverviewGridView.Refresh();
+                            }";
+                        }
+                        else if (action == "ProductPagesOverviewNewCountryRestrictionDropDownPartial")
+                        {
+                            buttonSettings.Name = "ProductPagesOverviewNewCountryRestrictionButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                ProductPagesOverviewNewCountryRestrictionListBox.UnselectAll();
+                                ProductPagesOverviewNewCountryRestrictionDD.HideDropDown(); 
+                                ProductPagesOverviewNewCountryRestrictionDD.SetText('Country');
+                            }";
+                        }
+                        else if (action == "BannerOverviewCountryDropDownPartial")
+                        {
+                            buttonSettings.Name = "BannerOverviewCountryButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                                BannerOverviewCountryListBox.UnselectAll();
+                                BannerOverviewCountryDD.HideDropDown();
+                                BannerOverviewCountryDD.SetText('Country');
+                                BannerOverviewGridView.PerformCallback();
+                            }";
+                        }
+                        else if (action == "ComposeBannerHeaderCountryDropDownPartial")
+                        {
+                            buttonSettings.Name = "ComposeBannerHeaderCountryButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                                ComposeBannerHeaderCountryListBox.UnselectAll();
+                                ComposeBannerHeaderCountryDD.HideDropDown();
+                                ComposeBannerHeaderCountryDD.SetText('Country');
+                                LoadingPanel.Show();
+                                BannerSelectorGridView.Refresh();
+                            }";
+                        }
+                        else if (action == "PageComposePageSectionCountryDropDown")
+                        {
+                            buttonSettings.Name = "PageSectionCountryButtonClear";
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                                PageSectionCountryListBox.UnselectAll();
+                                PageSectionCountryDD.HideDropDown();
+                                PageSectionCountryDD.SetText('Country');
+                                filterPageSections();
+                            }";
+                        }
+                        buttonSettings.Text = "Clear";
+                        buttonSettings.Style.Add("float", "left");
+                }).Render();
+            }
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "ProductPagesOverviewCountryRestrictionsDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductPagesOverviewCountryButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ProductPagesOverviewCountryDD.HideDropDown();
+                            ProductPagesOverviewCountryDD.SetText('Country');
+                            ProductPagesOverviewGridView.PerformCallback();
+                        }";
+                    }
+                    else if (action == "ProductPagesOverviewNewCountryRestrictionDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductPagesOverviewNewCountryRestrictionButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ProductPagesOverviewNewCountryRestrictionDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "BannerOverviewCountryDropDownPartial")
+                    {
+                        buttonSettings.Name = "BannerOverviewCountryButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            BannerOverviewCountryDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ComposeBannerHeaderCountryDropDownPartial")
+                    {
+                        buttonSettings.Name = "ComposeBannerHeaderCountryButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            ComposeBannerHeaderCountryDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "DeliveryExceptionsCountryDropDownPartial")
+                    {
+                        buttonSettings.Name = "DeliveryExceptionsCountryButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            DeliveryExceptionsCountryDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "PageComposePageSectionCountryDropDown")
+                    {
+                        buttonSettings.Name = "PageSectionCountryButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            PageSectionCountryDD.HideDropDown();
+                        }";
+                    }
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }).Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

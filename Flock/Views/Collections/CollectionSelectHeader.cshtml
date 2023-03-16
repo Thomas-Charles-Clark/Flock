@@ -1,0 +1,46 @@
+﻿@model Flock.ViewModels.CollectionHeaderFilters
+<div id="collection-select-header" style="background-color: #e1e1e1;">
+    <input type="hidden" id="collection-header-hidden-id" value="@(Model.CollectionID)" />
+@{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+    if(action == "ProductAssociationCollectionSelectHeader")
+    {
+        <div style="color:#0072C6; font-size: 14px; float: left; width: 50%; background-color: #e1e1e1; margin: 0; padding: 1em;">Product Collection Associations</div>
+        <div style="float: left; font-size: 14px; width: 50%; background-color: white; margin: 0; padding: 1em;"><a id="collection-compose-anchor" href='/admin/collections/compose/@(Model.CollectionID)?ProductTypeid=@(Model.ProductTypeID)&brandid=@(Model.BrandID)&launchid=@(Model.LaunchID)'>Compose Collection Page</a></div>
+        <div style="clear: both;"></div>
+        <div id="product-association-header" style="padding: 1em;">
+            @Html.Action("ProductAssociationHeaderProductTypeDropDownPartial", "Collections", new { SelectedProductTypeID = Model.ProductTypeID })
+            @Html.Action("ProductAssociationHeaderBrandDropDownPartial", "Collections", new { SelectedBrandID = Model.BrandID })
+            @Html.Action("ProductAssociationHeaderLaunchDropDownPartial", "Collections", new { SelectedLaunchID = Model.LaunchID })
+            <div id="collection-drop-down-container">
+                @Html.Action("ProductAssociationHeaderCollectionDropDownPartial", "Collections")
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+    }
+    else if (action == "CollectionComposeCollectionSelectHeader")
+    {
+        if(Model != null)
+        {
+            <div style="float: left; font-size: 14px; width: 50%; background-color: white; margin: 0; padding: 10px;"><a id="product-association-anchor" href="/admin/collections/productassociation/@(Model.CollectionID)?ProductTypeid=@(Model.ProductTypeID)&brandid=@(Model.BrandID)&launchid=@(Model.LaunchID)">Product to Collection Association</a></div>
+        }
+        else
+        {
+            <div style="float: left; font-size: 14px; width: 50%; background-color: white; margin: 0; padding: 10px;"><a id="product-association-anchor" href="/admin/collections/productassociation/@(Model.CollectionID)?ProductTypeid=@(Model.ProductTypeID)&brandid=@(Model.BrandID)&launchid=@(Model.LaunchID)">Product to Collection Association</a></div>
+        }    
+        <div style="color:#0072C6; font-size: 14px; float: left; width: 50%; background-color: #e1e1e1; margin: 0; padding: 1em;">Compose Collection Page</div>
+        <div style="clear: both;"></div>
+        <div id="compose-collection-header" style="padding: 1em;">
+            @Html.Action("CollectionComposeHeaderProductTypeDropDownPartial", "Collections", new { SelectedProductTypeID = Model.ProductTypeID })
+            @Html.Action("CollectionComposeHeaderBrandDropDownPartial", "Collections", new { SelectedBrandID = Model.BrandID })
+            @Html.Action("CollectionComposeHeaderLaunchDropDownPartial", "Collections", new { SelectedLaunchID = Model.LaunchID })
+            <div id="collection-drop-down-container">
+                @Html.Action("CollectionComposeHeaderCollectionDropDownPartial", "Collections", new { CollectionID = Model.CollectionID })
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+    }
+}
+    <div style="clear: both;"></div>
+</div>
+

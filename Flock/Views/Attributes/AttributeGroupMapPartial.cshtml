@@ -1,0 +1,143 @@
+﻿@using Flock.Models
+@using Flock.ViewModels
+@model ProductTypeAttributeGroupViewModel
+<div style="text-rendering: optimizeLegibility; margin: 0 3px 3px; font-size: 12px; font-weight: 700;" onclick="$('attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-inner').slideToggle('fast');"
+     onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+    <span style="float: left; line-height: 20px; margin-right: 12px;">
+        @(Model.AttributeGroups[0].AttributeGroupID): @(Model.AttributeGroups[0].AttributeGroup.Name)
+    </span>
+    <span style="float: left; line-height: 20px;">
+        Filter
+    </span>
+    @Html.DevExpress().CheckBoxFor(m => Model.AttributeGroups[0].Filter, settings =>
+                    {
+                        settings.Name = "Filter-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
+                        settings.Style.Add("float", "left");
+                        settings.Style.Add("margin-right", "12px");
+                    }).GetHtml()
+
+    <span style="float: left; line-height: 20px;">
+        Info
+    </span>
+    @Html.DevExpress().CheckBoxFor(m => Model.AttributeGroups[0].Info, settings =>
+                    {
+                        settings.Name = "Info-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
+                        settings.Style.Add("float", "left");
+                    }).GetHtml()
+    <span style="float: left; line-height: 20px;">
+        Mandatory
+    </span>
+    @Html.DevExpress().CheckBoxFor(m => Model.AttributeGroups[0].Mandatory, settings =>
+                    {
+                        settings.Name = "Mandatory-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
+                        settings.Style.Add("float", "left");
+                    }).GetHtml()
+    <span style="float: left; line-height: 20px;">
+        AutoSync
+    </span>
+    @Html.DevExpress().CheckBoxFor(m => Model.AttributeGroups[0].AutoSync, settings =>
+                    {
+                        settings.Name = "AutoSync-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
+                        settings.Style.Add("float", "left");
+                    }).GetHtml()
+    <span style="float: left; line-height: 20px;">
+        Sort Order
+    </span>
+    @Html.DevExpress().TextBoxFor(m => Model.AttributeGroups[0].SortOrder, settings =>
+                    {
+                        settings.Name = "SortOrder-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
+                        settings.Width = 60;
+                        settings.Style.Add("margin-left", "12px");
+                        settings.Style.Add("float", "left");
+                    }).GetHtml()
+
+    <img src="/images/systemicons/remove-icon.png" class="remove-icon" style="cursor: pointer; opacity: 0.0; float: right; width: 20px; position: relative; top: 1px;" onclick="RemoveAttributeGroup(@(Model.AttributeGroups[0].AttributeGroupID))" />
+    <img id="save-@(Model.AttributeGroups[0].AttributeGroupID)-@(Model.AttributeGroups[0].ProductTypeID)" src="/images/icons/24/save.png" style="margin-right: 8px; cursor: pointer; float: right; width: 20px; position: relative; top: 1px;" onclick="SaveAttributeGroupProductTypeFlags(@(Model.AttributeGroups[0].AttributeGroupID), @(Model.AttributeGroups[0].ProductTypeID))" />
+    <div style="clear: both"></div>
+</div>
+<div id="attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-inner" class="attribute-group-inner">
+    <div id="attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-droppable" style="width: 49%; float: left; padding: 0.5em;">
+        <h6>
+            Assigned
+            <a href="javascript:;" style="float: right; font-size: 10px; line-height: 20px;" onclick="ClearAllAttributes(@(Model.AttributeGroups[0].AttributeGroupID))">Clear All</a>
+        </h6>
+        <ul id="attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-assigned-list" style="min-height: 20px;">
+            @if (Model.AttributeGroups[0].AttributeGroup.Attributes.Where(p => Model.Attributes.Select(q => q.AttributeID).Contains(p.AttributeID)).Count() > 0)
+{
+    foreach (var Attribute in Model.AttributeGroups[0].AttributeGroup.Attributes.Where(p => Model.Attributes.Select(q => q.AttributeID).Contains(p.AttributeID)))
+    {
+        <li data-attribute-id="@(Attribute.AttributeID)" class="assigned-attribute" onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <label>@(Attribute.AttributeID): @(Attribute.Name)</label>
+            <img src="/images/systemicons/remove-icon.png" onclick="RemoveAttribute(@(Attribute.AttributeID), @(Model.AttributeGroups[0].AttributeGroupID))" class="remove-icon" style="cursor: pointer; opacity: 0.0; float: right; width: 18px;" />
+        </li>
+    }
+}
+else
+{
+                <li class="placeholder">
+                    <i style="font-size: 10px;">No Attributes Selected</i>
+                </li>
+            }
+        </ul>
+    </div>
+    <div id="attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-available" style="width: 50%; float: left; padding: 0.5em; border-left: 1px solid #cdcdcd;">
+        <h6>
+            Available
+            <a href="javascript:;" style="float: right; font-size: 10px; line-height: 20px;" onclick="AddAllAttributes(@(Model.AttributeGroups[0].AttributeGroupID))">Add All</a>
+        </h6>
+        <ul id="attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-full-list" class="attribute-group-full-list">
+            @if (Model.AttributeGroups[0].AttributeGroup.Attributes.Where(p => !Model.Attributes.Select(q => q.AttributeID).Contains(p.AttributeID)).Count() > 0)
+            {
+                foreach (var Attribute in Model.AttributeGroups[0].AttributeGroup.Attributes.Where(p => !Model.Attributes.Select(q => q.AttributeID).Contains(p.AttributeID)))
+                {
+                    <li data-attribute-id="@(Attribute.AttributeID)" class="attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-draggable">
+                        <label>@(Attribute.AttributeID): @(Attribute.Name)</label>
+                    </li>
+                }
+            }
+            else
+            {
+                <li>
+                    <i style="font-size: 10px;">All Attributes Utilised</i>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div style="clear: both;"></div>
+</div>
+
+<script type="text/javascript">
+    if ($("#attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-available").height() > $("#attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-droppable").height()) {
+        $("#attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-droppable").css("height", $("#attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-available").height() + 10 + 'px');
+    }
+
+    $("#attribute-group-" + @(Model.AttributeGroups[0].AttributeGroupID)  + "-droppable").droppable({
+        //helper: 'clone',
+        activeClass: "ui-state-highlight-attribute",
+        accept: '.attribute-group-' + @(Model.AttributeGroups[0].AttributeGroupID) + '-draggable',
+        drop: function (ev, ui) {
+            $(this).find(".placeholder").remove();
+            window.Attributes = new Array();
+            ui.draggable.detach().appendTo($(this).find("ul"));
+            $(this).find("li").each(function(index) {
+                Attributes.push($(this).data("attribute-id"));
+            });
+            $(".assigned-attribute").each(function(index) { 
+                Attributes.push($(this).data("attribute-id"));
+            });
+            // RIGHT. Here's a tricky one.
+            // We want to... Take this ProductTypeID, this AttributeGroupID, and all contained AttributeIDs.
+            // Send them up to 'UpdateProductTypeAttributeGroupAttributes'
+            UpdateAttributes(@(Model.AttributeGroups[0].AttributeGroupID));
+        }
+    });
+
+    $(".attribute-group-" + @(Model.AttributeGroups[0].AttributeGroupID) + "-draggable").draggable({
+        helper: 'clone',
+        revert: 'invalid'
+    });
+
+</script>
+
+<div class="clearfix"></div>

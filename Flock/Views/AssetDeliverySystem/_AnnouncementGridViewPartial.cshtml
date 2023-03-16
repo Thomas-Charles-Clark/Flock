@@ -1,0 +1,75 @@
+﻿@{ 
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "AnnouncementGridView";
+        settings.CallbackRouteValues = new { controller = "AssetDeliverySystem", action = "AnnouncementGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { controller = "AssetDeliverySystem", action = "AnnouncementGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { controller = "AssetDeliverySystem", action = "AnnouncementGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { controller = "AssetDeliverySystem", action = "AnnouncementGridViewPartialDelete" };
+        settings.KeyFieldName = "AnnouncementID";
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.SettingsEditing.EditFormColumnCount = 1;
+
+        settings.SettingsBehavior.FilterRowMode = GridViewFilterRowMode.Auto;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.ShowFilterRow = true;
+
+        MVCxGridViewColumn AnnouncementIDColumn = new MVCxGridViewColumn();
+        AnnouncementIDColumn.Name = "AnnouncementID";
+        AnnouncementIDColumn.FieldName = "AnnouncementID";
+        AnnouncementIDColumn.Caption = "ID";
+        AnnouncementIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+
+        MVCxGridViewColumn TextColumn = new MVCxGridViewColumn();
+        TextColumn.Name = "Text";
+        TextColumn.FieldName = "Text";
+        TextColumn.Caption = "Text";
+        TextColumn.ColumnType = MVCxGridViewColumnType.Memo;
+        TextColumn.Width = 300;
+        TextColumn.CellStyle.Wrap = DefaultBoolean.True;
+        TextColumn.SetDataItemTemplateContent(c => {
+            ViewContext.Writer.Write(Html.Raw(DataBinder.Eval(c.DataItem, "Text")));
+        });
+
+        var tProp = TextColumn.PropertiesEdit as MemoProperties;
+        tProp.MaxLength = 500;
+        tProp.Rows = 4;
+        tProp.Columns = 30;
+
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        OnDateColumn.Name = "OnDate";
+        OnDateColumn.FieldName = "OnDate";
+        OnDateColumn.Caption = "On Date";
+        OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        var onProp = OnDateColumn.PropertiesEdit as DateEditProperties;
+        onProp.Width = 150;
+
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+        OffDateColumn.Name = "OffDate";
+        OffDateColumn.FieldName = "OffDate";
+        OffDateColumn.Caption = "Off Date";
+        OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        var offProp = OffDateColumn.PropertiesEdit as DateEditProperties;
+        offProp.Width = 150;
+
+        settings.Columns.Add(AnnouncementIDColumn);
+        settings.Columns.Add(TextColumn);
+        settings.Columns.Add(OnDateColumn);
+        settings.Columns.Add(OffDateColumn);
+    });
+}
+@grid.BindToLINQ("", "", (s, e) => {
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    var data = UoW.GetRepository<Flock.Models.Announcement>().GetAll().Where(p => p.DeletedDT == null).AsQueryable();
+
+    e.KeyExpression = "AnnouncementID";
+    e.QueryableSource = data;
+}).GetHtml()

@@ -1,0 +1,602 @@
+﻿@model List<Flock.Models.Brand>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ImageSearchBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "ImageSearchBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#image-searching-icon').fadeIn('fast');
+            ImageSearchBrandDD.SetText(s.GetSelectedItem().text);
+            ImageSearchBrandDD.HideDropDown();
+            $.ajax({
+                url: '" + Url.Action("ImageSearch", "Images") + @"',
+                traditional: true,
+                data: { 
+                    ProductType: ImageSearchProductTypeListBox.GetValue(),
+                    Brand: ImageSearchBrandListBox.GetValue(),
+                    Launch: ImageSearchLaunchListBox.GetValue(),
+                    Collection: ImageSearchCollectionListBox.GetValue(),
+                    AspectRatio: ImageSearchAspectRatioListBox.GetValue(),
+                    ImageType: ImageSearchImageTypeListBox.GetValue(),
+                    Perspective: ImageSearchPerspectiveListBox.GetValue(),
+                    HotspotStatus: ImageSearchHotspotStatusListBox.GetValue(),
+                    Colour: ImageSearchColourListBox.GetValue(),
+                    Room: ImageSearchRoomListBox.GetValue(),
+                    Style: ImageSearchStyleListBox.GetValue(),
+                    NameOrID: ImageSearchNameOrIDTextBox.GetValue(),
+                    SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue() ,
+                    Resolution: ResolutionListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#image-data-view-container').html(data);
+                    $('#image-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function() { $('#image-searching-icon').fadeOut('slow'); });
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else if (action == "VideoSearchBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "VideoSearchBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#video-searching-icon').fadeIn('fast');
+            VideoSearchBrandDD.SetText(s.GetSelectedItem().text);
+            VideoSearchBrandDD.HideDropDown();
+            PerformVideoSearch();
+        }";
+    }
+    else if (action == "CollectionSearchBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "CollectionBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            CollectionBrandDD.SetText(s.GetSelectedItem().text);
+            CollectionBrandDD.HideDropDown(); 
+            $('#collection-searching-icon').fadeIn('fast');
+            $.ajax({
+                url: '" + Url.Action("CollectionSearch", "Collections") + @"',
+                traditional: true,
+                data: { 
+                    ProductType: CollectionProductTypeListBox.GetValue(),
+                    Brand: CollectionBrandListBox.GetValue(),
+                    Launch: CollectionLaunchListBox.GetValue(),
+                    NameOrID: CollectionNameOrIDTextBox.GetValue()
+                },
+                success: function(data) {
+                    $('#collection-data-view-container').html(data);
+                    $('#collection-searching-icon').fadeOut('slow');
+                    if (typeof InitCollectionDragDrop == 'function')
+                        InitCollectionDragDrop();
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function() { $('#collection-searching-icon').fadeOut('slow'); });
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else if (action == "ProductSearchBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductSearchBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            ProductSearchBrandDD.SetText(s.GetSelectedItem().text);
+            ProductSearchBrandDD.HideDropDown();
+            $('#product-searching-icon').fadeIn('fast');
+            var SearchText = ProductSearchNameOrIDTextBox.GetText();
+            if($('#product-search-small-marker').length > 0) {
+            $.ajax({
+                url: '" + Url.Action("ProductSearchSmall", "Products") + @"',
+                traditional: true,
+                data: { 
+                    ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                    BrandID: ProductSearchBrandListBox.GetValue(),
+                    LaunchID: ProductSearchLaunchListBox.GetValue(),
+                    PatternID: ProductSearchPatternListBox.GetValue(),
+                    Status: ProductSearchStatusListBox.GetValue(),
+                    StatusID: ProductSearchWebStatusListBox.GetValue(),
+                    StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                    CollectionID: ProductSearchCollectionListBox.GetValue(),
+                    ColourID: ProductSearchColourListBox.GetValue(),
+                    SearchString: SearchText,
+                    ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                    PriceListID: ProductSearchPriceListListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#product-data-view-container').html(data);
+                    $('#product-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $('#product-searching-icon').fadeOut('slow');
+                    alert(e.responseText);
+                },
+                timeout: 60000
+            });
+        }
+        else {
+            $.ajax({
+                url: '" + Url.Action("ProductSearch", "Products") + @"',
+                traditional: true,
+                data: { 
+                    ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                    BrandID: ProductSearchBrandListBox.GetValue(),
+                    LaunchID: ProductSearchLaunchListBox.GetValue(),
+                    PatternID: ProductSearchPatternListBox.GetValue(),
+                    Status: ProductSearchStatusListBox.GetValue(),
+                    StatusID: ProductSearchWebStatusListBox.GetValue(),
+                    StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                    CollectionID: ProductSearchCollectionListBox.GetValue(),
+                    ColourID: ProductSearchColourListBox.GetValue(),
+                    SearchString: SearchText,
+                    ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                    PriceListID: ProductSearchPriceListListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#product-data-view-container').html(data);
+                    $('#product-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $('#product-searching-icon').fadeOut('slow');
+                    alert(e.responseText);
+                },
+                timeout: 60000
+            });
+        }
+
+        }";
+    }
+    else if (action == "CollectionComposeHeaderBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "CollectionComposeHeaderBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            CollectionComposeHeaderBrandDD.HideDropDown();
+            CollectionComposeHeaderBrandDD.SetText(s.GetSelectedItem().text);
+
+            var url = '" + @Url.Action("productassociation", "collections", new { id = "-1", ProductTypeid = "-2", brandid = "-3", launchid = "-4" }) + @"';
+
+            url = url.replace('-1', $('#collection-header-hidden-id').val());
+            url = url.replace('-2', CollectionComposeHeaderProductTypeListBox.GetValue());
+            url = url.replace('-3', s.GetSelectedItem().value);
+            url = url.replace('-4', CollectionComposeHeaderLaunchListBox.GetValue());
+
+            $('#product-association-anchor').attr('href', url);
+
+
+            $.ajax({
+                url: '" + Url.Action("CollectionComposeHeaderCollectionDropDownPartial", "Collections") + @"',
+                traditional: true,
+                data: {
+                    CollectionID: $('#collection-header-hidden-id').val(),
+                    ProductTypeID: CollectionComposeHeaderProductTypeListBox.GetValue(),
+                    BrandID: CollectionComposeHeaderBrandListBox.GetValue(),
+                    LaunchID: CollectionComposeHeaderLaunchListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#collection-drop-down-container').html(data);
+                },
+                error: function(e, s, a) { 
+                    $.showError(e, s, a);
+                },
+                timeout: 60000
+            });
+        }";
+
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.CollectionHeaderSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                CollectionComposeHeaderBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "ProductAssociationHeaderBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductAssociationHeaderBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            ProductAssociationHeaderBrandDD.HideDropDown();
+            ProductAssociationHeaderBrandDD.SetText(s.GetSelectedItem().text);
+
+            var url = '" + @Url.Action("compose", "collections", new { id = "-1", ProductTypeid = "-2", brandid = "-3", launchid = "-4" }) + @"';
+
+            url = url.replace('-1', $('#collection-header-hidden-id').val());
+            url = url.replace('-2', ProductAssociationHeaderProductTypeListBox.GetValue());
+            url = url.replace('-3', s.GetSelectedItem().value);
+            url = url.replace('-4', ProductAssociationHeaderLaunchListBox.GetValue());
+
+            $('#collection-compose-anchor').attr('href', url);
+
+            $('.draggable').draggable('destroy');
+            $('#collection-contents').html('<div style=\'background-color: white; padding: 1em; height: 1108px; overflow-y: scroll;\' id=\'collection-contents-sortable\'><span id=\'collection-contents-placeholder\' style=\'padding: 0; margin: 0; font-size: 12px; font-weight: 400;\'>Either there are no products in this collection, or you have not selected a collection yet using the drop down lists above.</span></div>');
+            ProductAssociationHeaderBrandDD.SetText(s.GetSelectedItem().text);
+            $.ajax({
+                url: '" + Url.Action("ProductAssociationHeaderCollectionDropDownPartial", "Collections") + @"',
+                traditional: true,
+                data: {
+                    ProductTypeID: ProductAssociationHeaderProductTypeListBox.GetValue(),
+                    BrandID: ProductAssociationHeaderBrandListBox.GetValue(),
+                    LaunchID: ProductAssociationHeaderLaunchListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#collection-drop-down-container').html(data);
+                },
+                error: function(e, s, a) { 
+                    $.showError(e, s, a);
+                },
+                timeout: 60000
+            });
+        }";
+
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.ProductAssociationSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ProductAssociationHeaderBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "CollectionOverviewBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "CollectionOverviewBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            CollectionOverviewBrandDD.SetText(s.GetSelectedItem().text);
+            CollectionOverviewBrandDD.HideDropDown();
+            $('#CollectionGridView_DXEditor11_I').val(s.GetSelectedItem().value);
+        }";
+
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.SelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                CollectionOverviewBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "ProductPageComposeBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "BrandID";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            ProductPageComposeBrandDD.SetText(s.GetSelectedItem().text);
+            ProductPageComposeBrandDD.HideDropDown();
+        }";
+
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.ProductPageComposeSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ProductPageComposeBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "ProductPageSearchBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductPageSearchBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            ProductPageSearchBrandDD.HideDropDown();
+            ProductPageSearchBrandDD.SetText(s.GetSelectedItem().text);
+            $('#product-page-searching-icon').fadeIn('fast');
+            $.ajax({
+	            url: '" + Url.Action("ProductPageSearch", "ProductPages") + @"',
+	            traditional: true,
+	            data: {
+		            ProductTypeID: ProductPageSearchProductTypeListBox.GetValue(),
+		            BrandID: ProductPageSearchBrandListBox.GetValue(),
+		            LaunchID: ProductPageSearchLaunchListBox.GetValue(),
+		            CollectionID: ProductPageSearchCollectionListBox.GetValue(),
+		            PatternID: ProductPageSearchPatternListBox.GetValue(),
+		            ColourID: ProductPageSearchColourListBox.GetValue(),
+                    StatusID: ProductPageSearchStatusListBox.GetValue(),
+                    TemplateID: ProductPageSearchTemplateListBox.GetValue(),
+		            SearchString: ProductPageSearchNameTextBox.GetValue()
+	            },
+	            success: function(data) {
+		            $('#product-page-searching-icon').fadeOut('fast');
+		            $('#product-page-data-view-container').html(data);
+	            },
+	            error: function(e, s, a) { 
+		            $.showError(e, s, a, function() { $('#product-page-searching-icon').fadeOut('fast'); });
+	            },
+	            timeout: 60000
+            });
+        }";
+    }
+    else if (action == "ComposeProductPageHeaderBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "ComposeProductPageHeaderBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            ComposeProductPageHeaderBrandDD.HideDropDown();
+            ComposeProductPageHeaderBrandDD.SetText(s.GetSelectedItem().text);
+            $('#product-page-header-searching-icon').fadeIn('fast');
+            $.ajax({
+                url: '" + Url.Action("ComposeProductPageHeader", "ProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: ComposeProductPageHeaderProductTypeListBox.GetValue(),
+                    BrandID: ComposeProductPageHeaderBrandListBox.GetValue(),
+                    LaunchID: ComposeProductPageHeaderLaunchListBox.GetValue(),
+                    WebStatusID: ComposeProductPageHeaderWebStatusListBox.GetValue(),
+                    TemplateID: ComposeProductPageHeaderTemplateListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#product-page-header-searching-icon').fadeOut('fast');
+                        $('#product-select-header-container').html(data);
+                },
+                error: function(e, s, a) { 
+                    $.showError(e, s, a, function() { $('#product-page-header-searching-icon').fadeOut('fast'); });
+                },
+                timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.ProductHeaderSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+               ComposeProductPageHeaderBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "AttributeHeaderBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "AttributeBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            AttributeBrandDD.HideDropDown();
+            AttributeBrandDD.SetText(s.GetSelectedItem().text);
+            
+            $('#attribute-product-page-select-busy').fadeIn('fast');
+            $.ajax({
+                url: '" + Url.Action("ProductPageAttributeHeader", "ProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: AttributeProductTypeListBox.GetValue(),
+                    BrandID: AttributeBrandListBox.GetValue(),
+                    LaunchID: AttributeLaunchListBox.GetValue(),
+                    WebStatusID: AttributeWebStatusListBox.GetValue(),
+                    TemplateID: AttributeTemplateListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#attribute-filter-header').html(data);
+                    AttributeProductPageListBox.PerformCallback();
+                },
+                error: function(e, s, a) { 
+                    $.showError(e, s, a, function() { $('#attribute-product-page-select-busy').fadeOut('fast'); });
+                },
+                timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.AttributeHeaderSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                AttributeBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "TranslateProductPageHeaderBrandDropDown")
+    {
+        listBoxSettings.Name = "TranslateProductPageHeaderBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            TranslateProductPageHeaderBrandDD.HideDropDown();
+            TranslateProductPageHeaderBrandDD.SetText(s.GetSelectedItem().text);
+            $('#translate-product-page-header-searching-icon').fadeIn('fast');
+            var TargetLanguageID = null;
+            if(typeof(TranslationTargetLanguageListBox) != 'undefined' && typeof(TranslationTargetLanguageListBox) != false)
+                TargetLanguageID = TranslationTargetLanguageListBox.GetValue();
+            $('#translate-product-page-header-searching-icon').fadeIn('fast');
+            $.ajax({
+	            url: '" + Url.Action("TranslateProductPageHeader", "Translations") + @"',
+	            type: 'POST',
+	            traditional: true,
+	            data: { 
+		            ProductTypeID: TranslateProductPageHeaderProductTypeListBox.GetValue(),
+		            BrandID: TranslateProductPageHeaderBrandListBox.GetValue(),
+		            LaunchID: TranslateProductPageHeaderLaunchListBox.GetValue(),
+		            TemplateID: TranslateProductPageHeaderTemplateListBox.GetValue(),
+		            WebStatusID: TranslateProductPageHeaderWebStatusListBox.GetValue(),
+		            TranslationStatusID: TranslateProductPageHeaderTranslationStatusListBox.GetValue(),
+                    TargetLanguageID: TargetLanguageID
+	            },
+	            success: function(data) { 
+		            $('#translate-product-page-header-searching-icon').fadeOut('fast');
+		            $('#translate-product-page-header-container').html(data);
+
+                    $('#default-fieldset').slideUp('fast');
+                    $('#translation-fieldset').slideUp('fast');
+	            },
+	            error: function(e, s, a) { 
+		            $.showError(e, s, a, function() { $('#translate-product-page-header-searching-icon').fadeOut('fast'); });
+	            },
+	            timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.TranslateProductPageHeaderSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+               TranslateProductPageHeaderBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "TranslateCollectionHeaderBrandDropDown")
+    {
+        listBoxSettings.Name = "TranslateCollectionHeaderBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                TranslateCollectionHeaderBrandDD.HideDropDown();
+                TranslateCollectionHeaderBrandDD.SetText(s.GetSelectedItem().text);
+                var TargetLanguageID = null;
+                if(typeof(TranslationTargetLanguageListBox) != 'undefined' && typeof(TranslationTargetLanguageListBox) != false)
+                    TargetLanguageID = TranslationTargetLanguageListBox.GetValue();
+                $('#translate-collection-header-searching-icon').fadeIn('fast');
+                $.ajax({
+	                url: '" + Url.Action("TranslateCollectionHeader", "Translations") + @"',
+	                type: 'POST',
+	                traditional: true,
+	                data: { 
+		                ProductTypeID: TranslateCollectionHeaderProductTypeListBox.GetValue(),
+		                BrandID: TranslateCollectionHeaderBrandListBox.GetValue(),
+		                LaunchID: TranslateCollectionHeaderLaunchListBox.GetValue(),
+		                WebStatusID: TranslateCollectionHeaderWebStatusListBox.GetValue(),
+		                TranslationStatusID: TranslateCollectionHeaderTranslationStatusListBox.GetValue(),
+                        TargetLanguageID: TargetLanguageID
+	                },
+	                success: function(data) { 
+		                $('#translate-collection-header-searching-icon').fadeOut('fast');
+		                $('#translate-collection-header-container').html(data);
+                        if (TranslateHeaderContentListBox.FindItemByValue($('#content-id-label').html()) == null) {
+                            TranslateHeaderContentListBox.SetSelectedIndex(0);
+                            var e = new ASPxClientProcessingModeEventArgs();
+                            if(TranslateHeaderContentListBox.GetItemCount() > 0)
+                                TranslateHeaderContentListBox.SelectedIndexChanged.FireEvent(TranslateHeaderContentListBox, e);
+                            else {
+                                $('#pager-total').html('-');
+                                $('#pager-current').html(0);
+                            }
+                        }
+	                },
+	                error: function(e, s, a) { 
+		                $.showError(e, s, a, function() { $('#translate-collection-header-searching-icon').fadeOut('fast'); });
+	                },
+	                timeout: 60000
+                });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.TranslateCollectionHeaderSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+               TranslateCollectionHeaderBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "BrochureDetailsBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "BrochureDetailsBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            BrochureDetailsBrandDD.HideDropDown();
+            BrochureDetailsBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.BrochureDetailsSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+               BrochureDetailsBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "AttributeBrandDropDown")
+    {
+        listBoxSettings.Name = "AttributeDetailBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            AttributeDetailBrandDD.HideDropDown();
+            AttributeDetailBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.AttributesSelectedBrandID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+               AttributeDetailBrandDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "ProductPage_BrandDropDown")
+    {
+        listBoxSettings.Name = "RelatedProductPagePrimaryBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            RelatedProductPagePrimaryBrandDD.SetText(s.GetSelectedItem().text);
+            RelatedProductPagePrimaryBrandDD.HideDropDown();
+            LoadingPanel.Show();
+            
+            var rpppnid = RelatedProductPagePrimaryNameOrIDTextBox.GetValue();
+
+            if (rpppnid == 'Name, Code or ID')
+                rpppnid = null;
+
+            LoadingPanel.Show();
+            $.ajax({ 
+                url: '" + @Url.Action("RelatedProductPagePartial", "RelatedProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    PP_NameOrID: rpppnid,
+                    PP_ProductTypeID: RelatedProductPagePrimaryProductTypeListBox.GetValue(),
+                    PP_CollectionID: RelatedProductPagePrimaryCollectionListBox.GetValue(),
+                    PP_BrandID: RelatedProductPagePrimaryBrandListBox.GetValue(),
+                    PP_LaunchID: RelatedProductPagePrimaryLaunchListBox.GetValue(),
+                    PP_TemplateID: RelatedProductPagePrimaryTemplateListBox.GetValue(),
+                    PP_StatusID: RelatedProductPagePrimaryStatusListBox.GetValue(),
+                    RPP_ProductTypeID: RelatedProductPageSecondaryProductTypeListBox.GetValue(),
+                    RPP_CollectionID: RelatedProductPageSecondaryCollectionListBox.GetValue(),
+                    RPP_BrandID: RelatedProductPageSecondaryBrandListBox.GetValue(),
+                    RPP_LaunchID: RelatedProductPageSecondaryLaunchListBox.GetValue(),
+                    RPP_TemplateID: RelatedProductPageSecondaryTemplateListBox.GetValue(),
+                    RPP_StatusID: RelatedProductPageSecondaryStatusListBox.GetValue(),
+                    RPP_Count: RelatedProductPageCount.GetValue(),
+                    RPP_CountOperator: RelatedProductPageCountOperator.GetValue(),
+                    PageLimit: PageLimit.GetValue(),
+                    PageOffset: $('#current-page').val()
+                },
+                success: function(data) { 
+                    $('#ajax-target').html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function(e, s, a) { 
+                    $.showError(e, s, a);
+                },
+                timeout: 30000
+            });
+        }";
+    }
+    else if (action == "RelatedProductPage_BrandDropDown")
+    {
+        listBoxSettings.Name = "RelatedProductPageSecondaryBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            RelatedProductPageSecondaryBrandDD.SetText(s.GetSelectedItem().text);
+            RelatedProductPageSecondaryBrandDD.HideDropDown();
+            LoadingPanel.Show();
+            
+            var rpppnid = RelatedProductPagePrimaryNameOrIDTextBox.GetValue();
+
+            if (rpppnid == 'Name, Code or ID')
+                rpppnid = null;
+
+            LoadingPanel.Show();
+            $.ajax({ 
+                url: '" + @Url.Action("RelatedProductPagePartial", "RelatedProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    PP_NameOrID: rpppnid,
+                    PP_ProductTypeID: RelatedProductPagePrimaryProductTypeListBox.GetValue(),
+                    PP_CollectionID: RelatedProductPagePrimaryCollectionListBox.GetValue(),
+                    PP_BrandID: RelatedProductPagePrimaryBrandListBox.GetValue(),
+                    PP_LaunchID: RelatedProductPagePrimaryLaunchListBox.GetValue(),
+                    PP_TemplateID: RelatedProductPagePrimaryTemplateListBox.GetValue(),
+                    PP_StatusID: RelatedProductPagePrimaryStatusListBox.GetValue(),
+                    RPP_ProductTypeID: RelatedProductPageSecondaryProductTypeListBox.GetValue(),
+                    RPP_CollectionID: RelatedProductPageSecondaryCollectionListBox.GetValue(),
+                    RPP_BrandID: RelatedProductPageSecondaryBrandListBox.GetValue(),
+                    RPP_LaunchID: RelatedProductPageSecondaryLaunchListBox.GetValue(),
+                    RPP_TemplateID: RelatedProductPageSecondaryTemplateListBox.GetValue(),
+                    RPP_StatusID: RelatedProductPageSecondaryStatusListBox.GetValue(),
+                    RPP_Count: RelatedProductPageCount.GetValue(),
+                    RPP_CountOperator: RelatedProductPageCountOperator.GetValue(),
+                    PageLimit: PageLimit.GetValue(),
+                    PageOffset: $('#current-page').val()
+                },
+                success: function(data) { 
+                    $('#ajax-target').html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function(e, s, a) { 
+                    $.showError(e, s, a);
+                },
+                timeout: 10000
+            });
+        }";
+    }
+    else if (action == "SalePricesBrandDropDownPartial")
+    {
+        listBoxSettings.Name = "SalePricesBrandListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            if(changePrefilterCheck()) {
+                window.brandId = s.GetValue();
+                SalePricesBrandDD.SetText(s.GetSelectedItem().text);
+                SalePricesBrandDD.HideDropDown();
+                loadSalePrices();
+            }
+        }";
+    }
+
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "BrandID";
+}).BindList(Model).GetHtml()

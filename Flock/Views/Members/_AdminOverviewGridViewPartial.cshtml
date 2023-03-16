@@ -1,0 +1,132 @@
+﻿@using Flock.DAL;
+@using Flock.Models;
+@model Flock.Controllers.AdminOverviewSettings
+@{
+    using (var UoW = new UnitOfWork<FlockDataContext>())
+    {
+        var grid = Html.DevExpress().GridView(settings =>
+        {
+            settings.Name = "AdminOverviewGridView";
+            settings.CallbackRouteValues = new { Controller = "Members", Action = "AdminOverviewGridViewPartial" };
+            settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Members", Action = "AdminOverviewGridAddNew" };
+            settings.CustomActionRouteValues = new { Controller = "Members", Action = "AdminOverviewGridViewCustomCommand" };
+            settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+                e.customArgs['RoleID'] = AdminOverviewUserRoleListBox.GetValue();   
+            }";
+            settings.ClientSideEvents.EndCallback = @"function(s, e) {
+                if($('#AdminOverviewGridView_DXTitle').is(':visible')) {
+                    window.setTimeout(function() { 
+                        $('#AdminOverviewGridView_DXTitle').fadeOut('fast');
+                    }, 15000);
+                }
+            }";
+            settings.SettingsEditing.Mode = GridViewEditingMode.EditForm; 
+            settings.SettingsEditing.ShowModelErrorsForEditors = true;
+            settings.CommandColumn.ShowNewButtonInHeader = true;
+            settings.CommandColumn.Visible = true;
+            settings.CommandColumn.VisibleIndex = 0;
+
+            settings.SettingsDetail.ShowDetailButtons = true;
+            settings.SettingsDetail.ShowDetailRow = true;
+            settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = false;
+
+            settings.SetDetailRowTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(Html.Action("FetchMemberByEmail", "SmartFocus", new { Email = DataBinder.Eval(c.DataItem, "Email") }).ToHtmlString());
+            });
+            
+            settings.KeyFieldName = "Id";
+
+            MVCxGridViewColumn UserIDColumn = new MVCxGridViewColumn();
+            UserIDColumn.Name = "UserId";
+            UserIDColumn.FieldName = "Id";
+            UserIDColumn.Caption = "ID";
+            //settings.Columns.Add(UserIDColumn);
+
+            MVCxGridViewColumn EmailColumn = new MVCxGridViewColumn();
+            EmailColumn.Name = "Email";
+            EmailColumn.FieldName = "Email";
+            EmailColumn.Caption = "Email";
+            settings.Columns.Add(EmailColumn);
+            
+            MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+            NameColumn.Name = "Name";
+            NameColumn.FieldName = "Name";
+            NameColumn.Caption = "Name";
+            settings.Columns.Add(NameColumn);
+
+            MVCxGridViewColumn PhoneColumn = new MVCxGridViewColumn();
+            PhoneColumn.Name = "PhoneNumber";
+            PhoneColumn.FieldName = "PhoneNumber";
+            PhoneColumn.Caption = "Phone";
+            settings.Columns.Add(PhoneColumn);
+
+            MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+            CreatedDTColumn.Name = "CreatedDT";
+            CreatedDTColumn.FieldName = "CreatedDT";
+            CreatedDTColumn.Caption = "Date Created";
+            CreatedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+            settings.Columns.Add(CreatedDTColumn);
+
+            MVCxGridViewColumn SourceColumn = new MVCxGridViewColumn();
+            SourceColumn.Name = "Source";
+            SourceColumn.FieldName = "Source";
+            SourceColumn.Caption = "Source";
+            SourceColumn.EditFormSettings.Visible = DefaultBoolean.False;
+            settings.Columns.Add(SourceColumn);
+
+            MVCxGridViewColumn AccessFailedCountColumn = new MVCxGridViewColumn();
+            AccessFailedCountColumn.Name = "AccessFailedCount";
+            AccessFailedCountColumn.FieldName = "AccessFailedCount";
+            AccessFailedCountColumn.Caption = "Failed Attempts";
+            AccessFailedCountColumn.EditFormSettings.Visible = DefaultBoolean.False;
+            settings.Columns.Add(AccessFailedCountColumn);
+            
+            MVCxGridViewColumn LockoutEndDateColumn = new MVCxGridViewColumn();
+            LockoutEndDateColumn.Name = "LockoutEndDate";
+            LockoutEndDateColumn.FieldName = "LockoutEndDateUtc";
+            LockoutEndDateColumn.Caption = "Lockout Ends";
+            LockoutEndDateColumn.EditFormSettings.Visible = DefaultBoolean.False;
+            settings.Columns.Add(LockoutEndDateColumn);
+
+            MVCxGridViewColumn CustomCommandColumn = new MVCxGridViewColumn();
+            CustomCommandColumn.Name = "CustomCommandColumn";
+            CustomCommandColumn.FieldName = "CustomCommandColumn";
+            CustomCommandColumn.Caption = "&nbsp;";
+            CustomCommandColumn.UnboundType = DevExpress.Data.UnboundColumnType.String;
+            CustomCommandColumn.EditFormSettings.Visible = DefaultBoolean.False;
+            CustomCommandColumn.SetDataItemTemplateContent(c => {
+                if (DataBinder.Eval(c.DataItem, "LockoutEndDateUtc") != null)
+                    ViewContext.Writer.Write("<a href='javascript:;' style='margin-right: 1em;' onclick=\"AdminOverviewGridView.PerformCallback({ commandType: 'Unlock', userId: '" + c.KeyValue + "'});\">Unlock</a>");
+                
+                ViewContext.Writer.Write("<a href='javascript:;' onclick=\"AdminOverviewGridView.PerformCallback({ commandType: 'PasswordReminder', userId: '" + c.KeyValue + "' });\">Password Reset</a>");
+            });
+            settings.Columns.Add(CustomCommandColumn);
+
+            if (ViewData["ResetPasswordSent"] != null)
+            {
+                settings.Settings.ShowTitlePanel = true;
+                settings.SetTitlePanelTemplateContent(c => {
+                    ViewContext.Writer.Write(ViewData["ResetPasswordSent"]);
+                });
+            }
+        });
+
+        if (ViewData["EditErrors"] != null)
+        {
+            grid.SetEditErrorText(ViewData["EditErrors"].ToString());
+        }
+        
+        grid.BindToLINQ("", "", (s, e) =>
+        {
+            var source = UoW.GetRepository<vwUserOverview>().GetAll();
+            
+            if(Model.RoleID != null)
+                source = source.Where(p => p.RoleId == Model.RoleID);
+            
+            e.KeyExpression = "Id";
+            e.QueryableSource = source;
+        });
+        grid.GetHtml();
+    }
+}

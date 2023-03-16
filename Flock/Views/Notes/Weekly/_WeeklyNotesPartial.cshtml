@@ -1,0 +1,45 @@
+﻿@model Flock.ViewModels.WeeklyNotesViewModel
+
+@if (Model.FoundRecord == false)
+{
+    <h6 class="subheading">No record found.</h6>
+}
+else
+{
+    <input type="hidden" id="week" value="@(Model.Week)" />
+    <input type="hidden" id="year" value="@(Model.Year)" />
+    <input type="hidden" id="pricelist" value="@(Model.PriceListID)" />
+
+    <div class="notes-memo-container" style="padding-right: 0.5em">
+        <h6 class="subheading">Objectives</h6>
+        @Html.DevExpress().MemoFor(m => Model.Objectives, settings =>
+        {
+            settings.Name = "Objectives";
+            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            settings.Properties.Rows = 25;
+            settings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                objectives = s.GetText();
+            }";
+        }).GetHtml()
+    </div>
+
+    <div class="notes-memo-container" style="padding-left: 0.5em;">
+        <h6 class="subheading">Observations</h6>
+        @Html.DevExpress().MemoFor(m => Model.Observations, settings =>
+        {
+            settings.Name = "Observations";
+            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            settings.Properties.Rows = 25;
+            settings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                observations = s.GetText();
+            }";
+        }).GetHtml()
+    </div>
+
+    <div class="clearfix"></div>
+
+    <button id="save-btn" class="btn-default btn" onclick="saveWeekNotes()">Save</button>
+
+    <div class="clearfix"></div>
+   
+}

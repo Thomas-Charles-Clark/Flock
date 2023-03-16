@@ -1,0 +1,26 @@
+﻿@model Flock.ViewModels.BasePageSection
+@Html.DevExpress().ComboBoxFor(m => m.ProductTypeID, settings =>
+{
+    settings.Name = $"PageSection-{Model.PageSectionID}-ProductTypeID";
+    settings.CallbackRouteValues = new { Controller = "CMS", Action = "PageSection_ProductTypeIDComboBoxPartial" };
+    settings.Properties.ClientSideEvents.BeginCallback = @"function (s, e) { 
+        e.customArgs['PageSectionID'] = '" + Model.PageSectionID + @"';
+        e.customArgs['ProductTypeID'] = PageSection" + Model.PageSectionID + @"ProductTypeID.GetValue();
+    }";
+    settings.Properties.ClientInstanceName = "PageSection" + Model.PageSectionID + @"ProductTypeID";
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "ProductTypeID";
+    settings.Properties.ValueType = typeof(byte?);
+    settings.Style.Add("float", "left");
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.IncrementalFilteringDelay = 500;
+    settings.Properties.FilterMinLength = 0;
+    settings.Properties.NullText = "Type to search...";
+    settings.Width = 226;
+    settings.Properties.DropDownWidth = 290;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.Properties.Columns.Add("ProductTypeID", "Product Type ID", 90);
+    settings.Properties.Columns.Add("Name", "Name", 200);
+    settings.Properties.ClientSideEvents.ValueChanged = $"PageSection{Model.PageSectionID}ProductTypeIDChanged";
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetProductTypesForComboBox, Flock.ViewModels.LargeDatabaseDataProvider.GetProductTypeByIDForComboBox).GetHtml()

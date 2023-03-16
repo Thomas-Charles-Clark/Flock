@@ -1,0 +1,235 @@
+﻿@model Flock.ViewModels.BundlesViewModel
+@{
+    ViewBag.Title = "Bundles";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/css/bundles")
+}
+<script type="text/javascript">
+    var prefix = 'BUND';
+
+    window.bundleBeginCallback = (s, e) => {
+        if (e.hasOwnProperty('command')) {
+            if (e.command == 'STARTEDIT') {
+                e.customArgs['BundleID'] = window.editingKey;
+            } else if (e.command == 'UPDATEEDIT') {
+                e.customArgs['BundledProducts'] = getProductsList();
+                e.customArgs['ProductBundle'] = getProductsList().length ? 'valid' : null;
+            }
+        }
+    }
+    
+
+    function OnCodeKeyDown(event, input, s) {
+        var keyCode = event.keyCode || event.which;
+        if (keyCode != 8) { //Backspace
+            if (keyCode >= 37 && keyCode <= 40 || keyCode == 35 || keyCode == 36) { //Keyarrows, Home, End
+                return;
+            }
+            if (getCaretPos(input) < prefix.length)
+                ASPxClientUtils.PreventEventAndBubble(event);
+        }
+        else {
+            if (getCaretPos(input) > prefix.length)
+                return;
+            else
+                ASPxClientUtils.PreventEventAndBubble(event);
+        }
+    }
+
+    function getCaretPos(input) {
+        if (document.selection && document.selection.createRange) {
+            var range = document.selection.createRange();
+            var bookmark = range.getBookmark();
+            var caret_pos = bookmark.charCodeAt(2) - 2;
+        }
+        else {
+            if (input.setSelectionRange)
+                var caret_pos = input.selectionStart;
+        }
+        return caret_pos;
+    }
+
+
+    function increaseQty(ele) {
+        var qty = Number($(ele).closest('tr').find('td.qty').text());
+        qty += 1;
+        $(ele).closest('tr').find('td.qty').text(qty);
+    }
+    6
+    function decreaseQty(ele) {
+        var qty = Number($(ele).closest('tr').find('td.qty').text());
+
+        if (qty == 1)
+            return;
+
+        qty -= 1;
+
+        $(ele).closest('tr').find('td.qty').text(qty);
+    }
+
+    function getProductsList() {
+        if ($("#products-list").length > 0) {
+
+            var bundleProductId = $("#products-list").data("bundle-product-id");
+
+            var objArray = [];
+
+            $("#products-list").find("tr").each(function (i, obj) {
+                objArray.push({ BundleProductID: Number(bundleProductId), ProductID: Number($(obj).data("product-id")), Quantity: Number($(obj).find("td.qty").text()) });
+            });
+
+            return objArray;
+        } else {
+            return [];
+        }
+    }
+
+    function OpenMarketSelect() {
+        $("#market-selection-dialog input").removeAttr("checked");
+
+        if (BundleGridView.GetSelectedKeysOnPage().length == 0)
+            alert("Select at least one bundle.");
+        else
+            $("#market-selection-dialog").dialog("open");
+    }
+
+</script>
+
+<h4 class="page-heading">
+    Bundles
+</h4>
+
+@*<div class="page-subheading">
+    @Html.Action("BundlesPriceListDropDown")
+    <div class="clearfix"></div>
+</div>*@
+
+<div id="bulk-action-panel" style="width: 280px; position: static; float: none; margin: 20px 0;">
+    <h4>Bulk Action Panel</h4>
+    <ul>
+        <li style="margin-bottom: 8px;">
+            <a href="javascript:;" title="Assign Market" onclick="$('#market-selection-dialog').dialog('option', 'title', 'Select Markets for Assignment'); $('#market-selection-dialog').data('action', 'Assignment'); OpenMarketSelect();">Assign to Markets</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Delete Markets" onclick="$('#market-selection-dialog').dialog('option', 'title', 'Select Markets for Removal'); $('#market-selection-dialog').data('action', 'Removal'); OpenMarketSelect();">Remove from Markets</a>
+        </li>
+    </ul>
+</div>
+
+<div id="market-selection-dialog">
+    @{
+        for (int i = 0; i < Model.PriceLists.Count; i++)
+        {
+            <div style="width: 96px; height: 80px; float: left; margin: 1em;">
+                <label>
+                    <img style="margin-right: 8px; margin-bottom: 8px;" src="/images/icons/32/pricelists/@(Model.PriceLists[i].PriceListID).png" title="@(Model.PriceLists[i].Name)" />
+                    <input style="position: relative; bottom: 5px;" value="@(Model.PriceLists[i].PriceListID)" type="checkbox" />
+                    <br />
+                    @(Model.PriceLists[i].Name)
+                </label>
+            </div>
+        }
+    }
+</div>
+
+<div id="grid-view-container">
+    @Html.Action("BundleGridViewPartial")
+</div>
+
+<div class="clearfix"></div>
+
+<script type="text/javascript">
+
+    $("#market-selection-dialog").dialog({
+        title: "Market Selection",
+        width: 400,
+        height: "auto",
+        autoOpen: false,
+        resizable: false,
+        buttons: {
+            Ok: function () {
+                if ($("#market-selection-dialog input:checked").length == 0) {
+                    alert("No Markets have been selected for " + $(this).data("action") + ".");
+                    return;
+                }
+                else {
+                    var action = $(this).data("action");
+                    var preposition = "for";
+                    if (action == "Assignment")
+                        action = "create";
+                    else if (action == "Removal") {
+                        action = "remove";
+                        preposition = "from";
+                    }
+                    var confirm = window.confirm("This action will " + action + " the selected PriceList entries " + preposition + " the selected Bundles.\r\n\r\nAre you sure?");
+                    if (confirm) {
+                        if (action == "create") {
+                            AssignMarkets();
+                            $(this).dialog("close");
+                        }
+                        else {
+                            DeleteMarkets();
+                            $(this).dialog("close");
+                        }
+                    }
+                    else {
+                        $(this).dialog("close");
+                    }
+                }
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+
+
+    function AssignMarkets() {
+        var keys = null;
+
+        if (typeof (BundleGridView) != "undefined" && BundleGridView != false)
+            keys = BundleGridView.GetSelectedKeysOnPage();
+
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (BundleGridView) != "undefined" && BundleGridView != false) {
+                BundleGridView.PerformCallback({
+                    commandType: 'AssignMarkets',
+                    bundleIds: keys,
+                    priceListIds: $("#market-selection-dialog input:checked").map(function () {
+                        return this.value;
+                    }).get()
+                });
+            }
+        }
+        else
+            alert("Select at least one bundle.");
+        return false;
+    }
+
+    function DeleteMarkets() {
+        var keys = null;
+
+        if (typeof (BundleGridView) != "undefined" && BundleGridView != false)
+            keys = BundleGridView.GetSelectedKeysOnPage();
+
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (BundleGridView) != "undefined" && BundleGridView != false) {
+                BundleGridView.PerformCallback({
+                    commandType: 'DeleteMarkets',
+                    bundleIds: keys,
+                    priceListIds: $("#market-selection-dialog input:checked").map(function () {
+                        return this.value;
+                    }).get()
+                });
+            }
+        }
+        else
+            alert("Select at least one bundle.");
+        return false;
+    }
+
+</script>

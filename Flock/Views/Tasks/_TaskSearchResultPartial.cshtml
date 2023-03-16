@@ -1,0 +1,25 @@
+﻿@model Flock.ViewModels.TaskSearchViewModel
+
+<ul class="sortable">
+    @foreach (var t in Model.Tasks.Where(p => p.ParentTaskID == 0 && p.TaskTypeID == 1))
+    {
+        ViewBag.CurrentRecursionTaskID = t.TaskID;
+        @Html.Partial("_BugPartial", Model)
+    }
+</ul>
+
+<ol class="sortable">
+    @foreach (var t in Model.Tasks.Where(p => p.ParentTaskID == 0 && p.TaskTypeID == 2))
+    {
+        ViewBag.CurrentRecursionTaskID = t.TaskID;
+        @Html.Partial("_TaskPartial", Model)
+    }
+</ol>
+
+<script type="text/javascript">
+
+    $(".task-type-binder").each(function () {
+        $(this).html(getTaskTypeByID($(this).data("task-type-id")));
+    });
+
+</script>

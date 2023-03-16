@@ -1,0 +1,40 @@
+﻿@model List<Flock.Models.Country_Language>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Name = "GlobalCountryLanguageDD";
+
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        settings.Properties.DropDownWindowStyle.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.Solid;
+        settings.Properties.DropDownWindowStyle.CssClass = "adjusted-dropdown-global";
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='global-country-language-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("GlobalCountryLanguageListBoxPartial", Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    buttonSettings.Name = "GlobalCountryLanguageButtonClose";
+                    buttonSettings.Style.Add("margin-bottom", "0");
+                    buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                        GlobalCountryLanguageDD.HideDropDown();
+                    }";
+
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }).Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.Slide;
+    }
+).GetHtml()

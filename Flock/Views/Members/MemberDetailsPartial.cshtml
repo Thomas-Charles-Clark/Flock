@@ -1,0 +1,319 @@
+﻿@using Flock.ViewModels
+@using Flock.Models
+@model MemberDetailViewModel
+
+@{
+        <div id="compose-section">
+            <div class="content-panel-container">
+                <fieldset id="member-details-header">
+                    <legend>
+                        Member Details
+                    </legend>
+                    <div id="select-header-inner" style="background-color: white;">
+                        <div id="member-details-tabs" style="display: none;">
+                            <ul>
+                                <li><a href="#address-book">Address Book</a></li>
+                                <li><a href="#basket-history">Basket History</a></li>
+                                <li><a href="#order-history">Order History</a></li>
+                                <li><a href="#visitor-instances">Visitor Instances</a></li>
+                                <li><a href="#trade-details">Trade Details</a></li>
+                            </ul>
+                            <div id="address-book">
+                                @{
+                                    if (Model.AddressBook != null)
+                                    {
+                                        for (var i = 0; i < Model.AddressBook.Count; i++)
+                                        {
+                                            <div id="member-address-@(Model.AddressBook[i].MemberAddressID)-editor" class="member-address-editor">
+                                                @Html.Action("MemberAddressEditorPartial", "Members", new { MemberAddressID = Model.AddressBook[i].MemberAddressID })
+                                            </div>
+
+                                            <div class="member-address-display" style="">
+                                                <h6 style="margin-top: 0; line-height: 24px; width: 140px;">
+                                                    Address @(i + 1)
+                                                    <input type="button" class="btn btn-default" style="float: right;" onclick="$('#member-address-@(Model.AddressBook[i].MemberAddressID)-editor').dialog('open');" value="Edit" />
+                                                </h6>
+                                                <dl style="margin-top: 0; margin-left: 1em;">
+                                                    <dt>
+                                                        Full Name
+                                                    </dt>
+                                                    <dd>
+                                                        @(Model.AddressBook[i].FullName)
+                                                    </dd>
+                                                    <dt>
+                                                        Address
+                                                    </dt>
+                                                    <dd style="text-align: right;">
+                                                        @(Model.AddressBook[i].AddressLine1)<br />
+                                                        @(Model.AddressBook[i].AddressLine2)<br />
+                                                        @(Model.AddressBook[i].Town)<br />
+                                                        @(Model.AddressBook[i].County)<br />
+                                                        @(Model.AddressBook[i].Postcode)<br />
+                                                        @*@(UoW.GetRepository<Country>().GetAll().Where(p => p.CountryID == Model.AddressBook[i].CountryID).Select(p => p.Name).Single())*@
+                                                    </dd>
+                                                    @*<dt>
+                                                        Address Line 2
+                                                    </dt>
+                                                    <dd>
+                                                        @(Model.AddressBook[i].AddressLine2)
+                                                    </dd>
+                                                    <dt>
+                                                        Town
+                                                    </dt>
+                                                    <dd>
+                                                        @(Model.AddressBook[i].Town)
+                                                    </dd>
+                                                    <dt>
+                                                        County
+                                                    </dt>
+                                                    <dd>
+                                                        @(Model.AddressBook[i].County)
+                                                    </dd>
+                                                    <dt>
+                                                        Postcode
+                                                    </dt>
+                                                    <dd>
+                                                        @(Model.AddressBook[i].Postcode)
+                                                    </dd>
+                                                    <dt>
+                                                        Country
+                                                    </dt>
+                                                    <dd>
+                                                        @(UoW.GetRepository<Country>().GetAll().Where(p => p.CountryID == Model.AddressBook[i].CountryID).Select(p => p.Name).Single())
+                                                    </dd>*@
+                                                    <dt>
+                                                        Phone Number
+                                                    </dt>
+                                                    <dd>
+                                                        @(Model.AddressBook[i].PhoneNumber)
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        }
+                                    }
+                                    if (Model.AddressBook.Count == 0)
+                                    {
+                                        <h6>No addresses to display.</h6>
+                                    }
+                                }
+                                <div style="clear: both;"></div>
+                            </div>
+                            <div id="basket-history">
+                                @{
+                                    if (Model.Basket != null)
+                                    {
+                                        @Html.Partial("BasketCountryComboBoxPartial")
+                                        <div style="clear: both;"></div>
+                                        <div id="basket-area">
+                                            @Html.Partial("MemberBasketPartial", Model.Basket)
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div id="order-history">
+                                @{
+                                    if (Model.Transactions != null)
+                                    {
+                                        if (Model.Transactions.Count > 0)
+                                        {
+                                            foreach (var t in Model.Transactions.OrderByDescending(p => p.TransactionID))
+                                            {
+                                                foreach (var oh in t.OrderHeads)
+                                                {
+                                                    <div style="padding: 0 0 2em 0;">
+                                                        <h6>OrderHead ID: @(oh.OrderHeadID)</h6>
+
+                                                        @foreach (var ol in oh.OrderLines)
+                                                        {
+                                                            <p style="margin-left: 2em;">
+                                                                OrderLine ID: @(ol.OrderLineID)
+                                                            </p>
+                                                        }
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <h6>No order history to display.</h6>
+                                        }
+                                    }
+                                }
+                            </div>
+                            <div id="visitor-instances">
+                                @{
+                                    if (Model.VisitorInstances != null)
+                                    {
+                                        if (Model.VisitorInstances.Count > 0)
+                                        {
+                                            for (var i = 0; i < Model.VisitorInstances.Count; i++)
+                                            {
+                                                <div class="visitor-display">
+                                                    <div class="visitor-display-inner">
+                                                        <table class="visitor-instance-table">
+                                                            <tr>
+                                                                <th class="top" colspan="6">
+                                                                    Visitor ID: @(Model.VisitorInstances[i].VisitorID)
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    GUID
+                                                                </th>
+                                                                <td>
+                                                                    @(Model.VisitorInstances[i].GUID)
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    Culture
+                                                                </th>
+                                                                <td>
+                                                                    @(Model.VisitorInstances[i].Culture == null ? "Nothing to display" : Model.VisitorInstances[i].Culture)
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    Last Visit
+                                                                </th>
+                                                                <td>
+                                                                    @(Model.VisitorInstances[i].LastVisitDT == null ? "Nothing to display" : Model.VisitorInstances[i].LastVisitDT.ToString())
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    Created
+                                                                </th>
+                                                                <td>
+                                                                    @(Model.VisitorInstances[i].CreatedDT)
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    Modified
+                                                                </th>
+                                                                <td>
+                                                                    @(Model.VisitorInstances[i].ModifiedDT == null ? "Nothing to display" : Model.VisitorInstances[i].ModifiedDT.ToString())
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    IP
+                                                                </th>
+                                                                <td>
+                                                                    @*@(!Model.VisitorInstances[i].IP.HasValue ? "Nothing to display" : UoW.Context.fnc_IntToIP(Model.VisitorInstances[i].IP))*@
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    Actions
+                                                                </th>
+                                                                <td>
+                                                                    <a href="javascript:;" style="color: #0088CC" onclick="ForceVisitorLogout(@(Model.VisitorInstances[i].VisitorID))">Logout</a>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <h6>No Visitor Instances to display.</h6>
+                                        }
+                                    }
+                                }
+                            </div>
+                            <div id="trade-details">
+                                @if (Model.TradeAccountChecksResult == null)
+                                {
+                                    <h6>No Trade Account is associated with this Member.</h6>
+                                }
+                                else
+                                {
+                                    <h6>Trade Account Number: @(Model.Member.MertexCustomerAccountNumber)</h6>
+
+                                    if (Model.TradeAccountChecksResult.AccountCurrencyText.Contains("FAILED"))
+                                    {
+                                        <h5>FAILED TO MATCH ACCOUNT NUMBER TO EMAIL ADDRESS.</h5>
+                                    }
+                                    else
+                                    {
+                                        <dl>
+                                            <dt>Product Ordering:</dt>
+                                            <dd>@(Model.TradeAccountChecksResult.CanPlaceProductOrders)</dd>
+
+                                            <dt>Sample Ordering:</dt>
+                                            <dd>@(Model.TradeAccountChecksResult.CanPlaceSampleOrders)</dd>
+
+                                            <dt>Account Currency:</dt>
+                                            <dd>@(Model.TradeAccountChecksResult.AccountCurrencyText)</dd>
+
+                                            <dt>Open / Closed:</dt>
+                                            <dd>@(Model.TradeAccountChecksResult.AccountOpenClosedText)</dd>
+                                        </dl>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    
+}
+
+<div style="clear: both"></div>
+
+<script type="text/javascript">
+    $("#member-details-tabs").tabs({ active: window.selectedTab });
+    $('#member-details-tabs a').click(function (e) {
+        var curTab = $('.ui-tabs-active');
+        curTabIndex = curTab.index();
+        window.selectedTab = curTabIndex;
+    });
+    $("#member-details-tabs").show();
+
+    $(".member-address-editor").dialog({
+        title: 'Address Editor',
+        autoOpen: false,
+        width: 'auto',
+        buttons: {
+            Save: function(ev, ui) {
+                $.confirm(
+                    function (args) {
+                        LoadingPanel.Show();
+                        var MemberAddressID = $(args).find("table.member-address-container").data("member-address-id");
+                        SaveMemberAddressDetails(MemberAddressID);
+                        $(args).dialog("close");
+                    },
+                    function (args) {
+
+                    },
+                    $(this));
+            },
+            Cancel: function (ev, ui) {
+                $(this).dialog('close');
+            }
+        }
+    });
+
+    $(".member-address-editor-inner").show();
+</script>
+

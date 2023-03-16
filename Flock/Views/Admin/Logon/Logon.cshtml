@@ -1,0 +1,49 @@
+@{
+    ViewBag.Title = "Logon";
+    Layout = "";
+}
+@Styles.Render("~/bundles/css/admin/logon")
+
+<div id="divContent">
+    <div style="width: 250px; margin: 20px auto;">
+        <form>
+            <table style="width:250px;">
+                <tbody>
+                    <tr>
+                        <td colspan="2">
+                            <img src="~/img/admin/designers-guild.png" style="margin-bottom: 5px;" alt="Designers Guild">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right; font-weight: bold;">
+                            Email
+                        </td>
+                        <td style="text-align:center; font-weight: bold;">
+                            <input name="txbLoginName" type="text" maxlength="30" id="txbLoginName" class="form" style="width:170px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right; font-weight: bold;">
+                            Password
+                        </td>
+                        <td style="text-align:center;">
+                            <input name="txbPassword" type="password" maxlength="20" id="txbPassword" class="form" style="width:170px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align:center; padding-top: 10px;">
+                            <input type="submit" name="btnSignIn" value="Sign in" id="btnSignIn" class="buttonGreen">
+                            <div id="divMessage"></div>
+                            <img src="img/popup_loader.gif" id="loadingGif" alt="loading" style="display: none;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <span id="lblSignInMessage"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>

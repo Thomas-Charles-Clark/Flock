@@ -1,0 +1,14 @@
+﻿@model Flock.ViewModels.ADS_UsersViewModel
+@{
+    ViewBag.Title = "Asset Delivery System - Users";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/ADS_Users.css")
+}
+
+<h4 class="page-heading">Asset Delivery System Users</h4>
+
+<div id="grid-container">
+    @Html.Action("UserGridViewPartial")
+</div>

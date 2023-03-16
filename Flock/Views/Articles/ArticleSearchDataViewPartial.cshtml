@@ -1,0 +1,119 @@
+﻿@model List<Flock.Models.Article_SearchResult>
+@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "ArticleSearchDataView";
+    settings.CallbackRouteValues = new { Controller = "Articles", Action = "ArticleSearch" };
+    settings.AllowPaging = true;
+
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) {
+        if (typeof (initDragDrop) == 'function')
+            initDragDrop();
+        if (typeof (InitPodDragDrop) == 'function')
+            InitPodDragDrop();
+        if (typeof (InitSlideshowDragDrop) == 'function')
+            InitSlideshowDragDrop();
+        if(typeof(InitRelatedArticleDragDrop) == 'function')
+            InitRelatedArticleDragDrop();
+        if(typeof(InitArticleDragDrop) == 'function')
+            InitArticleDragDrop();
+    }";
+
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        e.customArgs['ArticleType'] = ArticleSearchArticleTypeListBox.GetValue();
+        e.customArgs['NameOrID'] = ArticleSearchNameOrIDTextBox.GetValue();
+    }";
+
+    settings.PagerSettings.Summary.Visible = true;
+    settings.PagerSettings.Summary.Text = "Page: {0} of {1} ({2} articles total)";
+    settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action.ToLower() != "compose")
+    {
+        settings.SettingsTableLayout.ColumnCount = 5;
+        settings.SettingsTableLayout.RowsPerPage = 4;
+        settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(4);
+
+        settings.PagerSettings.PageSizeItemSettings.Visible = true;
+        settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+
+        settings.PagerSettings.Visible = true;
+        settings.AlwaysShowPager = true;
+        settings.PagerSettings.EndlessPagingMode = DataViewEndlessPagingMode.Disabled;
+        settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    }
+    else
+    {
+        settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.SettingsTableLayout.ColumnCount = 3;
+        settings.PagerSettings.PageSizeItemSettings.ShowAllItem = false;
+        settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.PagerSettings.PageSizeItemSettings.Visible = true;
+        settings.PagerSettings.PageSizeItemSettings.ShowPopupShadow = true;
+        settings.PagerSettings.EndlessPagingMode = DataViewEndlessPagingMode.Disabled;
+        settings.PagerSettings.EllipsisMode = PagerEllipsisMode.InsideNumeric;
+        settings.PagerSettings.Visible = true;
+        settings.AlwaysShowPager = true;
+        settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.TopAndBottom;
+    }
+
+    settings.Style.Add("width", "100%");
+    settings.Style.Add("margin", "0.5em 0 0");
+    settings.EmptyDataText = "<h4>No results.</h4>";
+
+    settings.SettingsTableLayout.RowsPerPage = 4;
+
+    settings.SetItemTemplateContent(
+        c =>
+        {
+            var artID = DataBinder.Eval(c.DataItem, "ArticleID").ToString();
+            var discID = DataBinder.Eval(c.DataItem, "ImageID") == null ? null : DataBinder.Eval(c.DataItem, "ImageID").ToString();
+            var Name = DataBinder.Eval(c.DataItem, "Name") == null ? "" : DataBinder.Eval(c.DataItem, "Name").ToString();
+            //var ARID = DataBinder.Eval(c.DataItem, "AspectRatioID").ToString();
+
+            if(discID != null)
+            { 
+                ViewContext.Writer.Write(
+                    "<div id='article-box-" + artID + "' class='article' style='position: relative; width: 156px; z-index: 100;' data-aspect-ratio-id='2' data-article-id='" + artID + "' >" +
+                    "<div>" +
+                        "<img data-image-id='" + discID + "' class='imbd' id=\"" + "img" + discID + "\" src=\"" + Url.Content("https://flock.designersguild.com/ImageLibrary/156/" + discID + ".jpeg") + "\" title=\"Flock Image ID: " + discID + "\" alt=\"\" />" +
+                    "</div>" +
+                    "<div class=\"DataViewItemTitle\">" + Name + "</div>" +
+                    "</div>"
+                );
+            }
+            else
+            {
+                ViewContext.Writer.Write(
+                    "<div id='article-box-" + discID + "' class='article' style='position: relative; width: 156px; z-index: 100;' data-aspect-ratio-id='2' data-article-id='" + artID + "' >" +
+                    "<div>" +
+                        "<img class='imbd' style=\"width: 156px;\" src=\"" + Url.Content("~/Images/admin/image-not-set-thin.png") + "\" />" +
+                    "</div>" +
+                    "<div class=\"DataViewItemTitle\">" + Name + "</div>" +
+                    "</div>"
+                );
+            }
+        }
+    );
+}).Bind(Model).GetHtml()
+
+<script type="text/javascript">
+
+    if (typeof (initDragDrop) == "function")
+        initDragDrop();
+    if (typeof (InitPodDragDrop) == 'function')
+        InitPodDragDrop();
+    if (typeof (InitSlideshowDragDrop) == 'function')
+        InitSlideshowDragDrop();
+    if ($('#product-page-cutout-inner').length > 0) {
+        if (typeof (InitSlideshowDragDropFurn) == 'function')
+            InitSlideshowDragDropFurn();
+    }
+    if (typeof (InitRelatedArticleDragDrop) == 'function')
+        InitRelatedArticleDragDrop();
+    if (typeof (InitArticleDragDrop) == 'function')
+        InitArticleDragDrop();
+</script>

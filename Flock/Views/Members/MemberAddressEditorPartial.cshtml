@@ -1,0 +1,143 @@
+﻿@using Flock.Models
+@using Flock.DAL
+@model Flock.ViewModels.MemberAddressEditModel
+
+@using (var UoW = new UnitOfWork<FlockDataContext>())
+{
+    <div class="member-address-editor-inner" style="display: none; padding: 1em;">
+        <table class="member-address-container" data-member-address-id="@(Model.MemberAddressID)">
+            <tr>
+                <td>
+                    Primary Address
+                </td>
+                <td style="width: 250px;">
+                    @Html.DevExpress().CheckBoxFor(m => Model.PrimaryAddress, settings => {
+                        settings.Name = "PrimaryAddress-" + Model.MemberAddressID.ToString();
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    MemberID
+                </td>
+                <td>
+                    @(Model.MemberID)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Member Address ID
+                </td>
+                <td>
+                    @(Model.MemberAddressID)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Full Name
+                </td>
+                <td>
+                    @Html.DevExpress().TextBoxFor(m => Model.FullName, settings =>
+                    {
+                        settings.Name = "FullName-" + Model.MemberAddressID.ToString();
+                        settings.ShowModelErrors = true;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Address Line 1
+                </td>
+                <td>
+                    @Html.DevExpress().TextBoxFor(m => Model.AddressLine1, settings =>
+                    {
+                        settings.Name = "AddressLine1-" + Model.MemberAddressID.ToString();
+                        settings.ShowModelErrors = true;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Address Line 2
+                </td>
+                <td>
+                    @Html.DevExpress().TextBoxFor(m => Model.AddressLine2, settings =>
+                   {
+                       settings.Name = "AddressLine2-" + Model.MemberAddressID.ToString();
+                       settings.ShowModelErrors = true;
+                       settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                   }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Town
+                </td>
+                <td>
+                    @Html.DevExpress().TextBoxFor(m => Model.Town, settings =>
+                    {
+                        settings.Name = "Town-" + Model.MemberAddressID.ToString();
+                        settings.ShowModelErrors = true;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    County
+                </td>
+                <td>
+                    @Html.DevExpress().TextBoxFor(m => Model.County, settings =>
+                    {
+                        settings.Name = "County-" + Model.MemberAddressID.ToString();
+                        settings.ShowModelErrors = true;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Postcode
+                </td>
+                <td>
+                    @Html.DevExpress().TextBoxFor(m => Model.Postcode, settings =>
+                    {
+                        settings.Name = "Postcode-" + Model.MemberAddressID.ToString();
+                        settings.ShowModelErrors = true;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Country
+                </td>
+                <td>
+                    @Html.DevExpress().ComboBoxFor(m => Model.CountryID, settings =>
+                    {
+                        settings.Name = "CountryID-" + Model.MemberAddressID.ToString();
+                        settings.Properties.ValueField = "CountryID";
+                        settings.Properties.TextField = "Name";
+                        settings.ShowModelErrors = true;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).BindList(UoW.GetRepository<Country>().GetAll().ToList()).GetHtml()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Phone Number
+                </td>
+                <td>
+                    @Html.DevExpress().TextBoxFor(m => Model.PhoneNumber, settings =>
+                    {
+                        settings.Name = "PhoneNumber-" + Model.MemberAddressID.ToString();
+                        settings.ShowModelErrors = true;
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }).GetHtml()
+                </td>
+            </tr>
+        </table>
+    </div>
+}

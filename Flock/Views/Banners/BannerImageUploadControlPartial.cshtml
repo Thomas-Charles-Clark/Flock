@@ -1,0 +1,29 @@
+﻿@Html.DevExpress().UploadControl(
+settings =>
+{
+    settings.Name = "ucCallbacks";
+    settings.CallbackRouteValues = new { Controller = "Banners", Action = "ImageUploadCallback" };
+    settings.ControlStyle.CssClass = "editorArea";
+    settings.ValidationSettings.AllowedFileExtensions = new string[] { ".png" };
+    settings.UploadMode = UploadControlUploadMode.Standard;
+    settings.ValidationSettings.NotAllowedFileExtensionErrorText = "Illegal file extension.";
+    settings.ValidationSettings.ShowErrors = true;
+    settings.ValidationSettings.MaxFileSize = 2097152;
+    settings.UploadMode = UploadControlUploadMode.Standard;
+    settings.FileInputCount = 1;
+    settings.ClientSideEvents.FileUploadStart = @"function(s, e) {
+        $('#imageContainer').html('<img src=\'/Images/SystemIcons/busy-icon.gif\' />');
+    }";
+    settings.ClientSideEvents.FileUploadComplete = @"function(s, e) { 
+        var t = window.setTimeout(function(){
+        var v = new Date().getTime();
+        $('#imageContainer').html('<img id=\'previewImage\' src=\'https://flock.designersguild.com/imagelibrary/Banners/1.png?v='+t+'\' />');
+        }, 300);
+    }";
+    settings.ClientSideEvents.FilesUploadComplete = @"function(s, e) { 
+        var v = new Date().getTime();
+        var t = window.setTimeout(function(){
+        $('#imageContainer').html('<img id=\'previewImage\' src=\'https://flock.designersguild.com/imagelibrary/Banners/1.png?v='+t+'\' />');
+        }, 300);
+    }";
+}).GetHtml();

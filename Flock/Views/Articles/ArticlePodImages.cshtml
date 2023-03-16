@@ -1,0 +1,21 @@
+﻿@model Flock.ViewModels.ArticleComposeViewModel
+@if (Model.Images.Where(p => p.TemplateImageID == 1).Count() == 0)
+{
+    <div id="article-pod-placeholder" class="pod-sortable pod-image-placeholder">
+        <img src="/Images/admin/ar2-placeholder.png" style="width: 332px;" alt="Image not set." title="You must set a primary image for this article." />
+    </div>
+}
+else
+{
+    foreach (Flock.Models.Article_Image i in Model.Images.Where(p => p.TemplateImageID == 1).ToList())
+    {
+        <div data-image-id="@i.ImageID" class="pod-sortable pod-image" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <img style="width: 325px;" src="https://flock.designersguild.com/ImageLibrary/322/@(i.ImageID).jpeg" alt="@(i.AltText)" title="@(i.TitleText)" />
+            <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromArticlePods(1, @(i.ImageID))" />
+        </div>
+    }
+}
+@*<script type="text/javascript">
+    if (typeof (InitPodDragDrop) == "function")
+        InitPodDragDrop();
+</script>*@

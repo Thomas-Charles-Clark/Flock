@@ -1,0 +1,16 @@
+﻿@model Flock.ViewModels.CallToActionEditModel
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "CallToActionStyleID";
+    settings.CallbackRouteValues = new { Controller = "Animations", Action = "StyleIDComboBoxPartial" };
+    settings.ShowModelErrors = true;
+    settings.Properties.Caption = "Style";
+    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    settings.Properties.TextField = "Name";
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "StyleID";
+    settings.Properties.ValueType = typeof(short);
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+}).BindList(Model.AvailableStyles).Bind(Model.CallToActionStyleID).GetHtml()

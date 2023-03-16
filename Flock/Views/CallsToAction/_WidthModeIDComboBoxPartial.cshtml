@@ -1,0 +1,16 @@
+﻿@model Flock.ViewModels.CallToActionEditModel
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "CallToActionWidthModeID";
+    settings.CallbackRouteValues = new { Controller = "CallsToAction", Action = "WidthModeIDComboBoxPartial" };
+    settings.ShowModelErrors = true;
+    settings.Properties.Caption = "Width Mode";
+    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    settings.Properties.TextField = "Name";
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "CallToActionWidthModeID";
+    settings.Properties.ValueType = typeof(byte);
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+}).BindList(Model.AvailableWidthModes).Bind(Model.CallToActionWidthModeID).GetHtml()

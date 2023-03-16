@@ -1,0 +1,42 @@
+﻿@model List<Flock.Models.ArticleType>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    listBoxSettings.Name = "ArticleTypeListBox";
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+
+    if (action == "ArticleSearchArticleTypeDropDownPartial")
+    {
+        listBoxSettings.Name = "ArticleSearchArticleTypeListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#article-searching-icon').fadeIn('fast');
+            ArticleSearchArticleTypeDD.SetText(s.GetSelectedItem().text);
+            ArticleSearchArticleTypeDD.HideDropDown();
+            $('#article-searching-icon').fadeIn('fast');
+            $.ajax({
+                url: '" + Url.Action("ArticleSearch", "Articles") + @"',
+                traditional: true,
+                data: {
+                    ArticleTypeID: ArticleSearchArticleTypeListBox.GetValue(),
+                    NameOrID: ArticleSearchNameOrIDTextBox.GetValue()                                
+                },
+                success: function(data) {
+                    $('#article-data-view-container').html(data);
+                    $('#article-searching-icon').fadeOut('slow');
+                    if(typeof(InitArticleDragDrop) == 'function')
+                        InitArticleDragDrop();
+                },
+                timeout: 20000
+            });
+        }";
+    }
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "ArticleTypeID";
+}).BindList(Model).GetHtml()

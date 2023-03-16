@@ -1,0 +1,109 @@
+﻿@model List<Flock.Models.Language>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+    if (action == "CountrySearchLanguageDropDownPartial")
+    {
+        listBoxSettings.Name = "CountrySearchLanguageListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#country-searching-icon').fadeIn('fast');
+            CountrySearchLanguageDD.SetText(s.GetSelectedItem().text);
+            CountrySearchLanguageDD.HideDropDown();
+            $.ajax({
+                url: '" + Url.Action("Search", "CountrySearch") + @"',
+                traditional: true,
+                data: { 
+                    MarketID: CountrySearchMarketListBox.GetValue(),
+                    ContinentID: CountrySearchContinentListBox.GetValue(),
+                    RegionID: CountrySearchRegionListBox.GetValue(),
+                    LanguageID: CountrySearchLanguageListBox.GetValue(),
+                    SearchString: CountrySearchNameTextBox.GetText(),
+                    TableLock: CountrySearchCLTableLock.GetValue()
+                },
+                success: function(data) {
+                    $('#country-search-data-view-container').html(data);
+                    $('#country-searching-icon').fadeOut('slow');
+                    if (typeof (InitCountryDragDrop) == 'function')
+                        InitCountryDragDrop();
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function() { $('#country-searching-icon').fadeOut('slow'); });
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else if (action == "BannerOverviewLanguageDropDownPartial")
+    {
+        listBoxSettings.Name = "BannerOverviewLanguageListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            BannerOverviewLanguageDD.SetText(s.GetSelectedItem().text);
+            BannerOverviewLanguageDD.HideDropDown();
+            BannerOverviewGridView.PerformCallback();
+        }";
+    }
+    else if (action == "ComposeBannerHeaderLanguageDropDownPartial")
+    {
+        listBoxSettings.Name = "ComposeBannerHeaderLanguageListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ComposeBannerHeaderLanguageDD.SetText(s.GetSelectedItem().text);
+            ComposeBannerHeaderLanguageDD.HideDropDown();
+            $('#banner-select-header-busy').fadeIn('fast');
+            $.ajax({ 
+                url: '" + Url.Action("ComposeBannerHeaderBannerDropDownPartial", "Banners") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    SelectedBannerID: s.GetSelectedItem().value,
+                    SelectedBannerLocationID: ComposeBannerHeaderLocationListBox.GetValue(),
+                    SelectedSiteSectionID: ComposeBannerHeaderSiteSectionListBox.GetValue(), 
+                    SelectedCountryID: ComposeBannerHeaderCountryListBox.GetValue(), 
+                    SelectedLanguageID: ComposeBannerHeaderLanguageListBox.GetValue(),
+                    SelectedStatusID: ComposeBannerHeaderWebStatusListBox.GetValue()
+                },
+                success: function(data) { 
+                    $('#banner-select-header-busy').fadeOut('fast');
+                    $('#banner-header-banner-drop-down-container').html(data);
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function() { $('#banner-select-header-busy').fadeOut('fast'); });
+                },
+                timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.BannerSelectHeaderSelectedLanguageID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ComposeBannerHeaderLanguageDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "ComposeBannerLanguageDropDownPartial")
+    {
+        listBoxSettings.Name = "LanguageID";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ComposeBannerLanguageDD.SetText(s.GetSelectedItem().text);
+            ComposeBannerLanguageDD.HideDropDown();
+        }";
+        if (ViewBag.BannerDetailsLanguageID != null)
+        {
+            listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                s.SetSelectedItem(s.FindItemByValue(" + ViewBag.BannerDetailsLanguageID + @"));
+                if(s.GetSelectedItem() != null && s.GetSelectedItem() != false) {
+                    ComposeBannerLanguageDD.SetText(s.GetSelectedItem().text);
+                }
+            }";
+        }
+    }
+    
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "LanguageID";
+}
+).BindList(Model).GetHtml()

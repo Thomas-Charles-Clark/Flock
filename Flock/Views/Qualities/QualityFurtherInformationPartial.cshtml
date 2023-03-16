@@ -1,0 +1,47 @@
+﻿@using Flock.Models
+@using Flock.ViewModels
+@model QualityFurtherInformationViewModel
+@{
+    if(Model.Aftercares.Count > 0)
+    {
+        <h6>Aftercare</h6>   
+    }
+    foreach(Aftercare af in Model.Aftercares)
+    {
+        <img src="~/images/icons/afercaresymbols/@(af.AftercareID).gif" style="width: 26px; float: left; margin-right: 8px;"/>
+        <span style="float: left; line-height: 26px;">@(af.Name)</span>
+        <div style="clear: both; margin-bottom: 0.5em;"></div>
+    }
+    if(Model.Finishes.Count > 0)
+    {
+        <h6>Finish</h6>   
+    }
+    foreach (Finish f in Model.Finishes)
+    {
+        <img src="~/images/icons/finishsymbols/@(f.FinishID).gif" style="width: 26px; float: left; margin-right: 8px;" />
+        <span style="float: left; line-height: 26px;">@(f.Name)</span>
+        <div style="clear: both; margin-bottom: 0.5em;"></div>
+    }
+    if(Model.Usages.Count > 0)
+    {
+        <h6>Usage</h6>   
+    }
+    foreach (Usage u in Model.Usages)
+    {
+        <img src="~/images/icons/usagesymbols/@(u.UsageID).gif" style="width: 26px; float: left; margin-right: 8px;" />
+        <span style="float: left; line-height: 26px;">@(u.Name)</span>
+        <div style="clear: both; margin-bottom: 0.5em;"></div>
+    }
+    if(Model.TechnicalDescriptions.Count > 0)
+    {
+        <h6>Technical Description</h6>   
+    }
+    foreach(TechnicalDescription td in Model.TechnicalDescriptions)
+    {
+        <span style="display: block;">@(td.Name)</span>
+    }
+    if(Model.Aftercares.Count == 0 && Model.Finishes.Count == 0 && Model.TechnicalDescriptions.Count == 0 && Model.Usages.Count == 0)
+    {
+        <span>No further info found.</span>   
+    }
+}

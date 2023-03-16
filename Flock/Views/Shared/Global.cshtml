@@ -1,0 +1,43 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")    
+    @Scripts.Render("~/bundles/modernizr")    
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    
+    @Styles.Render("~/bundles/css/grids")
+    @Styles.Render("~/bundles/css/ribbon")
+    @Styles.Render("~/bundles/css/cms")
+    
+    @Scripts.Render("~/Scripts/cms/page-composition.js")
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+    @{
+        Html.DevExpress().GetScripts(
+           new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+           new Script { ExtensionSuite = ExtensionSuite.HtmlEditor },
+           new Script { ExtensionSuite = ExtensionSuite.GridView },
+           new Script { ExtensionSuite = ExtensionSuite.Editors },
+           new Script { ExtensionSuite = ExtensionSuite.TreeList }
+       );
+
+        Html.DevExpress().GetStyleSheets(
+            new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+            new StyleSheet { ExtensionSuite = ExtensionSuite.Editors },
+            new StyleSheet { ExtensionSuite = ExtensionSuite.HtmlEditor },
+            new StyleSheet { ExtensionSuite = ExtensionSuite.GridView },
+            new StyleSheet { ExtensionSuite = ExtensionSuite.TreeList }
+        );
+    }
+    @RenderSection("scripts", required: false)
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>

@@ -1,0 +1,166 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@Html.DevExpress().GridView(settings =>
+{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    
+    settings.Name = "CompetitionManager";
+    settings.KeyFieldName = "CompetitionID";
+    settings.CallbackRouteValues = new { Controller = "Promotions", Action = "CompetitionManagerGridView" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Promotions", Action = "AddNewCompetition" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Promotions", Action = "UpdateCompetition" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Promotions", Action = "DeleteCompetition" };
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+    settings.CommandColumn.ShowDeleteButton = true;
+    settings.SettingsBehavior.ConfirmDelete = true;
+    settings.Settings.ShowFilterRow = true;
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+    settings.Settings.ShowHeaderFilterButton = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    
+    settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+
+    MVCxGridViewColumn CompetitionIDColumn = new MVCxGridViewColumn();
+    CompetitionIDColumn.Name = "CompetitionID";
+    CompetitionIDColumn.FieldName = "CompetitionID";
+    CompetitionIDColumn.Caption = "ID";
+    CompetitionIDColumn.Width = 60;
+    CompetitionIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    CompetitionIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    CompetitionIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    CompetitionIDColumn.SortDescending();
+    settings.Columns.Add(CompetitionIDColumn);
+
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Name";
+    NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    NameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    var nProperties = NameColumn.PropertiesEdit as TextBoxProperties;
+    nProperties.MaxLength = 50;
+    NameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    settings.Columns.Add(NameColumn);
+
+    MVCxGridViewColumn HeadingColumn = new MVCxGridViewColumn();
+    HeadingColumn.Name = "Heading";
+    HeadingColumn.FieldName = "Heading";
+    HeadingColumn.Caption = "Heading";
+    HeadingColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    HeadingColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    HeadingColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    var sProperties = HeadingColumn.PropertiesEdit as TextBoxProperties;
+    sProperties.MaxLength = 70;
+    HeadingColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    settings.Columns.Add(HeadingColumn);
+
+    MVCxGridViewColumn SubHeadingColumn = new MVCxGridViewColumn();
+    SubHeadingColumn.Name = "SubHeading";
+    SubHeadingColumn.FieldName = "SubHeading";
+    SubHeadingColumn.Caption = "Sub Heading";
+    SubHeadingColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    SubHeadingColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    SubHeadingColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    var shProperties = SubHeadingColumn.PropertiesEdit as TextBoxProperties;
+    shProperties.MaxLength = 70;
+    SubHeadingColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    settings.Columns.Add(SubHeadingColumn);
+
+    MVCxGridViewColumn DescriptionColumn = new MVCxGridViewColumn();
+    DescriptionColumn.Name = "Description";
+    DescriptionColumn.FieldName = "Description";
+    DescriptionColumn.Caption = "Description";
+    DescriptionColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    DescriptionColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    DescriptionColumn.ColumnType = MVCxGridViewColumnType.Memo;
+    var dsProperties = DescriptionColumn.PropertiesEdit as MemoProperties;
+    dsProperties.MaxLength = 500;
+    dsProperties.Rows = 3;
+    dsProperties.Columns = 40;
+    DescriptionColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    settings.Columns.Add(DescriptionColumn);
+    
+    MVCxGridViewColumn TermsColumn = new MVCxGridViewColumn();
+    TermsColumn.Name = "Terms";
+    TermsColumn.FieldName = "Terms";
+    TermsColumn.Caption = "Terms";
+    TermsColumn.Visible = false;
+    TermsColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    TermsColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    TermsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    TermsColumn.ColumnType = MVCxGridViewColumnType.Memo;
+    var tmProperties = TermsColumn.PropertiesEdit as MemoProperties;
+    tmProperties.MaxLength = 1000;
+    tmProperties.Rows = 5;
+    tmProperties.Columns = 40;
+    settings.Columns.Add(TermsColumn);
+
+    MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+    OnDateColumn.Name = "OnDate";
+    OnDateColumn.FieldName = "OnDate";
+    OnDateColumn.Caption = "On Date";
+    OnDateColumn.Width = 75;
+    OnDateColumn.EditFormSettings.VisibleIndex = 10;
+    OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    OnDateColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(OnDateColumn);
+
+    MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+    OffDateColumn.Name = "OffDate";
+    OffDateColumn.FieldName = "OffDate";
+    OffDateColumn.Caption = "Off Date";
+    OffDateColumn.Width = 75;
+    OffDateColumn.EditFormSettings.VisibleIndex = 11;
+    OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    OffDateColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(OffDateColumn);
+
+    MVCxGridViewColumn MarketingPartnerColumn = new MVCxGridViewColumn();
+    MarketingPartnerColumn.Name = "MarketingPartnerID";
+    MarketingPartnerColumn.FieldName = "MarketingPartnerID";
+    MarketingPartnerColumn.Caption = "Marketing Partner";
+    MarketingPartnerColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+    MarketingPartnerColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    MarketingPartnerColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    MarketingPartnerColumn.EditFormSettings.Visible = DefaultBoolean.True;
+    MarketingPartnerColumn.SetDataItemTemplateContent(c => {
+        var MarketingPartnerID = (short?)DataBinder.Eval(c.DataItem, "MarketingPartnerID");
+        var MarketingPartner = "<i>Not Set</i>";
+        if (MarketingPartnerID != null)
+        {
+            MarketingPartner = UoW.GetRepository<MarketingPartner>().GetAll().Where(p => p.MarketingPartnerID == MarketingPartnerID).Select(p => p.Name).Single();
+        }
+        ViewContext.Writer.Write("<span>" + MarketingPartner + "</span>");
+    });
+    var mkPtProperties = MarketingPartnerColumn.PropertiesEdit as ComboBoxProperties;
+    var mkPtSrc = UoW.GetRepository<MarketingPartner>().GetAll().Where(p => p.DeletedDT == null).ToList();
+    mkPtSrc.Insert(0, new MarketingPartner() { MarketingPartnerID = null, Name = "Not Set" });
+    mkPtProperties.DataSource = mkPtSrc;
+    mkPtProperties.ValueField = "MarketingPartnerID";
+    mkPtProperties.TextField = "Name";
+    mkPtProperties.ValueType = typeof(short);
+    settings.Columns.Add(MarketingPartnerColumn);
+
+    MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+    CreatedDTColumn.Name = "CreatedDT";
+    CreatedDTColumn.FieldName = "CreatedDT";
+    CreatedDTColumn.Caption = "Created";
+    CreatedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+    CreatedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    settings.Columns.Add(CreatedDTColumn);
+    
+}).BindToLINQ("", "", (s, e) => { 
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<Competition>().GetAll().Where(p => p.DeletedDT == null);
+
+    e.KeyExpression = "CompetitionID";
+    e.QueryableSource = source;
+}).GetHtml()
+

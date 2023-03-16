@@ -1,0 +1,89 @@
+﻿@model Flock.ViewModels.HTML_PageSection
+
+<textarea id="pagesection-@(Model.PageSectionID)-htmlEditor">@(Model.Contents)</textarea>
+
+<script type="text/javascript">
+    window["PageSection@(Model.PageSectionID)HTMLEditor"] = CodeMirror.fromTextArea(document.getElementById('pagesection-@(Model.PageSectionID)-htmlEditor'), {
+        lineNumbers: true,
+        autoCloseTags: true,
+        mode: "htmlmixed"
+    });
+    window["PageSection@(Model.PageSectionID)HTMLEditor"].HTMLSectionID = @(Model.HTMLSectionID);
+</script>
+
+@*@Html.DevExpress().HtmlEditor(settings =>
+{
+    settings.Name = "PageSection" + Model.PageSectionID + "HtmlEditor";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(350);
+    settings.CallbackRouteValues = new { Controller = "CMS", Action = "HtmlPageSectionSave" };
+    //settings.CustomDataActionRouteValues = new { Controller = "CMS", Action = "HtmlPageSectionSave" };// Url.Action("HtmlPageSectionSave", "CMS");
+    //settings.SettingsImageUpload.UploadCallbackRouteValues = new { Controller = "CMS", Action = "HtmlPageSectionImageUpload" };
+    //settings.SettingsImageUpload.UploadImageFolder = "/images/htmlsectionimages/";
+
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        e.customArgs['HtmlID'] = '" + Model.HTMLSectionID + @"';
+        e.customArgs['Contents'] = s.GetHtml();
+        e.customArgs['PageID'] = '" + Model.PageID + @"';
+        e.customArgs['PageSectionID'] = '" + Model.PageSectionID + @"';
+    }";
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+        if(window.wasSaveButtonHit == true) {
+            window.wasSaveButtonHit = false;
+            //alert('Saved.');
+            return false;
+        }
+        else
+            return false;
+    }";
+
+    settings.ClientSideEvents.CallbackError = @"function(s, e) { 
+        alert(e.responseText);
+    }";
+
+    settings.ClientSideEvents.CustomCommand = @"function SendSaveCommand(s, e) { 
+        switch(e.commandName) {
+            case 'save':
+                window.wasSaveButtonHit = true;
+                s.PerformDataCallback();
+            break;
+            default: break;
+        }
+    }";
+
+
+    settings.ToolbarMode = HtmlEditorToolbarMode.None;
+    settings.SettingsHtmlEditing.AllowScripts = true;
+    settings.SettingsHtmlEditing.AllowIFrames = true;
+    settings.SettingsHtmlEditing.AllowEditFullDocument = false;
+    settings.SettingsHtmlEditing.AllowStyleAttributes = true;
+    settings.SettingsHtmlEditing.AllowYouTubeVideoIFrames = true;
+    settings.SettingsHtmlEditing.AllowHTML5MediaElements = true;
+    settings.SettingsHtmlEditing.AllowFormElements = true;
+    settings.SettingsHtmlEditing.UpdateDeprecatedElements = true;
+    settings.SettingsHtmlEditing.UpdateBoldItalic = true;
+    settings.SettingsHtmlEditing.EnterMode = HtmlEditorEnterMode.BR;
+    settings.Settings.AllowContextMenu = DefaultBoolean.True;
+    settings.Settings.AllowDesignView = false;
+    settings.Settings.AllowHtmlView = true;
+    settings.Settings.AllowPreview = true;
+    settings.Styles.HtmlViewArea.BorderBottom.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+    settings.Styles.ContentArea.BorderBottom.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+    settings.ActiveView = HtmlEditorView.Html;
+
+    //settings.Toolbars.CreateDefaultToolbars();
+
+    //settings.Toolbars[0].Items.Add<CustomToolbarButton>(button =>
+    //{
+    //    button.BeginGroup = true;
+    //    button.ToolTip = "save";
+    //    button.Image.Url = "/images/systemicons/save-icon.gif";
+    //    button.CommandName = "save";
+    //});
+
+    if (Model.Contents != null && Model.Contents != "")
+        settings.Html = Model.Contents;
+    else
+        settings.Html = "[No contents]";
+}).GetHtml()*@

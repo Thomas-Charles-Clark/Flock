@@ -1,0 +1,34 @@
+﻿@Html.DevExpress().ComboBox(cbSettings =>
+{
+    cbSettings.Name = "ComposeBannerHeaderTradeComboBox";
+    cbSettings.Properties.TextField = "Name";
+    cbSettings.Properties.ValueField = "Value";
+    cbSettings.Properties.ValueType = typeof(int);
+    cbSettings.Width = 150;
+    cbSettings.Height = 35;
+    cbSettings.SelectedIndex = 0;
+    cbSettings.ShowModelErrors = false;
+    cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+
+        //s.SetText(s.GetSelectedItem().texts[1]);
+
+        if (typeof BannerSelectorGridView !== 'undefined')
+            BannerSelectorGridView.Refresh();
+        else
+            BannerOverviewGridView.Refresh();
+    }";
+}).BindList(new List<Flock.Models.TradeSwitchOption>() {
+    new Flock.Models.TradeSwitchOption() {
+        Name = "Both",
+        Value = null
+    },
+    new Flock.Models.TradeSwitchOption() {
+        Name = "Retail",
+        Value = 0
+    },
+    new Flock.Models.TradeSwitchOption() {
+        Name = "Trade",
+        Value = 1
+    }
+}).GetHtml()
+        

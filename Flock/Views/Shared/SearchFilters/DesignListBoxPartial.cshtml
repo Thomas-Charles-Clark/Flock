@@ -1,0 +1,122 @@
+﻿@model List<Flock.Models.Design>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ProductSearchDesignDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductSearchDesignListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#product-searching-icon').fadeIn('fast');
+            ProductSearchDesignDD.SetText(s.GetSelectedItem().text);
+            ProductSearchDesignDD.HideDropDown();
+            $('#product-searching-icon').fadeIn('fast');
+            var SearchText = ProductSearchNameOrIDTextBox.GetText();
+            if($('#product-search-small-marker').length > 0) {
+                $.ajax({
+                    url: '" + Url.Action("ProductSearchSmall", "Products") + @"',
+                    traditional: true,
+                    data: { 
+                        ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                        BrandID: ProductSearchBrandListBox.GetValue(),
+                        LaunchID: ProductSearchLaunchListBox.GetValue(),
+                        PatternID: ProductSearchPatternListBox.GetValue(),
+                        Status: ProductSearchStatusListBox.GetValue(),
+                        StatusID: ProductSearchWebStatusListBox.GetValue(),
+                        StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                        CollectionID: ProductSearchCollectionListBox.GetValue(),
+                        ColourID: ProductSearchColourListBox.GetValue(),
+                        SearchString: SearchText,
+                        ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                        PriceListID: ProductSearchPriceListListBox.GetValue()
+                    },
+                    success: function(data) {
+                        $('#product-data-view-container').html(data);
+                        $('#product-searching-icon').fadeOut('slow');
+                    },
+                    error: function(e, s, a) {
+                        $('#product-searching-icon').fadeOut('slow');
+                        alert(e.responseText);
+                    },
+                    timeout: 60000
+                });
+            }
+            else {
+                $.ajax({
+                    url: '" + Url.Action("ProductSearch", "Products") + @"',
+                    traditional: true,
+                    data: { 
+                        ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                        BrandID: ProductSearchBrandListBox.GetValue(),
+                        LaunchID: ProductSearchLaunchListBox.GetValue(),
+                        PatternID: ProductSearchPatternListBox.GetValue(),
+                        Status: ProductSearchStatusListBox.GetValue(),
+                        StatusID: ProductSearchWebStatusListBox.GetValue(),
+                        StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                        CollectionID: ProductSearchCollectionListBox.GetValue(),
+                        ColourID: ProductSearchColourListBox.GetValue(),
+                        SearchString: SearchText,
+                        ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                        PriceListID: ProductSearchPriceListListBox.GetValue()
+                    },
+                    success: function(data) {
+                        $('#product-data-view-container').html(data);
+                        $('#product-searching-icon').fadeOut('slow');
+                    },
+                    error: function(e, s, a) {
+                        $('#product-searching-icon').fadeOut('slow');
+                        alert(e.responseText);
+                    },
+                    timeout: 60000
+                });
+            }
+        }";
+    }
+    else if (action == "ProductPageComposeDesignDropDownPartial")
+    {
+        listBoxSettings.Name = "DesignID";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ProductPageComposeDesignDD.SetText(s.GetSelectedItem().text);
+            ProductPageComposeDesignDD.HideDropDown();
+        }";
+
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.ProductPageComposeSelectedLaunchID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ProductPageComposeDesignDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "AttributeDesignDropDown")
+    {
+        listBoxSettings.Name = "AttributeDesignListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            AttributeDesignDD.SetText(s.GetSelectedItem().text);
+            AttributeDesignDD.HideDropDown();
+        }";
+
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.AttributesSelectedLaunchID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                AttributeDesignDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else
+    {
+        listBoxSettings.Name = "DesignListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            alert('Not Implemented');
+        }";
+    }
+    
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "DesignID";
+}
+).BindList(Model).GetHtml()

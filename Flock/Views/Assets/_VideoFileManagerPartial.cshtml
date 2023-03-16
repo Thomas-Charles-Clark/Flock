@@ -1,0 +1,80 @@
+@model string
+
+@Html.DevExpress().FileManager(settings => {
+    settings.Name = "VideoFileManager";
+    settings.CallbackRouteValues = new { Controller = "Assets", Action = "VideoFileManagerPartial" };
+    
+    settings.DownloadRouteValues = new { Controller = "Assets", Action = "VideoFileManagerPartialDownload" };
+    settings.SettingsToolbar.ShowDownloadButton = true;
+
+    settings.Settings.ThumbnailFolder = Url.Content("~/Content/FileManager/Thumbnails");
+
+    settings.ClientSideEvents.FileUploaded = @"function(s, e) { 
+        $.ajax({
+            url: '" + Url.Action("VideoUploaded", "Assets") + @"',
+            type: 'POST',
+            traditional: true,
+            data: { FileName: e.fileName },
+            success: function(data) {  },
+            error: function (xhr, status, error) {
+                if (xhr.status == 403) {
+                    alert('Sorry, your session has expired. Please login again to continue');
+                    window.location.href = '/Account/Login';
+                }
+                else {
+                    if (xhr.responseText)
+                        alert('An error occurred: ' + status + '\r\nError: ' + error + '\r\nResponse: ' + xhr.responseText);
+                    else
+                        alert('An error occurred: ' + status + '\r\nError: ' + error);
+                }
+            },
+            timeout: 20000
+        });
+    }";
+    
+    settings.ClientSideEvents.ItemDeleted = @"function(s, e) { 
+        alert(e.fileName);
+        $.ajax({
+            url: '" + Url.Action("VideoDeleted", "Assets") + @"',
+            type: 'POST',
+            traditional: true,
+            data: { FileName: e.fileName },
+            success: function(data) {  },
+            error: function (xhr, status, error) {
+                if (xhr.status == 403) {
+                    alert('Sorry, your session has expired. Please login again to continue');
+                    window.location.href = '/Account/Login';
+                }
+                else {
+                    if (xhr.responseText)
+                        alert('An error occurred: ' + status + '\r\nError: ' + error + '\r\nResponse: ' + xhr.responseText);
+                    else
+                        alert('An error occurred: ' + status + '\r\nError: ' + error);
+                }
+            },
+            timeout: 20000
+        });
+    }";
+
+        settings.SettingsEditing.AllowCreate = true;
+            settings.SettingsEditing.AllowRename = true;
+            settings.SettingsEditing.AllowMove = true;
+            settings.SettingsEditing.AllowDelete = true;
+            settings.SettingsUpload.Enabled = true;
+            settings.SettingsUpload.UseAdvancedUploadMode = true;
+    settings.SettingsUpload.AdvancedModeSettings.EnableMultiSelect = true;
+    settings.Settings.AllowedFileExtensions = new string[] { ".avi", ".mpeg", ".mpg", ".ac3", ".mov", ".flv" };
+    settings.SettingsFileList.View = DevExpress.Web.ASPxFileManager.FileListView.Thumbnails;
+}).BindToFolder(Model).GetHtml()
+
+@*
+Okay. Getting really quite annoying that we can't get a server side function to fire on successful upload - it just DOESN'T FIRE.
+    Can assign to the eventhandler but... guess what... doesn't fire.
+
+    remove call in global.asax.cs to alter default binder, remove attempted serverside functionality...
+    the binder does register, the eventhandler for fileuploaded does attach, it just is never fired.
+
+    So send an AJAX call on FileUploaded instead 
+
+    e.fileName
+*@

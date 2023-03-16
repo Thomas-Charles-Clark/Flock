@@ -1,0 +1,83 @@
+﻿@model Flock.ViewModels.ArticleComposeViewModel
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+}
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292; width: 100%;" onclick="$('#video-contents').slideToggle('fast');">
+            Video
+        </legend>
+        <div id="video-contents" style="background-color: white; padding: 0; width: 980px;" class="page-section-hideable">
+            <div id="article-video" style="width: 100%; padding: 1em; position: relative;">
+                @Html.Raw(Model.VideoEmbedCode)
+            </div>
+            <div class="fieldset-inner" style="position: relative;">
+                
+                @Html.DevExpress().LabelFor(m => Model.VideoID).GetHtml()
+                @Html.DevExpress().ComboBoxFor(m => Model.VideoID, settings => {
+                    settings.Properties.ClientInstanceName = "VideoID";
+                    settings.Properties.ValueType = typeof(short);
+                    settings.Properties.ValueField = "VideoID";
+                    settings.Properties.TextField = "Name";
+                }).BindList(UoW.GetRepository<Flock.Models.Video>().GetAll().ToList()).GetHtml()
+
+                @*@Html.DevExpress().TextBoxFor(m => Model.VideoEmbedCode, settings => {
+                settings.Properties.ClientInstanceName = "VideoEmbedCode";
+                    settings.Properties.MaxLength = 500;
+                    settings.Width = 923;
+                }).GetHtml()*@
+                
+                <img id="article-video-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveArticleVideo();" />
+            </div>
+        </div>
+    </fieldset>
+
+    <script type="text/javascript">
+        if (typeof (InitPodDragDrop) == "function")
+            InitPodDragDrop();
+
+        @*@{
+            if (ssImages.Count > 0)
+            {
+                <text>
+                    $.ajax({
+                        url: '@Url.Action("SlideshowImageOverlayPartial", "Articles")',
+                        type: 'GET',
+                        traditional: true,
+                        data: {
+                            ArticleID: $('#selected-article-id').val(),
+                            arID: 2,
+                            imageID: '@(ssImages[0].ImageID)'
+                        },
+                        success: function (data) {
+                            $('#slideshow-image-overlay-container').html(data);
+                        },
+                        timeout: 20000
+                    });
+                </text>
+            }
+        }*@
+    </script>
+</div>
+
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292; width: 100%;" onclick="$('#article-contents').slideToggle('fast');">
+            Contents (click to expand / contract)
+            <img id="page-section-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="article-contents" style="background: white; position: relative;">
+            <div id="article-contents-editor-container">
+                @Html.DevExpress().MemoFor(m => Model.Contents, settings =>
+                {
+                    settings.Name = "ArticleText";
+                    settings.Properties.ClientInstanceName = "ArticleText";
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Height = 550;
+                }).GetHtml()
+            </div>
+            <img id="article-text-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin: 1em; position: absolute; bottom: 10px; right: 10px;" onclick="SaveArticleText();" />
+        </div>
+    </fieldset>
+</div>
+

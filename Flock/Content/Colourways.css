@@ -1,0 +1,33 @@
+﻿#container {
+    width: 1350px;
+}
+
+.colourway-sortable {
+    padding: 0.5em;
+    padding-bottom: 0;
+}
+
+.colourway-image {
+    width: 32px;
+    margin-right: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.colourway-filter-class table {
+    width: 188px !important;
+}
+
+.ui-state-highlight-colourway {
+    display: inline;
+    margin-right: 0.5em;
+    margin-bottom: 0.5em;
+    position: relative;
+    vertical-align: top;
+    width: 32px;
+    height: 32px;
+    opacity: 0.4;
+    background-color: #f7dd88;
+    border: 1px solid #e96712;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}

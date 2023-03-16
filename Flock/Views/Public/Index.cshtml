@@ -1,0 +1,156 @@
+﻿@using Flock.Models.ContentItems;
+@model Flock.ViewModels.PageViewModel
+
+@{
+    Layout = "~/Views/Public/_Layout.cshtml";
+}
+
+<div id="page-chassis" class="pure-g">
+
+
+@foreach (PageSectionModel ps in Model.PageSectionModels)
+    {
+        <div id="page-section-@ps.PageSection.PageSectionID" class="page-section pure-g-r">
+        @foreach (ContentItem ci in ps.ContentItems)
+        {
+            // this... should definitely place them in order, because they should've been sorted by their sortorder already!
+            switch (ci.ItemType)
+            {
+                case ContentItemType.HTML:
+                    HtmlItem htmlItem = (HtmlItem)ci;
+                    <div class="@htmlItem.Record.Class" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@htmlItem.Record.HtmlID">
+                        <div class="section-inner">
+                            @Html.Raw(htmlItem.Record.Contents)
+                        </div>
+                    </div>
+                    break;
+                case ContentItemType.SlideShow:
+                    SlideShowItem slideShowItem = (SlideShowItem)ci;
+                    <div class="@slideShowItem.Record.Class" style="background-color: #ffe0c3" data-sort-order="@ci.SortOrder"  data-type="slideshow" data-content-id="@slideShowItem.Record.SlideShowID">
+                        <div class="section-inner">
+                            @{Html.RenderAction("ImageSliderPartial", "CMS", new { SlideShowID = @slideShowItem.Record.SlideShowID });}
+                        </div>
+                    </div> 
+                    break;
+                case ContentItemType.Form:
+                    FormItem formItem = (FormItem)ci;
+                    <div class="@formItem.ClassName" style="background-color: #ffe0c3" data-sort-order="@ci.SortOrder"  data-type="form" data-content-id="@formItem.Record.FormID">
+                        @switch(formItem.Record.FormType)
+                        {
+                            case 1:
+                                <div class="section-inner" id="form-id-@formItem.Record.FormID">
+                                    @{Html.RenderAction("NewsletterFormDisplayPartial", "Forms", new { FormID = @formItem.Record.FormID });}
+                                </div>
+                                break;
+                                                
+                            case 2:
+                                <div class="section-inner" id="form-id-@formItem.Record.FormID">
+                                    @{Html.RenderAction("CompetitionFormDisplayPartial", "Forms", new { FormID = @formItem.Record.FormID });}
+                                </div>
+                                break;
+
+                            default: break;   
+                        }
+                    </div>
+                    break;
+                case ContentItemType.Grid:
+                    GridSectionItem gridItem = (GridSectionItem)ci;
+                    switch (gridItem.Record.Purpose)
+                    {
+                        case 1:
+                            <div class="@gridItem.Record.Class content-grid" style="background-color:#C0FAC9; min-height: 200px;" data-sort-order="@ci.SortOrder" data-type="grid" data-content-id="@gridItem.Record.GridID">
+                                <div class="pure-g" id="grid-section-@gridItem.Record.GridID">
+                                    @foreach (ContentItem gridContentItem in gridItem.Contents)
+                                    {
+                                        switch (gridContentItem.ItemType)
+                                        {
+                                            case ContentItemType.HTML:
+                                                HtmlItem gridHtmlItem = (HtmlItem)gridContentItem;
+                                                <div class="@gridHtmlItem.Record.Class" style="background-color: #ff6a00" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@gridHtmlItem.Record.HtmlID">
+                                                <div class="section-inner">
+                                                    @Html.Raw(gridHtmlItem.Record.Contents)
+                                                </div>
+                                            </div>
+                                                break;
+                                            // snip
+                                            default: break;
+                                        }
+                                    }
+                            </div>
+                            </div>
+                                    break;
+
+                        case 2: // must present filters side and results side. in results side, echo contents of grid.
+                            <div class='pure-u-1-4' style='min-height: 600px; background-color: #9DB9D5;'>
+                                <div class="section-inner">
+                                    <em style="font-size: 2em">Here go some filter group things</em>
+                                </div>
+                            </div>
+                            <div class="pure-u-3-4 @gridItem.Record.Class" style='min-height: 600px; background-color: #DCEDFF;'>
+                                <div class="pure-g">
+                                    @foreach (ContentItem gridContentItem in gridItem.Contents)
+                                    {
+                                        switch (gridContentItem.ItemType)
+                                        {
+                                            case ContentItemType.SearchResult:
+                                                SearchResultItem searchResultItem = (SearchResultItem)gridContentItem;
+                                                    <div class="@searchResultItem.ClassName" data-sort-order="@searchResultItem.SortOrder"  data-type="" data-content-id="">
+                                                    <div class="section-inner" style="padding: 5px;box-sizing: border-box; -moz-box-sizing: border-box;">
+                                                        <div style="padding: 5px; height: 150px; box-sizing: border-box; -moz-box-sizing: border-box; background-color: #ff6a00">
+                                                            @Html.Raw(searchResultItem.ArbitraryContents)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            case ContentItemType.HTML:
+                                                HtmlItem gridHtmlItem = (HtmlItem)gridContentItem;
+                                                    <div class="@gridHtmlItem.Record.Class" style="background-color: #ff6a00" data-sort-order="@ci.SortOrder"  data-type="html" data-content-id="@gridHtmlItem.Record.HtmlID">
+                                                    <div class="section-inner">
+                                                        @Html.Raw(gridHtmlItem.Record.Contents)
+                                                    </div>
+                                                </div>
+                                                break;
+                                            // snip
+                                            default: break;
+                                        }
+                                    }
+                                </div>
+                            </div>
+                                    break;
+
+                        default: break;
+                    }
+                break;
+                default:
+                <h4>Other Content Item!</h4>
+                        break;
+            }
+        }
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        
+
+        PrefixedEvent(document, "AnimationEnd", dispatchMQEvent);//.addEventListener("animationEnd", dispatchMQEvent, false);
+
+    });
+
+
+    function dispatchMQEvent(event) {
+        //[tempName[i]].AdjustControl() should work. square bracket syntax expects a string - don't be eval
+        tempName.AdjustControl();
+    }
+
+    var pfx = ["webkit", "moz", "MS", "o", ""];
+    function PrefixedEvent(element, type, callback) {
+        for (var p = 0; p < pfx.length; p++) {
+            if (!pfx[p]) type = type.toLowerCase();
+            element.addEventListener(pfx[p] + type, callback, false);
+        }
+    }
+
+</script>

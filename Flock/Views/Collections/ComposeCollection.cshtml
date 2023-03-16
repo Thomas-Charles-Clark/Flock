@@ -1,0 +1,775 @@
+﻿@{
+    ViewBag.Title = "Compose Collection";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles
+{
+    @Styles.Render("~/Content/collections.css")
+    @Styles.Render("~/Content/collection-composition.css")
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #container {
+            width: 2034px !important;
+        }
+
+        #ComposeCollectionGridSelector_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+    </style>
+}
+@section scripts{
+
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+}
+
+@model Flock.ViewModels.CollectionViewModel
+
+<script type="text/javascript">
+
+
+    function InitCountryDragDrop() {
+        $("#country-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".country-restriction-flag",
+            placeholder: ".ui-state-highlight-country-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('country-flag')) {
+                    $("#country-restriction-section").sortable("refresh");
+                    window.CountryRestrictions = new Array();
+                    if ($("#country-restriction-placeholder").length > 0)
+                        $("#country-restriction-placeholder").remove();
+                    $("#country-restriction-section").children("div").each(function (index) {
+                        if ($(this).data('country-id') != null) {
+                            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                        }
+                    });
+                    UpdateCountryRestrictions();
+                }
+            }
+        });
+
+        $(".country-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".country-restriction-flag",
+            placeholder: ".ui-state-highlight-country-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('country-flag')) {
+                    $(".country-restriction-section").sortable("refresh");
+                    var CountryRestrictions = new Array();
+
+                    $(this).find(".country-restriction-placeholder").first().remove();
+                    $(this).children("div").each(function (index) {
+                        CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                    });
+                    var targ = $(this).parent();
+                    $.ajax({
+                        url: '/admin/cms/UpdateCollectionCountryRestrictions',
+                        type: "POST",
+                        traditional: true,
+                        data: { CollectionID: $("#selected-collection-id").val(), Countries: JSON.stringify(window.CountryRestrictions) },
+                        success: function (data) {
+                            $("#collection-country-restrictions-container").html(data);
+                            LoadingPanel.Hide();
+                        },
+                        timeout: 20000
+                    });
+                }
+            }
+        })
+
+        $(".country-flag").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#country-restriction-section, .country-restriction-section"
+        });
+    }
+
+    function RemoveCountryFromRestriction() {
+        $("#country-restriction-section").sortable("refresh");
+        window.CountryRestrictions = new Array();
+        if ($(".country-restriction-placeholder").length > 0)
+            $(".country-restriction-placeholder").remove();
+        $("#country-restriction-section").children("div").each(function (index) {
+            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+        });
+        UpdateCountryRestrictions();
+    }
+
+    function RemoveAllCountryRestrictions() {
+        var confirm = window.confirm("Are you sure?");
+        if (confirm) {
+            window.CountryRestrictions = new Array();
+            UpdateCountryRestrictions();
+        }
+    }
+
+    function UpdateCountryRestrictions() {
+        $("#add-all-country-dialog").dialog("close");
+        LoadingPanel.Show();
+        $.ajax({
+            url: '/admin/collections/UpdateCollectionCountryRestrictions',
+            type: "POST",
+            traditional: true,
+            data: { CollectionID: $("#selected-collection-id").val(), Countries: JSON.stringify(window.CountryRestrictions) },
+            success: function (data) {
+                $("#collection-country-restrictions-container").html(data);
+                LoadingPanel.Hide();
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveCollectionVideo(CollectionID) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("RemoveCollectionVideo", "Collections")',
+            traditional: true,
+            type: 'POST',
+            data: { CollectionID: CollectionID },
+            success: function (data) {
+                $("#collection-compose-container").html(data);
+                LoadingPanel.Hide();
+            }
+        });
+    }
+
+    function RemoveCollectionBrochure(CollectionID) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("RemoveCollectionBrochure", "Collections")',
+            traditional: true,
+            type: 'POST',
+            data: { CollectionID: CollectionID },
+            success: function (data) {
+                $("#collection-compose-container").html(data);
+                LoadingPanel.Hide();
+            }
+        });
+    }
+
+    function CopyPodToSlideshow() {
+        $.confirm(function () { ConfirmedCopyPodToSlideshow(); }, function () { })
+    }
+
+    function ConfirmedCopyPodToSlideshow() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("CopyImages", "Collections")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: $("#selected-collection-id").val(),
+                Direction: "PodSlideshow"
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#collection-slideshow-container").html(data);
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }
+
+    function CopySlideshowToPod() {
+        $.confirm(function () { ConfirmedCopySlideshowToPod(); }, function () { })
+    }
+
+    function ConfirmedCopySlideshowToPod() {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("CopyImages", "Collections")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: $("#selected-collection-id").val(),
+                Direction: "SlideshowPod"
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                $("#pod-list").html(data);
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }
+
+
+
+    $(document).ready(function () {
+        initDragDrop();
+    });
+
+    function SaveCollectionInfo() {
+        var id = Number($("#selected-collection-id").val());
+        $.ajax({
+            url: '@Url.Action("SaveCollectionInfo", "Collections")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: id,
+                Name: Name.GetValue(),
+                Code: Code.GetValue(),
+                PatternBookCode: PatternBookCode.GetValue(),
+                OnDate: $("input[name='OnDate']").val(),
+                OffDate: $("input[name='OffDate']").val(),
+                BrandID: CollectionBrand.GetValue(),
+                LaunchID: CollectionLaunch.GetValue(),
+                New: New.GetValue(),
+                PreviewColourways: PreviewColourways.GetValue()
+            },
+            success: function (data) {
+                $("#collection-info-container").html(data);
+                SuccessFade($("#collection-info-save"));
+            },
+            error: function (e, s, a) {
+                $("#collection-info-container").html(e.responseText);
+                FailureFade($("#collection-info-save"));
+            },
+            timeout: 20000
+        });
+    }
+
+    function SaveCollectionDetails() {
+        $.ajax({
+            url: '@Url.Action("SaveCollectionTextDetails", "Collections")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: Number($("#selected-collection-id").val()),
+                TitleTag: TitleTag.GetValue(),
+                URLKeywords: URLKeywords.GetValue(),
+                MetaDescription: MetaDescription.GetValue()
+            },
+            success: function (data) {
+                $("#details-and-pod-images-container").html(data);
+                SuccessFade($("#collection-details-save"));
+            },
+            error: function (e, s, a) {
+                $("#details-and-pod-images-container").html(e.responseText);
+                FailureFade($("#collection-details-save"));
+            },
+            timeout: 20000
+        });
+    }
+
+    function SaveCollectionDescriptiveText() {
+        $.ajax({
+            url: '@Url.Action("SaveCollectionDescriptionDetails", "Collections")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                CollectionID: Number($("#selected-collection-id").val()),
+                Heading: Heading.GetValue(),
+                SubHeading: SubHeading.GetValue(),
+                Description: CollectionHtmlEditor.GetValue()
+            },
+            success: function (data) {
+                $("#collection-description-container").html(data);
+                SuccessFade($("#collection-text-save"));
+            },
+            error: function (e, s, a) {
+                $("#collection-description-container").html(e.responseText);
+                FailureFade($("#collection-text-save"));
+            },
+            timeout: 20000
+        });
+    }
+
+    function htmlEncode(value) {
+        return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+    }
+
+    function htmlDecode(value) {
+        return String(value)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+    }
+
+    function initDragDrop() {
+        $('.draggable').draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }//,
+            //connectToSortable: ".sortable-list"
+        });
+
+        //$('.ar1').draggable({
+        //    helper: 'clone',
+        //    connectToSortable: '#pod-list'
+        //});
+
+        $('.ar2').draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: '.sortable-list'
+        });
+
+        $('.collection').draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#related-collection-inner"
+        });
+
+        $("#pod-list").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-collection-pod",
+            connectWith: '.ar1',
+            update: function (ev, ui) {
+                //if ($(ui.item).hasClass("draggable")) {
+                $("#pod-list").sortable("refresh");
+                window.podImages = new Array();
+                if ($("#placeholder-div").length > 0)
+                    $("#placeholder-div").remove();
+                $("#pod-list").children("div").each(function (index) {
+                    window.podImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                });
+                UpdateCollectionImageArea(1);
+                //}
+            }
+        });
+        $("#slideshow-list").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-collection-slideshow",
+            connectWith: '.ar2',
+            update: function (ev, ui) {
+                //if ($(ui.item).hasClass("draggable")) {
+                $("#slideshow-list").sortable("refresh");
+                window.slideshowImages = new Array();
+                if ($("#placeholder-div").length > 0)
+                    $("#placeholder-div").remove();
+                $("#slideshow-list").children("div").each(function (index) {
+                    window.slideshowImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                });
+                UpdateCollectionImageArea(2);
+                //}
+            }
+        });
+        $("#related-collection-inner").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-related-collection",
+            connectWith: '.collection',
+            update: function (ev, ui) {
+                if ($(this).data("collection-id") != $("#collection-slideshow-container").data("collection-id")) {
+                    //if ($(ui.item).hasClass("draggable")) {
+                    $("#related-collection-inner").sortable("refresh");
+                    window.relatedCollections = new Array();
+                    if ($("#collection-placeholder").length > 0)
+                        $("#collection-placeholder").remove();
+                    $("#related-collection-inner").children("div").each(function (index) {
+                        window.relatedCollections.push({ ID: $(this).data("collection-id"), SortOrder: index });
+                    });
+                    UpdateRelatedCollections();
+                    //}
+                }
+                else
+                    alert("Collections must not be related to themselves.");
+            }
+        });
+        $("#collection-sp1-container").droppable({
+            accept: ".ar1",
+            drop: function (ev, ui) { // ui.draggable
+                if ($("#sp1-placeholder").length > 0)
+                    $("#sp1-placeholder").remove();
+                UpdateCollectionImageArea(3, ui);
+            }
+        });
+        $("#collection-sp2-container").droppable({
+            accept: ".ar1",
+            drop: function (ev, ui) { // ui.draggable
+                if ($("#sp2-placeholder").length > 0)
+                    $("#sp2-placeholder").remove();
+                UpdateCollectionImageArea(4, ui);
+            }
+        });
+        $("#collection-viewall-container").droppable({
+            accept: ".ar1",
+            drop: function (ev, ui) {
+                if ($("#viewall-placeholder").length > 0)
+                    $("#viewall-placeholder").remove();
+                UpdateCollectionImageArea(5, ui);
+            }
+        });
+        $("#collection-brochure-container").droppable({
+            accept: ".ar1",
+            drop: function (ev, ui) {
+                if ($("#brochure-placeholder").length > 0)
+                    $("#brochure-placeholder").remove();
+                UpdateCollectionImageArea(6, ui);
+            }
+        });
+        $("#collection-sp3-container").droppable({
+            accept: ".ar3",
+            drop: function (ev, ui) { // ui.draggable
+                if ($("#sp3-placeholder").length > 0)
+                    $("#sp3-placeholder").remove();
+                UpdateCollectionImageArea(7, ui);
+            }
+        });
+        $("#collection-video-container").droppable({
+            accept: ".ar3",
+            drop: function (ev, ui) { // ui.draggable
+                if ($("#video-placeholder").length > 0)
+                    $("#video-placeholder").remove();
+                UpdateCollectionImageArea(8, ui);
+            }
+        });
+    }
+
+    function UpdateCollectionImageArea(TemplateImageID, ui) {
+        switch (TemplateImageID) {
+            case 1:
+                $("#collection-pod-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateCollectionImageArea", "Collections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { CollectionID: Number($("#selected-collection-id").val()), Images: JSON.stringify(window.podImages), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#collection-pod-busy").fadeOut("fast");
+                        $('#pod-list').html(data)
+                        return false;
+                    },
+                    error: function (e, s, a) {
+                        $("#collection-pod-busy").fadeOut("fast");
+                        alert(e.responseText);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 2:
+                $("#collection-slideshow-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateCollectionImageArea", "Collections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { CollectionID: Number($("#selected-collection-id").val()), Images: JSON.stringify(window.slideshowImages), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#collection-slideshow-busy").fadeOut("fast");
+                        $('#collection-slideshow-container').html(data)
+                        return false;
+                    },
+                    error: function (e, s, a) {
+                        $("#collection-slideshow-busy").fadeOut("fast");
+                        alert(e.responseText);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 3:
+                $("#collection-sp1-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateCollectionImageArea", "Collections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { CollectionID: Number($("#selected-collection-id").val()), Images: JSON.stringify([{ ID: $(ui.draggable).data("image-id"), SortOrder: 0 }]), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#collection-sp1-busy").fadeOut("fast");
+                        $("#collection-sp1-container").html(data);
+                    },
+                    error: function (data) {
+                        $("#collection-sp1-busy").fadeOut("fast");
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 4:
+                $("#collection-sp2-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateCollectionImageArea", "Collections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { CollectionID: Number($("#selected-collection-id").val()), Images: JSON.stringify([{ ID: $(ui.draggable).data("image-id"), SortOrder: 0 }]), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#collection-sp2-busy").fadeOut("fast");
+                        $("#collection-sp2-container").html(data);
+                    },
+                    error: function (data) {
+                        $("#collection-sp2-busy").fadeOut("fast");
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 5:
+                $("#collection-viewall-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateCollectionImageArea", "Collections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { CollectionID: Number($("#selected-collection-id").val()), Images: JSON.stringify([{ ID: $(ui.draggable).data("image-id"), SortOrder: 0 }]), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#collection-viewall-busy").fadeOut("fast");
+                        $("#collection-viewall-container").html(data);
+                    },
+                    error: function (data) {
+                        $("#collection-viewall-busy").fadeOut("fast");
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 6:
+                $("#collection-brochure-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateCollectionImageArea", "Collections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { CollectionID: Number($("#selected-collection-id").val()), Images: JSON.stringify([{ ID: $(ui.draggable).data("image-id"), SortOrder: 0 }]), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#collection-brochure-busy").fadeOut("fast");
+                        $("#collection-brochure-container").html(data);
+                    },
+                    error: function (data) {
+                        $("#collection-brochure-busy").fadeOut("fast");
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 7:
+                $("#collection-sp3-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateCollectionImageArea", "Collections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { CollectionID: Number($("#selected-collection-id").val()), Images: JSON.stringify([{ ID: $(ui.draggable).data("image-id"), SortOrder: 0 }]), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#collection-sp3-busy").fadeOut("fast");
+                        $("#collection-sp3-container").html(data);
+                    },
+                    error: function (data) {
+                        $("#collection-sp3-busy").fadeOut("fast");
+                    },
+                    timeout: 20000
+                });
+                break;
+            case 8:
+                $("#collection-video-busy").fadeIn("fast");
+                $.ajax({
+                    url: '@Url.Action("UpdateCollectionImageArea", "Collections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { CollectionID: Number($("#selected-collection-id").val()), Images: JSON.stringify([{ ID: $(ui.draggable).data("image-id"), SortOrder: 0 }]), TemplateImageID: TemplateImageID },
+                    success: function (data) {
+                        $("#collection-video-busy").fadeOut("fast");
+                        $("#collection-video-container").html(data);
+                    },
+                    error: function (data) {
+                        $("#collection-video-busy").fadeOut("fast");
+                    },
+                    timeout: 20000
+                });
+                break
+                break;
+            default: break;
+        }
+    }
+
+    function UpdateRelatedCollections() {
+        $("#collection-related-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("UpdateCollectionRelatedCollections", "Collections")',
+            traditional: true,
+            type: "POST",
+            data: { CollectionID: Number($("#selected-collection-id").val()), Collections: JSON.stringify(window.relatedCollections) },
+            success: function (data) {
+                $("#collection-related-busy").fadeOut("fast");
+                $('#related-collections').html(data)
+                return false;
+            },
+            error: function (e, s, a) {
+                $("#collection-related-busy").fadeOut("fast");
+                alert(e.responseText);
+                return false;
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveImageFromCollectionArea(TemplateImageID, ImageID) {
+        switch (TemplateImageID) {
+            case 1: $("#collection-pod-busy").fadeIn("fast"); break;
+            case 2: $("#collection-slideshow-busy").fadeIn("fast"); break;
+            case 3: $("#collection-sp1-busy").fadeIn("fast"); break;
+            case 4: $("#collection-sp2-busy").fadeIn("fast"); break;
+            case 5: $("#collection-viewall-busy").fadeIn("fast"); break;
+            case 6: $("#collection-brochure-busy").fadeIn("fast"); break;
+            case 7: $("#collection-sp3-busy").fadeIn("fast"); break;
+            case 8: $("#collection-video-busy").fadeIn("fast"); break;
+            default: return;
+        }
+        var confirm = window.confirm("Are you sure?");
+        if (confirm) {
+            $.ajax({
+                url: '@Url.Action("RemoveImageFromCollectionArea", "Collections")',//"/Products/UpdateCollectionAddProduct",
+                traditional: true,
+                type: "POST",
+                data: { CollectionID: Number($("#selected-collection-id").val()), TemplateImageID: TemplateImageID, ImageID: ImageID },
+                success: function (data) {
+                    switch (TemplateImageID) {
+                        case 1: $("#collection-pod-busy").fadeOut("fast"); $('#pod-list').html(data); break;
+                        case 2: $("#collection-slideshow-busy").fadeOut("fast"); $('#collection-slideshow-container').html(data); break;
+                        case 3: $("#collection-sp1-busy").fadeOut("fast"); $('#collection-sp1-container').html(data); break;
+                        case 4: $("#collection-sp2-busy").fadeOut("fast"); $('#collection-sp2-container').html(data); break;
+                        case 5: $("#collection-viewall-busy").fadeOut("fast"); $('#collection-viewall-container').html(data); break;
+                        case 6: $("#collection-brochure-busy").fadeOut("fast"); $('#collection-brochure-container').html(data); break;
+                        case 7: $("#collection-sp3-busy").fadeOut("fast"); $('#collection-sp3-container').html(data); break;
+                        case 8: $("#collection-video-busy").fadeOut("fast"); $('#collection-video-container').html(data); break;
+                        default: return false;
+                    }
+                    return false;
+                },
+                error: function (e, s, a) {
+                    switch (TemplateImageID) {
+                        case 1: $("#collection-pod-busy").fadeOut("fast"); break;
+                        case 2: $("#collection-slideshow-busy").fadeOut("fast"); break;
+                        case 3: $("#collection-sp1-busy").fadeOut("fast"); break;
+                        case 4: $("#collection-sp2-busy").fadeOut("fast"); break;
+                        case 5: $("#collection-viewall-busy").fadeOut("fast"); break;
+                        case 6: $("#collection-brochure-busy").fadeOut("fast"); break;
+                        case 7: $("#collection-sp3-busy").fadeOut("fast"); break;
+                        case 8: $("#collection-video-busy").fadeOut("fast"); break;
+                        default: return false;
+                    }
+                    alert(e.responseText);
+                    return false;
+                },
+                timeout: 20000
+            });
+        }
+        else {
+            switch (TemplateImageID) {
+                case 1: $("#collection-pod-busy").fadeOut("fast"); break;
+                case 2: $("#collection-slideshow-busy").fadeOut("fast"); break;
+                case 3: $("#collection-sp1-busy").fadeOut("fast"); break;
+                case 4: $("#collection-sp2-busy").fadeOut("fast"); break;
+                case 5: $("#collection-viewall-busy").fadeOut("fast"); break;
+                case 6: $("#collection-brochure-busy").fadeOut("fast"); break;
+                case 7: $("#collection-sp3-busy").fadeOut("fast"); break;
+                case 8: $("#collection-video-busy").fadeOut("fast"); break;
+                default: return false;
+            }
+        }
+    }
+
+    function BulkAddCollections() {
+        // must prompt for potential targets...
+
+        $("#related-collection-inner").sortable("refresh");
+        window.relatedCollections = new Array();
+        if ($("#collection-placeholder").length > 0)
+            $("#collection-placeholder").remove();
+        $("#related-collection-inner").children("div").each(function (index) {
+            window.relatedCollections.push({ ID: $(this).data("collection-id"), SortOrder: index });
+        });
+
+        $(".collection").each(function (index) {
+            if ($(this).data("collection-id") != $("#collection-slideshow-container").data("collection-id")) {
+                window.relatedCollections.push({ ID: $(this).data("collection-id"), SortOrder: (window.relatedCollections.length + index) });
+            }
+        })
+
+        $("#collection-related-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("UpdateCollectionRelatedCollections", "Collections")',
+            traditional: true,
+            type: "POST",
+            data: { CollectionID: Number($("#selected-collection-id").val()), Collections: JSON.stringify(window.relatedCollections) },
+            success: function (data) {
+                $("#collection-related-busy").fadeOut("fast");
+                $('#related-collections').html(data)
+                return false;
+            },
+            error: function (e, s, a) {
+                $("#collection-related-busy").fadeOut("fast");
+                alert(e.responseText);
+                return false;
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveRelatedCollectionFromCollection(CollectionID) {
+        $("#collection-related-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("RemoveRelatedCollectionFromCollection", "Collections")',
+            traditional: true,
+            type: "POST",
+            data: { CollectionID: Number($("#selected-collection-id").val()), RelatedCollectionID: CollectionID },
+            success: function (data) {
+                $("#collection-related-busy").fadeOut("fast");
+                $("#related-collections").html(data);
+            },
+            error: function (data) {
+                $("#collection-related-busy").fadeOut("fast");
+            },
+            timeout: 20000
+        });
+    }
+
+    function ShiftDXToHidden() {
+        $('#collection-description-hidden').val(CollectionHtmlEditor.GetHtml());
+        $('#collection-heading-hidden').val(CollectionHeading.GetValue());
+        $('#collection-subheading-hidden').val(CollectionSubHeading.GetValue());
+    }
+</script>
+
+<input type="hidden" id="selected-collection-id" value="@(Model.CollectionID)" />
+
+<h4 class="page-heading">
+    Compose Collection
+    <a id="association-link" class="link-img" target="_blank" title="Product Associations" href="/admin/collections/productassociation/@(Model.CollectionID)"></a>
+</h4>
+
+<div style="float: right; width: 986px;">
+    @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+    @Html.Partial("CollectionSearchPartial")
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+</div>
+
+<div style="float: left; width: 986px;">
+    <div id="collection-select-header-container">
+        <div class="content-panel-container">
+            <fieldset id="collection-select-header">
+                <legend style="color: black; border-bottom-color: #929292;" onclick="$('#collection-select-header-inner').slideToggle('fast');">Collection Selector (click to expand / contract)</legend>
+                <div id="collection-select-header-inner" style="">
+                    <div id="collection-header-grid-container">
+                        @Html.Action("ComposeCollectionGridSelectorPartial", "Collections")
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div id="collection-compose-container">
+        @if (ViewData["InvalidCollectionIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidCollectionIDError"])</h5>
+        }
+        @if (Model.CollectionID != null)
+        {
+            @Html.Partial("CollectionComposePartial", Model)
+        }
+    </div>
+</div>
+<div style="clear: both;"></div>

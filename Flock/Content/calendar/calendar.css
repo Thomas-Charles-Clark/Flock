@@ -1,0 +1,26 @@
+﻿html, body {
+    height: 100%;
+}
+
+#container {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+input {
+    display: block;
+}
+
+.container {
+    width: 2170px !important;
+}
+
+select {
+    width: auto !important;
+    height: auto;
+    line-height: initial;
+}
+
+.dhx_cal_event_clear {   
+    line-height: normal;
+}

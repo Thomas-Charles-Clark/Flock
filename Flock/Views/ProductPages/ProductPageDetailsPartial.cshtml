@@ -1,0 +1,65 @@
+﻿@model Flock.ViewModels.ProductPageComposeViewModel
+<div id="details-and-pod-images-container" class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#product-page-details-inner').slideToggle('fast')">
+        Product Page Details & Pod Images (click to expand / contract)
+        <img id="product-details-busy" class="busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+        </legend>
+    <div id="product-page-details-inner" style="background-color: white; padding: 1em; position: relative;">
+        <div style="clear: both;"></div>
+        <div style="width: 66%; float: right">
+            <div id="product-page-pod-container" class="droppable" data-product-page-id="@(Model.ProductPageID)">
+                <span style="margin-bottom: 7px; display: inline-block;">Pod Images: Square only</span>
+                <span style="margin-bottom: 8px; float: right;"><a href="javascript:;" onclick="CopySlideshowToPod()">Copy from Slideshow</a></span>
+                <img id="product-page-pod-busy" class="busy" style="float: right; width: 20px;" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                <div style="clear: both"></div>
+                <div id="pod-list" class="sortable-list">
+                    @Html.Partial("ProductPagePodImagesPartial", Model.Images.Where(p => p.TemplateImageID == 1).OrderBy(o => o.SortOrder).ToList())
+                </div>
+            </div>
+        </div>
+        <div style="width: 33.2%; float: left;">
+            @Html.DevExpress().LabelFor(m => Model.TitleTag).GetHtml()
+            <img id="product-page-titletag-busy" class="busy" style="float: right; width: 20px;" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+            @Html.DevExpress().TextBoxFor(m => Model.TitleTag, settings =>
+            {
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            }).GetHtml()
+            @Html.DevExpress().LabelFor(m => Model.URLKeywords, settings =>
+            {
+                settings.Style.Add("margin-top", "1em");
+                settings.Style.Add("margin-bottom", "2px");
+            }).GetHtml()
+            @Html.DevExpress().TextBoxFor(m => Model.URLKeywords, settings =>
+            {
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ValidateOnLeave = true;
+                settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = "^([a-z]|[a-z]-|[a-z]/)+[a-z]$";
+                settings.Properties.ValidationSettings.RegularExpression.ErrorText = @"Regular Expression Validation Failed.
+    URLs must not begin or end with a slash.
+    URL segments must not contain accented characters, such as é or ë.
+    URL segments may only contain the lower case letters 'a' through 'z', as well as hyphens.
+    URL segments must not begin or end with a hyphen.";
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            }).GetHtml()
+            @Html.DevExpress().LabelFor(m => Model.MetaDescription, settings =>
+            {
+                settings.Style.Add("margin-top", "1em");
+                settings.Style.Add("margin-bottom", "2px");
+            }).GetHtml()
+            @Html.DevExpress().MemoFor(m => Model.MetaDescription, settings =>
+            {
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Height = System.Web.UI.WebControls.Unit.Pixel(145);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            }).GetHtml()
+        </div>
+        <div style="clear: both;"></div>
+        <img id="product-page-details-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveProductPageDetails();" />
+    </div>
+    </fieldset>
+</div> 

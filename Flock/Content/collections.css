@@ -1,0 +1,135 @@
+﻿.container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container { 
+animation-name: min-width-2050px;
+width: 2050px !important;
+}
+
+#product-search-grid {
+    border-radius: 3px;
+    float: right;
+    padding: 0px;
+    width: 986px;
+}
+
+#collection-assign-grid {
+    width: 986px;
+    float: left;
+    padding: 0;
+}
+h4.subheading {
+    float: left;
+    margin: 7px 12px 0px 0px;
+    height: 34px;
+}
+
+#collection-assign-grid hr {
+    border: 0;
+    border-bottom: 1px solid silver;
+}
+
+#collection-list {
+    list-style-type: none;
+}
+
+    #collection-list li {
+        margin-bottom: 1em;
+    }
+
+    #collection-list h5 {
+        width: 50%;
+        height: 54px;
+        float: left;
+    }
+
+.delete-icon {
+    margin-left: 4em;
+}
+
+.delete-icon:hover {
+    cursor: pointer;
+}
+
+#product-searching-icon {
+    float: left; 
+    margin-left: 1em;
+    margin-top: 2px;
+    display: none;
+}
+
+#collection-slideshow-busy {
+    display: none;
+    margin-left: 1em;
+}
+
+.collection-busy {
+    display: none;
+    margin-left: 1em;
+}
+
+.ui-state-highlight-slideshow {
+    float: left;
+    opacity: 0.4;
+    height: 174px;
+    width: 286px;
+    margin-right: 1em;
+    margin-bottom: 1em;
+    background-color: #f7dd88;
+    border: 1px solid #e96712;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    line-height: 1.2em;
+}
+
+.ui-state-highlight-pod {
+    position: relative;
+    display: inline-block;
+    margin-right: 1em;
+    vertical-align: top;
+    opacity: 0.4;
+    height: 180px;
+    width: 295px;
+    background-color: #f7dd88;
+    border: 1px solid #e96712;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    line-height: 1.2em;
+}
+
+.ui-state-highlight-collection-contents {
+    display: block;
+    position: relative;
+    float: left;
+    padding-right: 1em;
+    vertical-align: top;
+    opacity: 0.4;
+    width: 185px;
+    height: 265px;
+    min-height: 265px;
+    background-color: #f7dd88;
+    border: 1px solid #e96712;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    line-height: 1.2em;
+}
+
+.ui-state-highlight-related-collection {
+    position: relative;
+    display: inline-block;
+    margin-right: 1em;
+    vertical-align: top;
+    opacity: 0.4;
+    height: 144px;
+    width: 195px;
+    background-color: #f7dd88;
+    border: 1px solid #e96712;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    line-height: 1.2em;
+}
+
+.hidden-input-field {
+    display: none !important;
+}
+
+.country-result {
+    height: auto !important; 
+}

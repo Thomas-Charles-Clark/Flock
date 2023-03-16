@@ -1,0 +1,48 @@
+﻿#container {
+    width: 1230px;
+    /*width: 1600px;*/
+}
+
+.translation-character-count {
+    line-height: 32px;
+    margin-bottom: 0;
+    font-size: 0.9em;
+    margin-top: 32px;
+}
+
+#pager-container {
+    text-align: center;
+    padding: 0.5em;
+}
+
+#pager-next {
+    width: 24px;
+    cursor: pointer;
+    margin-left: 1em;
+}
+
+#pager-prev {
+    width: 24px; 
+    cursor: pointer;
+    margin-right: 1em;
+}
+
+input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] { 
+cursor: default !important;
+}
+
+.busy-icon {
+    float: right;
+    margin-right: 10px;
+    margin-top: 2px;
+    display: none;
+}
+
+.content-img {
+    cursor: pointer;
+    /* border: 2px solid #8BBFE5; */
+    margin-right: 10px;
+    float: right;
+    margin-top: 3px;
+    height: 32px;
+}

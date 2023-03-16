@@ -1,0 +1,116 @@
+﻿@using Flock.Models
+@model Flock.ViewModels.CompetitionFormViewModel
+
+@using (Ajax.BeginForm("ProcessCompetitionForm", "Forms", new AjaxOptions{ InsertionMode = InsertionMode.Replace, UpdateTargetId = "form-id-"+Model.FormID }))
+{
+    @Html.DevExpress().LabelFor(p => p.Title).GetHtml()
+    @Html.DevExpress().DropDownEdit(settings =>
+    {
+        settings.Name = "Title";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    }).Bind(Model.Title).GetHtml()
+    
+    @Html.DevExpress().LabelFor(p => p.FirstName).GetHtml()
+    @Html.DevExpress().TextBox(settings => 
+    {
+        settings.Name = "FirstName";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    }).Bind(Model.FirstName).GetHtml()
+    
+    @Html.DevExpress().LabelFor(p => p.LastName).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "LastName";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    }).Bind(Model.LastName).GetHtml()
+    
+    <input type="text" name="address-search-field" id="address-search-field" value="" />
+    
+    @Html.DevExpress().LabelFor(p => p.AddressLineOne).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+        {
+            settings.Name = "AddressLineOne";
+            settings.ShowModelErrors = true;
+            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        }).Bind(Model.AddressLineOne).GetHtml()
+    
+    @Html.DevExpress().LabelFor(p => p.AddressLineTwo).GetHtml()
+    @Html.DevExpress().TextBox(settings => 
+    {
+        settings.Name = "AddressLineTwo";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    }).Bind(Model.AddressLineTwo).GetHtml()
+    
+    @Html.DevExpress().LabelFor(p => p.County).GetHtml()
+    @Html.DevExpress().TextBox(settings =>
+    {
+        settings.Name = "County";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;   
+    }).Bind(Model.County).GetHtml()
+    
+    @Html.DevExpress().LabelFor(p => p.PostCode).GetHtml()
+    @Html.DevExpress().TextBox(settings => 
+    {
+        settings.Name = "PostCode";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;   
+    }).Bind(Model.PostCode).GetHtml()
+
+    @Html.DevExpress().LabelFor(p => p.City).GetHtml()
+    @Html.DevExpress().TextBox(settings => 
+    {
+        settings.Name = "City";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;   
+    }).Bind(Model.City).GetHtml()
+   
+    @Html.DevExpress().LabelFor(p => p.CountryCode).GetHtml()
+    @Html.DevExpress().DropDownEdit(settings =>
+    {
+        settings.Name = "Country";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;   
+    }).Bind(Model.CountryCode).GetHtml()
+    //, new [] { new SelectListItem { Text = "United Kingdom", Value = "GB" } }).GetHtml()
+    
+    @Html.DevExpress().LabelFor(p => p.Email).GetHtml()
+    @Html.DevExpress().TextBox(settings => 
+    {   
+        settings.Name = "Email";
+        settings.ShowModelErrors = true;
+        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        settings.Properties.ValidationSettings.Display = Display.Dynamic;
+        settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = "\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
+        settings.Properties.ValidationSettings.RegularExpression.ErrorText = "Please enter a valid email.";
+    }).Bind(Model.Email).GetHtml()
+
+    @Html.HiddenFor(m => Model.MarketingPartnerID)
+    @Html.HiddenFor(m => Model.MarketingPartnerText)
+    
+    if(Model.MarketingPartnerID != null)
+    {
+        <label class="marketing-partner-text">@Model.MarketingPartnerText</label>
+        @Html.CheckBoxFor(p => Model.MarketingOptIn)
+    }
+    
+    @Html.Partial("~/Views/Forms/_CaptchaPartial.cshtml")
+    <input type="submit" value="submit" />
+}
+
+<script type="text/javascript">
+    if($("#address-search-field").length > 0)
+        setupGoogleAddressAutocomplete();
+
+    function ProcessFormSuccess() {
+
+    }
+
+    function ProcessFormFailure() {
+        captcha.Refresh();
+    }
+</script>

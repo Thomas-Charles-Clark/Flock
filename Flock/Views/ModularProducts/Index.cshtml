@@ -1,0 +1,63 @@
+﻿
+@{
+    ViewBag.Title = "Modular Products";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    <style type="text/css">
+        .modules-wrapper {
+            float: left;
+            margin-right: 2em;
+            width: 520px;
+            min-height: 264px;
+        }
+        .modules-wrapper-container:last-child {
+            margin-right: 0;
+        }
+        ul.module-list {
+            padding-left: 0.5em;
+        }
+        ul.module-list li {
+            list-style-type: none;
+            margin: 6px 2px;
+            line-height: 16px;
+        }
+        span.ui-icon {
+            margin-right: 4px;
+        }
+        ul.module-list li span.ui-icon {
+            float: left;
+            cursor: pointer;
+        }
+        h4.module-name span.ui-icon {
+            margin-top: 2px;
+            float: left;
+            cursor: pointer;
+        }
+        h5.module-option-group-name span.ui-icon {
+            float: left;
+            cursor: pointer;
+        }
+        .module {
+            margin-right: 1.5em;
+            float: left;
+        }
+
+        .drop-hover {
+            background-color: rgba(42, 200, 63, 0.1);
+        }
+
+    </style>
+}
+
+<h4 class="page-heading">Modular Products</h4>
+<div class="page-subheading"></div>
+
+<div id="modular-products-grid-container">
+    @Html.Action("ModularProductGridViewPartial")
+</div>
+
+<div id="modular-products-options-container">
+
+</div>

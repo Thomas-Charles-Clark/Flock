@@ -1,0 +1,169 @@
+﻿@{
+    ViewBag.Title = "Delivery Matrix";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/delivery-matrix.css")
+}
+@section scripts {
+    <script type="text/javascript">
+        function AddAvailableProductTypesToCourier(CourierID) {
+            LoadingPanel.Show();
+
+            var CountryID = CountrySelector.GetSelectedItem().value;
+            var DeliveryOptionID = DeliveryOptionSelector.GetSelectedItem().value;
+
+            var CourierProductTypes = new Array();
+
+            $(".courier-product-type-list").each(function () {
+                var cid = $(this).data("courier-id");
+                $(this).find('.product-type').each(function () {
+                    CourierProductTypes.push({
+                        CountryID: CountryID,
+                        DeliveryOptionID: DeliveryOptionID,
+                        ProductTypeID: $(this).data("product-type-id"),
+                        CourierID: cid
+                    });
+                });
+            });
+
+            $("#available-product-types li").each(function () {
+                CourierProductTypes.push({
+                    CountryID: CountryID,
+                    DeliveryOptionID: DeliveryOptionID,
+                    ProductTypeID: $(this).data("product-type-id"),
+                    CourierID: CourierID
+                });
+            });
+
+            $.ajax({
+                url: '@Url.Action("DeliveryMatrixMerge", "eCommerce")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    CountryID: CountryID,
+                    DeliveryOptionID: DeliveryOptionID,
+                    CourierProductTypes: JSON.stringify(CourierProductTypes)
+                },
+                success: function (data) {
+                    $("#delivery-matrix-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+
+        function RemoveProductType(ProductTypeID, CourierID) {
+
+            var CountryID = CountrySelector.GetSelectedItem().value;
+            var DeliveryOptionID = DeliveryOptionSelector.GetSelectedItem().value;
+
+            var CourierProductTypes = new Array();
+
+            $(".courier-product-type-list").each(function () {
+                var cid = $(this).data("courier-id");
+                $(this).find('.product-type').each(function () {
+                    if ($(this).data("product-type-id") != ProductTypeID) {
+                        CourierProductTypes.push({
+                            CountryID: CountryID,
+                            DeliveryOptionID: DeliveryOptionID,
+                            ProductTypeID: $(this).data("product-type-id"),
+                            CourierID: cid
+                        });
+                    }
+                });
+            });
+
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("DeliveryMatrixMerge", "eCommerce")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    CountryID: CountryID,
+                    DeliveryOptionID: DeliveryOptionID,
+                    CourierProductTypes: JSON.stringify(CourierProductTypes)
+                },
+                success: function (data) {
+                    $("#delivery-matrix-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+
+        function RemoveCourier(CourierID) {
+            var CountryID = CountrySelector.GetSelectedItem().value;
+            var DeliveryOptionID = DeliveryOptionSelector.GetSelectedItem().value;
+
+            var CourierProductTypes = new Array();
+
+            $(".courier-product-type-list").each(function () {
+                var cid = $(this).data("courier-id");
+                if (cid != CourierID) {
+                    $(this).find('.product-type').each(function () {
+                        CourierProductTypes.push({
+                            CountryID: CountryID,
+                            DeliveryOptionID: DeliveryOptionID,
+                            ProductTypeID: $(this).data("product-type-id"),
+                            CourierID: cid
+                        });
+                    });
+                }
+            });
+
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("DeliveryMatrixMerge", "eCommerce")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    CountryID: CountryID,
+                    DeliveryOptionID: DeliveryOptionID,
+                    CourierProductTypes: JSON.stringify(CourierProductTypes)
+                },
+                success: function (data) {
+                    $("#delivery-matrix-container").html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+
+        function SaveDeliveryBandPrice(index) {
+            $('#delivery-price-' + index);
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("SaveDeliveryBandPrice", "eCommerce")',
+                type: 'POST',
+                traditional: true,
+                data: {},
+                success: function (data) {
+                    $("#delivery-band-prices-detail-container").html(data);
+                    LoadingPanel.Hide();
+                    SuccessFade($("#delivery-band-price-"+index+"-save"));
+                },
+                error: function(e, s, a) { 
+                    $("#delivery-band-prices-detail-container").html(data);
+                    LoadingPanel.Hide()
+                    SuccessFade($("#delivery-band-price-"+index+"-save"));
+                },
+                timeout: 20000
+            });
+        }
+    </script>
+}
+
+<h4 class="page-heading">Delivery Matrix</h4>
+
+@Html.Action("DeliveryMatrixCountryComboBoxPartial", "eCommerce")
+
+@Html.Action("DeliveryMatrixDeliveryOptionComboBoxPartial", "eCommerce")
+
+<div style="clear: both;"></div>
+
+<div id="ajax-container">
+    <div id="delivery-matrix-container"></div>
+    <div style="clear: both;"></div>
+</div>
+

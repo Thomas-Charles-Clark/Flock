@@ -1,0 +1,19 @@
+﻿@model Flock.ViewModels.ProductPageTranslateViewModelHeader
+<div class="content-panel-container">
+    <fieldset id="product-page-select-header" style="cursor: default">
+        <legend>Product Page Selector</legend>
+        <div class="select-header-inner" style="background-color: #e1e1e1;">
+            @Html.Action("TranslateProductPageHeaderProductTypeDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateProductPageHeaderBrandDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateProductPageHeaderLaunchDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateProductPageHeaderTemplateDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateProductPageHeaderWebStatusDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateProductPageHeaderTranslationStatusDropDown", "Translations", new { Filters = Model })
+            <div id="translate-product-page-header-product-page-drop-down-container">
+                @Html.Action("TranslateProductPageHeaderProductPageDropDown", "Translations", new { Filters = Model })
+            </div>
+            <img id="translate-product-page-header-searching-icon" class="busy-icon" src="/images/systemicons/translate-busy.gif" />
+            <div style="clear: both"></div>
+        </div>
+    </fieldset>
+</div>

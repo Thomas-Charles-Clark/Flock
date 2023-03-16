@@ -1,0 +1,347 @@
+﻿@model Flock.ViewModels.PageTranslateViewModel
+@{
+    ViewBag.Title = "Translate Page";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/translations.css")
+}
+@section scripts {
+    <script type="text/javascript">
+        function SaveTranslation() {
+            $.ajax({
+                url: '@Url.Action("SavePageTranslation", "Translations")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: TranslateHeaderContentListBox.GetValue(),
+                    SelectedTargetLanguageID: TranslationTargetLanguageListBox.GetValue(),
+                    HeadingTranslation: HeadingTranslation.GetValue(),
+                    SubHeadingTranslation: SubHeadingTranslation.GetValue(),
+                    TitleTagTranslation: TitleTagTranslation.GetValue(),
+                    URLKeywordsTranslation: URLKeywordsTranslation.GetValue(),
+                    MetaDescriptionTranslation: MetaDescriptionTranslation.GetValue()
+                },
+                success: function (data) {
+                    $(HeadingTranslation.GetInputElement()).css('background-color', 'white');
+                    $(HeadingTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(SubHeadingTranslation.GetInputElement()).css('background-color', 'white');
+                    $(SubHeadingTranslation.GetInputElement()).parent().css('background-color', 'white');
+                    
+                    $(TitleTagTranslation.GetInputElement()).css('background-color', 'white');
+                    $(TitleTagTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(URLKeywordsTranslation.GetInputElement()).css('background-color', 'white');
+                    $(URLKeywordsTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(MetaDescriptionTranslation.GetInputElement()).css('background-color', 'white');
+                    $(MetaDescriptionTranslation.GetInputElement()).parent().css('background-color', 'white');
+
+                    window.TranslationUnsaved = false;
+
+                    //$("#translation-container").html(data);
+                    $("#translation-save-button").animate({ opacity: '0.0'}, 300, 'linear', function () {
+                        $(this).attr('src', '/images/icons/64/save-success.png').bind('onreadystatechange load', function () {
+                            $(this).unbind('onreadystatechange load');
+                            if (this.complete)
+                                $(this).animate({ opacity: '1.0' }, 300, 'linear', function () {
+                                    window.setTimeout(function () {
+                                    $("#translation-save-button").animate({ opacity: '0.0' }, 1000, 'linear', function () {
+                                        $(this).attr('src', '/images/icons/64/save.png').bind('onreadystatechange load', function () {
+                                            $(this).unbind('onreadystatechange load');
+                                            $(this).animate({ opacity: '1.0' }, 300, 'linear');
+                                        });
+                                        var e = new ASPxClientProcessingModeEventArgs();
+                                        HeadingTranslation.Init.FireEvent(HeadingTranslation, e);
+                                        SubHeadingTranslation.Init.FireEvent(SubHeadingTranslation, e);
+                                        TitleTagTranslation.Init.FireEvent(TitleTagTranslation, e);
+                                        URLKeywordsTranslation.Init.FireEvent(URLKeywordsTranslation, e);
+                                        MetaDescriptionTranslation.Init.FireEvent(MetaDescriptionTranslation, e);
+                                        PagerNext();
+                                    }, 2000);
+                                });
+                            });
+                        });
+                    });
+                },
+                error: function (e, s, a) {
+                    $('#translation-container').html(e.responseText);
+                    $('#translation-fieldset').show();
+                    var i = 0;
+
+                    function flash(i) {
+                        $('#translation-save-button').animate({ opacity: '1.0' }, 250, 'linear', function () {
+                            $('#translation-save-button').animate({
+                                opacity: '0.0',
+                            }, 250, 'linear', function () {
+                                i++;
+                                if (i == 3) {
+                                    $(this).attr('src', '/images/icons/64/save.png').bind('onreadystatechange load', function () {
+                                        if (this.complete) {
+                                            $(this).unbind('onreadystatechange load');
+                                            $(this).animate({ opacity: '1.0' }, 450, 'linear', function () {
+                                                return false;
+                                            });
+                                        }
+                                    });
+                                    return false;
+                                }
+                                else
+                                    flash(i);
+                            });
+                        });
+                    }
+
+                    $("#translation-save-button").animate({ opacity: '0.0' }, 250, 'linear', function(){
+                        $(this).attr('src','/images/icons/64/save-failed.png').bind('onreadystatechange load', function(){
+                            if (this.complete) {
+                                $(this).unbind('onreadystatechange load');
+                                flash(i);
+                                return false;
+                            }
+                        });
+                    });
+                },
+                timeout: 20000
+            });
+        }
+
+        function ReloadTranslation() {
+            window.TranslationUnsaved = false;
+            $.ajax({
+                url: '@Url.Action("ReloadPageTranslation", "Translations")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: TranslateHeaderContentListBox.GetValue(),
+                    SelectedTargetLanguageID: TranslationTargetLanguageListBox.GetValue()
+                },
+                success: function (data) {
+                    $('#translation-container').html(data);
+                },
+                error: function (e, s, a) {
+                    alert(e.responseText);
+                },
+                timeout: 20000
+            });
+        }
+
+        function SaveDefault() {
+            $.ajax({
+                url: '@Url.Action("SavePageDefault", "Translations")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: TranslateHeaderContentListBox.GetValue(), // ContentListBox - need to fill in the header for the collection
+                    Heading: Heading.GetValue(),
+                    SubHeading: SubHeading.GetValue(),
+                    TitleTag: TitleTag.GetValue(),
+                    URLKeywords: URLKeywords.GetValue(),
+                    MetaDescription: MetaDescription.GetValue()
+                },
+                success: function (data) {
+                    $(Heading.GetInputElement()).css('background-color', 'white');
+                    $(Heading.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(SubHeading.GetInputElement()).css('background-color', 'white');
+                    $(SubHeading.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(TitleTag.GetInputElement()).css('background-color', 'white');
+                    $(TitleTag.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(URLKeywords.GetInputElement()).css('background-color', 'white');
+                    $(URLKeywords.GetInputElement()).parent().css('background-color', 'white');
+
+                    $(MetaDescription.GetInputElement()).css('background-color', 'white');
+                    $(MetaDescription.GetInputElement()).parent().css('background-color', 'white');
+
+                    window.DefaultUnsaved = false;
+                    //$("#translation-container").html(data);
+                    $("#save-button").animate({ opacity: '0.0' }, 300, 'linear', function () {
+                        $(this).attr('src', '/images/icons/64/save-success.png').bind('onreadystatechange load', function () {
+                            $(this).unbind('onreadystatechange load');
+                            if (this.complete)
+                                $(this).animate({ opacity: '1.0' }, 300, 'linear', function () {
+                                    window.setTimeout(function () {
+                                        $("#save-button").animate({ opacity: '0.0' }, 1000, 'linear', function () {
+                                            $(this).attr('src', '/images/icons/64/save.png').bind('onreadystatechange load', function () {
+                                                $(this).unbind('onreadystatechange load');
+                                                $(this).animate({ opacity: '1.0' }, 300, 'linear');
+                                            });
+                                        })
+                                    }, 2000);
+                                });
+                        });
+                    });
+                },
+                error: function (e, s, a) {
+                    var i = 0;
+                    window.DefaultUnsaved = false;
+                    function flash(i) {
+                        $('#save-button').animate({ opacity: '1.0' }, 250, 'linear', function () {
+                            $('#save-button').animate({
+                                opacity: '0.0',
+                            }, 250, 'linear', function () {
+                                i++;
+                                if (i == 3) {
+                                    $(this).attr('src', '/images/icons/64/save.png').bind('onreadystatechange load', function () {
+                                        if (this.complete) {
+                                            $(this).unbind('onreadystatechange load');
+                                            $(this).animate({ opacity: '1.0' }, 450, 'linear', function () {
+                                                return false;
+                                            });
+                                        }
+                                    });
+                                    return false;
+                                }
+                                else
+                                    flash(i);
+                            });
+                        });
+                    }
+
+                    $("#save-button").animate({ opacity: '0.0' }, 250, 'linear', function () {
+                        $(this).attr('src', '/images/icons/64/save-failed.png').bind('onreadystatechange load', function () {
+                            if (this.complete) {
+                                $(this).unbind('onreadystatechange load');
+                                flash(i);
+                                return false;
+                            }
+                        });
+                    });
+                },
+                timeout: 20000
+            });
+        }
+        function ReloadDefault() {
+            window.DefaultUnsaved = false;
+            $.ajax({
+                url: '@Url.Action("ReloadPageDefault", "Translations")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: TranslateHeaderContentListBox.GetValue()
+                },
+                success: function (data) {
+                    $('#default-container').html(data);
+                },
+                error: function (e, s, a) {
+                    alert(e.responseText);
+                },
+                timeout: 20000
+            });
+        }
+        function PagerNext() {
+            if (window.DefaultUnsaved) {
+                alert("You have unsaved changes in the Default Language section. Please save or clear the changes before proceeding.");
+                return false;
+            }
+            if (window.TranslationUnsaved) {
+                alert("You have unsaved changes in the Translation section. Please save or clear the changes before proceeding.");
+                return false;
+            }
+            if (typeof (TranslateHeaderContentListBox) != "undefined" && typeof (TranslateHeaderContentListBox) != false) {
+                if (TranslateHeaderContentListBox.GetItemCount() > 0) {
+                    if (TranslateHeaderContentListBox.GetSelectedItem() != null) {
+                        if (TranslateHeaderContentListBox.GetSelectedItem().index != (TranslateHeaderContentListBox.GetItemCount() - 1)) {
+                            if (window.WasSave)
+                                TranslateHeaderContentListBox.SetSelectedIndex(0);
+                            else
+                                TranslateHeaderContentListBox.SetSelectedIndex(TranslateHeaderContentListBox.GetSelectedItem().index + 1);
+
+                            var e = new ASPxClientProcessingModeEventArgs();
+                            TranslateHeaderContentListBox.SelectedIndexChanged.FireEvent(TranslateHeaderContentListBox, e);
+                        }
+                        else {
+                            if ((parseInt($("#pager-current").html()) % 10) == 0) {
+
+                                $('#pager-current').html(TranslateHeaderContentListBox.GetSelectedItem().index + 1);
+
+                                var lb = aspxGetControlCollection().Get("TranslateHeaderContentListBox_DDD_L");
+
+                                lb.scrollHelper.isScrolledToBottom = true;
+                                lb.scrollHelper.isScrolledToTopSpacer = false;
+                                lb.scrollHelper.IsScrolledToBottomSpacer = false;
+
+                                var curr = $("#pager-current").html();
+                                var pageSize = lb.scrollHelper.defaultItemsRange.split(':')[1];
+                                lb.scrollHelper.itemsRange = curr + ":" + ((parseInt(curr) + parseInt(pageSize))).toString();
+
+                                // unless that next page has already been loaded by direct scrolling in the box.
+                                if (TranslateHeaderContentListBox.GetItemCount() <= (parseInt(curr) + parseInt(pageSize))) {
+                                    window.WasPagerNext = true;
+                                    lb.SendCallback();
+                                }
+                            }
+                            //$('#pager-current').html(TranslateHeaderContentListBox.GetSelectedItem().index + 1);
+                            //$('#pager-total').html(TranslateHeaderContentListBox.GetItemCount().toString());
+                        }
+                    }
+                    else {
+                        TranslateHeaderContentListBox.SetSelectedIndex(0);
+                        var e = new ASPxClientProcessingModeEventArgs();
+                        TranslateHeaderContentListBox.SelectedIndexChanged.FireEvent(TranslateHeaderContentListBox, e);
+                    }
+                }
+            }
+        }
+        function PagerPrevious() {
+            if (window.DefaultUnsaved) {
+                alert("You have unsaved changes in the Default Language section. Please save or clear the changes before proceeding.");
+                return false;
+            }
+            if (window.TranslationUnsaved) {
+                alert("You have unsaved changes in the Translation section. Please save or clear the changes before proceeding.");
+                return false;
+            }
+            if (typeof (TranslateHeaderContentListBox) != "undefined" && typeof (TranslateHeaderContentListBox) != false) {
+                if (TranslateHeaderContentListBox.GetItemCount() > 0) {
+                    if(TranslateHeaderContentListBox.GetSelectedItem() != null) {
+                        if (TranslateHeaderContentListBox.GetSelectedItem().index != 0) {
+                            TranslateHeaderContentListBox.SetSelectedIndex(TranslateHeaderContentListBox.GetSelectedItem().index - 1);
+                            var e = new ASPxClientProcessingModeEventArgs();
+                            TranslateHeaderContentListBox.SelectedIndexChanged.FireEvent(TranslateHeaderContentListBox, e);
+
+                            if ((parseInt($("#pager-current").html()) % 10) == 0) {
+
+                                $('#pager-current').html(TranslateHeaderContentListBox.GetSelectedItem().index + 1);
+
+                                var lb = aspxGetControlCollection().Get("TranslateHeaderContentListBox_DDD_L");
+
+                                lb.scrollHelper.isScrolledToBottom = true;
+                                lb.scrollHelper.isScrolledToTopSpacer = false;
+                                lb.scrollHelper.IsScrolledToBottomSpacer = false;
+
+                                var curr = $("#pager-current").html();
+                                var pageSize = lb.scrollHelper.defaultItemsRange.split(':')[1];
+                                lb.scrollHelper.itemsRange = curr + ":" + ((parseInt(curr) + parseInt(pageSize))).toString();
+
+                                // unless that next page has already been loaded by direct scrolling in the box.
+                                if (TranslateHeaderContentListBox.GetItemCount() < (parseInt(curr) + parseInt(pageSize))) {
+                                    lb.SendCallback();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+}
+
+
+<div id="translate-page-header-container">
+    @Html.Partial("TranslatePageHeader", Model.HeaderFilters)
+</div>
+
+<div id="translate-middle-container">
+    @Html.Partial("TranslateMiddlePartial", Model)
+</div>
+
+<div id="pager-container" class="content-panel-container">
+    <img id="pager-prev" src="~/images/icons/32/arrow-left.png" onclick="PagerPrevious();" /><span id="pager-current">-</span> / <span id="pager-total">-</span><img id="pager-next" src="~/images/icons/32/arrow-right.png" onclick="PagerNext();" />
+</div>

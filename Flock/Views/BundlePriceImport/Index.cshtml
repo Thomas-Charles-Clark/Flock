@@ -1,0 +1,94 @@
+﻿@{
+    ViewBag.Title = "Bundle Pricing Import";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/content/mailing-list-import.css")
+}
+@section scripts {
+    <script type="text/javascript">
+        function PerformImport() {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("Merge", "MailingListImport")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    FileName: $("#file-name").val(),
+                    CountryID: CountryComboBox.GetValue(),
+                    LanguageID: LanguageComboBox.GetValue(),
+                    ThirdPartyID: ThirdPartyTextBox.GetValue(),
+                    SendWelcomeEmail: false
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#merge-results-container").html(data);
+                },
+                timeout: 20000
+            });
+        }
+    </script>
+}
+
+<h4 class="page-heading">
+    Bundle Price Import
+</h4>
+
+<div class="page-subheading">
+    @using (Html.BeginForm("UploadControlForm", "UploadControl", FormMethod.Post, new { id = "upload-form" }))
+    {
+        @Html.DevExpress().UploadControl(settings =>
+        {
+            settings.Name = "UploadControl";
+            settings.CallbackRouteValues = new { Controller = "BundlePriceImport", Action = "UploadControlUpload" };
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin-right", "1em");
+            settings.ShowUploadButton = false;
+            settings.ClientSideEvents.FilesUploadStart = @"function(s, e) {
+
+            }";
+            settings.ClientSideEvents.FileUploadComplete = @"function(s, e) {
+                $('#results-panel').html(e.callbackData);
+            }";
+            settings.ShowProgressPanel = true;
+            settings.ValidationSettings.Assign(Flock.Controllers.BundlePriceImportControllerUploadControlSettings.UploadControlValidationSettings);
+        }).GetHtml()
+
+        @Html.DevExpress().Button(settings =>
+        {
+            settings.Name = "UploadButton";
+            settings.Text = "Upload";
+            settings.Style.Add("float", "left");
+            settings.Style.Add("padding", "4px 5px 3px 5px");
+            settings.Style.Add("margin-right", "2em");
+            settings.ClientSideEvents.Click = @"function (s, e) {
+                if (UploadControl.GetFileNames().length == 0) {
+                    alert('Please select a file to upload');
+                } else {
+                    UploadControl.Upload();
+                }
+            }";
+        }).GetHtml()
+    }
+    @*
+        Need to add a checkbox - unsaved - which simply demands acknowledgement from the user that the members being imported have given permission to be emailed.
+        Is this SendWelcomeEmailCheckbox doing anything? Do we want to remove it?
+    *@
+    <div style="clear: both;"></div>
+</div>
+
+<span id="mailing-list-yes" class="mailing-list-hint">&#10004;</span>
+<div style="overflow-x: scroll; margin: 0 auto;">
+    <img src="~/images/bundle-price-import.jpg">
+    <div style="clear: both;"></div>
+</div>
+<i style="margin-top: 10px; display: block;">
+    Please ensure that your data resides on the first Worksheet and that that Worksheet is named "Sheet1". (To rename a worksheet, right-click on the Worksheet tab at the bottom of the Excel window).
+</i>
+<p style="margin-top: 15px; font-size: 16px;">
+    This process can take a long time. After hitting the "Upload" button, <span style="text-decoration: underline; font-weight: bold">DO NOT REFRESH THE PAGE</span> until the process is complete.
+</p>
+
+<div id="results-panel">
+
+</div>

@@ -1,0 +1,52 @@
+﻿@model Flock.ViewModels.Video_PageSection
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ComposePageVideoComboBox" + Model.PageSectionID.ToString();
+    settings.Properties.NullDisplayText = "Find Video...";
+    settings.Properties.NullText = "Find Video...";
+    settings.Style.Add("margin", "0");
+    settings.Width = 200;
+    settings.Height = 35;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.CallbackRouteValues = new { Controller = "CMS", Action = "PageSectionVideoSelectPartial" };
+    settings.Properties.CallbackPageSize = 10;
+    settings.Properties.DropDownRows = 10;
+    settings.Properties.TextField = "Name";
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "VideoID";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.EnableClientSideAPI = true;
+    settings.Properties.FilterMinLength = 2;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    if (Model.Brochure != null)
+    {
+        settings.Properties.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['PageSectionID'] = " + Model.PageSectionID + @"
+            e.customArgs['VideoID'] = " + Model.VideoID + @"
+        }";
+    }
+    else
+    {
+        settings.Properties.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['PageSectionID'] = " + Model.PageSectionID + @"
+        }";
+    }
+
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        s.SetText(s.GetSelectedItem().text);
+        s.HideDropDown();
+    }";
+
+    if (Model.Brochure != null)
+    {
+        settings.Properties.ClientSideEvents.Init = @"function(s, e) {
+        s.SetSelectedItem(s.FindItemByValue(" + Model.VideoID + @"));
+        s.SetText(s.GetSelectedItem().text);
+    }";
+    }
+}).BindList(args =>
+{
+    return Flock.ViewModels.LargeDatabaseDataProvider.VideoHelper(args, Model.Brochure == null ? null : (object)Model.BrochureID);
+}, Flock.ViewModels.LargeDatabaseDataProvider.GetVideoByID).GetHtml()
+@*.BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetBrochureList, Flock.ViewModels.LargeDatabaseDataProvider.GetBrochureByID).GetHtml()*@

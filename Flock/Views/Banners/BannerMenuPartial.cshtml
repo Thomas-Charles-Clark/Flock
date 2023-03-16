@@ -1,0 +1,13 @@
+﻿@model Flock.ViewModels.BannerComposeViewModel
+<div class="content-panel-container">
+    <fieldset id="menu-restriction-fieldset">
+        <legend onclick="$('#menu-restriction-section').slideToggle('fast');">Menu Restrictions (click to expand / contract)</legend>
+        <div id="menu-restriction-section" style="position: relative; background-color: white; padding: 1em;">
+            @Html.Action("ComposeBannerMenuListBoxPartial", "Banners", new { MenuAssignmentSelectedMenuIDs = Model.MenuIDs })
+            <div style="clear: both;"></div>
+            <div style="width: 100%; height: 32px;"></div>
+            <img id="banner-menu-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveBannerMenus();" />
+            <div style="clear: both;"></div>
+        </div>
+    </fieldset>
+</div>

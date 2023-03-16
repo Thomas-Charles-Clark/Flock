@@ -1,0 +1,30 @@
+﻿@model List<Flock.Models.Report>
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "ReportsComboBox";
+    settings.CallbackRouteValues = new { Controller = "Reporting", Action = "ReportsComboBoxPartial" };
+    settings.Properties.NullText = "Report";
+    settings.Properties.ValueField = "ReportID";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueType = typeof(Int16);
+    settings.Style.Add("float", "left");
+    settings.Properties.Caption = "Report";
+    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+    settings.Properties.CaptionCellStyle.Width = 74;
+    
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+        $.ajax({
+            url: '"+Url.Action("ReportDetailPartial", "Reporting")+@"',
+            type: 'POST',
+            traditional: true,
+            async: false,
+            data: { 
+                ReportID: s.GetSelectedItem().value
+            }, 
+            success: function(data) { 
+                $('#report-detail-ajax-container').html(data);
+            },
+            timeout: 30000
+        });
+    }";
+}).BindList(Model).GetHtml()

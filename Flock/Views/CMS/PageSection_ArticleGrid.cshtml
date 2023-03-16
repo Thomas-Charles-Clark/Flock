@@ -1,0 +1,38 @@
+﻿@model List<Flock.Models.PageSection_Article_SelectResult>
+@for (int i = 0; i < Model.Count; i++)
+{
+    if (Model[i].ImageID != null)
+    {
+        <div class="article-cell" data-article-id="@(Model[i].ArticleID)" data-page-section-id="@(Model[i].PageSectionID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <img src="https://flock.designersguild.com/imagelibrary/156/@(Model[i].ImageID).jpeg" />
+            <span>Article: @(Model[i].Name)</span>
+            <br />
+            <span><a href="/admin/articles/compose/@(Model[i].ArticleID)">Article ID: @(Model[i].ArticleID)</a></span>
+            <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="RemoveArticleFromGrid(@(Model[i].PageSectionID), @(Model[i].ArticleID))" />
+        </div>
+    }
+    else
+    {
+        <div class="article-cell" data-article-id="@(Model[i].ArticleID)" data-page-section-id="@(Model[i].PageSectionID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <img src="/images/admin/ar2-placeholder.png" style="width: 156px;" />
+            <span>Article: @(Model[i].Name)</span>
+            <br />
+            <span><a href="/admin/articles/compose/@(Model[i].ArticleID)">Article ID: @(Model[i].ArticleID)</a></span>
+            <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" onclick="$(this).parent().remove(); UpdateArticleGrid(@(Model[i].PageSectionID))" />
+        </div>
+    }
+}
+@if (Model.Count == 0)
+{
+    <div class="article-cell article-placeholder">
+        <h5>No Articles have been assigned.</h5>
+    </div>
+}
+
+<div style="clear: both" class="article-placeholder"></div>
+
+<script type="text/javascript">
+    //$(".page-section-grid-container").sortable({
+    InitArticleDragDrop();
+    //});
+</script>

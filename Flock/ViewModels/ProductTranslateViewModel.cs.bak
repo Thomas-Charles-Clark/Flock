@@ -1,0 +1,78 @@
+﻿using DevExpress.Web.ASPxEditors;
+using Flock.DAL;
+using Flock.Models;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace Flock.ViewModels
+{
+    public class ProductTranslateViewModelBuilder
+    {
+        private UnitOfWork<FlockDataContext> UoW;
+
+        public ProductTranslateViewModelBuilder(UnitOfWork<FlockDataContext> UnitOfWork)
+        {
+            UoW = UnitOfWork;
+        }
+
+        public ProductTranslateViewModel Build(int? ProductID, byte? LanguageID)
+        {
+            ProductTranslateViewModel Model = new ProductTranslateViewModel();
+
+            if (ProductID != null)
+            {
+                Product original = UoW.GetRepository<Product>().GetAll().Where(p => p.ProductID == ProductID).Single();
+
+                Model.Description = original.Description;
+                Model.BasketName = original.BasketName;
+                Model.OrderFormName = original.OrderFormName;
+
+                Model.Name = original.Name;
+                Model.ImageID = UoW.GetRepository<Product_Image>().GetAll().Where(p => p.ProductID == ProductID && p.PerspectiveID == 1).Select(p => p.ImageID).SingleOrDefault();
+                Model.ID = original.ProductID;
+
+                if (LanguageID != null)
+                {
+                    Product_Language translation = UoW.GetRepository<Product_Language>().GetAll().Where(p => p.ProductID == ProductID && p.LanguageID == LanguageID).Single();
+
+                    Model.SelectedTargetLanguage = UoW.GetRepository<Language>().GetAll().Where(p => p.LanguageID == translation.LanguageID).Select(p => p.Name).Single();
+                    Model.BasketName = translation.BasketName;
+                    Model.OrderFormNameTranslation = translation.OrderFormName;
+                    Model.SelectedTargetLanguageID = LanguageID;
+                }
+
+                return Model;
+            }
+            else
+            {
+                return Model;
+            }
+        }
+    }
+
+    public class ProductTranslateViewModel : BaseTranslateViewModel
+    {
+        public ProductTranslateViewModelHeader HeaderFilters { get; set; }
+
+        public string BasketName { get; set; }
+        public string OrderFormName { get; set; }
+        public string OrderFormNameTranslation { get; set; }
+
+        public string WebStatus { get; set; }
+    }
+
+    public class ProductTranslateViewModelHeader
+    {
+        public byte? ProductTypeID { get; set; }
+        public byte? BrandID { get; set; }
+        public short? LaunchID { get; set; }
+        public byte? TemplateID { get; set; }
+        public int? ID { get; set; }
+        public byte? WebStatusID { get; set; }
+        public byte? TranslationStatusID { get; set; }
+        public byte? TargetLanguageID { get; set; }
+    }
+}

@@ -1,0 +1,270 @@
+﻿@model Flock.ViewModels.CacheBusterViewModel
+
+@Scripts.Render("~/bundles/js/knockout")
+
+<script type="text/javascript">
+
+    function getAvailableSites() {
+        return @Html.Raw(Json.Encode(Model.Sites.OrderBy(p => p.Name).ToList()));
+    }
+
+    function cacheBusterViewModel() {
+        var self = this;
+
+        self.availableContentTypes = [
+            {
+                Name: 'Article Page',
+                Value: 'article',
+                autocompleteEndpoint: '/admin/cms/Article_Autocomplete'
+            },
+            {
+                Name: 'Template Banners',
+                Value: 'banner',
+                autocompleteEndpoint: null
+            },
+            {
+                Name: 'Careers',
+                Value: 'careers',
+                autocompleteEndpoint: null
+            },
+            {
+                Name: 'Collection Page',
+                Value: 'collectionPage',
+                autocompleteEndpoint: '/admin/cms/Collection_Autocomplete'
+            },
+            {
+                Name: 'Landing Page',
+                Value: 'landingPage',
+                autocompleteEndpoint: '/admin/cms/LandingPage_Autocomplete'
+            },
+            {
+                Name: 'Menus',
+                Value: 'menu',
+                autocompleteEndpoint: null
+            },
+            {
+                Name: 'Product Page',
+                Value: 'productPage',
+                autocompleteEndpoint: '/admin/cms/ProductPage_Autocomplete'
+            },
+            {
+                Name: 'Snippets',
+                Value: 'snippet',
+                autocompleteEndpoint: null
+            }
+        ];
+
+        self.contentType = ko.observable();
+            
+        self.autocompleteVisible = ko.pureComputed(function () {
+            if (self.contentType()) {
+                return self.contentType().autocompleteEndpoint != null;
+            }
+        }, self);
+
+        self.contentType.subscribe(function (newValue) {
+            self.clearContent();
+            if (newValue) {
+                if (newValue.autocompleteEndpoint != null) {
+                    self.initAutocomplete();
+                }
+            }
+        });
+
+        self.content = ko.observable();
+
+        self.bustEnabled = ko.pureComputed({
+            read: function () {
+                return (self.autocompleteVisible() && self.content()) || (self.contentType() && !self.autocompleteVisible());
+            }
+        }, self);
+
+        self.availableSites = getAvailableSites();
+
+        var uk = Enumerable.From(self.availableSites).Where("$.CountryID == 81 && $.LanguageID == 1").Single();
+
+        self.site = ko.observable(uk);
+
+        self.bust = function () {
+
+            var contentId = null;
+
+            if (self.autocompleteVisible())
+                contentId = self.content().ContentID;
+
+            var sites = [];
+
+            if (self.site().CountryID == -1) {
+                sites = getAvailableSites().map(s => {
+                    return {
+                        countryId: s.CountryID,
+                        languageId: s.LanguageID
+                    }
+                });
+            } else {
+                sites.push(self.site());
+            }
+
+            $.ajax({
+                url: '/api/CMS_CacheBusterAPI/BustCache',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    ContentType: self.contentType().Value,
+                    ContentID: contentId,
+                    Sites: sites
+                },
+                success: function () {
+                    $("#success").fadeIn('fast');
+                    window.setTimeout(function () {
+                        $("#success").fadeOut('slow', function () {
+                            self.clearContent();
+                        });
+                    }, 2000);
+                }
+            });
+        }
+
+        self.clearContent = function () {
+            self.content(undefined);
+            $("#content-id").val(undefined);
+        }
+        
+        self.autocompleteEndpoint = ko.computed({
+            read: function () {
+                if (self.contentType()) {
+                    return self.contentType().autocompleteEndpoint;
+                }
+            }
+        }, self);
+
+        self.initAutocomplete = function () {
+            if ($("#content-id").autocomplete('instance'))
+                $("#content-id").autocomplete('destroy');
+
+            $("#content-id").autocomplete({
+                appendTo: $("#content-id").closest('.col-xs-12'),
+                source: function (request, response) {
+                    $("#content-id").addClass('ui-autocomplete-loading');
+                    var params = {
+                        term: request.term
+                    };
+                    $.ajax({
+                        url: self.autocompleteEndpoint(),
+                        type: "POST",
+                        dataType: "json",
+                        data: params,
+                        success: function (data) {
+                            $("#content-id").removeClass('ui-autocomplete-loading');
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.Name,
+                                    value: item
+                                };
+                            }));
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            $("#content-id").removeClass('ui-autocomplete-loading');
+                        }
+                    });
+                },
+                minLength: 3,
+                focus: function (event, ui) {
+                    event.preventDefault();
+                },
+                select: function (event, ui) {
+                    event.preventDefault();
+                    self.content(ui.item.value);
+                    $("#content-id").val(ui.item.label);
+                    return false;
+                },
+                autoFocus: true,
+                search: function (e, ui) {
+                    $(this).data('ui-autocomplete').menu.bindings = $();
+                }
+            });
+        }
+
+        self.bustedSuccessText = ko.pureComputed({
+            read: function () {
+                if (self.content()) {
+                    return self.contentType().Name + ' "' + self.content().Name + '" ' + ' Purged';
+                } else {    
+                    if (self.contentType()) {
+                        return self.contentType().Name + ' Purged';
+                    }
+                }
+            }
+        });
+
+        self.initAutocomplete();
+    }
+
+    var cacheBusterModel = new cacheBusterViewModel();
+
+    $(document).ready(function () {
+        ko.options.deferUpdates = true;
+        ko.applyBindings(cacheBusterModel, $('#cache-buster-modal')[0]);
+    });
+
+</script>
+
+<div id="cache-buster-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <a class="close" data-dismiss="modal">&times;</a>
+                    <h4 class="modal-title">
+                        Cache Buster
+                    </h4>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group row">
+                            <div class="col-xs-12">
+                                <label class="col-form-label">
+                                    Site
+                                </label>
+                                <select id="site" class="form-control" data-bind="options: availableSites, value: site, optionsText: 'Name', optionsValue: $data"></select> 
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xs-12">
+                                <label class="col-form-label">
+                                    Content Type
+                                </label>
+                                <select id="contentType" class="form-control" data-bind="options: availableContentTypes, value: contentType, optionsText: 'Name', optionsValue: $data, optionsCaption: 'Please Select'"></select>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="display: none;" data-bind="visible: autocompleteVisible">
+                            <div class="col-xs-12">
+                                <label class="col-form-label">
+                                    Content
+                                </label>
+                                <input id="content-id" class="form-control" data-bind="enable: contentType" placeholder="Search by Name or ID" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <button class="btn btn-success" style="display: block;" data-bind="click: function() { bust(); }, enable: bustEnabled">
+                                    Bust
+                                    <!-- ko with: contentType -->
+                                    <span data-bind="text: Name"></span>
+                                    <!-- /ko -->
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <span id="success" class="alert alert-success" style="display: none;" data-bind="text: bustedSuccessText"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

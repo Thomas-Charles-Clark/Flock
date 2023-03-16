@@ -1,0 +1,44 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "DeliveryOptionSelector";
+    settings.Properties.NullDisplayText = "Delivery Option...";
+    settings.Properties.NullText = "Delivery Option...";
+    settings.Style.Add("margin-right", "1em");
+    settings.Style.Add("float", "left");
+
+    settings.Height = 32;
+
+    settings.Properties.CallbackPageSize = 15;
+    settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "DeliveryMatrixDeliveryOptionComboBoxPartial" };
+    var prop = settings.Properties as ComboBoxProperties;
+    prop.TextField = "Name";
+    prop.ValueField = "DeliveryOptionID";
+    prop.ValueType = typeof(short);
+
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        var CountryID = null;
+        if(CountrySelector.GetSelectedItem() != null)
+            CountryID = CountrySelector.GetSelectedItem().value;
+
+        if(CountryID != null) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("DeliveryMatrixPartial", "eCommerce") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    CountryID: CountryID,
+                    DeliveryOptionID: s.GetSelectedItem().value
+                },
+                success: function(data) {
+                    $('#delivery-matrix-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }
+    }";
+}).BindList(args =>
+{
+    return Flock.ViewModels.LargeDatabaseDataProvider.GetDeliveryOptions(args);
+}, Flock.ViewModels.LargeDatabaseDataProvider.GetDeliveryOptionsByID).GetHtml()

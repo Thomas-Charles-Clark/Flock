@@ -1,0 +1,446 @@
+﻿@model Flock.ViewModels.BannerComposeViewModel
+<div class="content-panel-container">
+    <fieldset id="banner-link-fieldset">
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#banner-link-section').slideToggle('fast');">
+            Banner Link (click to expand / contract)
+            <img id="banner-link-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="banner-link-section" style="background-color: white; padding: 1em;">
+            @{
+                <label style="float: left; line-height: 32px; margin-right: 2em;">Link to:</label>
+                using(var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>()) 
+                {
+                    @Html.DevExpress().DropDownEdit(settings => {
+                   settings.Name = "LinkTypeDD";
+                        settings.Style.Add("float", "left");
+                        settings.SetDropDownWindowTemplateContent(c => {
+                            Html.DevExpress().ListBox(lbSettings =>
+                            {
+                                lbSettings.Name = "BannerLinkTypeID";
+                                lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                lbSettings.Properties.TextField = "Name";
+                                lbSettings.Properties.ValueField = "BannerLinkTypeID";
+                                lbSettings.Properties.ValueType = typeof(byte);
+                                lbSettings.Properties.ClientSideEvents.Init = @"function(s,e) {
+                                    if(s.FindItemByValue("+Model.LinkTypeID+@") != null) {
+                                        s.SetSelectedIndex(s.FindItemByValue(" + Model.LinkTypeID + @").index);
+                                        LinkTypeDD.SetText(s.GetSelectedItem().text);
+                                        switch(s.GetSelectedItem().value) {
+                                            case 1:
+                                                $('#banner-content-link-container').show();
+                                                $('#banner-content-page-link-container').show();
+                                            break;
+                                            case 2:
+                                                $('#banner-content-link-container').show();
+                                                $('#banner-content-product-page-link-container').show();
+                                            break;
+                                            case 3:
+                                                $('#banner-content-link-container').show();
+                                                $('#banner-content-collection-link-container').show();
+                                            break;
+                                            case 4:
+                                                $('#banner-external-link-container').show();
+                                            break;
+                                            case 5:
+                                                $('#banner-no-link').show();
+                                            break;
+case 6:
+                                                $('#banner-content-link-container').show();
+                                                $('#banner-content-article-link-container').show();
+break;
+                                            default: break;
+                                        }
+                                    }
+                                }";
+                                lbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s,e) {
+                                    LinkTypeDD.SetText(s.GetSelectedItem().text);
+                                    LinkTypeDD.HideDropDown();
+                                    switch(s.GetSelectedItem().value) {
+                                        case 1:
+                                            $('#banner-external-link-container').hide();
+                                            $('#banner-content-product-page-link-container').hide();
+                                            $('#banner-content-collection-link-container').hide();
+                                            $('#banner-content-article-link-container').hide();
+                                            $('#banner-no-link').hide();
+                                            $('#banner-content-link-container').show();
+                                            $('#banner-content-page-link-container').show();
+                                        break;
+                                        case 2:
+                                            $('#banner-external-link-container').hide();
+                                            $('#banner-content-page-link-container').hide();
+                                            $('#banner-content-collection-link-container').hide();
+                                            $('#banner-content-article-link-container').hide();
+                                            $('#banner-no-link').hide();
+                                            $('#banner-content-link-container').show();
+                                            $('#banner-content-product-page-link-container').show();
+                                        break;
+                                        case 3:
+                                            $('#banner-external-link-container').hide();
+                                            $('#banner-content-page-link-container').hide();
+                                            $('#banner-content-product-page-link-container').hide();
+                                            $('#banner-content-article-link-container').hide();
+                                            $('#banner-no-link').hide();
+                                            $('#banner-content-link-container').show();
+                                            $('#banner-content-collection-link-container').show();
+                                        break;
+                                        case 4:
+                                            $('#banner-content-link-container').hide();
+                                            $('#banner-no-link').hide();
+                                            $('#banner-external-link-container').show();
+                                        break;
+                                        case 5:
+                                            $('#banner-external-link-container').hide();
+                                            $('#banner-content-product-page-link-container').hide();
+                                            $('#banner-content-collection-link-container').hide();
+                                            $('#banner-content-article-link-container').hide();
+                                            $('#banner-content-page-link-container').hide();
+                                            $('#banner-content-link-container').hide();
+                                            $('#banner-no-link').show();
+                                        break;
+                                        case 6:
+                                            $('#banner-external-link-container').hide();
+                                            $('#banner-content-product-page-link-container').hide();
+                                            $('#banner-content-collection-link-container').hide();
+                                            $('#banner-content-page-link-container').hide();
+                                            $('#banner-content-link-container').show();
+                                            $('#banner-no-link').hide();
+                                            $('#banner-content-article-link-container').show();
+                                        break;
+                                        default: break;
+                                    }
+                                }";
+                            }).BindList(UoW.GetRepository<Flock.Models.BannerLinkType>().GetAll().ToList()).Render();
+                        });
+                    }).GetHtml()
+                
+                <label style="float: left; line-height: 32px; margin-left: 100px; margin-right: 2em;">Target:</label>
+                    @Html.DevExpress().DropDownEdit(settings => {
+                        settings.Name = "NewWindowDD";
+                        settings.Style.Add("float", "left");
+                        settings.SetDropDownWindowTemplateContent(c => {
+                            Html.DevExpress().ListBoxFor(m => Model.NewWindow, lbSettings =>
+                            {
+                                
+                                lbSettings.Name = "NewWindow";
+                                lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                lbSettings.Properties.Items.Add("New Window", "True");
+                                lbSettings.Properties.Items.Add("Same Window", "False");
+                                lbSettings.Properties.ClientSideEvents.Init = @"function(s,e) {
+                                    if(s.GetSelectedItem() != null) {
+                                        NewWindowDD.SetText(s.GetSelectedItem().text);
+                                    }
+                                }";
+                                lbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s,e) {
+                                    NewWindowDD.SetText(s.GetSelectedItem().text);
+                                    NewWindowDD.HideDropDown();
+                                }";
+                            }).Render();
+                        });
+                    }).GetHtml()
+                <label style="float: left; line-height: 32px; margin-left: 100px; margin-right: 2em;">Test Link:</label>
+                    if (Model.LinkTypeID != 4)
+                    {
+                        <a style="font-size: 14px; line-height: 32px;" href="http://flock-demo.designersguild.com/@(Model.LinkURL)" target="@if (Model.NewWindow.HasValue) { ViewContext.Writer.Write(!Model.NewWindow.Value ? "_blank" : "_self" ); }">Click to test</a>
+                    }
+                    else
+                    {
+                        <a style="font-size: 14px; line-height: 32px;" href="@(Model.ExternalURL)" target="@if (Model.NewWindow.HasValue) { ViewContext.Writer.Write(!Model.NewWindow.Value ? "_blank" : "_self" ); }">Click to test</a>
+                    }
+                <div style="clear: both;"></div>
+                <div id="banner-content-link-container" style="display: none;">
+                <div id="banner-content-page-link-container" style="display: none; position: relative;">
+                    <table class="banner-link-table" style="width: 100%;">
+                        <tr>
+                            <th>
+                                Page
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div id="page-drop-target">
+                                    @if (Model.PageID != null)
+                                    {
+                                        var pa = UoW.GetRepository<Flock.Models.Page>().GetAll().Where(p => p.PageID == Model.PageID).Single();
+                                        var i = UoW.GetRepository<Flock.Models.Page_Image>().GetAll().Where(p => p.PageID == Model.PageID && p.TemplateImageID == 1).Select(p => p.ImageID).FirstOrDefault();
+                                        if (i != null)
+                                        {
+                                            <img style="margin: 2em;" src="https://flock.designersguild.com/imagelibrary/239/@(i).jpeg" />
+                                        }
+                                        else
+                                        {
+
+                                        }
+                                        <label style="display: block;">Page ID: @(Model.PageID)</label>
+                                        <label>@(pa.Name)</label>
+                                    }
+                                    else
+                                    {
+                                        <i style="display: block; margin: 4em;">Drag a Page here from the Resource Panel</i>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <img id="banner-page-link-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="$('#confirm-dialog').dialog('open');" />
+                </div>
+                <div id="banner-content-product-page-link-container" style="display: none; position: relative;">
+                    <table class="banner-link-table" style="width: 100%;">
+                        <tr>
+                            <th>
+                                Product Page
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div id="product-page-drop-target">
+                                    @if (Model.ProductPageID != null)
+                                    {
+                                        var pa = UoW.GetRepository<Flock.Models.vwProductPage>().GetAll().Where(p => p.ProductPageID == Model.ProductPageID).Single();
+                                        var i = UoW.GetRepository<Flock.Models.ProductPage_Image>().GetAll().Where(p => p.ProductPageID == Model.ProductPageID && p.TemplateImageID == 1).Select(p => p.ImageID).FirstOrDefault();
+                                        if (i != null)
+                                        {
+                                            <img style="margin: 2em;" src="https://flock.designersguild.com/imagelibrary/239/@(i).jpeg" />
+                                        }
+                                        else
+                                        {
+                                            
+                                        }
+                                        <label style="display: block;">Product Page ID: @(Model.ProductPageID)</label>
+                                        <label style="display: block;">@(pa.Name)</label>
+                                                <label>
+                                            @{
+                                        string colour = "black";
+                                                string statusText = "unknown";
+                                                statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == pa.StatusID).Select(p => p.Name).Single();
+                                                switch (pa.StatusID)
+                                                {
+                                                    case 0:
+                                                        colour = "green";
+                                                        break;
+                                                    case 1:
+                                                        colour = "orange";
+                                                        break;
+                                                    case 2:
+                                                        colour = "orange";
+                                                        break;
+                                                    case 3:
+                                                        colour = "green";
+                                                        break;
+                                                    case 4:
+                                                        colour = "red";
+                                                        break;
+                                                    default: break;
+                                                }
+                                                ViewContext.Writer.Write("<span style='color: " + colour + " '>" + statusText + "</span>");   
+                                            }
+                                        </label>
+                                    }
+                                    else
+                                    {
+                                        <i style="display: block; margin: 4em;">Drag a Product Page here from the Resource Panel</i>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <img id="banner-product-page-link-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="$('#confirm-dialog').dialog('open');" />
+                </div>
+                <div id="banner-content-collection-link-container" style="display: none; position: relative;">
+                    <table class="banner-link-table" style="width: 100%;">
+                        <tr>
+                            <th>
+                                Collection
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div id="collection-drop-target">
+                                    @if (Model.CollectionID != null)
+                                    {
+                                        var pa = UoW.GetRepository<Flock.Models.vwCollection>().GetAll().Where(p => p.CollectionID == Model.CollectionID).Single();
+                                        var i = UoW.GetRepository<Flock.Models.Collection_Image>().GetAll().Where(p => p.CollectionID == Model.CollectionID && p.TemplateImageID == 1).Select(p => p.ImageID).FirstOrDefault();
+                                        if (i != null)
+                                        {
+                                            <img style="margin: 2em;" src="https://flock.designersguild.com/imagelibrary/239/@(i).jpeg" />
+                                        }
+                                        <label style="display: block;">Collection ID: @(pa.CollectionID)</label>
+                                        <label style="display: block;">@Model.CollectionName</label>
+                                        <label>
+                                        @{
+                                            string colour = "black";
+                                            string statusText = "unknown";
+                                            statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == pa.StatusID).Select(p => p.Name).Single();
+                                            switch (pa.StatusID)
+                                            {
+                                                case 0:
+                                                    colour = "green";
+                                                    break;
+                                                case 1:
+                                                    colour = "orange";
+                                                    break;
+                                                case 2:
+                                                    colour = "orange";
+                                                    break;
+                                                case 3:
+                                                    colour = "green";
+                                                    break;
+                                                case 4:
+                                                    colour = "red";
+                                                    break;
+                                                default: break;
+                                            }
+                                            ViewContext.Writer.Write("<span style='color: " + colour + " '>" + statusText + "</span>");
+                                        }
+                                        </label>
+                                    }
+                                    else
+                                    {
+                                        <i style="display: block; margin: 4em;">Drag a Collection here from the Resource Panel</i>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <img id="banner-collection-link-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="$('#confirm-dialog').dialog('open');" />
+                </div>
+                <div id="banner-content-article-link-container" style="display: none; position: relative;">
+                    <table class="banner-link-table" style="width: 100%;">
+                        <tr>
+                            <th>
+                                Article
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div id="article-drop-target">
+                                    @if (Model.ArticleID != null)
+                                    {
+                                        var pa = UoW.GetRepository<Flock.Models.Article>().GetAll().Where(p => p.ArticleID == Model.ArticleID).Single();
+                                        var i = UoW.GetRepository<Flock.Models.Article_Image>().GetAll().Where(p => p.ArticleID == Model.ArticleID && p.TemplateImageID == 1).Select(p => p.ImageID).FirstOrDefault();
+                                        if (i != null)
+                                        {
+                                            <img style="margin: 2em;" src="https://flock.designersguild.com/imagelibrary/239/@(i).jpeg" />
+                                        }
+                                        else
+                                        {
+
+                                        }
+                                        <label style="display: block;">Article ID: @(Model.ArticleID)</label>
+                                        <label>@(pa.Name)</label>
+                                    }
+                                    else
+                                    {
+                                        <i style="display: block; margin: 4em;">Drag an Article here from the Resource Panel</i>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <img id="banner-article-link-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="$('#confirm-dialog').dialog('open');" />
+                </div>
+            </div>
+
+            <div id="banner-external-link-container" style="display: none; position: relative;">
+                <label style="float: left; line-height: 32px; margin-right: 2em;">External Link:</label>
+                @Html.DevExpress().TextBox(settings => {
+                   settings.Name = "ExternalURL";
+                   settings.Style.Add("float", "left");
+                   settings.Width = System.Web.UI.WebControls.Unit.Percentage(90);
+                }).Bind(Model.LinkURL).GetHtml()
+                <img id="banner-external-link-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 4px; right: 10px;" onclick="$('#confirm-dialog').dialog('open');" />
+                <div style="clear: both;"></div>
+            </div>
+                
+            <div id="banner-no-link" style="display: none; position: relative;">
+                <img id="banner-no-link-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 4px; right: 10px;" onclick="$('#confirm-dialog').dialog('open');" />
+            </div>    
+            }
+        }
+            <input type="hidden" id="banner-page-link" value="@(Model.PageID)" />
+            <input type="hidden" id="banner-product-page-link" value="@(Model.ProductPageID)" />
+            <input type="hidden" id="banner-collection-link" value="@(Model.CollectionID)" />
+            <input type="hidden" id="banner-article-link" value="@(Model.ArticleID)" />
+
+            @*<label style="width: 100%;">The options beneath are mutually exclusive. Setting an External Link URL will automatically check the 'New Window' checkbox.</label>
+            <label style="float: left; line-height: 30px; margin-right: 8px;">External URL:</label>
+            @Html.DevExpress().TextBoxFor(m => m.LinkURL, settings =>
+       {
+           settings.Width = System.Web.UI.WebControls.Unit.Pixel(675);
+           settings.Style.Add("float", "left");
+           settings.Properties.ClientSideEvents.LostFocus = @"function(s, e) {
+                    NewWindowCheckBox.SetValue(true);
+                    UpdateBannerLink(1, s.GetText());
+                }";
+       }).GetHtml()
+            <label style="float: left; line-height: 30px; margin-left: 50px; margin-right: 8px;">New Window?</label>
+            @Html.DevExpress().CheckBoxFor(m => m.NewWindow, settings =>
+       {
+           settings.Name = "NewWindowCheckBox";
+           settings.Style.Add("margin-top", "4px");
+           settings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) {
+                    $('#banner-link-busy').fadeIn('fast');
+                    $.ajax({
+                        url: '" + Url.Action("BannerSetNewWindowFlag", "Banners") + @"',
+                        type: 'POST',
+                        traditional: true,
+                        data: {
+                            BannerID: $('#banner-compose-section').data('banner-id'),
+                            NewWindow: s.GetValue()
+                        },
+                        success: function(data) {
+                            $('#banner-link-busy').fadeOut('fast');
+                            $('#banner-link-container').html(data);
+                        },
+                        error: function (xhr, status, error) {
+                            $('#banner-link-busy').fadeOut('fast');
+                            if (xhr.status == 403) {
+                                alert('Sorry, your session has expired. Please login again to continue');
+                                window.location.href = '/Account/Login';
+                            }
+                            else {
+                                if (xhr.responseText)
+                                    alert('An error occurred: ' + status + '\r\nError: ' + error + '\r\nResponse: ' + xhr.responseText);
+                                else
+                                    alert('An error occurred: ' + status + '\r\nError: ' + error);
+                            }
+                        },
+                        timeout: 20000
+                    });
+                }";
+       }).GetHtml()
+            <div style="clear: both;"></div>
+            <table id="banner-link-table" style="width: 100%;">
+                <tr>
+                    <th>
+                        Collection
+                    </th>
+                    <th>
+                        Page
+                    </th>
+                    <th>
+                        Product Page
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td>
+                        
+                    </td>
+                </tr>
+            </table>
+            <div style="text-align: center; margin-top: 1em;"><a href="#" onclick='RemoveBannerLink();return false'>Remove Link</a></div>*@
+        </div>
+    </fieldset>
+</div>
+
+
+
+<script type="text/javascript">
+    if (typeof (InitLinkDragDrop) == "function")
+        InitLinkDragDrop();
+</script>

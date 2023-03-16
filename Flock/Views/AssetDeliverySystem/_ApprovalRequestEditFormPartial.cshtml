@@ -1,0 +1,56 @@
+﻿@model Flock.ViewModels.ApprovalRequestEditModel
+
+<input type="hidden" id="ApprovalRequestID" name="ApprovalRequestID" value="@(Model.ApprovalRequestID)" />
+
+<input type="hidden" id="UserID" name="UserID" value="@(Model.Id)" />
+
+<div class="row">
+    @*<div class="form-group">
+        <div class="col-md-offset-3 col-md-9">
+            <h4>Approval Request @(Model.ApprovalRequestID)</h4>
+        </div>
+    </div>*@
+    <div class="form-group">
+        <div class="col-md-9">
+            <label class="control-label" style="float: right; line-height: 22px;">Approval Status</label>
+        </div>
+        <div class="col-md-3">
+            @*@{
+                var selList = new List<SelectListItem>()
+                {
+                    new SelectListItem() { Value = null, Text = "Not Approved" },
+                    new SelectListItem() { Value = "false", Text = "Timed Expiry" },
+                    new SelectListItem() { Value = "true", Text = "Indefinite Approval" }
+                };
+
+            }
+            @Html.DropDownListFor(m => Model.ApprovalStatus, selList)*@
+
+            @Html.DevExpress().ComboBoxFor(m => Model.ApprovalStatus, settings =>
+            {
+                settings.Name = "ApprovalStatus";
+                settings.Properties.Items.Add(new ListEditItem() { Text = "Not Approved", Value = null });
+                settings.Properties.Items.Add(new ListEditItem() { Text = "Timed Expiry", Value = false });
+                settings.Properties.Items.Add(new ListEditItem() { Text = "Indefinite Approval", Value = true });
+            }).GetHtml()
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-9">
+            <label class="control-label" style="float: right; line-height: 22px;">Approval Expiry</label>
+        </div>
+        <div class="col-md-3">
+            @Html.DevExpress().DateEditFor(m => Model.ApprovalExpiryDT, settings =>
+            {
+                settings.Name = "ApprovalExpiryDT";
+                settings.ShowModelErrors = true;
+            }).GetHtml()
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-9 col-md-3">
+            <button class="btn btn-success" onclick="UserGridView.UpdateEdit()">Save</button>
+            <button class="btn btn-primary" onclick="UserGridView.CancelEdit()">Cancel</button>
+        </div>
+    </div>
+</div>

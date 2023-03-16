@@ -1,0 +1,73 @@
+﻿@using Flock.ViewModels
+@using Flock.Models
+@model AttributeAssignmentViewModel
+@if (Model.AttributeGroups.Count == 0)
+{
+    <label style="font-weight: 700;">No attributes specified. Please begin by selecting a Product Type, or clicking Suggest.</label>
+}
+else
+{
+    for(byte i = 0; i < Model.AttributeGroups.Count; i++)
+    {
+        <div id="attribute-group-@Model.AttributeGroups[i].AttributeGroupID" class="attribute-group @(Model.AttributeGroups[i].AutoSync ? "attribute-group-disabled" : "")" data-attribute-group-id="@Model.AttributeGroups[i].AttributeGroupID">
+            <h5>
+                @Model.AttributeGroups[i].Name
+                @if (!Model.AttributeGroups[i].IsMultipleSelect)
+                {
+                    <a href="" style="font-size: 10px; font-weight: 400; color: black; float: right;" onclick="ClearGroup('@Model.AttributeGroups[i].Name'); return false;">Clear</a>
+                }
+                @if(Model.AttributeGroups[i].Filter)
+                {
+                    <text><span style="margin-left: 8px;">(F)</span></text>
+                }
+                @if(Model.AttributeGroups[i].Info)
+                {
+                    <text><span style="margin-left: 8px;">(I)</span></text>
+                }
+            </h5>
+            <div  class="attribute-group-inner">
+                @if (Model.AttributeGroups[i].IsMultipleSelect)
+                {
+                    <ul>
+                        @foreach (Attribute_SelectResult a in Model.AttributeGroups[i].Options)
+                        {
+                        
+                            <li style="@(Model.AttributeGroups[i].SelectedValues.Contains(a.AttributeID) ? "background-color: #FEE998" : "")">
+                                <input onchange="ToggleHighlight(this)" type="checkbox" data-attribute-id="@(a.AttributeID)" value="@(a.AttributeID)" @(Model.AttributeGroups[i].SelectedValues.Contains(a.AttributeID) ? "checked" : "") @(Model.AttributeGroups[i].AutoSync ? "disabled='disabled'" : "") /><label>@(a.Name)</label>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <ul>
+                        @foreach (Attribute_SelectResult a in Model.AttributeGroups[i].Options)
+                        {
+                            <li style="@(Model.AttributeGroups[i].SelectedValues.Contains(a.AttributeID) ? "background-color: #FEE998" : "")">
+                                <input onchange="ToggleHighlight(this)" type="radio" data-attribute-id="@(a.AttributeID)" name="@(Model.AttributeGroups[i].Name)" value="@(a.AttributeID)" @(Model.AttributeGroups[i].SelectedValues.Contains(a.AttributeID) ? "checked" : "") /><label>@(a.Name)</label>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    }
+}
+<div style="clear: both;"></div>
+
+<script type="text/javascript">
+    function ToggleHighlight(ele) {
+        if ($(ele).prop('checked')) {
+            $('input[name=' + $(ele).attr('name') + ']').parent().css("background-color", "white");
+            $(ele).parent().css("background-color", "#FEE998");
+        }
+        else {
+            $(ele).parent().css("background-color", "white");
+        }
+    }
+
+    function ClearGroup(name) {
+        $('input[name='+name+']').removeAttr('checked');
+        $('input[name='+name+']').parent().css("background-color", "white");
+    }
+</script>

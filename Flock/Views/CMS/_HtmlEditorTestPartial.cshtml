@@ -1,0 +1,6 @@
+﻿@model string
+@Html.DevExpress().HtmlEditor(settings => {
+    settings.Name = "TestEditor";
+    settings.CallbackRouteValues = new { Controller = "CMS", Action = "HtmlEditorTestPartial" };
+    settings.Html = Model;
+}).GetHtml()

@@ -1,0 +1,46 @@
+
+    customerPayingForDispatch: false
+
+	account
+		AccountNumber		"K0099"							string
+		Email				"tclark@designersguild.com"		string
+		Name				"Mertex - Test Account"			string
+
+	
+	basket
+		[0]
+			Code			"FDG2340/01/C"					string
+			Total			3								short
+			Type			null							string
+		[1]
+			Code			"FDG2340/02/C"					string
+			Total			1								short
+			Type			null							string
+		[2]
+			Code			"FDG2340/03/C"					string
+			Total			1								short
+			Type			null							string
+		[3]
+			Code			"FDG2340/04/R"					string
+			Total			1								short
+			Type			null							string
+		[4]
+			Code			"FDG2340/05/R"					string
+			Total			2								short
+			Type			null							string
+
+	selectedAddress
+		AddressLine1		"Sarah Waller"					string
+		AddressLine2		"3 Latimer Place."				string
+		AddressLine3		null							string
+		AddressLine4		null							string
+		Country				"United Kingdom"				string
+		CountryCode			"GB"							string
+		Name				"Mertex - Test Account"			string
+		Postcode			"W10 6QT"						string
+		
+	selectedDispatchMethod
+		CARRCODE			"FC"							string
+		HAULCODE			"RM"							string
+		Name				"1ST CLASS - RM - FC"			string
+

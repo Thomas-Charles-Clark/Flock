@@ -1,0 +1,39 @@
+﻿@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "BrochureIDComboBox";
+
+    settings.CallbackRouteValues = new { Controller = "Assets", Action = "BrochureRequestComboBoxPartial" };
+
+    settings.Properties.ValueType = typeof(short);
+    settings.Properties.ValueField = "BrochureID";
+    settings.Properties.TextField = "Name";
+
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+
+    if ((Flock.ViewModels.LargeDatabaseDataProvider.GetRequestedBrochures() as List<Flock.Models.Brochure>).Count == 0)
+        settings.Properties.NullText = "No Requests.";
+    else
+        settings.Properties.NullText = "Select Brochure...";
+    
+    settings.Properties.NullDisplayText = settings.Properties.NullText;
+    
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        $('#brochure-id-hidden').val(s.GetSelectedItem().value);
+        $('#get-xlsx-button').show();
+        LoadingPanel.Show();
+        $.ajax({
+            url: '" + Url.Action("BrochureRequestGridViewPartial", "Assets") + @"',
+            type: 'GET',
+            traditional: true,
+            data: {
+                BrochureID: s.GetSelectedItem().value
+            },
+            success: function(data) {
+                $('#brochure-request-gridview-container').html(data);
+                LoadingPanel.Hide();
+            },
+            timeout: 300000
+        });
+    }";
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetRequestedBrochures()).GetHtml()

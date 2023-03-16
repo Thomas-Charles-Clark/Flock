@@ -1,0 +1,32 @@
+@{
+	var gridLookup = Html.DevExpress().GridLookup(settings => {
+        settings.Name = "StoreEventLocationGridLookup";
+		settings.KeyFieldName = "StoreEventLocationID";
+
+		settings.GridViewProperties.CallbackRouteValues = new { Controller = "StoreEvents", Action = "StoreEventLocationGridLookupPartial" };
+		settings.Properties.SelectionMode = GridLookupSelectionMode.Multiple;
+		settings.Properties.TextFormatString = "{0}";
+
+				settings.GridViewProperties.SettingsEditing.AddNewRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventLocationGridLookupPartialAddNew" };
+        settings.GridViewProperties.SettingsEditing.UpdateRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventLocationGridLookupPartialUpdate" };
+        settings.GridViewProperties.SettingsEditing.DeleteRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventLocationGridLookupPartialDelete" };
+        settings.GridViewProperties.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.GridViewProperties.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+		settings.GridViewProperties.SettingsPager.Visible = true;
+		settings.GridViewProperties.Settings.ShowGroupPanel = true;
+		settings.GridViewProperties.Settings.ShowFilterRow = true;
+
+				settings.Columns.Add("StoreEventLocationID");
+				settings.Columns.Add("Name");
+			});
+		if (ViewData["EditError"] != null){
+        gridLookup.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@gridLookup.Bind(Model).GetHtml()

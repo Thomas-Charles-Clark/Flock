@@ -1,0 +1,181 @@
+@model Flock.ViewModels.RedirectViewModel
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "RedirectsGridView";
+        settings.CallbackRouteValues = new { Controller = "Redirects", Action = "RedirectsGridViewPartial" };
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Redirects", Action = "RedirectsGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Redirects", Action = "RedirectsGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Redirects", Action = "RedirectsGridViewPartialDelete" };
+        //settings.SettingsEditing.BatchUpdateRouteValues = new { Controller = "Redirects", Action = "RedirectsGridViewPartialBatchUpdate" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 3;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+        
+		settings.KeyFieldName = "OldURL";
+
+		settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        MVCxGridViewColumn OldUrlColumn = new MVCxGridViewColumn();
+        OldUrlColumn.Name = "OldURL";
+        OldUrlColumn.FieldName = "OldURL";
+        OldUrlColumn.Caption = "Old URL";
+        OldUrlColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        OldUrlColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OldUrlColumn.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        var ouc = OldUrlColumn.PropertiesEdit as TextBoxProperties;
+        ouc.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        settings.Columns.Add(OldUrlColumn);
+        
+        MVCxGridViewColumn NewUrlColumn = new MVCxGridViewColumn();
+        NewUrlColumn.Name = "NewURL";
+        NewUrlColumn.FieldName = "NewURL";
+        NewUrlColumn.Caption = "New URL";
+        NewUrlColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        NewUrlColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        NewUrlColumn.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        var nuc = NewUrlColumn.PropertiesEdit as TextBoxProperties;
+        nuc.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        settings.Columns.Add(NewUrlColumn);
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            Html.DevExpress().Label(lbSettings => {
+                lbSettings.Text = "Old URL";
+                lbSettings.Style.Add("line-height", "32px");
+                lbSettings.Style.Add("margin", "0 7px 7px 0");
+                lbSettings.Style.Add("float", "left");
+                lbSettings.Width = 80;
+            }).Render();
+            Html.DevExpress().TextBox(tbSettings => {
+                tbSettings.Name = "OldURL";
+                tbSettings.ReadOnly = false;
+                tbSettings.ShowModelErrors = true;
+                var oldProp = tbSettings.Properties as TextBoxProperties;
+                oldProp.ValidationSettings.RegularExpression.ValidationExpression = "/^([a-z]|[a-z]-|[a-z]/)+[a-z]$";
+                oldProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                tbSettings.Width = 760;
+                tbSettings.Style.Add("margin", "0 7px 7px 0");
+                tbSettings.Style.Add("float", "left");
+            }).Bind(
+                Model == null ? (DataBinder.Eval(c.DataItem, "OldURL") == null ? "" : DataBinder.Eval(c.DataItem, "OldURL").ToString()) : ""
+            ).Render();
+            
+            ViewContext.Writer.Write("<div style='clear: both;'></div>");
+            
+            Html.DevExpress().Label(lbSettings => {
+                lbSettings.Text = "New URL";
+                lbSettings.Style.Add("line-height", "32px");
+                lbSettings.Style.Add("margin", "0 7px 7px 0");
+                lbSettings.Style.Add("float", "left");
+                lbSettings.Width = 80;
+            }).Render();
+            Html.DevExpress().TextBox(tbSettings => {
+                tbSettings.Name = "NewURL";
+                tbSettings.ReadOnly = true;
+                tbSettings.Width = 760;
+                tbSettings.Style.Add("margin", "0 7px 7px 0");
+                tbSettings.Style.Add("float", "left");
+                tbSettings.ShowModelErrors = true;
+                var newProp = tbSettings.Properties as TextBoxProperties;
+                newProp.ValidationSettings.RegularExpression.ValidationExpression = "/^([a-z]|[a-z]-|[a-z]/)+[a-z]$";
+                newProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+            }).Bind(
+                Model == null ? (DataBinder.Eval(c.DataItem, "NewURL") == null ? "" : DataBinder.Eval(c.DataItem, "NewURL").ToString()) : ""
+            ).Render();
+
+
+            ViewContext.Writer.Write("<div style='clear: both;'></div>");
+            
+            
+            ViewContext.Writer.Write("<div id='page-selector-grid' style='margin: 1em;'>");
+            Html.DevExpress().Label(lbSettings =>
+            {
+                lbSettings.Text = "Page";
+                lbSettings.Style.Add("line-height", "30px");
+                lbSettings.Style.Add("margin", "0 7px 7px 0");
+                lbSettings.Style.Add("float", "left");
+                lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Render();
+            ViewContext.Writer.Write(Html.Partial("~/Views/CMS/MenuBuilderPageSelectorGridPartial.cshtml", new ViewDataDictionary() { }).ToHtmlString());
+            ViewContext.Writer.Write("</div>");
+
+            ViewContext.Writer.Write("<div id='product-page-selector-grid' style='margin: 1em;'>");
+            Html.DevExpress().Label(lbSettings =>
+            {
+                lbSettings.Text = "Product Page";
+                lbSettings.Style.Add("line-height", "30px");
+                lbSettings.Style.Add("margin", "0 7px 7px 0");
+                lbSettings.Style.Add("float", "left");
+                lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Render();
+            ViewContext.Writer.Write(Html.Partial("~/Views/CMS/MenuBuilderProductPageSelectorGridPartial.cshtml", new ViewDataDictionary() { }).ToHtmlString());
+            ViewContext.Writer.Write("</div>");
+
+
+            ViewContext.Writer.Write("<div id='collection-selector-grid' style='margin: 1em;'>");
+            Html.DevExpress().Label(lbSettings =>
+            {
+                lbSettings.Text = "Collection";
+                lbSettings.Style.Add("line-height", "30px");
+                lbSettings.Style.Add("margin", "0 7px 7px 0");
+                lbSettings.Style.Add("float", "left");
+                lbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Render();
+            ViewContext.Writer.Write(Html.Partial("~/Views/CMS/MenuBuilderCollectionSelectorGridPartial.cshtml", new ViewDataDictionary() { }).ToHtmlString());
+            ViewContext.Writer.Write("</div>");
+
+            ViewContext.Writer.Write("<div style='clear: both'></div>");
+
+            ViewContext.Writer.Write("<div style='text-align: right; margin-top: 1em;'>");
+            Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "btnUpdate";
+                btnSettings.ControlStyle.CssClass = "button";
+                btnSettings.Text = "Update";
+                btnSettings.Style.Add("margin-right", "1em");
+                btnSettings.ClientSideEvents.Click = "function(s, e){ RedirectsGridView.UpdateEdit(); }";
+            }).Render();
+            Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "btnCancel";
+                btnSettings.ControlStyle.CssClass = "button";
+                btnSettings.Text = "Cancel";
+                btnSettings.ClientSideEvents.Click = "function(s, e){ RedirectsGridView.CancelEdit(); }";
+            }).Render();
+
+            ViewContext.Writer.Write("</div>");
+            
+        });
+        
+        
+        
+    }).BindToLINQ("", "", (sender, e) =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+        var source = UoW.GetRepository<Flock.Models.Redirect>().GetAll().OrderByDescending(p => p.CreatedDT);
+
+        e.QueryableSource = source;
+        e.KeyExpression = "OldURL";
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.GetHtml()

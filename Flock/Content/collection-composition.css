@@ -1,0 +1,217 @@
+﻿* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.collection-content {
+    float: left;
+    width: 176px;
+    margin-bottom: 1em;
+    margin-right: 1em;
+    padding: 0.5em;
+    height: 265px;
+}
+
+#container {
+    width: 1992px;
+}
+
+#page-data {
+    background-color: #E1E1E1;
+    border-radius: 2px;
+    height: 320px;
+    margin-top: 2em;
+    padding: 10px;
+    width: 100%;
+}
+    #page-data h5 {
+        margin-top: 0;
+    }
+
+.pod-sortable {
+    position: relative;
+    display: inline-block;
+    margin-right: 1em;
+    vertical-align: top;
+}
+
+.related-collection-sortable {
+    position: relative;
+    display: inline-block;
+    margin-right: 1em;
+    vertical-align: top;
+}
+
+#collection-pod-container {
+    position: relative;
+}
+
+.collection-busy {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+}
+
+#pod-list {
+    background-color: #CDCDCD;
+    border-radius: 2px;
+    height: 218px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px;
+    white-space: nowrap;
+    border: 1px solid #6D6D6D;
+}
+
+#collection-description-and-slideshow {
+    padding: 10px;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    background-color: #e1e1e1;
+    border-radius: 2px;
+}
+
+#collection-slideshow-container {
+    height: 558px;
+    overflow-y: scroll;
+    position: relative;
+    width: 100%;
+    border-radius: 2px;
+}
+
+#collection-slideshow-container {
+    background-color: #CDCDCD;
+    border: 1px solid #6D6D6D;
+    padding: 1em;
+    height: 625px;
+}
+
+.collection-slideshow-item {
+    float: left;
+    position: relative;
+    margin-right: 1em;
+    margin-bottom: 1em;
+    width: 428px;
+}
+
+#collection-html-editor-container {
+    background-color: white;
+    height: 481px;
+}
+
+#slideshow-buttons {
+    margin-top: 1em;
+}
+
+.slideshow-button {
+    float: right;
+    margin-left: 1em;
+}
+
+#video-section {
+}
+
+.video-section-part {
+    width: 475px;
+    height: auto;
+    text-align: center;
+}
+
+#video-supporting-image {
+    float: left;
+}
+
+#video-image {
+    float: right;
+}
+
+.select-container {
+    margin: 1em 0;
+    font-size: 14px;
+}
+
+.bottom-item {
+    width: 231px;
+    height: 231px;
+    text-align: center;
+    margin-right: 10px; 
+    float: left;
+}
+
+#related-collection-inner {
+    position: relative;
+    overflow: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    height: 183px;
+    width: 978px;
+}
+
+#image-data-view-container {
+    width: 100%;
+    overflow-y: auto;
+    background-color: white;
+}
+
+#collection-data-view-container {
+    width: 100%;
+    overflow-y: auto;
+    background-color: white;
+}
+
+legend {
+    color: white;
+    font-size: 1.2em;
+    line-height: 30px;
+    padding-left: 0.5em;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+#collection-searching-icon { 
+    display: none;
+    float: left;
+    margin-left: 1em;
+    margin-top: 2px;
+}
+
+#bottom-section {
+    position: relative;
+    z-index: 0;
+}
+
+.bottom-item {
+    position: relative;
+}
+
+#collection-sp3-container {
+    height: 100%;
+    position: relative;
+}
+
+#collection-video-container {
+    height: 100%;
+    position: relative;
+}
+
+#association-link {
+    background: url("/images/icons/32/o_collection/elements_hierarchy.png") 0px 0px no-repeat transparent;
+}
+
+    #association-link:hover {
+        background: url("/images/icons/32/o_collection/elements_hierarchy_2.png") 0px 0px no-repeat transparent;
+    }
+
+
+
+.multiselectable-selected {
+    opacity: 0.4;
+    background-color: azure;
+}
+
+.multisortable-selected {
+    background-color: rgb(255, 247, 188);
+    border: 1px solid #FFBE90
+    ;
+}

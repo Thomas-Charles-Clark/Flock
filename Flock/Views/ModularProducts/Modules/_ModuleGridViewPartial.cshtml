@@ -1,0 +1,83 @@
+@{
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ModuleGridView";
+        settings.CallbackRouteValues = new { Controller = "ModularProducts", Action = "ModuleGridViewPartial" };
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "ModularProducts", Action = "ModuleGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+		settings.KeyFieldName = "ModuleID";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+        
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) { 
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("Module_ModuleOptionsPartial", "ModularProducts") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    ModuleID: s.GetRowKey(e.visibleIndex) 
+                },
+                success: function(data) {
+                    $('#module-detail-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 30000
+            });
+        }";
+
+        settings.Styles.Row.Cursor = "pointer";
+        
+        settings.Columns.Add(column => {
+            column.Name = "ModuleID";
+            column.FieldName = "ModuleID";
+            column.Caption = "ModuleID";
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column => {
+            column.Name = "Name";
+            column.FieldName = "Name";
+            column.Caption = "Name";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            var cProp = column.PropertiesEdit as TextBoxProperties;
+            cProp.MaxLength = 100;
+            cProp.ConvertEmptyStringToNull = true;
+        });
+
+        settings.Columns.Add(column => {
+            column.Name = "Description";
+            column.FieldName = "Description";
+            column.Caption = "Description";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            var cProp = column.PropertiesEdit as TextBoxProperties;
+            cProp.MaxLength = 500;
+            cProp.ConvertEmptyStringToNull = true;
+        });
+
+        settings.SetDetailRowTemplateContent(c => { 
+            
+        });
+	});
+	if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,208 @@
+﻿@using Flock.Models
+@using Flock.ViewModels
+@model ProductTypeAttributeGroupViewModel
+@{
+    <div id="attribute-groups-assigned" style="float: left; width: 49%;">
+    @if(Model.AttributeGroups.Count > 0) {
+        foreach (var AttributeGroup in Model.AttributeGroups.OrderBy(p => p.AttributeGroup.SortOrder))
+        {
+            <div id="attribute-group-@(AttributeGroup.AttributeGroupID)" class="attribute-group" data-attribute-group-id="@(AttributeGroup.AttributeGroupID)">
+                <div style="margin: 0 3px 3px; text-rendering: optimizeLegibility; font-size: 12px; font-weight: 700;" onclick="$('attribute-group-@(AttributeGroup.AttributeGroupID)-inner').slideToggle('fast');"
+                    onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+                    <span style="float: left; line-height: 23px; margin-right: 12px;">
+                        @(AttributeGroup.AttributeGroupID): @(AttributeGroup.AttributeGroup.Name)
+                    </span>
+                    <span style="float: left; line-height: 23px;">
+                        Filter
+                    </span>
+                    @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Filter, settings =>
+                    {
+                        settings.Name = "Filter-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        settings.Style.Add("float", "left");
+                        settings.Style.Add("margin-right", "12px");
+                    }).GetHtml()
+
+                    <span style="float: left; line-height: 23px;">
+                        Info
+                    </span>
+                    @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Info, settings =>
+                    {
+                        settings.Name = "Info-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        settings.Style.Add("margin-right", "12px");
+                        settings.Style.Add("float", "left");
+                    }).GetHtml()
+
+
+                    <span style="float: left; line-height: 23px;">
+                        Mandatory
+                    </span>
+                    @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Mandatory, settings =>
+                    {
+                        settings.Name = "Mandatory-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        settings.Style.Add("margin-right", "12px");
+                        settings.Style.Add("float", "left");
+                    }).GetHtml()
+                    
+                    <span style="float: left; line-height: 23px;">
+                        AutoSync
+                    </span>
+                    @Html.DevExpress().CheckBoxFor(m => AttributeGroup.AutoSync, settings =>
+                    {
+                        settings.Name = "AutoSync-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        settings.Style.Add("margin-right", "12px");
+                        settings.Style.Add("float", "left");
+                    }).GetHtml()
+                    <div class="clearfix"></div>
+                    <span style="float: left; line-height: 23px;">
+                        Sort Order
+                    </span>
+                    @Html.DevExpress().TextBoxFor(m => AttributeGroup.SortOrder, settings =>
+                    {
+                        settings.Name = "SortOrder-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        settings.Width = 60;
+                        settings.Style.Add("margin-left", "12px");
+                        settings.Style.Add("float", "left");
+                    }).GetHtml()
+
+                    <img src="/images/systemicons/remove-icon.png" class="remove-icon" style="cursor: pointer; opacity: 0.0; float: right; width: 20px; position: relative; top: 1px;" onclick="RemoveAttributeGroup(@(AttributeGroup.AttributeGroupID))" />
+                    <img id="save-@(AttributeGroup.AttributeGroupID)-@(AttributeGroup.ProductTypeID)" src="/images/icons/24/save.png" style="margin-right: 8px; cursor: pointer; float: right; width: 20px; position: relative; top: 1px;" onclick="SaveAttributeGroupProductTypeFlags(@(AttributeGroup.AttributeGroupID), @(AttributeGroup.ProductTypeID))" />
+                    <div style="clear: both"></div>
+                </div>
+                <div id="attribute-group-@(AttributeGroup.AttributeGroupID)-inner" class="attribute-group-inner">
+                    <div id="attribute-group-@(AttributeGroup.AttributeGroupID)-droppable" style="width: 49%; float: left; padding: 0.5em;">
+                        <h6>
+                            Assigned
+                            <a href="javascript:;" style="float: right; font-size: 10px; line-height: 20px;" onclick="ClearAllAttributes(@(AttributeGroup.AttributeGroupID))">Clear All</a>
+                        </h6>
+                        <ul id="attribute-group-@(AttributeGroup.AttributeGroupID)-assigned-list" style="min-height: 20px;">
+                            @if (AttributeGroup.AttributeGroup.Attributes.Where(p => Model.Attributes.Select(q => q.AttributeID).Contains(p.AttributeID)).Count() > 0)
+{
+    foreach (var Attribute in AttributeGroup.AttributeGroup.Attributes.Where(p => Model.Attributes.Select(q => q.AttributeID).Contains(p.AttributeID)).OrderBy(p => p.SortOrder))
+    {
+        <li data-attribute-id="@(Attribute.AttributeID)" class="assigned-attribute" onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+            <label>@(Attribute.AttributeID): @(Attribute.Name)</label>
+            <img src="/images/systemicons/remove-icon.png" onclick="RemoveAttribute(@(Attribute.AttributeID), @(AttributeGroup.AttributeGroupID))" class="remove-icon" style="cursor: pointer; opacity: 0.0; float: right; width: 18px;" />
+        </li>
+    }
+}
+else
+{
+                                <li class="placeholder">
+                                    <i style="font-size: 10px;">No Attributes Selected</i>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div id="attribute-group-@(AttributeGroup.AttributeGroupID)-available" style="width: 50%; float: left; padding: 0.5em; border-left: 1px solid #cdcdcd;">
+                        <h6>
+                            Available
+                            <a href="javascript:;" style="float: right; font-size: 10px; line-height: 20px;" onclick="AddAllAttributes(@(AttributeGroup.AttributeGroupID))">Add All</a>
+                        </h6>
+                        <ul id="attribute-group-@(AttributeGroup.AttributeGroupID)-full-list" class="attribute-group-full-list">
+                            @if (AttributeGroup.AttributeGroup.Attributes.Where(p => !Model.Attributes.Select(q => q.AttributeID).Contains(p.AttributeID)).Count() > 0)
+                            {
+                                foreach (var Attribute in AttributeGroup.AttributeGroup.Attributes.Where(p => !Model.Attributes.Select(q => q.AttributeID).Contains(p.AttributeID)).OrderBy(p => p.SortOrder))
+                                {
+                                    <li data-attribute-id="@(Attribute.AttributeID)" class="attribute-group-@(AttributeGroup.AttributeGroupID)-draggable">
+                                        <label>@(Attribute.AttributeID): @(Attribute.Name)</label>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li>
+                                    <i style="font-size: 10px;">All Attributes Utilised</i>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div style="clear: both;"></div>
+
+                    @*<ul class="attribute-list" data-attribute-group-id="@(AttributeGroup.AttributeGroupID)">
+                    @foreach (var Attribute in AttributeGroup.AttributeGroup.Attributes)
+                    {
+                        <li>
+                            @(Attribute.Name)
+                            @*.Where(p => Model.Attributes.Select(x => x.AttributeID).Contains(p.AttributeID)))
+                        </li>
+                </ul>
+                    }*@
+                </div>
+            </div>
+            <script type="text/javascript">
+                if ($("#attribute-group-@(AttributeGroup.AttributeGroupID)-available").height() > $("#attribute-group-@(AttributeGroup.AttributeGroupID)-droppable").height()) {
+                    $("#attribute-group-@(AttributeGroup.AttributeGroupID)-droppable").css("height", $("#attribute-group-@(AttributeGroup.AttributeGroupID)-available").height() + 10 + 'px');
+                }
+
+                $("#attribute-group-@(AttributeGroup.AttributeGroupID)-droppable").droppable({
+                    //helper: 'clone',
+                    activeClass: "ui-state-highlight-attribute",
+                    accept: '.attribute-group-@(AttributeGroup.AttributeGroupID)-draggable',
+                    drop: function (ev, ui) {
+                        $(this).find(".placeholder").remove();
+                        window.Attributes = new Array();
+                        ui.draggable.detach().appendTo($(this).find("ul"));
+                        $(this).find("li").each(function (index) {
+                            Attributes.push($(this).data("attribute-id"));
+                        });
+                        $(".assigned-attribute").each(function (index) {
+                            Attributes.push($(this).data("attribute-id"));
+                        });
+                        UpdateAttributes(@(AttributeGroup.AttributeGroupID));
+                    }
+                });
+
+                $(".attribute-group-@(AttributeGroup.AttributeGroupID)-draggable").draggable({
+                    helper: 'clone',
+                    revert: 'invalid'
+                });
+
+            </script>
+        }
+    }
+    else
+    {
+        <label class="placeholder" style="font-style: italic;">There are no Attribute Groups assigned to this Product Type.</label>
+    }
+    </div>
+    
+    <div id="attribute-groups-list" style="float: right; width: 49%;">
+        @foreach(var AttributeGroup in Model.AvailableGroups)
+        {
+            <div id="attribute-group-@(AttributeGroup.AttributeGroupID)" class="attribute-group attribute-group-available" data-attribute-group-id="@(AttributeGroup.AttributeGroupID)">
+                <h5 onmouseover ="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+                    @(AttributeGroup.AttributeGroupID): @(AttributeGroup.Name)
+                </h5>
+            </div>
+        }
+    </div>
+}
+<script type="text/javascript">
+
+    resizeLeftDroppable();
+
+    $(".attribute-group-available").draggable({
+        helper: 'clone',
+        revert: 'invalid'
+    });
+
+    $("#attribute-groups-assigned").droppable({
+        activeClass: "ui-state-highlight-attribute",
+        accept: '.attribute-group-available',
+        tolerance: 'pointer',
+        drop: function (ev, ui) {
+            $(this).find(".placeholder").remove();
+            AddAttributeGroup($(ui.draggable).data("attribute-group-id"));
+        }
+    });
+
+    function ToggleHighlight(ele) {
+        if ($(ele).prop('checked')) {
+            $('input[name=' + $(ele).attr('name') + ']').parent().css("background-color", "white");
+            $(ele).parent().css("background-color", "#FEE998");
+        }
+        else {
+            $(ele).parent().css("background-color", "white");
+        }
+    }
+</script>

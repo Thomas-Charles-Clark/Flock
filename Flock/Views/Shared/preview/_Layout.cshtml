@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Designers Guild</title>
+    @RenderSection("meta", required: false)
+    @Styles.Render("~/bundles/grid")
+    @Styles.Render("~/content/preview/hotspot.css")
+    @Styles.Render("~/Content/preview/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @*@{
+        @Html.DevExpress().GetStyleSheets(
+            new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout })
+    }*@
+    <link rel="stylesheet" type="text/css" href="/DXR.axd?r=0_1753,1_8,1_9,0_1755,1_7,0_1628,1_4,0_1630-BkpL7" />
+    <script id="dxis_2048454531" src="/DXR.axd?r=1_145,1_81,1_137,1_78,1_140,1_118,1_80,16_25,16_2,1_130,1_88,16_7,1_128,1_90,1_89,16_8,1_143,1_114,1_144,1_109,16_9,1_136,1_135,1_121,16_24,1_131,1_85,1_110,1_99,1_106,1_120,16_15,1_129,1_123,16_16,16_18,1_127,1_134,1_138,16_21,16_23-GkpL7" type="text/javascript" >
+    </script>
+    @*@RenderSection("dxscripts", required: false)*@
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Designers Guild", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+                @*@Html.Partial("_LoginPartial")*@
+            </div>
+        </div>
+    </div>
+    <div class="breadcrumb">
+        <h5 id="javascript-required-notice">For optimum user experience, please enable Javascript in your browser.</h5>
+        <script type="text/javascript">
+            var notice = document.getElementById("javascript-required-notice");
+            notice.parentNode.removeChild(notice);
+        </script>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Designers Guild</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    
+    @Scripts.Render("~/bundles/bootstrap")
+    @*@RenderSection("scripts", required: false)*@    
+    @*@{
+        @Html.DevExpress().GetScripts(
+            new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout });
+
+    }*@
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("a").each(function () {
+                //if present, must strip the 'http://.../' chunk
+                var originalHref = $(this).prop("href");
+                originalHref = originalHref.replace("http://localhost:65123/", "");
+                $(this).prop("href",  "/admin/preview/" + originalHref);
+            });
+        });
+    </script></body>
+</html>

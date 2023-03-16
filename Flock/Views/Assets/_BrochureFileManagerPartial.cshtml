@@ -1,0 +1,72 @@
+@model string
+
+@Html.DevExpress().FileManager(settings => {
+    settings.Name = "BrochureFileManager";
+    settings.CallbackRouteValues = new { Controller = "Assets", Action = "BrochureFileManagerPartial" };
+
+    settings.DownloadRouteValues = new { Controller = "Assets", Action = "BrochureFileManagerPartialDownload" };
+    settings.SettingsToolbar.ShowDownloadButton = true;
+
+    settings.ClientSideEvents.FileUploaded = @"function(s, e) { 
+        $.ajax({
+            url: '" + Url.Action("BrochureUploaded", "Assets") + @"',
+            type: 'POST',
+            traditional: true,
+            data: { FileName: e.fileName },
+            success: function(data) { 
+                
+            },
+            error: function (xhr, status, error) {
+                if (xhr.status == 403) {
+                    alert('Sorry, your session has expired. Please login again to continue');
+                    window.location.href = '/Account/Login';
+                }
+                else {
+                    if (xhr.responseText)
+                        alert('An error occurred: ' + status + '\r\nError: ' + error + '\r\nResponse: ' + xhr.responseText);
+                    else
+                        alert('An error occurred: ' + status + '\r\nError: ' + error);
+                }
+            },
+            timeout: 20000
+        });
+    }";
+
+    settings.ClientSideEvents.SelectionChanged = @"function(s, e) {  
+        $.ajax({
+            url: '" + Url.Action("BrochureDetailsPartial", "Assets") + @"',
+            type: 'POST',
+            traditional: true,
+            data: { FileName: e.name },
+            success: function(data) { 
+                $('#brochure-details-container').html(data);
+            },
+            error: function (xhr, status, error) {
+                if (xhr.status == 403) {
+                    alert('Sorry, your session has expired. Please login again to continue');
+                    window.location.href = '/Account/Login';
+                }
+                else {
+                    if (xhr.responseText)
+                        alert('An error occurred: ' + status + '\r\nError: ' + error + '\r\nResponse: ' + xhr.responseText);
+                    else
+                        alert('An error occurred: ' + status + '\r\nError: ' + error);
+                }
+            },
+            timeout: 20000
+        });
+    }";
+
+    settings.Settings.ThumbnailFolder = Url.Content("~/Content/FileManager/Thumbnails");
+    
+    settings.SettingsEditing.AllowCreate = true;
+    settings.SettingsEditing.AllowRename = true;
+    settings.SettingsEditing.AllowMove = true;
+    settings.SettingsEditing.AllowDelete = true;
+    settings.SettingsUpload.Enabled = true;
+    settings.SettingsUpload.UseAdvancedUploadMode = true;
+    settings.SettingsUpload.AdvancedModeSettings.EnableMultiSelect = true;
+    settings.Settings.AllowedFileExtensions = new string[] { ".*" };
+
+    settings.SettingsFileList.View = DevExpress.Web.ASPxFileManager.FileListView.Details;
+}).BindToFolder(Model).GetHtml()

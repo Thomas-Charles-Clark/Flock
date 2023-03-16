@@ -1,0 +1,24 @@
+﻿@using Flock.Models
+@model Flock.ViewModels.NewsletterFormViewModel
+
+@using (Ajax.BeginForm("ProcessForm", "Forms", new {  }, new AjaxOptions { UpdateTargetId="form-id-"+Model.FormID, OnSuccess = "ProcessFormSuccess", OnFailure = "ProcessFormFailure" }))
+{
+    @Html.EditorForModel()
+    @Html.ValidationSummary()
+
+    <input type="submit" value="submit" />
+}
+                    
+
+<script type="text/javascript">
+    if($("#address-search-field").length > 0)
+        setupGoogleAddressAutocomplete();
+
+    function ProcessFormSuccess() {
+
+    }
+
+    function ProcessFormFailure() {
+
+    }
+</script>

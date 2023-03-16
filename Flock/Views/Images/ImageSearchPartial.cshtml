@@ -1,0 +1,104 @@
+﻿<div class="resource-panel-container">
+    <fieldset id="image-search-fieldset">
+        <!-- 
+            right, so... we click on ONE... we want to use the selector to find all EXCEPT the target.
+            -->
+        <legend onclick="$('.hideable-dataview').not('#images-dataview').slideUp('fast'); $('#images-dataview').slideToggle('fast');">Image Search (click to expand / contract)</legend>
+        <div id="images-dataview" class="hideable-dataview" style="display: none;">
+            <div style="width: 100%; background-color: white; padding: 1em; padding-bottom: 0;">
+                @Html.DevExpress().CheckBox(settings =>
+           {
+               settings.Name = "SearchWithinHotspotsCheckbox";
+               settings.Text = "Search within hotspots";
+               settings.Checked = true;
+           }).GetHtml()
+                @Html.Action("ImageSearchProductTypeDropDownPartial", "Images")
+                @Html.Action("ImageSearchBrandDropDownPartial", "Images")
+                @Html.Action("ImageSearchLaunchDropDownPartial", "Images")
+                @Html.Action("ImageSearchCollectionDropDownPartial", "Images")
+                @Html.Action("ImageSearchAspectRatioDropDownPartial", "Images")
+                @Html.Action("ImageSearchImageTypeDropDownPartial", "Images")
+                @Html.Action("ImageSearchPerspectiveDropDownPartial", "Images")
+                @Html.Partial("~/Views/Shared/SearchFilters/ResolutionDropDownPartial.cshtml")
+                @Html.Action("ImageSearchHotspotStatusDropDownPartial", "Images")
+                @Html.Action("ImageSearchColourDropDownPartial", "Images")
+                @Html.Action("ImageSearchRoomDropDownPartial", "Images")
+                @Html.Action("ImageSearchStyleDropDownPartial", "Images")
+                @Html.Action("ImageSearchNameOrIDTextBoxPartial", "Images")
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "ImageSearchClearFiltersButton";
+                    settings.Text = "Reset";
+                    settings.Style.Add("line-height", "32px");
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        ImageSearchProductTypeListBox.UnselectAll();
+                        ImageSearchProductTypeDD.SetText('Product Type');
+                        ImageSearchBrandListBox.UnselectAll();
+                        ImageSearchBrandDD.SetText('Brand');
+                        ImageSearchLaunchListBox.UnselectAll();
+                        ImageSearchLaunchDD.SetText('Launch');
+                        ImageSearchCollectionListBox.UnselectAll();
+                        ImageSearchCollectionDD.SetText('Collection');
+                        ImageSearchAspectRatioListBox.UnselectAll();
+                        ImageSearchAspectRatioDD.SetText('Aspect Ratio');
+                        ImageSearchImageTypeListBox.UnselectAll();
+                        ImageSearchImageTypeDD.SetText('Image Type');
+                        ImageSearchPerspectiveListBox.UnselectAll();
+                        ImageSearchPerspectiveDD.SetText('Perspective');
+                        ImageSearchHotspotStatusListBox.UnselectAll();
+                        ImageSearchHotspotStatusDD.SetText('Hotspot Status');
+                        ImageSearchColourListBox.UnselectAll();
+                        ImageSearchColourDD.SetText('Colour');
+                        ImageSearchRoomListBox.UnselectAll();
+                        ImageSearchRoomDD.SetText('Room');
+                        ImageSearchStyleListBox.UnselectAll();
+                        ImageSearchStyleDD.SetText('Style');
+                        ImageSearchNameOrIDTextBox.SetText('Name, Code or ID');
+                        ResolutionDD.SetText('Resolution');
+                        ResolutionListBox.UnselectAll();
+                        
+                        $('#image-searching-icon').fadeIn('fast');
+                        $.ajax({
+                            url: '" + Url.Action("ImageSearch", "Images") + @"',
+                            traditional: true,
+                            data: {
+                                ProductType: ImageSearchProductTypeListBox.GetValue(),
+                                Brand: ImageSearchBrandListBox.GetValue(),
+                                Launch: ImageSearchLaunchListBox.GetValue(),
+                                Collection: ImageSearchCollectionListBox.GetValue(),
+                                AspectRatio: ImageSearchAspectRatioListBox.GetValue(),
+                                ImageType: ImageSearchImageTypeListBox.GetValue(),
+                                Perspective: ImageSearchPerspectiveListBox.GetValue(),
+                                HotspotStatus: ImageSearchHotspotStatusListBox.GetValue(),
+                                Colour: ImageSearchColourListBox.GetValue(),
+                                Room: ImageSearchRoomListBox.GetValue(),
+                                Style: ImageSearchStyleListBox.GetValue(),
+                                NameOrID: ImageSearchNameOrIDTextBox.GetValue(),
+                                SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue(),
+                                Resolution: ResolutionListBox.GetValue()
+                            },
+                            success: function(data) {
+                                $('#image-data-view-container').html(data);
+                                $('#image-searching-icon').fadeOut('slow');
+                            },
+                            error: function(e, s, a) {
+                                $.showError(e, s, a, function() { $('#image-searching-icon').fadeOut('slow'); });
+                            },
+                            timeout: 20000
+                        });
+                    }";
+                }).GetHtml()
+                <img id="image-searching-icon" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both;"></div>
+
+            </div>
+            <div id="image-data-view-container" style="width: 100%; overflow-y: auto;">
+                @Html.Action("ImageSearch", "Images")
+            </div>
+        </div>
+
+    </fieldset>
+    <div style="clear: both;"></div>
+</div>

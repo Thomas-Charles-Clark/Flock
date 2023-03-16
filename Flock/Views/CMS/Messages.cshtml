@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Messages";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+    #container {
+        width: 1275px;
+    }
+    </style >
+}
+
+<h4 class="page-heading">Messages</h4>
+
+<div id="messages-grid-container" style="float: left;">    
+    @Html.Partial("MessagesGridViewPartial")
+</div>
+
+
+<div id="bulk-action-panel">
+    <h4>Bulk Action Panel</h4>
+    <ul>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$('#new-state-modal').dialog('open');">Set New State</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Enable" onclick="$('#date-picker-modal').data('for-date', 'on'); $('#date-picker-modal').dialog('open');">Set On Date</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Disable" onclick="$('#date-picker-modal').data('for-date', 'off'); $('#date-picker-modal').dialog('open');">Set Off Date</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$.confirm(CopyPodToSlideshow, function () { });">Copy Pod Images to Slideshow</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$.confirm(CopySlideshowToPod, function () { });">Copy Slideshow Images to Pod</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Delete" onclick="$.confirm(DeleteSelectedCollections, function () { });">Delete</a>
+        </li>
+    </ul>
+</div>
+<div style="clear:both;"></div>
+
+<div id="date-picker-modal" style="width: 342px; height: 340px;" data-for-date="null">
+@Html.DevExpress().Label(settings =>
+{
+    settings.Text = "Date: ";
+}).GetHtml()
+    @Html.DevExpress().Calendar(settings =>
+{
+    settings.Name = "BulkActionDatePicker";
+    settings.Properties.DisplayFormatString = "d";
+}).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div id="bad-selection-dialog">
+    <h5 style="display: none;">You must select at least one Product Page.</h5>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#bad-selection-dialog").dialog({
+            title: "Bad Selection",
+            width: 240,
+            height: "auto",
+            resizable: false,
+            modal: true,
+            autoOpen: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog('close');
+                }
+            }
+        })
+        $("#bad-selection-dialog > h5").css("display", "block");
+
+        $("#date-picker-modal").dialog({
+            autoOpen: false,
+            title: "Select Date",
+            height: "auto",
+            width: 400,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    switch ($(this).data("for-date")) {
+                        case "on":
+                            SetOnDateForMessages();
+                            break;
+                        case "off":
+                            SetOffDateForMessages();
+                            break;
+                    }
+                    $(this).data("for-date", "null")
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    });
+
+    function SetOnDateForMessages() {
+        var keys = null;
+
+        if (typeof (MessageGridView) != "undefined" && MessageGridView != false)
+            keys = MessageGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            MessageGridView.PerformCallback({ commandType: 'SetOnDate', keyString: keys.toString(), dateString: BulkActionDatePicker.GetValue().toGMTString() });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return false;
+    }
+
+    function SetOffDateForMessages() {
+        var keys = null;
+
+        if (typeof (MessageGridView) != "undefined" && MessageGridView != false)
+            keys = MessageGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            MessageGridView.PerformCallback({ commandType: 'SetOffDate', keyString: keys.toString(), dateString: BulkActionDatePicker.GetValue().toGMTString() });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return false;
+    }
+    function DeleteSelectedMessages() {
+        var keys = null;
+
+        if (typeof (MessageGridView) != "undefined" && MessageGridView != false)
+            keys = MessageGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false)
+            MessageGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+        else
+            $("#bad-selection-dialog").dialog("open");
+    }
+</script>

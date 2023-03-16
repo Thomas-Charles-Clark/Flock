@@ -1,0 +1,25 @@
+﻿@model Flock.ViewModels.SlideEditModel
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "SlideArticleID";
+    settings.CallbackRouteValues = new { Controller = "Animations", Action = "SlideArticleIDComboBoxPartial" };
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.Display = Display.Dynamic;
+    settings.Properties.Caption = "Article ID";
+    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Left;
+    settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "Name";
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "ArticleID";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.IncrementalFilteringDelay = 1000;
+    settings.Properties.NullText = "Type to search...";
+    settings.Width = 156;
+    settings.Properties.DropDownWidth = 350;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.Properties.Columns.Add("ArticleID", "Article ID", 60);
+    settings.Properties.Columns.Add("Name", "Name", 270);
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetArticleIDs, Flock.ViewModels.LargeDatabaseDataProvider.GetArticleByID).Bind(Model == null ? null : Model.SlideArticleID).GetHtml()

@@ -1,0 +1,17 @@
+﻿@using Flock.Controllers
+@using Flock.ViewModels
+@using Flock.Models
+@using Flock.Models.ContentItems
+
+@model Flock.ViewModels.ProductViewModel
+
+@{
+    Layout = "~/Views/Public/_Layout.cshtml";
+}
+
+<h2>ProductPage</h2>
+
+@foreach(Product otherProduct in Model.AssociatedProducts)
+{
+    <div class="associatedproduct">@otherProduct.Name</div>   
+}

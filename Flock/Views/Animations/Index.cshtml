@@ -1,0 +1,27 @@
+﻿@model Flock.ViewModels.AnimationViewModel
+@{
+    ViewBag.Title = "Animations";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/composition-base.css")
+    @Styles.Render("~/Content/animation.css")
+}
+
+<h4 class="page-heading">
+    Animations
+</h4>
+
+<div id="animation-selector-container">
+    @Html.Action("_AnimationSelectorGridViewPartial")
+</div>
+
+<div id="animation-detail-container">
+
+</div>
+
+<div id="call-to-action-grid-dialog">
+    <div id="call-to-action-grid-dialog-inner">
+        @Html.Action("CallToActionGridViewPartial")
+    </div>
+</div>

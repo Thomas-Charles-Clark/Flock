@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "Sales Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@model Flock.ViewModels.SalesOverviewResultsViewModel
+
+@section styles {
+    @Styles.Render("~/bundles/composer")
+
+    <style type="text/css">
+        #container {
+            width: 1266px !important;
+        }
+
+        .dxb {
+            padding-top: 5px !important;
+            padding-bottom: 5px !important;
+        }
+
+        .dxgvDetailCell_MetropolisBlue {
+            padding: 0 !important;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        function checkReadiness() {
+            return true;
+        }
+
+        function fetchResults() {
+            SalesOverviewResultsGridView.PerformCallback();
+            $.ajax({
+                url: '@Url.Action("UpdateSummary", "eCommerce")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    From: FromDate.GetDate().toGMTString(),
+                    To: ToDate.GetDate().toGMTString(),
+                    PriceListID: SalesOverviewPriceListListBox.GetValue()
+                },
+                success: function (data) {
+                    $("#summary-container").html(data);
+                }
+            });
+        }
+    </script>
+}
+
+<h4 class="page-heading">Sales Overview</h4>
+
+<div class="page-subheading" style="margin-bottom: 13px;">
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "FromDateLbl";
+        settings.Text = "From: ";
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+        settings.Style.Add("line-height", "35px");
+        settings.Height = 35;
+    }).GetHtml()
+        @Html.DevExpress().DateEdit(settings =>
+    {
+        settings.Name = "FromDate";
+        settings.Properties.NullText = "From Date...";
+        settings.Height = 35;
+        settings.Properties.MaxDate = DateTime.Now;
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+        settings.Date = Convert.ToDateTime("01-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString());
+        settings.Properties.DisplayFormatString = "d";
+        settings.Properties.ClientSideEvents.DateChanged = @"function(s, e) {
+            if(checkReadiness()) {
+                fetchResults();
+            }
+        }";
+    }).GetHtml()
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "ToDateLbl";
+        settings.Text = "To: ";
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 7px");
+        settings.Style.Add("line-height", "35px");
+        settings.Height = 35;
+    }).GetHtml()
+        @Html.DevExpress().DateEdit(settings =>
+    {
+        settings.Name = "ToDate";
+        settings.Properties.NullText = "To Date...";
+        settings.Height = 35;
+        //settings.Properties.MinDate = DateTime.Now;
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+        settings.Date = Convert.ToDateTime("01-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString()).AddMonths(1);
+        settings.Properties.DisplayFormatString = "d";
+        settings.Properties.ClientSideEvents.DateChanged = @"function(s, e) {
+            if(checkReadiness()) {
+                fetchResults();
+            }
+        }";
+    }).GetHtml()
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Name = "PriceListLbl";
+        settings.Text = "Price List: ";
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 7px");
+        settings.Style.Add("line-height", "35px");
+        settings.Height = 35;
+    }).GetHtml()
+        @Html.Action("SalesOverviewPriceListDropDownPartial", "eCommerce")
+
+        <div style="clear: both;"></div>
+    </div>
+
+    <div id="summary-container">
+        @Html.Partial("SalesOverview/Results", Model.Summary)
+    </div>
+
+    <div id="grid-view-container">
+        @Html.Partial("SalesOverview/_SalesOverviewResultsGridViewPartial", Model.Transactions)
+    </div>

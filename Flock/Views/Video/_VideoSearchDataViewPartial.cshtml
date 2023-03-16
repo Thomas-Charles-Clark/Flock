@@ -1,0 +1,86 @@
+﻿@model List<Flock.Models.Video_SearchResult>
+@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "VideoOverviewDataView";
+    settings.CallbackRouteValues = new { Controller = "Video", Action = "VideoSearch" };
+    settings.AllowPaging = true;
+
+    settings.ClientSideEvents.Init = @"function(s, e) { 
+        if(typeof(initVideoDragDrop) == 'function')
+            initVideoDragDrop();
+    }";
+
+    settings.ClientSideEvents.EndCallback = @"function(s, e) {
+        if(typeof(initVideoDragDrop) == 'function')
+            initVideoDragDrop();
+    }";
+    
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        e.customArgs['Brand'] = VideoSearchBrandListBox.GetValue();
+        e.customArgs['Launch'] = VideoSearchLaunchListBox.GetValue();
+        e.customArgs['NameOrID'] = VideoSearchNameOrIDTextBox.GetValue();
+    }";
+
+    settings.PagerSettings.Summary.Visible = true;
+    settings.PagerSettings.Summary.Text = "Page: {0} of {1} ({2} videos total)";
+    settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action.ToLower() != "compose")
+    {
+        settings.SettingsTableLayout.ColumnCount = 5;
+        settings.SettingsTableLayout.RowsPerPage = 3;
+        settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(4);
+
+        settings.PagerSettings.PageSizeItemSettings.Visible = true;
+        settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+
+        settings.PagerSettings.Visible = true;
+        settings.AlwaysShowPager = true;
+        settings.PagerSettings.EndlessPagingMode = DataViewEndlessPagingMode.Disabled;
+        settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    }
+    else
+    {
+        settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.SettingsTableLayout.ColumnCount = 3;
+        settings.PagerSettings.PageSizeItemSettings.ShowAllItem = false;
+        settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.PagerSettings.PageSizeItemSettings.Visible = true;
+        settings.PagerSettings.PageSizeItemSettings.ShowPopupShadow = true;
+        settings.PagerSettings.EndlessPagingMode = DataViewEndlessPagingMode.Disabled;
+        settings.PagerSettings.EllipsisMode = PagerEllipsisMode.InsideNumeric;
+        settings.PagerSettings.Visible = true;
+        settings.AlwaysShowPager = true;
+        settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.TopAndBottom;
+    }
+
+    settings.Style.Add("width", "100%");
+    settings.Style.Add("margin", "0.5em 0 0");
+    settings.EmptyDataText = "<h4>No results.</h4>";
+
+    settings.SettingsTableLayout.RowsPerPage = 4;
+
+    settings.SetItemTemplateContent(
+        c =>
+        {
+            var vID = DataBinder.Eval(c.DataItem, "VideoID").ToString();
+            var Name = DataBinder.Eval(c.DataItem, "Name") == null ? "" : DataBinder.Eval(c.DataItem, "Name").ToString();
+
+            ViewContext.Writer.Write(
+                "<div id='video-box-" + vID + "' class='video' style='position: relative; width: 156px; z-index: 100;' data-video-id='" + vID + "' >" +// onclick='SelectImage(" + discID + ")'>" +
+                "<div>" +
+                "</div>" +
+                "<div class=\"DataViewItemTitle\">" + Name + "</div>" +
+                "</div>"
+            );
+        }
+    );
+}).Bind(Model).GetHtml()
+
+<script type="text/javascript">
+    if (typeof (initVideoDragDrop) == "function")
+        initVideoDragDrop();
+</script>

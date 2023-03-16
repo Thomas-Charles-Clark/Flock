@@ -1,0 +1,40 @@
+﻿@using Flock.ViewModels
+@model StoreEvent_Date_ViewModel
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "StoreEventDateTimeSlotGridView-" + Model.StoreEvent_DateID;
+        settings.CallbackRouteValues = new { Controller = "StoreEvents", Action = "StoreEventDateTimeSlotGridViewPartial" };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['StoreEvent_DateID'] = " + Model.StoreEvent_DateID + @";
+        }";
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventDateTimeSlotGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventDateTimeSlotGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventDateTimeSlotGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.Width = 200;
+        
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+        settings.KeyFieldName = "StoreEvent_Date_TimeSlotID";
+
+        settings.SettingsPager.Visible = false;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.Columns.Add("TimeSlot");
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model.TimeSlots).GetHtml()

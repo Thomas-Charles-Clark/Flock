@@ -1,0 +1,24 @@
+﻿@model Flock.ViewModels.GiftVoucherViewModel
+@Html.DevExpress().ComboBox(settings => {
+    settings.Name = "CreditTransactionID";
+    settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "GiftVoucherCreditTransactionIDComboBoxPartial" };
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+    settings.Properties.CallbackPageSize = 15;
+    settings.Properties.TextField = "TransactionID";
+    settings.Properties.TextFormatString = "{0}";
+    settings.Properties.ValueField = "TransactionID";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.FilterMinLength = 1;
+    settings.Properties.NullText = "Type to search...";
+    settings.Width = 226;
+    settings.Properties.DropDownWidth = 650;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.Properties.Columns.Add("TransactionID", "Transaction ID", 90);
+    settings.Properties.Columns.Add("TransactionTotal", "Total Paid", 90);
+    settings.Properties.Columns.Add("TransactionPandP", "of which P&P", 90);
+    settings.Properties.Columns.Add("CreditTotal", "Credit Total", 90);
+    
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetTransactionIDs, Flock.ViewModels.LargeDatabaseDataProvider.GetTransactionByID).Bind(Model == null ? null : Model.CreditTransactionID).GetHtml()
+

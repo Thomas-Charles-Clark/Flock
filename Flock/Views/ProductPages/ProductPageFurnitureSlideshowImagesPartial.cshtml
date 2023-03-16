@@ -1,0 +1,27 @@
+﻿<div class="content-panel-container">
+    <fieldset>
+        <legend onclick="$('#slideshow-list').slideToggle('fast')">Slideshow Images - Landscape Full-Width Banner Only (click to expand/contract)</legend>
+        <div id="slideshow-list" class="fieldset-inner" style="background-color: white;">
+            @*<div id="slideshow-list" class="sortable-list" style="width: 100%; height: 100%; background-color: white;">*@
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    <div class="product-page-slideshow-item" data-image-id="@(Model[i].ImageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300);">
+                        <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromProductPageArea(2, @(Model[i].ImageID))" />
+                        <img style="width: 200px; height: auto;" src="https://flock.designersguild.com/ImageLibrary/322/@(Model[i].ImageID).jpeg" />
+                    </div>
+                }
+                @if (Model.Count == 0)
+                {
+                    <div class="product-page-slideshow-placeholder">
+                        There are no images associated to this product page's slideshow.
+                    </div>
+                }
+            @*</div>*@
+            <div class="product-page-slideshow-placeholder" style="clear: both;"></div>
+        </div>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    if (typeof (InitSlideshowDragDropFurn) == 'function')
+        InitSlideshowDragDropFurn();
+</script>

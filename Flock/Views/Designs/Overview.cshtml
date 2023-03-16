@@ -1,0 +1,116 @@
+﻿@{
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section scripts {
+    
+}
+@section styles {
+    
+    <style type="text/css">
+        #container {
+            width: 1264px;
+        }
+    </style>
+}
+
+<h4 class="page-heading">
+    Design Overview
+</h4>
+
+<div id="DesignGridContainer" style="float: left;">
+    @Html.Partial("DesignOverviewGridViewPartial", "ProductPages")
+</div>
+
+<div id="bulk-action-panel" style="float: right;">
+    <h4>Bulk Action Panel</h4>
+    <ul>
+        <li>
+            <a href="javascript:;" title="Delete" onclick="DeleteSelectedDesigns()">Delete</a>
+        </li>
+    </ul>
+</div>
+
+<div style="clear:both;"></div>
+
+<div id="date-picker-modal" style="width: 342px; height: 340px;" data-for-date="null">
+    @Html.DevExpress().Label(settings =>
+{
+    settings.Text = "Date: ";
+}).GetHtml()
+    @Html.DevExpress().DateEdit(settings =>
+{
+    settings.Name = "BulkActionDatePicker";
+    settings.Properties.DisplayFormatString = "d";
+}).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#date-picker-modal").dialog({
+            autoOpen: false,
+            height: 442,
+            width: 348,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    switch ($(this).data("for-date")) {
+                        case "on":
+                            SetOnDateForProductPages();
+                            break;
+                        case "off":
+                            SetOffDateForProductPages();
+                            break;
+                    }
+                    $(this).data("for-date", "null")
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    });
+
+    function SetOnDateForDesigns() {
+        var keys = null;
+
+        if (typeof (DesignOverviewGridView) != "undefined" && DesignOverviewGridView != false)
+            keys = DesignOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false)
+            if (typeof (DesignOverviewGridView) != "undefined" && DesignOverviewGridView != false)
+                DesignOverviewGridView.PerformCallback({ commandType: 'Enable', keyString: keys.toString(), dateString: BulkActionDatePicker.GetDate().toUTCString() });
+            else
+                alert("Select at least one product page.");
+        return false;
+    }
+
+    function SetOffDateForDesigns() {
+        var keys = null;
+
+        if (typeof (DesignOverviewGridView) != "undefined" && DesignOverviewGridView != false)
+            keys = DesignOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false)
+            if (typeof (DesignOverviewGridView) != "undefined" && DesignOverviewGridView != false)
+                DesignOverviewGridView.PerformCallback({ commandType: 'Disable', keyString: keys.toString(), dateString: BulkActionDatePicker.GetDate().toUTCString() });
+            else
+                alert("Select at least one product page.")
+        return false;
+    }
+
+    function DeleteSelectedDesigns() {
+        var conf = confirm("Are you sure?");
+        if (conf) {
+            var keys = null;
+
+            if (typeof (DesignOverviewGridView) != "undefined" && DesignOverviewGridView != false)
+                keys = DesignOverviewGridView.GetSelectedKeysOnPage();
+
+            if (typeof (keys) != "undefined" && keys != false)
+                if (typeof (DesignOverviewGridView) != "undefined" && DesignOverviewGridView != false)
+                    DesignOverviewGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+        }
+    }
+</script>

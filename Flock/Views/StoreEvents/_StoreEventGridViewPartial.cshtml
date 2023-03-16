@@ -1,0 +1,111 @@
+@using Flock.Models
+@model Flock.ViewModels.StoreEventViewModel
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+}
+@{
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "StoreEventGridView";
+        settings.CallbackRouteValues = new { Controller = "StoreEvents", Action = "StoreEventGridViewPartial" };
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "StoreEvents", Action = "StoreEventGridViewPartialDelete" };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            if(typeof StoreEventLocationsListBox === 'object')
+                e.customArgs['selectedStoreEventLocationIDs'] = StoreEventLocationsListBox.GetSelectedValues();
+            console.log(e.command);
+            if (e.command == 'STARTEDIT' || e.command == 'STARTNEWROW') {
+                $('#store-events-detail-container').empty();
+            }
+        }";
+        
+        settings.ClientSideEvents.RowClick = @"function(s, e) { 
+            LoadingPanel.Show();
+            $.ajax({
+                url: '/admin/storeevents/loadStoreEventDetailPartial',
+                type: 'POST',
+                data: {
+                    StoreEventID: s.GetRowKey(e.visibleIndex)
+                },
+                success: function(data) { 
+                    LoadingPanel.Hide();
+                    $('#store-events-detail-container').html(data);
+                },
+                timeout: 30000
+            });
+        }";
+
+        
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+		settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.Styles.RowHotTrack.Cursor = "pointer";
+
+		settings.KeyFieldName = "StoreEventID";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.Settings.ShowHeaderFilterButton = false;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SetEditFormTemplateContent(c => {
+            if (Model == null)
+                ViewContext.Writer.Write(Html.Action("StoreEventGridEditFormPartial", "StoreEvents", new { StoreEventID = c.KeyValue }));
+            else
+                ViewContext.Writer.Write(Html.Partial("_StoreEventGridEditFormPartial", Model));
+        });
+       
+
+        MVCxGridViewColumn StoreEventIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn HeadingColumn = new MVCxGridViewColumn();
+
+        StoreEventIDColumn.Name = "StoreEventID";
+        StoreEventIDColumn.FieldName = "StoreEventID";
+        StoreEventIDColumn.Caption = "Store Event ID";
+        StoreEventIDColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        StoreEventIDColumn.Width = 80;
+        
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        NameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        var ncProp = NameColumn.PropertiesEdit as TextBoxProperties;
+        ncProp.MaxLength = 100;
+        ncProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+
+        HeadingColumn.Name = "Heading";
+        HeadingColumn.FieldName = "Heading";
+        HeadingColumn.Caption = "Heading";
+        HeadingColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        var hcProp = HeadingColumn.PropertiesEdit as TextBoxProperties;
+        hcProp.MaxLength = 100;
+        ncProp.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+
+        settings.Columns.Add(StoreEventIDColumn);
+        settings.Columns.Add(NameColumn);
+        //settings.Columns.Add(HeadingColumn);
+        
+	});
+	if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ("", "", (s, e) =>
+{
+    var source = UoW.GetRepository<Flock.Models.StoreEvent>().GetAll().Where(p => p.DeletedDT == null).OrderByDescending(p => p.StoreEventID);
+
+    e.QueryableSource = source;
+    e.KeyExpression = "StoreEventID";
+}
+).GetHtml()

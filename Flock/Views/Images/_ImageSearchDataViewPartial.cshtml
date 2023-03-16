@@ -1,0 +1,149 @@
+@model List<Flock.Models.Image_SearchResult>
+@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "ImageOverviewDataView";
+    settings.CallbackRouteValues = new { Controller = "Images", Action = "ImageSearch" };
+    settings.AllowPaging = true;
+    
+    settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+        if(typeof(initDragDrop) == 'function')
+            initDragDrop();
+        if (typeof(InitPodDragDrop) == 'function')
+            InitPodDragDrop();
+        if (typeof(InitSlideshowDragDrop) == 'function')
+            InitSlideshowDragDrop();     
+        if(typeof(ConfigureReplacement) == 'function')
+            ConfigureReplacement();
+        
+        if($('#product-page-cutout-inner').length > 0) {
+            if (typeof(InitSlideshowDragDropFurn) == 'function')
+                InitSlideshowDragDropFurn();
+        }
+    }";
+    /*
+     * ProductType: ProductTypeListBox.GetValue(),
+                    Brand: BrandListBox.GetValue(),
+                    Launch: LaunchListBox.GetValue(),
+                    Collection: CollectionListBox.GetValue(),
+                    AspectRatio: AspectRatioListBox.GetValue(),
+                    ImageType: ImageTypeListBox.GetValue(),
+                    Perspective: PerspectiveListBox.GetValue(),
+                    HotspotStatus: HotspotStatusListBox.GetValue(),
+                    Colour: ColourListBox.GetValue(),
+                    Room: RoomListBox.GetValue(),
+                    Style: StyleListBox.GetValue(),
+                    NameOrID: NameOrIDTextBox.GetValue(),
+                    SearchWithinHotspots: SearchWithinHotspotsCheckbox.GetValue() 
+     */
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+        e.customArgs['ProductType'] = ImageSearchProductTypeListBox.GetValue();
+        e.customArgs['Brand'] = ImageSearchBrandListBox.GetValue();
+        e.customArgs['Launch'] = ImageSearchLaunchListBox.GetValue();
+        e.customArgs['Collection'] = ImageSearchCollectionListBox.GetValue();
+        e.customArgs['AspectRatio'] = ImageSearchAspectRatioListBox.GetValue();
+        e.customArgs['ImageType'] = ImageSearchImageTypeListBox.GetValue();
+        e.customArgs['Perspective'] = ImageSearchPerspectiveListBox.GetValue();
+        e.customArgs['HotspotStatus'] = ImageSearchHotspotStatusListBox.GetValue();
+        e.customArgs['Colour'] = ImageSearchColourListBox.GetValue();
+        e.customArgs['Room'] = ImageSearchRoomListBox.GetValue();
+        e.customArgs['Style'] = ImageSearchStyleListBox.GetValue();
+        e.customArgs['NameOrID'] = ImageSearchNameOrIDTextBox.GetValue();
+        e.customArgs['SearchWithinHotspots'] = SearchWithinHotspotsCheckbox.GetValue();
+    }";
+
+    settings.PagerSettings.Summary.Visible = true;
+    settings.PagerSettings.Summary.Text = "Page: {0} of {1} ({2} images total)";
+    settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    //settings.PagerSettings.Summary..Add(DevExpress.Data.SummaryItemType.Count, "CollectionID").DisplayFormat = "Total: {0:n0}";
+
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action.ToLower() != "compose")
+    {
+        settings.SettingsTableLayout.ColumnCount = 5;
+        settings.SettingsTableLayout.RowsPerPage = 3;
+        settings.ControlStyle.ItemSpacing = System.Web.UI.WebControls.Unit.Pixel(4);
+
+        settings.PagerSettings.PageSizeItemSettings.Visible = true;
+        settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        
+        settings.PagerSettings.Visible = true;
+        settings.AlwaysShowPager = true;
+        settings.PagerSettings.EndlessPagingMode = DataViewEndlessPagingMode.Disabled;
+        settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.Bottom;
+    }
+    else
+    {
+        settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.SettingsTableLayout.ColumnCount = 3;
+        settings.PagerSettings.PageSizeItemSettings.ShowAllItem = false;
+        settings.PagerSettings.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.PagerSettings.PageSizeItemSettings.Visible = true;
+        settings.PagerSettings.PageSizeItemSettings.ShowPopupShadow = true;
+        settings.PagerSettings.EndlessPagingMode = DataViewEndlessPagingMode.Disabled;
+        settings.PagerSettings.EllipsisMode = PagerEllipsisMode.InsideNumeric;
+        settings.PagerSettings.Visible = true;
+        settings.AlwaysShowPager = true;
+        settings.PagerSettings.Position = System.Web.UI.WebControls.PagerPosition.TopAndBottom;
+    }
+
+    settings.Style.Add("width", "100%");
+    settings.Style.Add("margin", "0.5em 0 0");
+    settings.EmptyDataText = "<h4>No results.</h4>";
+    
+    settings.SettingsTableLayout.RowsPerPage = 4;
+    
+    settings.SetItemTemplateContent(
+        c =>
+        {
+            var discID = DataBinder.Eval(c.DataItem, "ImageID").ToString();
+            var intID = DataBinder.Eval(c.DataItem, "IntranetImageID").ToString();
+            var Name = DataBinder.Eval(c.DataItem, "Name") == null ? "" : DataBinder.Eval(c.DataItem, "Name").ToString();
+            var ARID = DataBinder.Eval(c.DataItem, "AspectRatioID").ToString();
+            
+            ViewContext.Writer.Write(
+                "<div id='image-box-" + discID + "' class='draggable image ar" + ARID + "' style='position: relative; width: 156px; z-index: 100;' data-aspect-ratio-id='" + ARID + "' data-image-id='" + discID + "' >" +// onclick='SelectImage(" + discID + ")'>" +
+                "<div>" +
+                    "<img data-image-id='" + discID + "' class='imbd' id=\"" + "img" + discID + "\" src=\"" + Url.Content("https://flock.designersguild.com/ImageLibrary/156/" + discID + ".jpeg") + "\" title=\"Flock Image ID: " + discID + "&#013;Intranet Image ID: " + intID + "\" alt=\"\" />" +
+                "</div>" +
+                "<div class=\"DataViewItemTitle\">" + Name + "</div>" +
+                "</div>"
+            );
+        }
+    );
+}).Bind(Model).GetHtml()
+
+<script type="text/javascript">
+    function SelectImage(id) {
+        if(typeof(window.SelectedImages) == "undefined" || window.SelectedImages == false)
+            window.SelectedImages = [];
+
+        if ($("#image-box-" + id).css("background-color").toLowerCase() == "#aabbcc" || $("#image-box-" + id).css("background-color").toLowerCase() == "rgb(170, 187, 204)")
+            $("#image-box-" + id).css("background-color", "white");
+        else
+            $("#image-box-" + id).css("background-color", "#aabbcc");
+
+        var search_term = id;
+        var found = false;
+        for (var i = window.SelectedImages.length - 1; i >= 0; i--) {
+            if (window.SelectedImages[i] === search_term) {
+                window.SelectedImages.splice(i, 1);
+                found = true;
+            }
+        }
+
+        if(!found)
+            window.SelectedImages.push(id);
+    }
+    if (typeof (initDragDrop) == "function")
+        initDragDrop();
+    if (typeof (InitPodDragDrop) == 'function')
+        InitPodDragDrop();
+    if (typeof (InitSlideshowDragDrop) == 'function')
+        InitSlideshowDragDrop();
+    if ($('#product-page-cutout-inner').length > 0) {
+        if (typeof (InitSlideshowDragDropFurn) == 'function')
+            InitSlideshowDragDropFurn();
+    }
+</script>

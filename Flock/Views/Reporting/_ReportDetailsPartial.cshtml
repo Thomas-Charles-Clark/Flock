@@ -1,0 +1,82 @@
+﻿@model Flock.ViewModels.ReportDetailViewModel
+
+<input id="selected-report-id" value="@(Model.Report == null ? null : (Int16?)Model.Report.ReportID)" type="hidden" />
+
+<div class="report-details-container">
+    @Html.DevExpress().TextBoxFor(m => Model.Report.Name, settings =>
+    {
+        settings.Name = "Name";
+        settings.Width = 250;
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin-bottom", "1em");
+        settings.Properties.Caption = "Name";
+        settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+        settings.Properties.CaptionCellStyle.Width = 74;
+    }).GetHtml()
+
+    <label class="report-id-lbl">Report ID: @(Model.Report == null ? null : (Int16?)Model.Report.ReportID)</label>
+
+    <div class="clearfix"></div>
+
+    @Html.DevExpress().ComboBoxFor(m => Model.Report.ReportGroupID, settings =>
+    {
+        settings.Name = "ReportGroup";
+        settings.Properties.ValueField = "ReportGroupID";
+        settings.Properties.TextField = "Name";
+        settings.Style.Add("margin-bottom", "1em");
+        settings.Properties.ValueType = typeof(Int32);
+        settings.Properties.Caption = "Group";
+        settings.Properties.ConvertEmptyStringToNull = true;
+        settings.Properties.CaptionSettings.VerticalAlign = EditorCaptionVerticalAlign.Middle;
+        settings.Properties.CaptionCellStyle.Width = 74;
+        settings.Properties.ValidationSettings.RequiredField.IsRequired = true;
+        settings.Properties.ValidationSettings.RequiredField.ErrorText = "ReportGroup is required.";
+    }).BindList(Model.ReportGroups).GetHtml()
+
+    @Html.DevExpress().MemoFor(m => Model.Report.Description, settings =>
+    {
+        settings.Name = "Description";
+        settings.Properties.Rows = 10;
+        settings.Width = 370;
+        settings.Properties.ConvertEmptyStringToNull = true;
+        settings.Style.Add("margin-bottom", "1em");
+        settings.Properties.Caption = "Description";
+        settings.Properties.CaptionCellStyle.Width = 74;
+    }).GetHtml()
+
+    @Html.DevExpress().ListBox(settings =>
+    {
+        settings.Name = "Employees";
+        settings.Properties.ClientInstanceName = "lbChosen";
+        settings.Width = 370;
+        settings.Height = 150;
+        settings.Properties.ItemStyle.CssClass = "lbItem";
+        settings.ControlStyle.CssClass = "listBoxLeft";
+        settings.Properties.TextField = "Name";
+        settings.Properties.ValueField = "EmployeeID";
+        settings.Properties.ValueType = typeof(Int16);
+        settings.Properties.Caption = "Recipients";
+        settings.Properties.CaptionCellStyle.Width = 74;
+        settings.Properties.SelectionMode = ListEditSelectionMode.Multiple;
+        settings.Properties.ClientSideEvents.KeyUp = @"function(s, e) {
+            if (e.htmlEvent.keyCode == 46) {
+                s.BeginUpdate();
+                for (var i = s.GetSelectedItems().length - 1; i >= 0; i = i - 1) {
+                    s.RemoveItem(s.GetSelectedIndices()[i]);
+                }
+                s.EndUpdate();
+            }
+        }";
+
+        settings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            InitialiseJQuery();
+        }";
+    }).BindList(Model.Employees == null ? null : Model.Employees.OrderBy(p => p.Name)).GetHtml()
+</div>
+
+<div style="margin-left: 384px;">
+    <div id="save-btn" class="btn btn-default" onclick="SaveReport()">
+        Save
+    </div>
+</div>
+

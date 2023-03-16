@@ -1,0 +1,16 @@
+﻿
+@{
+    ViewBag.Title = "Bad Emails";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<h4 class="page-heading">Bad Emails</h4>
+
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/bademails.css")
+}
+
+<div id="gridview-container">
+    @Html.Action("BadEmailGridViewPartial", "Members")
+</div>

@@ -1,0 +1,79 @@
+﻿@using Flock.Models
+@model System.Data.Linq.IMultipleResults
+
+@{
+    @*
+    .GetResult<Image>().Single();
+    .GetResult<>().Single();
+
+*@
+    var ImageResult = Model.GetResult<Image>().Single();
+    
+    <h5>Image ID: @ImageResult.ImageID</h5>
+    
+    <img src="https://flock.designersguild.com/imagelibrary/987/@(ImageResult.ImageID).jpeg" alt="@ImageResult.AltText" title="@ImageResult.TitleText" />
+    
+    <table id="hotspots-list">
+        <tr>
+            <th>Product ID</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Product Name</th>
+            <th>Code</th>
+            <th>Hotspot Image</th>
+            <th>Product Page ID</th>
+            <th>Product Page Name</th>
+            <th>Product Page URL Keywords</th>
+            <th>Product Page Deleted Date</th>
+            <th>Web Status</th>
+        </tr>
+    @{
+        
+        var HotspotResults = Model.GetResult<ImageInspectHotspotsResult>();
+        foreach(var HotspotResult in HotspotResults)
+        { 
+            <tr>
+                <td>@(HotspotResult.ProductID)</td>
+                <td>@(HotspotResult.X)</td>
+                <td>@(HotspotResult.Y)</td>
+                <td>@(HotspotResult.ProductName)</td>
+                <td>@(HotspotResult.Code)</td>
+                <td><img src="https://flock.designersguild.com/imagelibrary/156/@(HotspotResult.Front).jpeg" /></td>
+                <td>@(HotspotResult.ProductPageID)</td>
+                <td>@(HotspotResult.ProductPageName)</td>
+                <td>@(HotspotResult.URLKeywords)</td>
+                <td>@(HotspotResult.DeletedDT)</td>
+                <td>
+                    @{
+            using (Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext> UoW = new Flock.DAL.UnitOfWork<FlockDataContext>())
+            {
+                var WebStatus = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == HotspotResult.WebStatusID).Select(p => p.Name).Single();
+                var colour = "black";
+                switch (HotspotResult.WebStatusID)
+                {
+                    case 0:
+                        colour = "green";
+                        break;
+                    case 1:
+                        colour = "orange";
+                        break;
+                    case 2:
+                        colour = "orange";
+                        break;
+                    case 3:
+                        colour = "green";
+                        break;
+                    case 4:
+                        colour = "red";
+                        break;
+                    default: break;
+                }   
+                            <span style="color: @(colour)">@(WebStatus)</span>
+            }
+                    }
+                </td>
+            </tr>
+        }
+    }
+    </table>
+}

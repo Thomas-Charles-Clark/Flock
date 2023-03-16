@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "Video Manager";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/Content/asset-management.css")
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Videos</h4>
+
+@Html.Action("VideoGridViewPartial")

@@ -1,0 +1,185 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "ImageInfoGridView";
+    settings.CallbackRouteValues = new { Controller = "CMS", Action = "ImageInfoGridView" };
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+    //settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.SettingsBehavior.EnableRowHotTrack = true;
+
+    settings.Styles.Row.Cursor = "pointer";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    settings.KeyFieldName = "ImageID";
+
+    settings.ClientSideEvents.Init = @"function(s, e) {
+        s.SetFocusedRowIndex(-1);
+    }";
+
+    settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+    settings.ClientSideEvents.RowClick = @"function(s, e) {
+
+        var id = s.GetRowKey(e.visibleIndex);
+
+        LoadingPanel.Show();
+        $.ajax({
+            url: '" + @Url.Action("InspectImage", "CMS") + @"',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ImageID: id
+            },
+            success: function(data) {
+                LoadingPanel.Hide();
+                $('#image-hub-target').html(data);
+            },
+            error: function(e, s, a) {
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }";
+
+    var UoW = new UnitOfWork<FlockDataContext>();
+
+    MVCxGridViewColumn ImageIDColumn = new MVCxGridViewColumn();
+    ImageIDColumn.Name = "ImageID";
+    ImageIDColumn.FieldName = "ImageID";
+    ImageIDColumn.Caption = "Image ID";
+    ImageIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    ImageIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    settings.Columns.Add(ImageIDColumn);
+
+    MVCxGridViewColumn IntranetImageIDColumn = new MVCxGridViewColumn();
+    IntranetImageIDColumn.Name = "IntranetImageID";
+    IntranetImageIDColumn.FieldName = "IntranetImageID";
+    IntranetImageIDColumn.Caption = "Intranet Image ID";
+    settings.Columns.Add(IntranetImageIDColumn);
+
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Image Name";
+    NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    settings.Columns.Add(NameColumn);
+
+    MVCxGridViewColumn ImageTypeColumn = new MVCxGridViewColumn();
+    ImageTypeColumn.Name = "ImageTypeID";
+    ImageTypeColumn.FieldName = "ImageTypeID";
+    ImageTypeColumn.Caption = "Image Type";
+    ImageTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    ImageTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+    ImageTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    ImageTypeColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    ImageTypeColumn.SetDataItemTemplateContent(c => {
+        var it = (byte)DataBinder.Eval(c.DataItem, "ImageTypeID");
+        var imgtype = UoW.GetRepository<ImageType>().GetAll().Where(p => p.ImageTypeID == it).Select(p => p.Name).Single();
+        ViewContext.Writer.Write(imgtype);
+    });
+    settings.Columns.Add(ImageTypeColumn);
+
+    MVCxGridViewColumn WidthColumn = new MVCxGridViewColumn();
+    WidthColumn.Name = "Width";
+    WidthColumn.FieldName = "Width";
+    WidthColumn.Caption = "Width";
+    WidthColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    WidthColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    settings.Columns.Add(WidthColumn);
+
+    MVCxGridViewColumn HeightColumn = new MVCxGridViewColumn();
+    HeightColumn.Name = "Height";
+    HeightColumn.FieldName = "Height";
+    HeightColumn.Caption = "Height";
+    HeightColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    HeightColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    settings.Columns.Add(HeightColumn);
+
+    MVCxGridViewColumn AspectRatioColumn = new MVCxGridViewColumn();
+    AspectRatioColumn.Name = "AspectRatioID";
+    AspectRatioColumn.FieldName = "AspectRatioID";
+    AspectRatioColumn.Caption = "Aspect Ratio";
+    AspectRatioColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    AspectRatioColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    AspectRatioColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    AspectRatioColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+    AspectRatioColumn.SetDataItemTemplateContent(c =>
+    {
+        var arid = (byte)DataBinder.Eval(c.DataItem, "AspectRatioID");
+        var aspect = UoW.GetRepository<AspectRatio>().GetAll().Where(p => p.AspectRatioID == arid).Select(p => p.Name).Single();
+        ViewContext.Writer.Write(aspect);
+    });
+    settings.Columns.Add(AspectRatioColumn);
+
+    MVCxGridViewColumn PerspectiveColumn = new MVCxGridViewColumn();
+    PerspectiveColumn.Name = "PerspectiveID";
+    PerspectiveColumn.FieldName = "PerspectiveID";
+    PerspectiveColumn.Caption = "Perspective";
+    PerspectiveColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    PerspectiveColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+    PerspectiveColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    PerspectiveColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+    PerspectiveColumn.SetDataItemTemplateContent(c =>
+    {
+        var pid = (byte?)DataBinder.Eval(c.DataItem, "PerspectiveID");
+        if (pid != null && pid != 0) {
+            var persp = UoW.GetRepository<Perspective>().GetAll().Where(p => p.PerspectiveID == pid).Select(p => p.Name).Single();
+            ViewContext.Writer.Write(persp);
+        }
+    });
+    settings.Columns.Add(PerspectiveColumn);
+
+    MVCxGridViewColumn StarRatingColumn = new MVCxGridViewColumn();
+    StarRatingColumn.Name = "StarRating";
+    StarRatingColumn.FieldName = "StarRating";
+    StarRatingColumn.Caption = "Rating";
+    StarRatingColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    StarRatingColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    settings.Columns.Add(StarRatingColumn);
+
+    MVCxGridViewColumn HotspotColumn = new MVCxGridViewColumn();
+    HotspotColumn.Name = "HotspotCount";
+    HotspotColumn.FieldName = "HotspotCount";
+    HotspotColumn.Caption = "Hotspot Count";
+    HotspotColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    HotspotColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    settings.Columns.Add(HotspotColumn);
+
+
+
+    settings.HeaderFilterFillItems = (s, e) => {
+        switch(e.Column.Name)
+        {
+            case "AspectRatioID":
+                e.Values.Clear();
+                foreach (var i in UoW.GetRepository<AspectRatio>().GetAll().Select(p => p.Name))
+                    e.AddValue(i, i);
+                e.AddShowAll();
+                break;
+            case "PerspectiveID":
+                e.Values.Clear();
+                foreach (var i in UoW.GetRepository<Perspective>().GetAll().Select(p => p.Name))
+                    e.AddValue(i, i);
+                e.AddShowAll();
+                break;
+            case "ImageTypeID":
+                e.Values.Clear();
+                foreach (var i in UoW.GetRepository<ImageType>().GetAll().Select(p => p.Name))
+                    e.AddValue(i, i);
+                e.AddShowAll();
+                break;
+            default:
+                break;
+        }
+    };
+}).BindToLINQ("", "", (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    var source = dataContext.GetRepository<Flock.Models.vwImage>().GetAll();//.Where(p => p.DeletedDT == null);
+
+    e.KeyExpression = "ImageID";
+    e.QueryableSource = source;
+}).GetHtml()

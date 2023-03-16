@@ -1,0 +1,83 @@
+﻿@model Flock.ViewModels.PageComposeViewModel
+<div class="content-panel-container">
+    <fieldset id="page-details-fieldset">
+        <legend onclick="$('#page-details-section').slideToggle('fast');">
+            Page Details (click to expand / contract)
+            <img id="page-details-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="page-details-section" class="fieldset-inner">
+            <img id="page-details-save-success" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SavePageDetails(@(Model.PageID));" />
+            <div style="width: 66%; float: right">
+                <div id="page-pod-container" class="droppable" data-page-id="@(Model.PageID)">
+                    <span>Pod Images: Landscape (Feature) only</span>
+                    <img id="pod-busy" class="busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                    <div id="pod-list" class="sortable-list" style="width: 632px;">
+                        @Html.Partial("PagePodImages", Model.Images.Where(p => p.TemplateImageID == 1).OrderBy(o => o.SortOrder).ToList())
+                    </div>
+                </div>
+                <div>
+                    <span style="margin-top: 1em; display: block">Description (1200)</span>
+                    @Html.DevExpress().MemoFor(m => Model.Description, settings =>
+                    {
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(99);
+                        settings.Height = System.Web.UI.WebControls.Unit.Pixel(143);
+                        settings.ShowModelErrors = true;
+                        settings.Properties.MaxLength = 1200;
+                        settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    }).GetHtml()
+                </div>
+            </div>
+            <div style="width: 33.2%; float: left;">
+                <span style="display: block;">Page Title (70)</span>
+                @Html.DevExpress().TextBoxFor(m => Model.TitleTag, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(304);
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                }).GetHtml()
+                <span style="margin-top: 1em; display: block">URL Keywords (100)</span>
+                @Html.DevExpress().TextBoxFor(m => Model.URLKeywords, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(304);
+                    settings.ShowModelErrors = true;
+                    settings.ClientEnabled = !Model.ProductTypeID.HasValue;
+                    settings.Properties.ValidationSettings.ValidateOnLeave = true;
+                    settings.Properties.MaxLength = 70;
+                    settings.Properties.ValidationSettings.RegularExpression.ValidationExpression = "^([a-z]|[a-z]-|[a-z]/)+[a-z]$";
+                    settings.Properties.ValidationSettings.RegularExpression.ErrorText = @"Regular Expression Validation Failed.
+    URLs must not begin or end with a slash.
+    URL segments must not contain accented characters, such as é or ë.
+    URL segments may only contain the lower case letters 'a' through 'z', as well as hyphens.
+    URL segments must not begin or end with a hyphen.";
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                }).GetHtml()
+                <span style="margin-top: 1em; display: block">Meta Description (500)</span>
+                @Html.DevExpress().MemoFor(m => Model.MetaDescription, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(304);
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(143);
+                    settings.ShowModelErrors = true;
+                    settings.Properties.MaxLength = 500;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                }).GetHtml()
+                <span style="margin-top: 1em; display: block">Heading (70)</span>
+                @Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(304);
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    settings.Properties.MaxLength = 70;
+                }).GetHtml()
+                <span style="margin-top: 1em; display: block">Sub Heading (100)</span>
+                @Html.DevExpress().TextBoxFor(m => Model.SubHeading, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(304);
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    settings.Properties.MaxLength = 100;
+                }).GetHtml()
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+    </fieldset>
+</div>

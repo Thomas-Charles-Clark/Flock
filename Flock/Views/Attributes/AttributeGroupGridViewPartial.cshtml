@@ -1,0 +1,133 @@
+﻿@Html.DevExpress().GridView(settings => {
+    settings.Name = "AttributeGroupGridView";
+    settings.CallbackRouteValues = new { Controller = "Attributes", Action = "AttributeGroupGridViewPartial" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Attributes", Action = "AttributeGroupGridViewAddNew" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Attributes", Action = "AttributeGroupGridViewUpdate" };
+    settings.CustomActionRouteValues = new { Controller = "Attributes", Action = "AttributeGroupGridViewCustomCommand" };
+    settings.SettingsBehavior.AllowGroup = false;
+
+    settings.SettingsBehavior.AllowSort = false;
+    
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.Width = 650;
+
+    settings.CommandColumn.Visible = true;
+    
+    settings.CommandColumn.ShowEditButton = true;
+    settings.CommandColumn.ShowNewButtonInHeader = true;
+    settings.CommandColumn.VisibleIndex = 100;
+    
+    settings.KeyFieldName = "AttributeGroupID";
+
+    settings.SettingsDetail.ShowDetailButtons = true;
+    settings.SettingsDetail.ShowDetailRow = true;
+    settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+    settings.SetDetailRowTemplateContent(c => {
+        ViewContext.Writer.Write(Html.Action("AttributeGridViewPartial", "Attributes", new { AttributeGroupID = c.KeyValue }));
+    });
+
+    
+    MVCxGridViewColumn IDColumn = new MVCxGridViewColumn();
+    IDColumn.Name = "AttributeGroupID";
+    IDColumn.FieldName = "AttributeGroupID";
+    IDColumn.Caption = "ID";
+    IDColumn.Width = 40;
+    IDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    IDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    IDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    IDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    settings.Columns.Add(IDColumn);
+
+    MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+    NameColumn.Name = "Name";
+    NameColumn.FieldName = "Name";
+    NameColumn.Caption = "Name";
+    NameColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(NameColumn);
+
+    MVCxGridViewColumn HeadingColumn = new MVCxGridViewColumn();
+    HeadingColumn.Name = "Heading";
+    HeadingColumn.FieldName = "Heading";
+    HeadingColumn.Caption = "Heading";
+    HeadingColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    HeadingColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    HeadingColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    HeadingColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(HeadingColumn);
+
+    MVCxGridViewColumn MultipleSelectColumn = new MVCxGridViewColumn();
+    MultipleSelectColumn.Name = "MultipleSelect";
+    MultipleSelectColumn.FieldName = "MultipleSelect";
+    MultipleSelectColumn.Caption = "Multiple Select";
+    MultipleSelectColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+    var MultipleSelectProperties = MultipleSelectColumn.PropertiesEdit as ComboBoxProperties;
+    MultipleSelectProperties.DataSource = new object[2] { new { Name = "No", MultipleSelect = (byte)0  }, new { Name = "Yes", MultipleSelect = (byte)1 } };
+    MultipleSelectProperties.TextField = "Name";
+    MultipleSelectProperties.ValueField = "MultipleSelect";
+    MultipleSelectProperties.ValueType = typeof(byte);
+    MultipleSelectColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    MultipleSelectColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    MultipleSelectColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(MultipleSelectColumn);
+
+    MVCxGridViewColumn UseIconsColumn = new MVCxGridViewColumn();
+    UseIconsColumn.Name = "UseIcons";
+    UseIconsColumn.FieldName = "UseIcons";
+    UseIconsColumn.Caption = "Use Icons";
+    UseIconsColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+    var UseIconsProperties = UseIconsColumn.PropertiesEdit as ComboBoxProperties;
+    UseIconsProperties.DataSource = new object[2] { new { Name = "No", UseIcons = (byte)0 }, new { Name = "Yes", UseIcons = (byte)1 } };
+    UseIconsProperties.TextField = "Name";
+    UseIconsProperties.ValueField = "UseIcons";
+    UseIconsProperties.ValueType = typeof(byte);
+    UseIconsColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    UseIconsColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    UseIconsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    settings.Columns.Add(UseIconsColumn);
+
+    MVCxGridViewColumn ShuffleColumn = new MVCxGridViewColumn();
+    ShuffleColumn.Name = "ShuffleColumn";
+    ShuffleColumn.FieldName = "ShuffleColumn";
+    ShuffleColumn.Caption = "Reorder";
+    ShuffleColumn.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+    ShuffleColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    ShuffleColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    ShuffleColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    ShuffleColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+    ShuffleColumn.Width = 55;
+    ShuffleColumn.SetDataItemTemplateContent(c => {
+        ViewContext.Writer.Write("<div>" 
+            + "<img src='/images/icons/dxrip/shuffle-up.png' style='cursor: pointer; display: inline-block; margin-right: 1em;' onclick='AttributeGroupGridView.PerformCallback({CommandType:\"MoveUp\", AttributeGroupID: " + Convert.ToByte(c.KeyValue) + "});' />"
+            + "<img src='/images/icons/dxrip/shuffle-down.png' style='cursor: pointer; display: inline-block;' onclick='AttributeGroupGridView.PerformCallback({CommandType:\"MoveDown\", AttributeGroupID: " + Convert.ToByte(c.KeyValue) + "});' />"
+            + "<div style='clear: both;'></div></div>");
+    });
+    settings.Columns.Add(ShuffleColumn);
+    
+    MVCxGridViewColumn SortOrderColumn = new MVCxGridViewColumn();
+    SortOrderColumn.Name = "SortOrder";
+    SortOrderColumn.FieldName = "SortOrder";
+    SortOrderColumn.Caption = "Sort Order";
+    SortOrderColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+    SortOrderColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+    SortOrderColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    SortOrderColumn.EditFormSettings.Visible = DefaultBoolean.False;
+    SortOrderColumn.SortAscending();
+    settings.Columns.Add(SortOrderColumn);
+
+    //settings.CustomColumnSort = (s, e) => {
+    //    if(e.Column.FieldName == "ShuffleColumn"
+    //    e.Column = SortOrderColumn;
+    //};
+    
+}).BindToLINQ("", "", (s, e) => {
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var source = dataContext.GetRepository<Flock.Models.AttributeGroup>().GetAll();
+    e.QueryableSource = source;
+
+    e.KeyExpression = "AttributeGroupID";
+}).GetHtml()

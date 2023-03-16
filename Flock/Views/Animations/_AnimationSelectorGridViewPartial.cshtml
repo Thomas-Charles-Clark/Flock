@@ -1,0 +1,105 @@
+@model Flock.ViewModels.AnimationGridModel
+@{
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "AnimationSelectorGridView";
+        settings.CallbackRouteValues = new { Controller = "Animations", Action = "_AnimationSelectorGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Animations", Action = "_AnimationSelectorGridAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Animations", Action = "_AnimationSelectorGridUpdate"};
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Animations", Action = "_AnimationSelectorGridDelete" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+        
+		settings.KeyFieldName = "AnimationID";
+
+		settings.SettingsPager.Visible = true;
+		settings.Settings.ShowGroupPanel = false;
+		settings.Settings.ShowFilterRow = true;
+		settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+		settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+		settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+		settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+		settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+        
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Styles.RowHotTrack.Cursor = "pointer";
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        
+        settings.Columns.Add("AnimationID");
+        settings.Columns.Add("Name");
+        settings.Columns.Add("AspectRatioID");
+
+        settings.ClientSideEvents.RowClick = "LoadAnimationDetail";
+        
+        var AnimationIDColumn = settings.Columns["AnimationID"] as MVCxGridViewColumn;
+        AnimationIDColumn.Caption = "ID";
+        AnimationIDColumn.Width = 90;
+        AnimationIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        AnimationIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        AnimationIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        AnimationIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        AnimationIDColumn.Settings.AllowDragDrop = DefaultBoolean.False;
+
+        var NameColumn = settings.Columns["Name"] as MVCxGridViewColumn;
+        NameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        NameColumn.Settings.AllowDragDrop = DefaultBoolean.False;
+        NameColumn.EditFormCaptionStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Middle;
+        NameColumn.EditFormCaptionStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+
+        var AspectRatioIDColumn = settings.Columns["AspectRatioID"] as MVCxGridViewColumn;
+        AspectRatioIDColumn.Name = "AspectRatioID";
+        AspectRatioIDColumn.Caption = "Aspect Ratio";
+        AspectRatioIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        AspectRatioIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        AspectRatioIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        AspectRatioIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        AspectRatioIDColumn.Settings.AllowDragDrop = DefaultBoolean.False;
+        AspectRatioIDColumn.EditFormCaptionStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Middle;
+        AspectRatioIDColumn.EditFormCaptionStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        AspectRatioIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var arProp = AspectRatioIDColumn.PropertiesEdit as ComboBoxProperties;
+        arProp.DataSource = Model.AspectRatios;
+        arProp.ValueField = "AspectRatioID";
+        arProp.ValueType = typeof(byte);
+        arProp.TextField = "Name";
+            
+        settings.SettingsText.PopupEditFormCaption = "Create Animation";
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.Width = 320;
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsEditing.EditFormColumnCount = 1;
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "AspectRatioID":
+                    e.Values.Clear();
+                    foreach (var ar in Model.AspectRatios)
+                    {
+                        e.AddValue(ar.Name, ar.AspectRatioID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default:
+                    break;
+            }
+        };
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model.Animations).GetHtml()

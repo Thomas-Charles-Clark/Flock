@@ -1,0 +1,14 @@
+﻿@model List<Flock.Models.ProductPage_Image>
+<div style="position: relative;" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+    @if (Model.Count() == 0)
+    {
+        <img id="cutout-placeholder" src="~/Images/admin/ar2-placeholder.png" style="width: 100%;" alt="Image not set" title="You must set a cut-out image for this product page" />
+    }
+    else
+    {
+        <img class="furniture-cutout-image" src="https://flock.designersguild.com/imagelibrary/654/@(Model[0].ImageID).jpeg"
+             alt="@(Model[0].AltText)"
+             title="@(Model[0].TitleText)" />
+        <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromProductPageArea(3, @(Model[0].ImageID))" />
+    }
+</div>

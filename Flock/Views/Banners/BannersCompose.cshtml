@@ -1,0 +1,738 @@
+﻿@model Flock.ViewModels.BannerComposeViewModel
+@{
+    ViewBag.Title = "Compose Banner";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section Styles{
+    @Styles.Render("~/Content/colorpicker.css")
+    @Styles.Render("~/Content/product-page-composition.css")
+    @Styles.Render("~/Content/banner-composition.css")
+    @Styles.Render("~/Content/jquery-fileupload-ui.css")
+    @Styles.Render("~/bundles/composer")
+
+    <style type="text/css">
+        #BannerSelectorGridView_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+
+        #banner-location-schematic:hover {
+            cursor: pointer;
+        }
+    </style>
+}
+@section Scripts
+{
+    @Scripts.Render("~/Scripts/colorpicker/colorpicker.js")
+    @Scripts.Render("~/Scripts/jquery.ui-widget.js")
+    @Scripts.Render("~/Scripts/jquery.iframe-transport.js")
+    @Scripts.Render("~/Scripts/jquery.fileupload.js")
+}
+
+<script type="text/javascript">
+
+    function CloneBanner(bannerId) {
+        $.confirm(function () {
+            $.ajax({
+                url: '/admin/banners/cloneBanner',
+                type: 'POST',
+                data: {
+                    BannerID: bannerId
+                },
+                success: function (data) {
+                    $.info("Info", "Clone Complete");
+                    BannerSelectorGridView.Refresh();
+                }
+            });
+        }, function () {
+
+        }, "Clone Banner");
+    }
+
+    function UpdateImageLibraryTarget(ev, ui, _isImageB) {
+
+        var isImageB = _isImageB;
+
+        $.ajax({
+            url: '@Url.Action("BannerImageAreaPartial", "Banners")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                BannerID: $("#selected-banner-id").val(),
+                source: 1,
+                ImageLibraryID: $(ui.draggable).data("image-id"),
+                isImageB: isImageB
+            },
+            success: function (data) {
+                //$("#error-span").html(data._response.result.files[0].name + " uploaded OK");
+                $("#error-span").css("color", "green");
+                $("#error-span").fadeIn("fast");
+                window.setTimeout(function () { $("#alert-span").fadeOut("fast"); }, 10000);
+                $("#error-span").fadeOut("fast", function () {
+                    $("#banner-image-preview" + (isImageB ? "-2" : "-1")).fadeOut("fast", function () {
+                        if ($("#image-preview-container" + (isImageB ? "-2" : "-1") + " img").length > 0) {
+                            $("#banner-image-preview" + (isImageB ? "-2" : "-1")).attr("src", data.files[0].url);
+                        } else {
+                            $("#image-preview-container" + (isImageB ? "-2" : "-1")).append("<img src='" + data.files[0].url + "' style='max-width: 100%;' id='banner-image-preview" + (isImageB ? "-2" : "-1") + "' />")
+                        }
+                    })
+                    window.setTimeout(function () {
+                        $("#banner-image-preview" + (isImageB ? "-2" : "-1")).fadeIn("fast");
+                        $("#banner-image-area" + (isImageB ? "-2" : "-1")).tabs("option", "active", 2);
+                        $.ajax({
+                            url: '@Url.Action("BannerLocationPartial", "Banners")',
+                            type: 'POST',
+                            traditional: true,
+                            data: {
+                                BannerID: $("#selected-banner-id").val()
+                            },
+                            success: function (data) {
+                                $("#banner-location-sitesection-container").html(data);
+                            },
+                            error: function (e, s, a) {
+                                alert(s + ' error: e.responseText was: ' + e.responseText);
+                            },
+                            timeout: 20000
+                        });
+                    }, 0);
+                });
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a);
+            },
+            timeout: 20000
+        });
+    }
+
+    function CreateNewBanner() {
+        $.ajax({
+            url: '@Url.Action("addnewfromselectgrid", "banners")',
+            type: 'POST',
+            data: {},
+            success: function (data) {
+                BannerSelectorGridView.Refresh();
+            },
+            timeout: 30000
+        });
+    }
+
+    function SaveBannerSiteSections() {
+
+        $.ajax({
+            url: '@Url.Action("SaveBannerSiteSections", "Banners")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ID: $("#selected-banner-id").val(),
+                SiteSectionIDs: ComposeBannerSiteSectionListBox.GetSelectedValues().toString()
+            },
+            success: function (data) {
+                SuccessFade($("#banner-sitesection-save"));
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a, function () {
+                    FailureFade($("#banner-sitesection-save"));
+                });
+            },
+            timeout: 20000
+        });
+    }
+
+    function SaveBannerLocations() {
+
+        var SelectedBannerLocations = new Array();
+
+        $("input[name^='BannerLocation']").each(function () {
+            if (window[$(this).attr("name")].GetValue() == true)
+                SelectedBannerLocations.push(Number($(this).attr("name").replace('BannerLocation', '')));
+        });
+
+        $.ajax({
+            url: '@Url.Action("SaveBannerLocations", "Banners")',
+            type: 'POST',
+            traditional: true,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                ID: $("#selected-banner-id").val(),
+                BannerLocationIDs: SelectedBannerLocations.toString()
+            }),
+            success: function (data) {
+
+                if (data.reload == false)
+                    SuccessFade($("#banner-location-save"));
+                else
+                    window.location.href = '/admin/banners/compose/' + $("#selected-banner-id").val();
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a, function () {
+                    FailureFade($("#banner-location-save"));
+                });
+            },
+            timeout: 20000
+        });
+    }
+
+    function SaveBannerMenus() {
+        $.ajax({
+            url: '@Url.Action("SaveBannerMenus", "Banners")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ID: $("#selected-banner-id").val(),
+                MenuIDs: ComposeBannerMenuListBox.GetSelectedValues().toString()
+            },
+            success: function (data) {
+                SuccessFade($("#banner-menu-save"));
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a, function () {
+                    FailureFade($("#banner-menu-save"));
+                })
+            },
+            timeout: 20000
+        });
+    }
+
+    function SaveBannerDetails() {
+
+        var onDate = null;
+        if (OnDate.GetValue() != null)
+            onDate = OnDate.GetValue().toGMTString();
+        var offDate = null;
+        if (OffDate.GetValue() != null)
+            offDate = OffDate.GetValue().toGMTString();
+        $.ajax({
+            url: '@Url.Action("SaveBannerDetails", "Banners")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                BannerID: $("#selected-banner-id").val(),
+                Name: Name.GetValue(),
+                OnDate: onDate,
+                OffDate: offDate,
+                TitleText: TitleText.GetValue(),
+                AltText: AltText.GetValue(),
+                OverlayText: OverlayText.GetValue(),
+                LanguageID: LanguageID.GetValue(),
+                CssClassesToSave: ComposeBannerCssClassesListBox.GetSelectedValues(),
+                ForegroundColour: $("#foreground").val(),
+                BackgroundColour: $("#background").val(),
+                TradeSwitch: TradeSwitch.GetValue()
+            },
+            success: function (data) {
+                $("#banner-details-container").html(data);
+                SuccessFade($("#banner-details-save"));
+                BannerSelectorGridView.Refresh();
+            },
+            error: function (e, s, a) {
+                $("#banner-details-container").html(e.responseText);
+                FailureFade($("#banner-details-save"));
+            },
+            timeout: 20000
+        });
+    }
+
+    function InitCountryDragDrop() {
+        $("#country-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".country-restriction-flag",
+            placeholder: ".ui-state-highlight-country-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('country-flag')) {
+                    $("#country-restriction-section").sortable("refresh");
+                    window.CountryRestrictions = new Array();
+                    if ($("#country-restriction-placeholder").length > 0)
+                        $("#country-restriction-placeholder").remove();
+                    $("#country-restriction-section").children("div").each(function (index) {
+                        window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                    });
+                    UpdateCountryRestrictions();
+                }
+            }
+        });
+        $(".country-flag").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#country-restriction-section"
+        });
+    }
+
+    function UpdateCountryRestrictions() {
+        $("#country-restriction-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("UpdateBannerCountryRestrictions", "Banners")',
+            type: "POST",
+            traditional: true,
+            data: { BannerID: $("#selected-banner-id").val(), Countries: JSON.stringify(window.CountryRestrictions) },
+            success: function (data) {
+                $("#country-restriction-busy").fadeOut("fast");
+                $("#banner-country-container").html(data);
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a, function () {
+                    $("#country-restriction-busy").fadeOut("fast");
+                });
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveCountryFromRestriction() {
+        $("#country-restriction-section").sortable("refresh");
+        window.CountryRestrictions = new Array();
+        if ($("#country-restriction-placeholder").length > 0)
+            $("#country-restriction-placeholder").remove();
+        $("#country-restriction-section").children("div").each(function (index) {
+            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+        });
+        UpdateCountryRestrictions();
+    }
+
+    function RemoveAllCountryRestrictions() {
+        var confirm = window.confirm("Are you sure?");
+        if (confirm) {
+            window.CountryRestrictions = new Array();
+            UpdateCountryRestrictions();
+        }
+    }
+
+    function InitProductPagesDragDrop() {
+        $(".productpage").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }
+        });
+    }
+
+    function initDragDrop() {
+        $(".collection").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }
+        });
+
+        $(".image").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            }
+        });
+
+        $(".article").draggable({
+            helper: "clone",
+            start: function (ev, ui) {
+                $(ui.helper).css('z-index', '300000')
+            }
+        });
+    }
+
+    function InitPagesDragDrop() {
+        $("#page-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".page",
+            placeholder: ".ui-state-highlight-page-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('page')) {
+                    $("#page-restriction-section").sortable("refresh");
+                    window.PageRestrictions = new Array();
+                    if ($(".page-restriction-placeholder").length > 0)
+                        $(".page-restriction-placeholder").remove();
+                    $("#page-restriction-section").children("div").each(function (index) {
+                        window.PageRestrictions.push({ ID: $(this).data("page-id"), SortOrder: 0 });
+                    });
+                    UpdatePageRestrictions();
+                }
+            }
+        });
+        $(".page").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#page-restriction-section"
+        });
+    }
+
+    function BulkAddPages() {
+        $.confirm(function () {
+            window.PageRestrictions = new Array();
+            if ($(".page-restriction-placeholder").length > 0)
+                $(".page-restriction-placeholder").remove();
+            $("#page-restriction-section").children("div").each(function (index) {
+                window.PageRestrictions.push({ ID: $(this).data("page-id"), SortOrder: 0 });
+            });
+            $(".page").each(function () {
+                window.PageRestrictions.push({ ID: $(this).data("page-id"), SortOrder: 0 });
+            });
+            UpdatePageRestrictions();
+        }, function () { }, "Are you sure?");
+    }
+
+    function UpdatePageRestrictions() {
+        $("#page-restriction-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("UpdateBannerPageRestrictions", "Banners")',
+            type: "POST",
+            traditional: true,
+            data: { BannerID: $("#selected-banner-id").val(), Pages: JSON.stringify(window.PageRestrictions) },
+            success: function (data) {
+                $("#page-restriction-busy").fadeOut("fast");
+                $("#banner-page-container").html(data);
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a, function () {
+                    $("#page-restriction-busy").fadeOut("fast");
+                });
+            },
+            timeout: 20000
+        });
+    }
+
+    function removePageRestriction(ele) {
+        $.confirm(function () {
+            $(ele).parent().remove();
+            RemovePageFromRestriction()
+        }, function () {
+
+        });
+    }
+
+    function RemovePageFromRestriction() {
+        $("#page-restriction-section").sortable("refresh");
+        window.PageRestrictions = new Array();
+        if ($(".page-restriction-placeholder").length > 0)
+            $(".page-restriction-placeholder").remove();
+        $("#page-restriction-section").children("div").each(function (index) {
+            window.PageRestrictions.push({ ID: $(this).data("page-id"), SortOrder: 0 });
+        });
+        UpdatePageRestrictions();
+    }
+
+    function InitLinkDragDrop() {
+        // need the three droppable targets to be... well... droppable.
+        // collection, page, product-page-drop-target
+        $("#collection-drop-target").droppable({
+            accept: '.collection',
+            drop: function (ev, ui) {
+                $("#banner-collection-link").val($(ui.draggable).data("collection-id"));
+                $("#confirm-dialog").dialog("open");
+            }
+        });
+        $("#page-drop-target").droppable({
+            accept: '.page',
+            drop: function (ev, ui) {
+                $("#banner-page-link").val($(ui.draggable).data("page-id"));
+                $("#confirm-dialog").dialog("open");
+            }
+        });
+        $("#product-page-drop-target").droppable({
+            accept: '.productpage',
+            drop: function (ev, ui) {
+                $("#banner-product-page-link").val($(ui.draggable).data("product-page-id"));
+                $("#confirm-dialog").dialog("open");
+            }
+        });
+        $("#article-drop-target").droppable({
+            accept: '.article',
+            drop: function (ev, ui) {
+                $("#banner-article-link").val($(ui.draggable).data("article-id"));
+                $("#confirm-dialog").dialog("open");
+            }
+        });
+    }
+
+    // LinkTypeID: 1 == Page; 2 == Product Page; 3 == Collection; 4 == External
+    function UpdateBannerLink() {
+
+        var data = null;
+
+        switch (BannerLinkTypeID.GetValue()) {
+            case 1:
+                data = $("#banner-page-link").val();
+                break;
+            case 2:
+                data = $("#banner-product-page-link").val();
+                break;
+            case 3:
+                data = $("#banner-collection-link").val();
+                break;
+            case 4:
+                data = ExternalURL.GetValue();
+                break;
+            case 5:
+                break;
+            case 6:
+                data = $("#banner-article-link").val();
+                break;
+        }
+
+        if (BannerLinkTypeID.GetValue() != 5 && (data == null || data == "")) {
+            $("#bad-selection-dialog").dialog("open");
+            return false;
+        }
+
+        $("#banner-link-busy").fadeIn("fast");
+
+        $.ajax({
+            url: '@Url.Action("UpdateBannerLink", "Banners")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                BannerID: $("#selected-banner-id").val(),
+                LinkType: BannerLinkTypeID.GetValue(),
+                NewWindow: NewWindow.GetValue(),
+                Data: data
+            },
+            success: function (data) {
+                $("#banner-link-busy").fadeOut("fast");
+                $("#banner-link-container").html(data);
+                switch (BannerLinkTypeID.GetValue()) {
+                    case 1:
+                        SuccessFade($("#banner-page-link-save"));
+                        break;
+                    case 2:
+                        SuccessFade($("#banner-product-page-link-save"));
+                        break;
+                    case 3:
+                        SuccessFade($("#banner-collection-link-save"));
+                        break;
+                    case 4:
+                        SuccessFade($("#banner-external-link-save"));
+                        break;
+                    case 5:
+                        SuccessFade($("#banner-no-link-save"));
+                        break;
+                    case 6:
+                        SuccessFade($("#banner-article-link-save"));
+                        break;
+                }
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a, function () {
+                    $("#banner-link-busy").fadeOut("fast");
+                    switch (BannerLinkTypeID.GetValue()) {
+                        case 1:
+                            FailureFade($("#banner-page-link-save"));
+                            break;
+                        case 2:
+                            FailureFade($("#banner-product-page-link-save"));
+                            break;
+                        case 3:
+                            FailureFade($("#banner-collection-link-save"));
+                            break;
+                        case 4:
+                            FailureFade($("#banner-external-link-save"));
+                            break;
+                        case 5:
+                            FailureFade($("#banner-no-link-save"));
+                            break;
+                    }
+                });
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveBannerLink() {
+        var confirm = window.confirm("Are you sure you want to remove this banner's link?");
+        if (confirm) {
+            $("#banner-link-busy").fadeIn("fast");
+            $.ajax({
+                url: '@Url.Action("RemoveBannerLink", "Banners")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    BannerID: $("#selected-banner-id").val()
+                },
+                success: function (data) {
+                    $("#banner-link-busy").fadeOut("fast");
+                    $("#banner-link-container").html(data);
+                },
+                error: function (e, s, a) {
+                    $.showError(e, s, a, function () {
+                        $("#banner-link-busy").fadeOut("fast");
+                    });
+                },
+                timeout: 20000
+            });
+        }
+    }
+
+
+    function ExpandLHS() {
+        $('#banner-details-section').slideDown('fast');
+        $('#banner-link-section').slideDown('fast');
+        $('#banner-image-area').slideDown('fast');
+        $('#template-location-section').slideDown('fast');
+        $('#country-restriction-section').slideDown('fast');
+        $('#page-restriction-section').slideDown('fast');
+        $('#site-section-restriction-section').slideDown('fast');
+    }
+
+    function CollapseLHS() {
+        $('#banner-details-section').slideUp('fast');
+        $('#banner-link-section').slideUp('fast');
+        $('#banner-image-area').slideUp('fast');
+        $('#template-location-section').slideUp('fast');
+        $('#country-restriction-section').slideUp('fast');
+        $('#page-restriction-section').slideUp('fast');
+        $('#site-section-restriction-section').slideUp('fast');
+    }
+
+
+</script>
+
+<div id="confirm-dialog">
+    <h5 style="display: none;">Are you sure you wish to change this Banner's link?</h5>
+</div>
+
+<div id="bad-selection-dialog">
+    <h5 style="display: none;">You must provide something to link to.</h5>
+</div>
+
+<script type="text/javascript">
+    $("#confirm-dialog").dialog({
+        title: "Confirm",
+        width: "auto",
+        height: "auto",
+        resizable: false,
+        modal: true,
+        autoOpen: false,
+        buttons: {
+            Ok: function () {
+                $(this).dialog('close');
+                UpdateBannerLink($(this).data('link-type'));
+            },
+            Cancel: function () {
+                $(this).dialog('close');
+            }
+        }
+    })
+    $("#confirm-dialog > h5").css("display", "block");
+
+    $("#bad-selection-dialog").dialog({
+        title: "Confirm",
+        width: "auto",
+        height: "auto",
+        resizable: false,
+        modal: true,
+        autoOpen: false,
+        buttons: {
+            Ok: function () {
+                $(this).dialog('close');
+            }
+        }
+    })
+    $("#bad-selection-dialog > h5").css("display", "block");
+</script>
+
+<div id="schematic-dialog">
+    <img src="/images/admin/schematic.png?v=1" style="width: 600px; display: none;" title="Banner Location Schematic" />
+</div>
+
+<div id="email-schematic-dialog">
+    <div style="width: 342px; height: 500px; box-sizing: border-box; border: 1px dashed blue; padding: 2em;">
+        <h3>
+            Image A
+        </h3>
+        <p style="font-size: larger">
+            684px wide by 1000px tall
+        </p>
+    </div>
+    <hr />
+    <div style="width: 684px; height: 500px; box-sizing: border-box; border: 1px dashed #21bf20; padding: 2em;">
+        <h3>
+            Image B
+        </h3>
+        <p style="font-size: larger">
+            1368px wide by 1000px tall
+        </p>
+    </div>
+    <p style="font-size: small; margin-top: 15px; font-style: italic; width: 684px;">
+        Note: the popup will actually display at half the size of Image B, but for the sake of crisp clear images we ask that you provide larger source files so that they can be reduced down to fit, rather than scaled up to fit.
+    </p>
+</div>
+
+<script type="text/javascript">
+    $("#schematic-dialog").dialog({
+        title: 'Banner Location Schematic',
+        width: 'auto',
+        height: 'auto',
+        resizable: false,
+        autoOpen: false,
+        buttons: {
+            Ok: function () { $(this).dialog("close") }
+        }
+    });
+
+    $("#schematic-dialog > img").css("display", "block");
+
+
+    $("#email-schematic-dialog").dialog({
+        title: 'Email Popup Image Dimensions',
+        width: 'auto',
+        height: 'auto',
+        resizable: false,
+        autoOpen: false,
+        buttons: {
+            Ok: function () { $(this).dialog("close") }
+        }
+    });
+
+    $("#email-schematic-dialog > img").css("display", "block");
+</script>
+
+<input type="hidden" id="selected-banner-id" value="@(Model.BannerID)" />
+
+<h4 class="page-heading">
+    Compose Banner
+</h4>
+
+<div id="resource-panels" style="float: right; width: 986px;">
+    @Html.Partial("~/Views/ProductPages/ProductPageSearchPartial.cshtml")
+    @Html.Partial("~/Views/Collections/CollectionSearchPartial.cshtml")
+    @Html.Partial("~/Views/Pages/PageSearchPartial.cshtml")
+    @Html.Partial("~/Views/Articles/ArticleSearchPartial.cshtml")
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+    @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+</div>
+
+<div style="float: left; width: 986px;">
+    <div id="banner-select-header-container">
+        <div class="content-panel-container">
+            <fieldset id="banner-select-header">
+                <legend style="color: black; border-bottom-color: #929292;" onclick="$('#banner-select-header-inner').slideToggle('fast');">
+                    Banner Selector (click to expand / contract)
+                </legend>
+                <div id="banner-select-header-inner" style="padding-top: 4px; padding-bottom: 0;">
+                    @Html.Action("ComposeBannerHeaderBannerLocationDropDownPartial", "Banners")
+                    @Html.Action("ComposeBannerHeaderSiteSectionDropDownPartial", "Banners")
+                    @Html.Action("ComposeBannerHeaderCountryDropDownPartial", "Banners")
+                    @Html.Action("ComposeBannerHeaderPageComboBoxPartial", "Banners")
+                    @Html.Action("ComposeBannerHeaderTradeComboBoxPartial", "Banners")
+                    <div style="clear: both;"></div>
+                    <div id="banner-header-banner-drop-down-container">
+                        @Html.Partial("BannerSelectGridViewPartial", new Flock.ViewModels.BannerSelectGridSettings())
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div id="banner-compose-section" data-banner-id="@(Model.BannerID)">
+        @if (ViewData["InvalidBannerIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidBannerIDError"])</h5>
+        }
+        @if (Model.BannerID != null)
+        {
+            @Html.Partial("BannerComposePartial", Model)
+        }
+    </div>
+</div>
+
+<div style="clear: both"></div>

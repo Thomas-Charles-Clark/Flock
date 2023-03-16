@@ -1,0 +1,35 @@
+﻿@model List<Flock.Models.Menu>
+<div id="compose-section">
+    <div class="content-panel-container">
+        <fieldset id="page-select-header">
+            <legend style="cursor: default">
+                Menu Builder
+            </legend>
+            <div id="select-header-inner" style="background-color: white;">
+                <div id="menu-builder-container" style="display: none;">
+                    <ul>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            <li><a href="#menu-@((i+1).ToString())">@(Model[i].LocalName)</a></li>
+                        }
+                        @*<li><a href="#menu-1">@(Model.Where(p => p.MenuID == 0).SingleOrDefault().Name)</a></li>*@
+                    </ul>
+
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <div id="menu-@((i+1).ToString())">
+                            @Html.Action("MenuItemsBuilderPartial", "CMS", new { MenuID = Model[i].MenuID, TradeSwitch = Model[i].TradeSwitch })
+                        </div>
+                    }
+                </div>
+                <div style="clear: both"></div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+<div style="clear: both"></div>
+
+<script type="text/javascript">
+    $("#menu-builder-container").tabs({});
+    $("#menu-builder-container").show();
+</script>

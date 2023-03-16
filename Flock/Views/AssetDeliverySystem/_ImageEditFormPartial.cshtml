@@ -1,0 +1,151 @@
+﻿@model Flock.ViewModels.AdvertisingImageEditModel
+
+<div id="name-description-container">
+    @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+    {
+        settings.Properties.MaxLength = 50;
+        settings.Properties.Caption = "Name";
+        settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Top;
+        settings.ShowModelErrors = true;
+        settings.Width = 300;
+        settings.Style.Add("margin-bottom", "15px");
+    }).GetHtml()
+
+    @Html.DevExpress().MemoFor(m => Model.Description, settings =>
+    {
+        settings.Properties.Rows = 10;
+        settings.Properties.MaxLength = 4000;
+        settings.Properties.Caption = "Description";
+        settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Top;
+        settings.ShowModelErrors = true;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Style.Add("margin-bottom", "15px");
+    }).GetHtml()
+</div>
+<div id="thumbnail-container">
+    @if (Model.UniqueThumbnailFilename != null)
+    {
+        <img src="~/Images/AssetDistributionSystem/Thumbnails/@(Model.UniqueThumbnailFilename)" title="@(Model.ThumbnailFilename)" />
+    }
+</div>
+
+<div class="clearfix"></div>
+
+<p class="edit-form-notes">
+    Thumbnail: .jpg or .jpeg, maximum 400px wide<br/>
+    Web Quality: .jpg or .jpeg, less than 40mb file size<br/>
+    Print Quality .jpg, .jpeg, .tif, .tiff, .tga or .targa, less than 500mb file size.
+</p>
+
+<div id="upload-controls-container">
+    <label class="dxeCaption_MetropolisBlue image-upload-caption">Thumbnail Image: <span id="thumbnail-filename">@(Model.ThumbnailFilename)</span></label>
+    @using (Html.BeginForm("ThumbnailUploadControlUpload", "AssetDeliverySystem", FormMethod.Post))
+    {
+        @Html.DevExpress().UploadControl(settings =>
+        {
+            settings.Name = "ThumbnailUploadControl";
+
+            settings.CallbackRouteValues = new { Controller = "AssetDeliverySystem", Action = "ThumbnailUploadControlUpload" };
+
+            settings.AdvancedModeSettings.EnableDragAndDrop = true;
+
+            settings.ShowUploadButton = true;
+            settings.ShowProgressPanel = true;
+
+            settings.Style.Add("margin-bottom", "15px");
+
+            settings.ValidationSettings.Assign(Flock.Controllers.AssetDeliverySystemControllerThumbnailUploadControlSettings.UploadValidationSettings);
+
+            settings.ClientSideEvents.FileUploadComplete = @"function(s, e) {
+                var d = $.parseJSON(e.callbackData);
+                console.log(d);
+                $('#thumbnail-filename').text(d.fileName);
+                $('#thumbnail-container').empty();
+                var t = $(""<img src='"" + d.filePath + ""' title='"" + d.fileName + ""'/> "");
+                $('#thumbnail-container').append(t);
+                RefreshPartial();
+            }";
+        }).GetHtml()
+        <input type="hidden" name="advertising-image-id" value="@(Model.AdvertisingImageID)" />
+    }
+
+    <label class="dxeCaption_MetropolisBlue image-upload-caption">Web Quality Image: <span id="web-quality-filename">@(Model.WebQualityFilename)</span></label>
+    @using (Html.BeginForm("WebQualityUploadControlUpload", "AssetDeliverySystem", FormMethod.Post))
+    {
+        @Html.DevExpress().UploadControl(settings =>
+        {
+            settings.Name = "WebQualityUploadControl";
+
+            settings.CallbackRouteValues = new { Controller = "AssetDeliverySystem", Action = "WebQualityUploadControlUpload" };
+
+            settings.AdvancedModeSettings.EnableDragAndDrop = true;
+
+            settings.ShowUploadButton = true;
+            settings.ShowProgressPanel = true;
+
+            settings.Style.Add("margin-bottom", "15px");
+
+            settings.ValidationSettings.Assign(Flock.Controllers.AssetDeliverySystemControllerWebQualityUploadControlSettings.UploadValidationSettings);
+
+            settings.ClientSideEvents.FileUploadComplete = @"function(s, e) {
+                var d = $.parseJSON(e.callbackData);
+                $('#web-quality-filename').text(d.fileName);
+                RefreshPartial();
+            }";
+        }).GetHtml()
+        <input type="hidden" name="advertising-image-id" value="@(Model.AdvertisingImageID)" />
+    }
+
+    <label class="dxeCaption_MetropolisBlue image-upload-caption">Print Quality Image: <span id="print-quality-filename">@(Model.PrintQualityFilename)</span></label>
+    @using (Html.BeginForm("PrintQualityUploadControlUpload", "AssetDeliverySystem", FormMethod.Post))
+    {
+        @Html.DevExpress().UploadControl(settings =>
+        {
+            settings.Name = "PrintQualityUploadControl";
+
+            settings.CallbackRouteValues = new { Controller = "AssetDeliverySystem", Action = "PrintQualityUploadControlUpload" };
+
+            settings.AdvancedModeSettings.EnableDragAndDrop = true;
+
+            settings.ShowUploadButton = true;
+            settings.ShowProgressPanel = true;
+
+            settings.Style.Add("margin-bottom", "15px");
+
+            settings.ValidationSettings.Assign(Flock.Controllers.AssetDeliverySystemControllerPrintQualityUploadControlSettings.UploadValidationSettings);
+
+            settings.ClientSideEvents.FileUploadComplete = @"function(s, e) {
+                var d = $.parseJSON(e.callbackData);
+                $('#print-quality-filename').text(d.fileName);
+                RefreshPartial();
+            }";
+        }).GetHtml()
+        <input type="hidden" name="advertising-image-id" value="@(Model.AdvertisingImageID)" />
+    }
+</div>
+<div class="clearfix"></div>
+
+<div id="edit-form-dates-container">
+    @Html.DevExpress().DateEditFor(m => Model.OnDate, settings =>
+{
+    settings.Properties.Caption = "On Date";
+    settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Top;
+    settings.ShowModelErrors = true;
+    settings.Style.Add("float", "left");
+}).GetHtml()
+
+    @Html.DevExpress().DateEditFor(m => Model.OffDate, settings =>
+    {
+        settings.Properties.Caption = "Off Date";
+        settings.Properties.CaptionSettings.Position = EditorCaptionPosition.Top;
+        settings.ShowModelErrors = true;
+        settings.Style.Add("float", "left");
+    }).GetHtml()
+    <div class='clearfix'></div>
+</div>
+
+<div class="popup-button-container">
+    <button class='btn btn-success' onclick='UpdateImage(@(Model.AdvertisingImageID));'><span class='glyphicon glyphicon-check'></span>Ok</button>
+    <button class='btn btn-danger' onclick='CancelEdit();'><span class='glyphicon glyphicon-remove-circle'></span>Cancel</button>
+</div>
+<div class='clearfix'></div>

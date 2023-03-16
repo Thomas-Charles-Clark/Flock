@@ -1,0 +1,123 @@
+﻿@model Flock.ViewModels.ApprovalRequestEditModel
+@using Flock.DAL;
+@using Flock.Models;
+@{ 
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ApprovalRequestGridView";
+
+        settings.CallbackRouteValues = new { controller = "AssetDeliverySystem", action = "ApprovalRequestGridViewPartial" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { controller = "AssetDeliverySystem", action = "ApprovalRequestGridViewUpdate" };
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+            e.customArgs['userId'] = '" + Model.UserID + @"';
+        }";
+
+        settings.KeyFieldName = "ApprovalRequestID";
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+        settings.SettingsBehavior.FilterRowMode = GridViewFilterRowMode.Auto;
+
+        MVCxGridViewColumn ApprovalRequestIDColumn = new MVCxGridViewColumn();
+        ApprovalRequestIDColumn.Name = "ApprovalRequestID";
+        ApprovalRequestIDColumn.FieldName = "ApprovalRequestID";
+        ApprovalRequestIDColumn.Caption = "Approval Request ID";
+        ApprovalRequestIDColumn.SortDescending();
+        settings.Columns.Add(ApprovalRequestIDColumn);
+
+        MVCxGridViewColumn RequestDTColumn = new MVCxGridViewColumn();
+        RequestDTColumn.Name = "RequestDT";
+        RequestDTColumn.FieldName = "RequestDT";
+        RequestDTColumn.Caption = "Request Date";
+        RequestDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        settings.Columns.Add(RequestDTColumn);
+
+        MVCxGridViewColumn WebsiteURLColumn = new MVCxGridViewColumn();
+        WebsiteURLColumn.Name = "WebsiteURL";
+        WebsiteURLColumn.FieldName = "WebsiteURL";
+        WebsiteURLColumn.Caption = "Website";
+        settings.Columns.Add(WebsiteURLColumn);
+
+        MVCxGridViewColumn DigitalMarketingColumn = new MVCxGridViewColumn();
+        DigitalMarketingColumn.Name = "DigitalMarketing";
+        DigitalMarketingColumn.FieldName = "DigitalMarketing";
+        DigitalMarketingColumn.Caption = "Digital Marketing";
+        settings.Columns.Add(DigitalMarketingColumn);
+
+        MVCxGridViewColumn DirectMarketingColumn = new MVCxGridViewColumn();
+        DirectMarketingColumn.Name = "DirectMarketing";
+        DirectMarketingColumn.FieldName = "DirectMarketing";
+        DirectMarketingColumn.Caption = "Direct Marketing";
+        settings.Columns.Add(DirectMarketingColumn);
+
+        MVCxGridViewColumn PublicationNameColumn = new MVCxGridViewColumn();
+        PublicationNameColumn.Name = "PrintAdvertPublicationName";
+        PublicationNameColumn.FieldName = "PrintAdvertPublicationName";
+        PublicationNameColumn.Caption = "Publication Name";
+        settings.Columns.Add(PublicationNameColumn);
+
+        MVCxGridViewColumn PublicationDTColumn = new MVCxGridViewColumn();
+        PublicationDTColumn.Name = "PrintAdvertPublicationDT";
+        PublicationDTColumn.FieldName = "PrintAdvertPublicationDT";
+        PublicationDTColumn.Caption = "Publication Date";
+        settings.Columns.Add(PublicationDTColumn);
+
+        MVCxGridViewColumn ApprovalStatusColumn = new MVCxGridViewColumn();
+        ApprovalStatusColumn.Name = "ApprovalStatus";
+        ApprovalStatusColumn.FieldName = "ApprovalStatus";
+        ApprovalStatusColumn.Caption = "Approval Status";
+        settings.Columns.Add(ApprovalStatusColumn);
+
+        MVCxGridViewColumn ApprovalExpiryColumn = new MVCxGridViewColumn();
+        ApprovalExpiryColumn.Name = "ApprovalExpiryDT";
+        ApprovalExpiryColumn.FieldName = "ApprovalExpiryDT";
+        ApprovalExpiryColumn.Caption = "Approval Expiry";
+        settings.Columns.Add(ApprovalExpiryColumn);
+
+        settings.HtmlRowPrepared += (s, e) => {
+            if(e.RowType == GridViewRowType.Data)
+            {
+                if (Convert.ToInt32(e.KeyValue) == Model.MostRecentApprovalRequestID)
+                {
+                    e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#d5f5ff");
+                }
+                else
+                {
+                    e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#dcdcdc");
+                }
+            }
+        };
+
+         /*
+            Sooo... what are we doing about this. We'd like the ability to set this really quickly.
+
+            Approval Status is a... drop down?
+
+            Which permits you to select Indefinite | Expiring | Null 
+
+            if you've selected expiring, you must set an expiry dt.
+         */
+
+        settings.SetEditFormTemplateContent(c => {
+            if (Model.ApprovalRequestID == null)
+            {
+                Html.RenderAction("ApprovalRequestEditFormPartial", new { ApprovalRequestID = c.KeyValue });
+            }
+            else
+            {
+                Html.RenderPartial("_ApprovalRequestEditFormPartial", Model);
+            }
+        });
+    });
+}
+@grid.BindToLINQ("", "", (s, e) => {
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<ApprovalRequest>().GetAll().Where(p => p.Id == Model.UserID);
+
+    e.QueryableSource = source;
+    e.KeyExpression = "ApprovalRequestID";
+}).GetHtml()

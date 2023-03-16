@@ -1,0 +1,304 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "DeliveryOptionGridView";
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.CallbackRouteValues = new { Controller = "eCommerce", Action = "DeliveryOptionGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryOptionGridViewAddNew" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "eCommerce", Action = "DeliveryOptionGridViewDelete" };
+
+        settings.CustomActionRouteValues = new { Controller = "eCommerce", Action = "DeliveryOptionGridViewPartialCustomCommand" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.SettingsBehavior.ConfirmDelete = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.KeyFieldName = "DeliveryID";
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            if(s.callbackCustomArgs.commandType == 'Delete') {
+                if(s.callbackCustomArgs.keyString == $('#selected-delivery-id').val()) {
+                    $('#selected-delivery-id').val(null);
+                    $('#delivery-compose-container').html('');
+                }
+            }
+        }";
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+            var id = s.GetRowKey(e.visibleIndex);
+            $('#selected-delivery-id').val(id);
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + @Url.Action("ChangeDeliveryOption", "eCommerce") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    DeliveryID: id
+                },
+                success: function(data) {
+                    $('#delivery-compose-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 20000
+            });
+        }";
+
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "DeliveryID").DisplayFormat = "Total: {0:n0}";
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.Styles.Row.Cursor = "pointer";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.Width = 50;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.SetHeaderTemplateContent(c =>
+        {
+            Html.DevExpress().CheckBox(settingsCheckBox =>
+            {
+                settingsCheckBox.Name = "cbSelectAll";
+                settingsCheckBox.Properties.ClientSideEvents.CheckedChanged = string.Format("function(s, e) {{ if(s.GetChecked()) {0}.SelectAllRowsOnPage(s.GetChecked()); else {0}.UnselectAllRowsOnPage(s.GetChecked()); }}", settings.Name);
+                settingsCheckBox.Checked = c.Grid.VisibleRowCount == c.Grid.Selection.Count;
+            }).Render();
+            ViewContext.Writer.Write("<a class=\"dxgvCommandColumnItem_MetropolisBlue dxgv__cci\" onclick=\"DeliveryOptionGridView.AddNewRow();\" href=\"javascript:;\">New</a>");
+        });
+
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.Settings.ShowFilterRow = true;
+
+        settings.SettingsPager.Mode = GridViewPagerMode.EndlessPaging;
+        // property to EndlessPaging, and the Settings.VerticalScrollBarMode
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+        settings.Settings.VerticalScrollableHeight = 380;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsPager.PageSizeItemSettings.Visible = false;
+        settings.SettingsPager.PageSize = 10;
+
+        settings.SettingsBehavior.AllowFocusedRow = true;
+
+        MVCxGridViewColumn DeliveryIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn DeliveryServiceIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn HaulCodeColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CarrCodeColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PostCodeRestrictionsColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn MinThresholdColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn MaxThresholdColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PricePerItemColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn PricePerDispatchColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn OnDateColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn OffDateColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+
+        DeliveryIDColumn.Name = "DeliveryID";
+        DeliveryIDColumn.FieldName = "DeliveryID";
+        DeliveryIDColumn.Caption = "Delivery ID";
+        DeliveryIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        DeliveryIDColumn.Width = 65;
+        DeliveryIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        DeliveryIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        DeliveryIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        DeliveryIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(DeliveryIDColumn);
+
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        NameColumn.Width = 130;
+        NameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        var nProp = NameColumn.PropertiesEdit as TextBoxProperties;
+        nProp.MaxLength = 100;
+        NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        NameColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(NameColumn);
+
+        DeliveryServiceIDColumn.Name = "DeliveryServiceID";
+        DeliveryServiceIDColumn.FieldName = "DeliveryServiceID";
+        DeliveryServiceIDColumn.Caption = "Delivery Service";
+        DeliveryServiceIDColumn.Width = 85;
+        DeliveryServiceIDColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        DeliveryServiceIDColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        DeliveryServiceIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        DeliveryServiceIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        DeliveryServiceIDColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        DeliveryServiceIDColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var plProp = DeliveryServiceIDColumn.PropertiesEdit as ComboBoxProperties;
+        plProp.TextField = "Name";
+        plProp.ValueField = "DeliveryServiceID";
+        plProp.ValueType = typeof(byte);
+        plProp.DataSource = UoW.GetRepository<DeliveryService>().GetAll().ToList();
+        settings.Columns.Add(DeliveryServiceIDColumn);
+        
+        HaulCodeColumn.Name = "HAULCODE";
+        HaulCodeColumn.FieldName = "HAULCODE";
+        HaulCodeColumn.Caption = "HAULCODE";
+        HaulCodeColumn.Width = 65;
+        HaulCodeColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        HaulCodeColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        HaulCodeColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        HaulCodeColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(HaulCodeColumn);
+
+        CarrCodeColumn.Name = "CARRCODE";
+        CarrCodeColumn.FieldName = "CARRCODE";
+        CarrCodeColumn.Caption = "CARRCODE";
+        CarrCodeColumn.Width = 65;
+        CarrCodeColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        CarrCodeColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CarrCodeColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        CarrCodeColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(CarrCodeColumn);
+
+        PostCodeRestrictionsColumn.Name = "PostCodeRestrictions";
+        PostCodeRestrictionsColumn.FieldName = "PostCodeRestrictions";
+        PostCodeRestrictionsColumn.Caption = "PostCode Restrictions";
+        PostCodeRestrictionsColumn.Width = 90;
+        PostCodeRestrictionsColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        PostCodeRestrictionsColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        PostCodeRestrictionsColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PostCodeRestrictionsColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        PostCodeRestrictionsColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        //settings.Columns.Add(PostCodeRestrictionsColumn);
+
+        MinThresholdColumn.Name = "MinThreshold";
+        MinThresholdColumn.FieldName = "MinThreshold";
+        MinThresholdColumn.Caption = "Min";
+        MinThresholdColumn.Width = 55;
+        MinThresholdColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        MinThresholdColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var minThresProp = MinThresholdColumn.PropertiesEdit as SpinEditProperties;
+        minThresProp.NumberFormat = SpinEditNumberFormat.Number;
+        minThresProp.DisplayFormatString = "F2";
+        minThresProp.LargeIncrement = 10;
+        minThresProp.Increment = 1;
+        MinThresholdColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        MinThresholdColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        MinThresholdColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(MinThresholdColumn);
+
+        MaxThresholdColumn.Name = "MaxThreshold";
+        MaxThresholdColumn.FieldName = "MaxThreshold";
+        MaxThresholdColumn.Caption = "Max";
+        MaxThresholdColumn.Width = 55;
+        MaxThresholdColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        MaxThresholdColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var maxThresProp = MinThresholdColumn.PropertiesEdit as SpinEditProperties;
+        maxThresProp.NumberFormat = SpinEditNumberFormat.Number;
+        maxThresProp.DisplayFormatString = "F2";
+        maxThresProp.LargeIncrement = 10;
+        maxThresProp.Increment = 1;
+        MaxThresholdColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        MaxThresholdColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        MaxThresholdColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(MaxThresholdColumn);
+
+
+        PricePerItemColumn.Name = "PricePerItem";
+        PricePerItemColumn.FieldName = "PricePerItem";
+        PricePerItemColumn.Caption = "Price Per Item";
+        PricePerItemColumn.Width = 65;
+        PricePerItemColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        PricePerItemColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var ppiProp = PricePerItemColumn.PropertiesEdit as SpinEditProperties;
+        ppiProp.NumberFormat = SpinEditNumberFormat.Number;
+        ppiProp.DisplayFormatString = "F2";
+        ppiProp.LargeIncrement = 10;
+        ppiProp.Increment = 1;
+        PricePerItemColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PricePerItemColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        PricePerItemColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(PricePerItemColumn);
+
+        PricePerDispatchColumn.Name = "PricePerDispatch";
+        PricePerDispatchColumn.FieldName = "PricePerDispatch";
+        PricePerDispatchColumn.Caption = "Price Per Dispatch";
+        PricePerDispatchColumn.Width = 65;
+        PricePerDispatchColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        PricePerDispatchColumn.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        var ppdProp = PricePerDispatchColumn.PropertiesEdit as SpinEditProperties;
+        ppdProp.NumberFormat = SpinEditNumberFormat.Number;
+        ppdProp.DisplayFormatString = "F2";
+        ppdProp.LargeIncrement = 10;
+        ppdProp.Increment = 1;
+        PricePerDispatchColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        PricePerDispatchColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        PricePerDispatchColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(PricePerDispatchColumn);
+
+        CreatedDTColumn.Name = "CreatedDTColumn";
+        CreatedDTColumn.FieldName = "CreatedDT";
+        CreatedDTColumn.Caption = "Created";
+        CreatedDTColumn.Width = 75;
+        CreatedDTColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        CreatedDTColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        CreatedDTColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        CreatedDTColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CreatedDTColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        //settings.Columns.Add(CreatedDTColumn);
+
+        OnDateColumn.Name = "OnDateColumn";
+        OnDateColumn.FieldName = "OnDate";
+        OnDateColumn.Caption = "On Date";
+        OnDateColumn.Width = 75;
+        OnDateColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        OnDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OnDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OnDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OnDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(OnDateColumn);
+
+        OffDateColumn.Name = "OffDateColumn";
+        OffDateColumn.FieldName = "OffDate";
+        OffDateColumn.Caption = "Off Date";
+        OffDateColumn.Width = 75;
+        OffDateColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        OffDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+        OffDateColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        OffDateColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        OffDateColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(OffDateColumn);
+        
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "DeliveryTypeID":
+                    e.Values.Clear();
+                    foreach (var v in UoW.GetRepository<DeliveryType>().GetAll().OrderBy(p => p.DeliveryTypeID))
+                    {
+                        e.AddValue(v.Name, v.DeliveryTypeID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                default: break;
+            }
+        };
+    });
+}
+@grid.BindToLINQ("", "", (s, e) =>
+{
+    //var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<Delivery>().GetAll().Where(p => p.DeletedDT == null);
+
+    e.KeyExpression = "DeliveryID";
+    e.QueryableSource = source;
+}).GetHtml()

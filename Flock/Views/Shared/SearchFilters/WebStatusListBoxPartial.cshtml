@@ -1,0 +1,426 @@
+﻿@model List<Flock.Models.Status>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    if (action == "ProductSearchWebStatusDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductSearchWebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#product-searching-icon').fadeIn('fast');
+            ProductSearchWebStatusDD.SetText(s.GetSelectedItem().text);
+            ProductSearchWebStatusDD.HideDropDown();
+            $('#product-searching-icon').fadeIn('fast');
+            var SearchText = ProductSearchNameOrIDTextBox.GetText();
+            $.ajax({
+                url: '" + Url.Action("ProductSearch", "Products") + @"',
+                traditional: true,
+                data: { 
+                    ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                    BrandID: ProductSearchBrandListBox.GetValue(),
+                    LaunchID: ProductSearchLaunchListBox.GetValue(),
+                    PatternID: ProductSearchPatternListBox.GetValue(),
+                    Status: ProductSearchStatusListBox.GetValue(),
+                    StatusID: ProductSearchWebStatusListBox.GetValue(),
+                    StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                    CollectionID: ProductSearchCollectionListBox.GetValue(),
+                    ColourID: ProductSearchColourListBox.GetValue(),
+                    SearchString: SearchText,
+                    ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                    PriceListID: ProductSearchPriceListListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#product-data-view-container').html(data);
+                    $('#product-searching-icon').fadeOut('slow');
+                },
+                error: function(e, s, a) {
+                    $('#product-searching-icon').fadeOut('slow');
+                    alert(e.responseText);
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    else if (action == "ProductPageSearchStatusDropDownPartial")
+    {
+        listBoxSettings.Name = "ProductPageSearchStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#product-page-searching-icon').fadeIn('fast');
+            ProductPageSearchStatusDD.SetText(s.GetSelectedItem().text);
+            ProductPageSearchStatusDD.HideDropDown();
+            $.ajax({
+	            url: '" + Url.Action("ProductPageSearch", "ProductPages") + @"',
+	            traditional: true,
+	            data: {
+		            ProductTypeID: ProductPageSearchProductTypeListBox.GetValue(),
+		            BrandID: ProductPageSearchBrandListBox.GetValue(),
+		            LaunchID: ProductPageSearchLaunchListBox.GetValue(),
+		            CollectionID: ProductPageSearchCollectionListBox.GetValue(),
+		            PatternID: ProductPageSearchPatternListBox.GetValue(),
+		            ColourID: ProductPageSearchColourListBox.GetValue(),
+		            StatusID: ProductPageSearchStatusListBox.GetValue(),
+                    TemplateID: ProductPageSearchTemplateListBox.GetValue(),
+		            SearchString: ProductPageSearchNameTextBox.GetValue()
+	            },
+	            success: function(data) {
+		            $('#product-page-searching-icon').fadeOut('fast');
+		            $('#product-page-data-view-container').html(data);
+	            },
+	            error: function(e, s, a) { 
+		            $('#product-page-searching-icon').fadeOut('fast');
+		            alert(e.responseText);
+	            },
+	            timeout: 60000
+            });
+        }";
+    }
+    else if (action == "ComposeProductPageHeaderWebStatusDropDownPartial")
+    {
+        listBoxSettings.Name = "ComposeProductPageHeaderWebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            ComposeProductPageHeaderWebStatusDD.HideDropDown();
+            ComposeProductPageHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+
+            $('#product-page-header-searching-icon').fadeIn('fast');
+	        $.ajax({
+		        url: '" + Url.Action("ComposeProductPageHeader", "ProductPages") + @"',
+                type: 'POST',
+		        traditional: true,
+		        data: {
+			        ProductTypeID: ComposeProductPageHeaderProductTypeListBox.GetValue(),
+			        BrandID: ComposeProductPageHeaderBrandListBox.GetValue(),
+			        LaunchID: ComposeProductPageHeaderLaunchListBox.GetValue(),
+			        WebStatusID: ComposeProductPageHeaderWebStatusListBox.GetValue(),
+			        TemplateID: ComposeProductPageHeaderTemplateListBox.GetValue()
+		        },
+		        success: function(data) {
+			        $('#product-page-header-searching-icon').fadeOut('fast');
+                    $('#product-select-header-container').html(data);
+		        },
+		        error: function(e, s, a) { 
+			        $('#product-page-header-searching-icon').fadeOut('fast');
+			        alert(e.responseText);
+		        },
+		        timeout: 60000
+	        });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.ProductHeaderSelectedWebStatusID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ComposeProductPageHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "AttributeHeaderWebStatusDropDownPartial")
+    {
+        listBoxSettings.Name = "AttributeWebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            AttributeWebStatusDD.HideDropDown();
+            AttributeWebStatusDD.SetText(s.GetSelectedItem().text);
+            
+            $('#attribute-product-page-select-busy').fadeIn('fast');
+            $.ajax({
+                url: '" + Url.Action("ProductPageAttributeHeader", "ProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ProductTypeID: AttributeProductTypeListBox.GetValue(),
+                    BrandID: AttributeBrandListBox.GetValue(),
+                    LaunchID: AttributeLaunchListBox.GetValue(),
+                    WebStatusID: AttributeWebStatusListBox.GetValue(),
+                    TemplateID: AttributeTemplateListBox.GetValue()
+                },
+                success: function(data) {
+                    $('#attribute-filter-header').html(data);
+                    AttributeProductPageListBox.PerformCallback();
+                },
+                error: function(e, s, a) { 
+                    $('#attribute-product-page-select-busy').fadeOut('fast');
+                    alert(e.responseText);
+                },
+                timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.AttributeHeaderSelectedWebStatusID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                AttributeWebStatusDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "ComposeBannerHeaderWebStatusDropDownPartial")
+    {
+        listBoxSettings.Name = "ComposeBannerHeaderWebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            ComposeBannerHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+            ComposeBannerHeaderWebStatusDD.HideDropDown();
+            $('#banner-select-header-busy').fadeIn('fast');
+            $.ajax({ 
+                url: '" + Url.Action("ComposeBannerHeaderBannerDropDownPartial", "Banners") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    SelectedBannerID: s.GetSelectedItem().value,
+                    SelectedBannerLocationID: ComposeBannerHeaderLocationListBox.GetValue(),
+                    SelectedSiteSectionID: ComposeBannerHeaderSiteSectionListBox.GetValue(), 
+                    SelectedCountryID: ComposeBannerHeaderCountryListBox.GetValue(), 
+                    SelectedLanguageID: ComposeBannerHeaderLanguageListBox.GetValue(),
+                    SelectedStatusID: ComposeBannerHeaderWebStatusListBox.GetValue()
+                },
+                success: function(data) { 
+                    $('#banner-select-header-busy').fadeOut('fast');
+                    $('#banner-header-banner-drop-down-container').html(data);
+                },
+                error: function(e, s, a) {
+                    $('#banner-select-header-busy').fadeOut('fast');
+                    alert(e.responseText);
+                },
+                timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.BannerSelectHeaderSelectedStatusID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                ComposeBannerHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "TranslateProductPageHeaderWebStatusDropDown")
+    {
+        listBoxSettings.Name = "TranslateProductPageHeaderWebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            TranslateProductPageHeaderWebStatusDD.HideDropDown();
+            TranslateProductPageHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+            var TargetLanguageID = null;
+            if(typeof(TranslationTargetLanguageListBox) != 'undefined' && typeof(TranslationTargetLanguageListBox) != false)
+                TargetLanguageID = TranslationTargetLanguageListBox.GetValue();
+            $('#translate-product-page-header-searching-icon').fadeIn('fast');
+            $.ajax({
+	            url: '" + Url.Action("TranslateProductPageHeader", "Translations") + @"',
+	            type: 'POST',
+	            traditional: true,
+	            data: { 
+		            ProductTypeID: TranslateProductPageHeaderProductTypeListBox.GetValue(),
+		            BrandID: TranslateProductPageHeaderBrandListBox.GetValue(),
+		            LaunchID: TranslateProductPageHeaderLaunchListBox.GetValue(),
+		            TemplateID: TranslateProductPageHeaderTemplateListBox.GetValue(),
+		            WebStatusID: TranslateProductPageHeaderWebStatusListBox.GetValue(),
+		            TranslationStatusID: TranslateProductPageHeaderTranslationStatusListBox.GetValue(),
+                    TargetLanguageID: TargetLanguageID
+	            },
+	            success: function(data) { 
+		            $('#translate-product-page-header-searching-icon').fadeOut('fast');
+		            $('#translate-product-page-header-container').html(data);
+                
+                    $('#default-fieldset').slideUp('fast');
+                    $('#translation-fieldset').slideUp('fast');
+	            },
+	            error: function(e, s, a) { 
+		            $('#translate-product-page-header-searching-icon').fadeOut('fast');
+		            alert(e.responseText);
+	            },
+	            timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.TranslateProductPageHeaderSelectedWebStatusID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                TranslateProductPageHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "TranslateCollectionHeaderWebStatusDropDown")
+    {
+        listBoxSettings.Name = "TranslateCollectionHeaderWebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            TranslateCollectionHeaderWebStatusDD.HideDropDown();
+            TranslateCollectionHeaderWebStatusDD.SetText(s.GetSelectedItem().text);                            
+            var TargetLanguageID = null;
+            if(typeof(TranslationTargetLanguageListBox) != 'undefined' && typeof(TranslationTargetLanguageListBox) != false)
+                TargetLanguageID = TranslationTargetLanguageListBox.GetValue();
+            $('#translate-collection-header-searching-icon').fadeIn('fast');
+            $.ajax({
+	            url: '" + Url.Action("TranslateCollectionHeader", "Translations") + @"',
+	            type: 'POST',
+	            traditional: true,
+	            data: { 
+		            ProductTypeID: TranslateCollectionHeaderProductTypeListBox.GetValue(),
+		            BrandID: TranslateCollectionHeaderBrandListBox.GetValue(),
+		            LaunchID: TranslateCollectionHeaderLaunchListBox.GetValue(),
+		            WebStatusID: TranslateCollectionHeaderWebStatusListBox.GetValue(),
+		            TranslationStatusID: TranslateCollectionHeaderTranslationStatusListBox.GetValue(),
+                    TargetLanguageID: TargetLanguageID
+	            },
+	            success: function(data) { 
+		            $('#translate-collection-header-searching-icon').fadeOut('fast');
+		            $('#translate-collection-header-container').html(data);
+	            },
+	            error: function(e, s, a) { 
+		            $('#translate-collection-header-searching-icon').fadeOut('fast');
+		            alert(e.responseText);
+	            },
+	            timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.TranslateCollectionHeaderSelectedWebStatusID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                TranslateCollectionHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "TranslatePageHeaderWebStatusDropDown")
+    {
+        listBoxSettings.Name = "TranslatePageHeaderWebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            TranslatePageHeaderWebStatusDD.HideDropDown();
+            TranslatePageHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+            $.ajax({
+	            url: '" + Url.Action("TranslatePageHeaderPageDropDown", "Translations") + @"',
+	            type: 'POST',
+	            traditional: true,
+	            data: {
+	                SelectedPageID: TranslateHeaderContentListBox.GetValue(),
+	                SelectedSiteSectionID: TranslatePageHeaderSiteSectionListBox.GetValue(),
+	                SelectedParentPageID: TranslatePageHeaderParentPageListBox.GetValue(),
+	                SelectedWebStatusID: TranslatePageHeaderWebStatusListBox.GetValue(),
+	                SelectedTranslationStatusID: TranslatePageHeaderTranslationStatusListBox.GetValue()
+	            },
+	            success: function(data) { 
+	                $('#translate-page-page-drop-down-container').html(data);
+	            },
+	            error: function(e, s, a) { 
+	                alert(e.responseText);
+	            },
+	            timeout: 60000
+            });
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) {
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.TranslatePageHeaderSelectedWebStatusID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                TranslatePageHeaderWebStatusDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else if (action == "ProductPage_StatusDropDown")
+    {
+        listBoxSettings.Name = "RelatedProductPagePrimaryStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            RelatedProductPagePrimaryStatusDD.SetText(s.GetSelectedItem().text);
+            RelatedProductPagePrimaryStatusDD.HideDropDown();
+            LoadingPanel.Show();
+            
+            var rpppnid = RelatedProductPagePrimaryNameOrIDTextBox.GetValue();
+
+            if (rpppnid == 'Name, Code or ID')
+                rpppnid = null;
+
+            LoadingPanel.Show();
+            $.ajax({ 
+                url: '" + @Url.Action("RelatedProductPagePartial", "RelatedProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    PP_NameOrID: rpppnid,
+                    PP_ProductTypeID: RelatedProductPagePrimaryProductTypeListBox.GetValue(),
+                    PP_CollectionID: RelatedProductPagePrimaryCollectionListBox.GetValue(),
+                    PP_BrandID: RelatedProductPagePrimaryBrandListBox.GetValue(),
+                    PP_LaunchID: RelatedProductPagePrimaryLaunchListBox.GetValue(),
+                    PP_TemplateID: RelatedProductPagePrimaryTemplateListBox.GetValue(),
+                    PP_StatusID: RelatedProductPagePrimaryStatusListBox.GetValue(),
+                    RPP_ProductTypeID: RelatedProductPageSecondaryProductTypeListBox.GetValue(),
+                    RPP_CollectionID: RelatedProductPageSecondaryCollectionListBox.GetValue(),
+                    RPP_BrandID: RelatedProductPageSecondaryBrandListBox.GetValue(),
+                    RPP_LaunchID: RelatedProductPageSecondaryLaunchListBox.GetValue(),
+                    RPP_TemplateID: RelatedProductPageSecondaryTemplateListBox.GetValue(),
+                    RPP_StatusID: RelatedProductPageSecondaryStatusListBox.GetValue(),
+                    RPP_Count: RelatedProductPageCount.GetValue(),
+                    RPP_CountOperator: RelatedProductPageCountOperator.GetValue(),
+                    PageLimit: PageLimit.GetValue(),
+                    PageOffset: $('#current-page').val()
+                },
+                success: function(data) { 
+                    $('#ajax-target').html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function(e, s, a) { 
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                    //log e
+                },
+                timeout: 30000
+            });
+        }";
+    }
+    else if (action == "RelatedProductPage_StatusDropDown")
+    {
+        listBoxSettings.Name = "RelatedProductPageSecondaryStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+            RelatedProductPageSecondaryStatusDD.SetText(s.GetSelectedItem().text);
+            RelatedProductPageSecondaryStatusDD.HideDropDown();
+            LoadingPanel.Show();
+            
+            var rpppnid = RelatedProductPagePrimaryNameOrIDTextBox.GetValue();
+
+            if (rpppnid == 'Name, Code or ID')
+                rpppnid = null;
+
+            LoadingPanel.Show();
+            $.ajax({ 
+                url: '" + @Url.Action("RelatedProductPagePartial", "RelatedProductPages") + @"',
+                type: 'POST',
+                traditional: true,
+                data: { 
+                    PP_NameOrID: rpppnid,
+                    PP_ProductTypeID: RelatedProductPagePrimaryProductTypeListBox.GetValue(),
+                    PP_CollectionID: RelatedProductPagePrimaryCollectionListBox.GetValue(),
+                    PP_BrandID: RelatedProductPagePrimaryBrandListBox.GetValue(),
+                    PP_LaunchID: RelatedProductPagePrimaryLaunchListBox.GetValue(),
+                    PP_TemplateID: RelatedProductPagePrimaryTemplateListBox.GetValue(),
+                    PP_StatusID: RelatedProductPagePrimaryStatusListBox.GetValue(),
+                    RPP_ProductTypeID: RelatedProductPageSecondaryProductTypeListBox.GetValue(),
+                    RPP_CollectionID: RelatedProductPageSecondaryCollectionListBox.GetValue(),
+                    RPP_BrandID: RelatedProductPageSecondaryBrandListBox.GetValue(),
+                    RPP_LaunchID: RelatedProductPageSecondaryLaunchListBox.GetValue(),
+                    RPP_TemplateID: RelatedProductPageSecondaryTemplateListBox.GetValue(),
+                    RPP_StatusID: RelatedProductPageSecondaryStatusListBox.GetValue(),
+                    RPP_Count: RelatedProductPageCount.GetValue(),
+                    RPP_CountOperator: RelatedProductPageCountOperator.GetValue(),
+                    PageLimit: PageLimit.GetValue(),
+                    PageOffset: $('#current-page').val()
+                },
+                success: function(data) { 
+                    $('#ajax-target').html(data);
+                    LoadingPanel.Hide();
+                },
+                error: function(e, s, a) { 
+                    LoadingPanel.Hide();
+                    alert(s + ' error: e.responseText was: ' + e.responseText);
+                    //log e
+                },
+                timeout: 30000
+            });
+        }";
+    }
+    else if (action == "PageComposePageSectionWebStatusDropDown")
+    {
+        listBoxSettings.Name = "PageSectionWebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            filterPageSections();
+            PageSectionWebStatusDD.HideDropDown();
+            PageSectionWebStatusDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+    else
+    {
+        listBoxSettings.Name = "WebStatusListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e){ 
+            alert('Not Implemented');
+        }";
+    }
+    
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    listBoxSettings.Properties.ValueField = "StatusID";
+    listBoxSettings.Properties.TextField = "Name";
+}
+).BindList(Model).GetHtml()

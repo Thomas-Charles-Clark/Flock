@@ -1,0 +1,62 @@
+﻿@model Flock.ViewModels.ProductDirectoryGridDetailViewModel
+@{
+    Layout = null;
+}
+
+@{      
+    long? FImageID = (long?)Model.FrontImageID;
+    long? BImageID = (long?)Model.BackImageID;
+    long? CImageID = (long?)Model.CloseupImageID;
+    long? SImageID = (long?)Model.StyledImageID;
+
+    var FImages = "<div class='image-column'><h5>Front</h5><ul id='front-image-list' class='image-list' data-perspective-id='1'>" + (FImageID != 0 ? "<li onmouseover=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)\" onmouseout=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)\"><img data-image-id='" + FImageID + "' class='image-column-large-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/195/" + FImageID + ".jpeg'/><img src='~/Images/SystemIcons/remove-icon.png' class='image-remove-icon' onclick='$(this).parent().remove(); RemoveImageFromPerspective(1, " + FImageID + ")' /></li><li><img data-image-id='-1' class='image-column-large-thumb' src='/Images/admin/image-not-set.png' alt='Image not set'/></li>" : "<li id='front-blank'></li>");
+    for (int i = 0; i < Model.UnselectedFrontImages.Count; i++)
+    {
+        FImages += "<li style='display: relative;' onmouseover=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)\" onmouseout=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)\"><img data-image-id='" + Model.UnselectedFrontImages[i] + "' class='front-image-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/195/" + Model.UnselectedFrontImages[i] + ".jpeg'/><img src='~/Images/SystemIcons/remove-icon.png' class='image-remove-icon' onclick='$(this).parent().remove(); RemoveImageFromPerspective(1, " + Model.UnselectedFrontImages[i] + ")' /></li>";
+    }
+    if (FImageID != 0)
+    {
+        FImages += "<li><img data-image-id='-1' src='/Images/admin/image-not-set.png' alt='Image Not Set'/></li>";
+    }
+    FImages += "</ul></div>";
+
+    var BImages = "<div class='image-column'><h5>Reverse</h5><ul id='back-image-list' class='image-list' data-perspective-id='2'>" + (BImageID != 0 ? "<li onmouseover=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)\" onmouseout=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)\"><img data-image-id='" + BImageID + "' class='image-column-large-thumb' alt='Back' src='https://flock.designersguild.com/imagelibrary/195/" + BImageID + ".jpeg'/><img data-image-id='" + Model.UnselectedBackImages[i] + "' class='back-image-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/195/" + BImageID + ".jpeg'/></li><li><img data-image-id='-1' class='image-column-large-thumb' src='/Images/admin/image-not-set.png' alt='Image not set'/></li>" : "<li id='back-blank'></li>");
+    for (int i = 0; i < Model.UnselectedBackImages.Count; i++)
+    {
+        BImages += "<li style='display: relative;' onmouseover=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)\" onmouseout=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)\"><img data-image-id='" + Model.UnselectedBackImages[i] + "' class='back-image-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/195/" + Model.UnselectedBackImages[i] + ".jpeg'/></li>";
+    }
+    if (BImageID != 0)
+    {
+        BImages += "<li><img data-image-id='-1' src='/Images/admin/image-not-set.png' alt='Image Not Set'/></li>";
+    }
+    BImages += "</ul></div>";
+
+    var CImages = "<div class='image-column'><h5>Closeup</h5><ul id='closeup-image-list' class='image-list' data-perspective-id='3'>" + (CImageID != 0 ? "<li onmouseover=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)\" onmouseout=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)\"><img data-image-id='" + CImageID + "' class='image-column-large-thumb' alt='Closeup' src='https://flock.designersguild.com/imagelibrary/195/" + CImageID + ".jpeg'/><img data-image-id='" + Model.UnselectedCloseupImages[i] + "' class='closeup-image-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/195/" + CImageID + ".jpeg'/></li><li><img src='~/Images/SystemIcons/remove-icon.png' class='image-remove-icon' onclick='$(this).parent().remove(); RemoveImageFromPerspective(3, " + Model.UnselectedCloseupImages[i] + ")' /></li>" : "<li id='closeup-blank'><img data-image-id='-1' class='image-column-large-thumb' src='/Images/admin/image-not-set.png' alt='Image not set'/></li>");
+    for (int i = 0; i < Model.UnselectedCloseupImages.Count; i++)
+    {
+        CImages += "<li style='display: relative;' onmouseover=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)\" onmouseout=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)\"><img data-image-id='" + Model.UnselectedCloseupImages[i] + "' class='closeup-image-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/195/" + Model.UnselectedCloseupImages[i] + ".jpeg'/></li>";
+    }
+    if (CImageID != 0)
+    {
+        CImages += "<li><img data-image-id='-1' src='/Images/admin/image-not-set.png' alt='Image Not Set'/></li>";
+    }
+    CImages += "</ul></div>";
+
+    var SImages = "<div class='image-column'><h5>Styled</h5><ul id='styled-image-list' class='image-list' data-perspective-id='4'>" + (SImageID != 0 ? "<li onmouseover=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)\" onmouseout=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)\"><img data-image-id='" + SImageID + "' class='image-column-large-thumb' alt='Styled' src='https://flock.designersguild.com/imagelibrary/195/" + SImageID + ".jpeg'/><img data-image-id='" + Model.UnselectedStyledImages[i] + "' class='styled-image-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/195/" + SImageID + ".jpeg'/></li><li><img src='~/Images/SystemIcons/remove-icon.png' class='image-remove-icon' onclick='$(this).parent().remove(); RemoveImageFromPerspective(4, " + Model.UnselectedCloseupImages[i] + ")' /></li>" : "<li id='styled-blank'><img data-image-id='-1' class='image-column-large-thumb' src='/Images/admin/image-not-set.png' alt='Image not set'/></li>");
+    for (int i = 0; i < Model.UnselectedStyledImages.Count; i++)
+    {
+        SImages += "<li style='display: relative;' onmouseover=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)\" onmouseout=\"$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)\"><img data-image-id='" + Model.UnselectedStyledImages[i] + "' class='styled-image-thumb' alt='Front' src='https://flock.designersguild.com/imagelibrary/195/" + Model.UnselectedStyledImages[i] + ".jpeg'/></li>";
+    }
+    if (SImageID != 0)
+    {
+        SImages += "<li><img data-image-id='-1' src='/Images/admin/image-not-set.png' alt='Image Not Set'/></li>";
+    }
+    SImages += "</ul></div>";
+
+    ViewContext.Writer.Write(
+        "<div class='product-overview-detail-row' style='white-space: nowrap;'>" +
+        "<div id='assigned-product-images'>" + FImages + BImages + CImages + SImages /*+ unlockImage*/ + "<div style='clear: both;'></div></div>" +
+        //"<img style='float: left; width: 4%; background-color: #C0C0C0;' src='/Images/admin/right-scroll-button.png' onclick='ScrollRight()' />" +
+        "</div>"
+    );
+}

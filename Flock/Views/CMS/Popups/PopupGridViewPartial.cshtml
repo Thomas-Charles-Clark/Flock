@@ -1,0 +1,16 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "PopupGridView";
+
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "PopupGridViewPartial" };
+    });
+}
+@grid.BindToLINQ("", "", (s, e) => {
+    var source = UoW.GetRepository<Popup>().GetAll().Where(p => p.DeletedDT == null);
+    e.KeyExpression = "PopupID";
+    e.QueryableSource = source;
+}).GetHtml()

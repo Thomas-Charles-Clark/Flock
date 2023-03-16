@@ -1,0 +1,69 @@
+@{
+	var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "GridView";
+        settings.CallbackRouteValues = new { Controller = "CallsToAction", Action = "GridViewPartial" };
+
+		settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "CallsToAction", Action = "GridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "CallsToAction", Action = "GridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "CallsToAction", Action = "GridViewPartialDelete" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+
+        settings.KeyFieldName = "StyleID";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.Styles.RowHotTrack.Cursor = "pointer";
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        
+		settings.Columns.Add("StyleID");
+        settings.Columns.Add("Name");
+        settings.ClientSideEvents.RowClick = "LoadStyleDetail";
+
+        var StyleIDColumn = settings.Columns["StyleID"] as MVCxGridViewColumn;
+        StyleIDColumn.Caption = "ID";
+        StyleIDColumn.Width = 90;
+        StyleIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        StyleIDColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        StyleIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        StyleIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        StyleIDColumn.Settings.AllowDragDrop = DefaultBoolean.False;
+
+        var NameColumn = settings.Columns["Name"] as MVCxGridViewColumn;
+        NameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        NameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        NameColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        NameColumn.Settings.AllowDragDrop = DefaultBoolean.False;
+        NameColumn.EditFormCaptionStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Middle;
+        NameColumn.EditFormCaptionStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+
+
+        settings.SettingsText.PopupEditFormCaption = "Create Style";
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.Width = 320;
+        settings.SettingsPopup.EditForm.Modal = true;
+        settings.SettingsEditing.EditFormColumnCount = 1;
+        
+        
+	});
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

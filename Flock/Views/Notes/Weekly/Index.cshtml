@@ -1,0 +1,119 @@
+﻿@model Flock.ViewModels.ReportingManagerViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/Notes.css")
+
+    <style type="text/css">
+    </style>
+}
+<script type="text/javascript">
+    var observations = null;
+    var objectives = null;
+
+    function TryGetRecord() {
+        //console.log("objectives: " + objectives);
+        //console.log("observations: " + observations);
+
+        if ($("#pricelist").length) {
+            if ((objectives != Objectives.GetText()) || (observations != Observations.GetText())) {
+                $.unsavedWarning(function (args) {
+                    GetRecord();
+                }, function (args) {
+                    WeekPriceListListBox.SetValue(pl);
+                    WeekPriceListDD.SetText(WeekPriceListListBox.GetSelectedItem().text);
+                    WeekBeginning.SetValue(w);
+                }, [])
+            } else {
+                GetRecord();
+            }
+        }
+        else {
+            GetRecord();
+        }
+    }
+
+    var pl = null;
+    var w = null;
+
+    function GetRecord() {
+
+        w = WeekBeginning.GetValue() ? WeekBeginning.GetValue() : null;
+
+        if (w != null) {
+            var d = new Date(w.getFullYear(), w.getMonth(), w.getDate());
+        
+            pl = WeekPriceListListBox.GetValue();
+
+            if (pl != null) {
+
+                LoadingPanel.Show();
+
+                $.ajax({
+                    url: '@Url.Action("GetWeeklyNotes", "Notes")',
+                    type: 'POST',
+                    traditional: true,
+                    async: false,
+                    data: {
+                        PriceListID: pl,
+                        WeekCommencing: w.toGMTString()
+                    },
+                    success: function (data) {
+                        LoadingPanel.Hide();
+                        $("#ajax-target").html(data);
+                        objectives = Objectives.GetText();
+                        observations = Observations.GetText();
+                        //console.log("objectives: " + objectives);
+                        //console.log("observations: " + observations);
+                    },
+                    timeout: 30000
+                });
+            }
+        }
+    }
+
+    function saveWeekNotes() {
+        //LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("SaveWeeklyNotes", "Notes")',
+            type: 'POST',
+            traditional: true,
+            async: false,
+            data: {
+                PriceListID: $("#pricelist").val(),
+                Week: $("#week").val(),
+                Year: $("#year").val(),
+                FoundRecord: true,
+                Observations: Observations.GetText(),
+                Objectives: Objectives.GetText()
+            },
+            success: function (data) {
+                //LoadingPanel.Hide();
+                objectives = Objectives.GetText();
+                observations = Observations.GetText();
+                //console.log("objectives: " + objectives);
+                //console.log("observations: " + observations);
+                GreenFade($("#save-btn"));
+            },
+            error: function(e, s, a) {
+                RedFade($("#save-btn"));
+                $.showError(e, s, a);
+            },
+            timeout: 30000
+        });
+    }
+</script>
+
+<h4 class="page-heading">Weekly Notes</h4>
+
+<div class="page-subheading" style="margin-bottom: 0;">
+    @Html.Action("WeeklyPriceListDropDownPartial", "Notes")
+    @Html.Action("WeekBeginningDateEdit", "Notes")
+    <div class="clearfix"></div>
+</div>
+
+<div id="ajax-target">
+
+</div>

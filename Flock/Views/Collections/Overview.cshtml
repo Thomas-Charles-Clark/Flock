@@ -1,0 +1,240 @@
+﻿@{
+    ViewBag.Title = "Collections";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles
+{
+    @Styles.Render("~/Content/collections.css")
+    
+    <style type="text/css">
+        body {
+            min-width: 2050px !important;
+        }
+    </style>
+}
+@section scripts {
+    
+}
+
+<h4 class="page-heading">Collections</h4>
+
+<div id="bulk-action-panel">
+    <h4>Bulk Action Panel</h4>
+    <ul>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$('#new-state-modal').dialog('open');">Set New State</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Enable" onclick="$('#date-picker-modal').data('for-date', 'on'); $('#date-picker-modal').dialog('open');">Set On Date</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Disable" onclick="$('#date-picker-modal').data('for-date', 'off'); $('#date-picker-modal').dialog('open');">Set Off Date</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$.confirm(CopyPodToSlideshow, function () { });">Copy Pod Images to Slideshow</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Set New" onclick="$.confirm(CopySlideshowToPod, function () { });">Copy Slideshow Images to Pod</a>
+        </li>
+        <li>
+            <a href="javascript:;" title="Delete" onclick="$.confirm(DeleteSelectedCollections, function () { });">Delete</a>
+        </li>
+    </ul>
+</div>
+
+<div id="CollectionGridContainer">
+    @Html.Action("CollectionGridViewPartial")
+</div>
+
+<div style="clear:both;"></div>
+
+<div id="date-picker-modal" style="width: 342px; height: 340px;" data-for-date="null">
+    @Html.DevExpress().Label(settings =>
+{
+    settings.Text = "Date: ";
+}).GetHtml()
+    @Html.DevExpress().Calendar(settings =>
+{
+    settings.Name = "BulkActionDatePicker";
+    settings.Properties.DisplayFormatString = "d";
+}).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div id="new-state-modal">
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Text = "New";
+    }).GetHtml()
+    @Html.DevExpress().CheckBox(settings =>
+    {
+        settings.Name = "NewStateCheckbox";
+    }).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div id="bad-selection-dialog">
+    <h5 style="display: none;">You must select at least one Product Page.</h5>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#bad-selection-dialog").dialog({
+            title: "Bad Selection",
+            width: 240,
+            height: "auto",
+            resizable: false,
+            modal: true,
+            autoOpen: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog('close');
+                }
+            }
+        })
+        $("#bad-selection-dialog > h5").css("display", "block");
+
+        $("#new-state-modal").dialog({
+            title: "Set New State",
+            autoOpen: false,
+            height: "auto",
+            width: 160,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    SetNewStateForCollections();
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    NewStateCheckbox.SetValue(false);
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $("#date-picker-modal").dialog({
+            autoOpen: false,
+            title: "Select Date",
+            height: "auto",
+            width: 400,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    switch ($(this).data("for-date")) {
+                        case "on":
+                            SetOnDateForCollections();
+                            break;
+                        case "off":
+                            SetOffDateForCollections();
+                            break;
+                    }
+                    $(this).data("for-date", "null")
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    });
+
+    function SetOnDateForCollections() {
+        var keys = null;
+
+        if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false)
+            keys = CollectionGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false) 
+                CollectionGridView.PerformCallback({ commandType: 'SetOnDate', keyString: keys.toString(), dateString: BulkActionDatePicker.GetValue().toUTCString() });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return false;
+    }
+
+    function SetOffDateForCollections() {
+        var keys = null;
+
+        if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false)
+            keys = CollectionGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false) 
+                CollectionGridView.PerformCallback({ commandType: 'SetOffDate', keyString: keys.toString(), dateString: BulkActionDatePicker.GetValue().toUTCString() });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return false;
+    }
+
+    function SetNewStateForCollections() {
+        var keys = null;
+
+        if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false)
+            keys = CollectionGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false) {
+                CollectionGridView.PerformCallback({ commandType: 'setNewState', keyString: keys.toString(), newState: NewStateCheckbox.GetValue() });
+                NewStateCheckbox.SetValue(false);
+            }
+        }
+        else {
+            NewStateCheckbox.SetValue(false);
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+
+    function CopyPodToSlideshow() {
+        var keys = null;
+
+        if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false)
+            keys = CollectionGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false) {
+                CollectionGridView.PerformCallback({ commandType: 'copypodtoslideshow', keyString: keys.toString() });
+            }
+        }
+        else {
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+    function CopySlideshowToPod() {
+        var keys = null;
+
+        if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false)
+            keys = CollectionGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false) {
+                CollectionGridView.PerformCallback({ commandType: 'copyslideshowtopod', keyString: keys.toString() });
+            }
+        }
+        else {
+            $("#bad-selection-dialog").dialog("open");
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function OpenComposer(CollectionID) {
+        var url = '@Url.Action("compose", "collections", new { id = -1 })';
+        url = url.replace(-1, CollectionID);
+        window.location.href = url;
+    }
+
+    function DeleteSelectedCollections() {
+        var keys = null;
+
+        if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false)
+            keys = CollectionGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false)
+            if (typeof (CollectionGridView) != "undefined" && CollectionGridView != false)
+                CollectionGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+    }
+</script>

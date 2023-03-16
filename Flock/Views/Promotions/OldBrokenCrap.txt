@@ -1,0 +1,544 @@
+﻿
+
+<div id="update-discount-dialog">
+    @Html.DevExpress().SpinEdit(settings =>
+    {
+        settings.Name = "BulkDiscount";
+        settings.Properties.NullDisplayText = "No Change";
+        settings.Number = 0.0M;
+        settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+        settings.Properties.Increment = 0.1M;
+        settings.Properties.LargeIncrement = 1.0M;
+        settings.Properties.NumberType = SpinEditNumberType.Float;
+
+        settings.Properties.DisplayFormatString = "{0:F2}";
+
+        settings.Properties.DisplayFormatInEditMode = true;
+        
+    }).GetHtml()
+    @Html.DevExpress().DropDownEdit(settings =>
+        {
+            settings.Name = "BulkDiscountType";
+            settings.SetDropDownWindowTemplateContent(c =>
+            {
+                Html.DevExpress().ListBox(lb =>
+                {
+                    lb.Name = "BulkDiscountTypeListBox";
+                    lb.Properties.Items.Add("Percent Off", 1);
+                    lb.Properties.Items.Add("Amount Off", 2);
+                    lb.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                        BulkDiscountType.SetText(s.GetSelectedItem().text);
+                        BulkDiscountType.HideDropDown();
+                    }";
+                    lb.Properties.ClientSideEvents.Init = @"function(s, e) {
+                        BulkDiscountType.SetText(s.GetSelectedItem().text);
+                    }";
+                    lb.SelectedIndex = 0;
+                }).Render();
+            });
+        }).GetHtml()
+    @Html.DevExpress().DateEdit(settings =>
+   {
+       settings.Name = "BulkOnDate";
+       settings.Properties.DisplayFormatString = "d";
+       settings.Properties.NullText = "No Change";
+       settings.Properties.NullDisplayText = "No Change";
+   }).GetHtml()
+    @Html.DevExpress().DateEdit(settings =>
+    {
+        settings.Name = "BulkOffDate";
+        settings.Properties.DisplayFormatString = "d";
+        settings.Properties.NullText = "No Change";
+        settings.Properties.NullDisplayText = "No Change";
+    }).GetHtml()
+</div>
+
+
+
+
+
+
+    <script type="text/javascript">
+
+        function ChangeCellStyleOverride(visibleIndex, columnIndex, styleIndex) {
+            if (window.cellEditError) {
+                if (typeof (window.runCounter) == "undefined" || typeof (window.runCounter) == false)
+                    window.runCounter = 0;
+            }
+            else if (window.runCounter > 2)
+                window.runCounter = 0;
+
+            if (styleIndex < 0 || styleIndex > 2)
+                return;
+            var row = this.grid.GetDataRow(visibleIndex);
+            if (!row) return;
+            var cell = this.GetDataCellByColumnIndex(row, columnIndex);
+            if (!cell) return;
+            if (styleIndex === 2) {
+                if (_aspxIsExists(cell.dxgvSavedClassName))
+                    cell.className = cell.dxgvSavedClassName;
+                if (_aspxIsExists(cell.dxgvSavedCssText))
+                    cell.style.cssText = cell.dxgvSavedCssText;
+                return;
+            }
+            if (!_aspxIsExists(cell.dxgvSavedClassName))
+                cell.dxgvSavedClassName = cell.className;
+            if (!_aspxIsExists(cell.dxgvSavedCssText))
+                cell.dxgvSavedCssText = cell.style.cssText;
+            var styleRow = this.grid._getStyleRow(-1, 3);
+            var styleCell = styleIndex === 0 ? styleRow.cells[0] : styleRow.cells[1];
+            cell.className = styleCell.className;
+            cell.style.cssText = styleCell.style.cssText;
+
+            if (window.cellEditError) {
+                cell.style.cssText += 'background-color: #ff0000';
+                window.runCounter++;
+            }
+            if (window.runCounter > 0) {
+                cell.style.cssText += 'background-color: #ff0000';
+                $(cell).attr("title", window.errorTipText);
+                window.runCounter++;
+                window.cellEditError = false;
+            }
+            this.LoadCellAlign(cell, columnIndex);
+        }
+
+
+        function DateSanityCheck(OnDate, OffDate) {
+            return OnDate < OffDate;
+        }
+
+        function date_by_subtracting_days(date, days) {
+            return new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate() - days,
+                date.getHours(),
+                date.getMinutes(),
+                date.getSeconds(),
+                date.getMilliseconds()
+            );
+        }
+
+        function CalculateStatus(onDate, offDate) {
+            var StatusID = -1;
+            var PendingOn = new Date();
+            var PendingOff = new Date();
+            var Now = new Date();
+            var Offset = 14;
+            var StatusText = "Unknown";
+
+            PendingOn = date_by_subtracting_days(onDate, Offset - onDate.getDate());//onDate.addDays(-Offset);
+
+            if (offDate != null) {
+                PendingOff = date_by_subtracting_days(offDate, Offset - offDate.getDate());
+
+                if (Now < PendingOn)
+                    StatusID = 3;
+                else if (Now > PendingOn && Now < onDate)
+                    StatusID = 2;
+                else if (Now > PendingOff && Now < offDate)
+                    StatusID = 1;
+                else if (Now > onDate && Now < PendingOff)
+                    StatusID = 0;
+                else if (Now >= onDate && offDate == null)
+                    StatusID = 0;
+                else
+                    StatusID = 4;
+            }
+            else {
+                if (Now < PendingOn)
+                    StatusID = 3;
+                else if (Now > PendingOn && Now < onDate)
+                    StatusID = 2;
+                else if (Now >= onDate && offDate == null)
+                    StatusID = 0;
+                else
+                    StatusID = 4;
+            }
+
+            switch (StatusID) {
+                case 0:
+                    StatusText = "On";
+                    break;
+                case 1:
+                    StatusText = "Pending Off (On)";
+                    break;
+                case 2:
+                    StatusText = "Pending On";
+                    break;
+                case 3:
+                    StatusText = "Pre-Launch";
+                    break;
+                case 4:
+                    StatusText = "Off";
+                    break;
+            }
+
+            var result = [];
+            result.StatusID = StatusID;
+            result.StatusText = StatusText;
+
+            return result;
+        }
+
+        function SaveBulk() {
+			SalePriceGridView.UpdateEdit();
+        }
+        function CancelBulk() {
+            SalePriceGridView.UnselectAllRowsOnPage();
+            $("#confirm-dialog").data("action", "cancel");
+            $("#extra-confirm-message").html("All unsaved changes will be lost.");
+            $("#extra-confirm-message").show();
+            $("#confirm-dialog").dialog("open");
+        }
+
+        function CancelAddNewBulk() {
+            SalePriceAddNewGridView.UnselectAllRowsOnPage();
+            $("#confirm-dialog").data("action", "cancel");
+            $("#extra-confirm-message").html("All unsaved changes will be lost.");
+            $("#extra-confirm-message").show();
+            $("#confirm-dialog").data("target", "addnew");
+            $("#confirm-dialog").dialog("open");
+        }
+
+        function OpenBulkAddNewDialog() {
+            var keys = SalePriceAddNewGridView.GetSelectedKeysOnPage();
+            if (typeof (keys) != "undefined" && keys != false) {
+                $('#update-discount-dialog').data("type", "addnew");
+                $('#update-discount-dialog').dialog('open');
+            }
+            else {
+                $("#bad-selection-dialog").dialog("open");
+            }
+        }
+
+        //function SetBulkDiscount() {
+        //    var keys = SalePriceGridView.GetSelectedKeysOnPage();
+        //    SalePriceGridView.SetEditValue("SalePriceTypeID", BulkDiscountTypeListBox.GetValue());
+        //    SalePriceGridView.SetEditValue("OnDate", BulkOnDate.GetValue());
+        //    SalePriceGridView.SetEditValue("OffDate", BulkOffDate.GetValue());
+        //}
+
+        function OpenBulkDialog() {
+            var keys = SalePriceGridView.GetSelectedKeysOnPage();
+            if (typeof (keys) != "undefined" && keys != false) {
+                $('#update-discount-dialog').data("type", "update");
+                $('#update-discount-dialog').dialog('open');
+            }
+            else {
+                $("#bad-selection-dialog").dialog("open");
+            }
+        }
+
+        function OpenBulkDialogDelete() {
+            var keys = SalePriceGridView.GetSelectedKeysOnPage();
+            if (typeof (keys) != "undefined" && keys != false) {
+                $("#confirm-dialog").data("action", "DeleteSelectedSalePrices");
+                $("#confirm-dialog").dialog("open");
+            }
+            else {
+                $("#bad-selection-dialog").dialog("open");
+            }
+        }
+
+        function HideColumns() {
+            window.LessColumns = true;
+            $(".hideable-column").hide();
+            $("#container").css("width", "auto !important");
+            $("#sale-price-grid-real-container").css("width", "1185px");
+            $("#SalePriceGridContainer").css("max-width", "1372px");
+            $("#SalePriceGridContainer").css("width", "1372px");
+            //var column = 2;
+            //while (column <= 4) {
+            //    $('#ProductOverviewGridContainer tr td:nth-child(' + column + '),th:nth-child( ' + column + ')').hide();
+            //    column++;
+            //}
+            $("#bulk-action-panel").css("margin-right", "0");
+            //$("#bulk-action-panel").css("margin-top", "1em");
+            $("#column-hide").unbind("click");
+            $("#column-hide").html("Show Columns");
+            $("#column-hide").on("click", function () { ShowColumns(); });
+            if(typeof(SalePriceGridView) != "undefined" && SalePriceGridView != null)
+                SalePriceGridView.AdjustControl();
+            if(SalePriceAddNewGridView)
+                SalePriceAddNewGridView.AdjustControl();
+        }
+
+            function ShowColumns() {
+                window.LessColumns = false;
+                $(".hideable-column").show();
+                $("#container").css("width", "2400px !important");
+                $("#sale-price-grid-real-container").css("width", "auto");
+                $("#SalePriceGridContainer").css("max-width", "none");
+                $("#SalePriceGridContainer").css("width", "auto");
+                //$("#sale-price-grid-real-container").css("width", "2400px");
+                //var column = 4;
+                //while (column >= 2) {
+                //    $('#ProductOverviewGridContainer tr td:nth-child(' + column + '),th:nth-child( ' + column + ')').show();
+                //    column--;
+                //}
+                $("#bulk-action-panel").css("margin-right", "1em");
+                $("#bulk-action-panel").css("margin-top", "0");
+                $("#column-hide").unbind("click");
+                $("#column-hide").html("Hide Columns");
+                $("#column-hide").on("click", function () { HideColumns(); });
+                if (typeof (SalePriceGridView) != "undefined" && SalePriceGridView != null)
+                    SalePriceGridView.AdjustControl();
+                else if(typeof(SalePriceAddNewGridView) != "undefined" && SalePriceAddNewGridView != null)
+                    SalePriceAddNewGridView.AdjustControl();
+            }
+
+            function OpenMarketSelect() {
+                $("#selection-dialog input").removeAttr("checked");
+
+                if (ProductOverviewGridView.GetSelectedKeysOnPage().length == 0)
+                    alert("Select at least one Product.");
+                else
+                    $("#selection-dialog").dialog("open");
+            }
+
+            function BulkUpdateValuesClientSide(key, row, shift) {
+
+                var ExRate = $("#price-list-exchange-rate").html();
+                var beh = SalePriceAddNewGridView.GetBatchEditHelper();
+                beh.updatedValues[key] = new Object();
+                beh.updatedValues[key][(19 + shift).toString()] = new Array();
+                beh.updatedValues[key][(19 + shift).toString()].push(BulkDiscount.GetValue());
+                beh.updatedValues[key][(19 + shift).toString()].push(BulkDiscount.GetValue().toString());
+
+                beh.updatedValues[key][(20 + shift).toString()] = new Array();
+                beh.updatedValues[key][(20 + shift).toString()].push(BulkDiscountTypeListBox.GetValue());
+                beh.updatedValues[key][(20 + shift).toString()].push(BulkDiscountTypeListBox.GetValue().toString());
+
+                /*
+                var curr_date = d.getDate();
+                    var curr_month = d.getMonth() + 1; //Months are zero based
+                    var curr_year = d.getFullYear();
+                */
+
+                var onDate = BulkOnDate.GetDate();
+                if (onDate != null) {
+                    var day = ("0" + onDate.getDate()).slice(-2)
+                    var month = ("0" + (onDate.getMonth() + 1)).slice(-2)
+                    var year = onDate.getFullYear();
+                    var finalOnDate = day + '/' + month + '/' + year;
+                    beh.updatedValues[key][(24+shift).toString()] = new Array();
+                    beh.updatedValues[key][(24+shift).toString()].push(BulkOnDate.GetDate());
+                    beh.updatedValues[key][(24 + shift).toString()].push(BulkOnDate.GetDate());
+                    $(row).children().eq(23 + shift).html(finalOnDate);
+                    $(row).children().eq(23 + shift).css("background-color", "#D7F9C7");
+                }
+                var offDate = BulkOffDate.GetDate();
+                if (offDate != null) {
+                    var day = ("0" + offDate.getDate()).slice(-2)
+                    var month = ("0" + (offDate.getMonth() + 1)).slice(-2)
+                    var year = offDate.getFullYear();
+                    var finalOffDate = day + '/' + month + '/' + year;
+                    beh.updatedValues[key][(25+shift).toString()] = new Array();
+                    beh.updatedValues[key][(25+shift).toString()].push(BulkOffDate.GetDate());
+                    beh.updatedValues[key][(25+shift).toString()].push(BulkOffDate.GetDate());
+                    $(row).children().eq(24 + shift).html(finalOffDate);
+                    $(row).children().eq(24 + shift).css("background-color", "#D7F9C7");
+                }
+                if (onDate != null || offDate != null) {
+                    var status = CalculateStatus(onDate, offDate);
+                    $(row).children().eq(25 + shift).html(status.StatusText);
+                    $(row).children().eq(25 + shift).css("background-color", "#D7F9C7");
+                }
+
+                // gross margin calculation:
+
+                // convert COST STERLING into CURRENT CURRENCY by EX RATE. E.g. for $, *1.6
+                // then it's (PRICEEX - COST in CURRENCY) / PRICEEX = 0.x  * 100, stick it in... the right box...
+
+                var currentPriceInc = $(row).children().eq(14 + shift).html();
+                var currentPriceEx = $(row).children().eq(15 + shift).html();
+
+                var costSterling = $(row).children().eq(17 + shift).html().replace('£', '');
+                var costCurrency = costSterling * ExRate;
+                //$('#SalePriceGridView_DXDataRow' + (index - 1)).children().eq(14).html();
+
+                $(row).children().eq(18 + shift).css("background-color", "#D7F9C7");
+                $(row).children().eq(18 + shift).html(BulkDiscount.GetText());
+                //SalePriceGridView.GetBatchEditHelper().pageServerValues[key][19] = BulkDiscount.GetValue();
+
+                $(row).children().eq(19 + shift).css("background-color", "#D7F9C7");
+                $(row).children().eq(19 + shift).html(BulkDiscountTypeListBox.GetSelectedItem().text);
+                //SalePriceGridView.GetBatchEditHelper().pageServerValues[key][20] = BulkDiscountTypeListBox.GetValue();
+
+
+                if (BulkDiscountTypeListBox.GetSelectedItem().value == 1) {
+
+                    var newPriceInc = currentPriceInc * (1 - (BulkDiscount.GetValue() / 100));
+                    var newPriceEx = currentPriceEx * (1 - (BulkDiscount.GetValue() / 100));
+
+                    $(row).children().eq(20 + shift).html((Math.round(newPriceInc * 100) / 100).toFixed(2));
+                    $(row).children().eq(20 + shift).css('background-color', '#D7F9C7');
+
+                    $(row).children().eq(21 + shift).html((Math.round(newPriceEx * 100) / 100).toFixed(2));
+                    $(row).children().eq(21 + shift).css('background-color', '#D7F9C7');
+
+
+                    beh.updatedValues[key][(21 + shift).toString()] = new Array();
+                    beh.updatedValues[key][(21 + shift).toString()].push((Math.round(newPriceInc * 100) / 100));
+                    beh.updatedValues[key][(21 + shift).toString()].push((Math.round(newPriceInc * 100) / 100).toString());//.toFixed(2));
+
+                    beh.updatedValues[key][(22 + shift).toString()] = new Array();
+                    beh.updatedValues[key][(22 + shift).toString()].push((Math.round(newPriceEx * 100) / 100));
+                    beh.updatedValues[key][(22 + shift).toString()].push((Math.round(newPriceEx * 100) / 100).toString());//.toFixed(2));
+
+
+                    var GM = (((newPriceEx - costCurrency) / newPriceEx) * 100);
+                    GM = Math.round(GM);
+                    $(row).children().eq(22 + shift).html(GM + '%');
+                    $(row).children().eq(22 + shift).css("background-color", "#D7F9C7");
+
+                }
+                else {
+
+                    var newPriceInc = currentPriceInc - BulkDiscount.GetValue();
+                    var newPriceEx = currentPriceEx - BulkDiscount.GetValue();
+
+                    $(row).children().eq(20 + shift).html((Math.round(newPriceInc * 100) / 100).toFixed(2));
+                    $(row).children().eq(20 + shift).css('background-color', '#D7F9C7');
+
+                    $(row).children().eq(21 + shift).html((Math.round(newPriceEx * 100) / 100).toFixed(2));
+                    $(row).children().eq(21 + shift).css('background-color', '#D7F9C7');
+
+
+                    beh.updatedValues[key][(21 + shift).toString()] = new Array();
+                    beh.updatedValues[key][(21 + shift).toString()].push((Math.round(newPriceInc * 100) / 100));
+                    beh.updatedValues[key][(21 + shift).toString()].push((Math.round(newPriceInc * 100) / 100).toString());//.toFixed(2));
+
+                    beh.updatedValues[key][(22 + shift).toString()] = new Array();
+                    beh.updatedValues[key][(22 + shift).toString()].push((Math.round(newPriceEx * 100) / 100));
+                    beh.updatedValues[key][(22 + shift).toString()].push((Math.round(newPriceEx * 100) / 100).toString());//.toFixed(2));
+
+                    var GM = (((newPriceEx - costCurrency) / newPriceEx) * 100);
+
+                    GM = Math.round(GM);
+                    $(row).children().eq(22 + shift).html(GM + '%');
+                    $(row).children().eq(22 + shift).css("background-color", "#D7F9C7");
+
+                }
+            }
+
+            $(document).ready(function () {
+
+                $("#column-hide").on("click", function () { HideColumns(); });
+
+                $("#update-discount-dialog").dialog({
+                    title: "Selection",
+                    width: 600,
+                    height: "auto",
+                    autoOpen: false,
+                    resizable: false,
+                    buttons: {
+                        Ok: function () {
+                            switch ($(this).data("type")) {
+                                case "update":
+                                    var keys = SalePriceGridView.GetSelectedKeysOnPage();
+                                    for (var i = 0; i < keys.length; i++) {
+                                        var cell = $("#SalePriceGridView tr.data-row td:first-child").filter(function () {
+                                            return $(this).html() == keys[i];
+                                        }).first();
+                                        var index = $(cell).parent().parent().children().index($(cell).parent()) - 3;
+                                        BulkUpdateValuesClientSide(keys[i], '#SalePriceGridView_DXDataRow'+index, 0);
+                                    }
+                                    break;
+
+                                case "addnew":
+                                    var keys = SalePriceAddNewGridView.GetSelectedKeysOnPage();
+                                    for (var i = 0; i < keys.length; i++) {
+                                        var cell = $("#SalePriceAddNewGridView tr.add-new-data-row td:first-child").filter(function () {
+                                            return $(this).html() == keys[i];
+                                        }).first();
+                                        var index = $(cell).parent().parent().children().index($(cell).parent()) - 3;
+                                        BulkUpdateValuesClientSide(keys[i], '#SalePriceAddNewGridView_DXDataRow'+index, -1);
+                                    }
+                                    break;
+                                default: break;
+                            }
+                            $(this).data("type", "");
+                            
+                            $(this).dialog("close");
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+
+                $("#confirm-dialog").dialog({
+                    title: "Confirm",
+                    width: 350,
+                    height: "auto",
+                    autoOpen: false,
+                    resizable: false,
+                    buttons: {
+                        Ok: function () {
+                            switch ($(this).data("action")) {
+                                case "delete":
+                                    ConfirmedDelete();
+                                    $(this).dialog("close");
+                                    break;
+                                case "cancel":
+                                    switch ($(this).data("target")) {
+                                        case "addnew":
+                                            SalePriceAddNewGridView.Refresh();
+                                            break;
+                                        default:
+                                            SalePriceGridView.Refresh();
+                                            break;
+                                    }
+                                    $(this).data("target", "");
+                                    $(this).dialog("close");
+                                    break;
+                                default:
+                                    $(this).dialog("close");
+                                    break;
+                            }
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+
+                $("#bad-selection-dialog").dialog({
+                    title: "Invalid Selection",
+                    width: 350,
+                    height: "auto",
+                    autoOpen: false,
+                    resizable: false,
+                    buttons: {
+                        Ok: function () { $(this).dialog("close"); }
+                    }
+                });
+            });
+
+            function DeleteSelectedSalePrices() {
+
+                var keys = null;
+
+                if (typeof (SalePriceGridView) != "undefined" && SalePriceGridView != false)
+                    keys = SalePriceGridView.GetSelectedKeysOnPage();
+
+                if (typeof (keys) != "undefined" && keys != false) {
+                    if (typeof (SalePriceGridView) != "undefined" && SalePriceGridView != false) {
+                        $("#confirm-dialog").data("action", "delete");
+                        $("#confirm-dialog").dialog("open");
+                    }
+                }
+                else {
+                    $("#bad-selection-dialog").dialog("open");
+                }
+            }
+
+            function ConfirmedDelete() {
+                keys = SalePriceGridView.GetSelectedKeysOnPage();
+                SalePriceGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+            }
+
+    </script>

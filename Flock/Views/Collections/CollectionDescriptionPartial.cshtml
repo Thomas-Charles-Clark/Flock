@@ -1,0 +1,52 @@
+﻿@model Flock.ViewModels.CollectionViewModel
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#slideshow-list').slideToggle('fast'); $('#collection-text-slideshow-inner').slideToggle('fast')">Collection Text & Slideshow Images</legend>
+        <div id="collection-text-slideshow-inner" style="background-color: white; padding-right: 1em; padding-left: 1em; position: relative; display: block; padding-top: 1em; padding-bottom: 1em;">
+            <div style="float: right; width: 49%;">
+                <div>
+                    @Html.DevExpress().LabelFor(m => Model.Heading, settings =>
+                        {
+                            settings.Style.Add("margin-top", "1em");
+                            settings.Style.Add("margin-bottom", "2px");
+                        }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
+                        {
+                            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                            settings.Name = "Heading";
+                            settings.Properties.MaxLength = 70;
+                        }).GetHtml()
+                    @Html.DevExpress().LabelFor(m => Model.SubHeading, settings =>
+                       {
+                           settings.Style.Add("margin-top", "1em");
+                           settings.Style.Add("margin-bottom", "2px");
+                       }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.SubHeading, settings =>
+                        {
+                            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                            settings.Name = "SubHeading";
+                            settings.Properties.MaxLength = 70;
+                        }).GetHtml()
+                    @Html.DevExpress().LabelFor(m => Model.Description, settings =>
+                    {
+                        settings.Style.Add("margin-top", "1em");
+                        settings.Style.Add("margin-bottom", "2px");
+                    }).GetHtml()
+                    <div id="collection-html-editor-container">             
+                        @Html.Partial("CollectionHTMLEditorPartial", Model.Description, new ViewDataDictionary())
+                    </div>
+                </div>
+            </div>
+            <div style="float: left; width: 49%;">
+                <span style="margin-bottom: 8px; display: inline-block;">Slideshow Images: Landscape (Feature) only</span>
+                <span style="margin-bottom: 8px; float: right;"><a href="javascript:;" onclick="CopyPodToSlideshow()">Copy from Pod</a></span>
+                <img id="collection-slideshow-busy" style="float: right; width: 20px;" class="busy" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
+                <div style="clear: both;"></div>
+                <div id="collection-slideshow-container" class="droppable" data-collection-id="@(Model.CollectionID)">
+                    @Html.Partial("CollectionSlideshowImagesPartial", Model.CollectionImages.Where(p => p.TemplateImageID == 2).ToList())
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+
+            <img id="collection-text-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveCollectionDescriptiveText();" />
+        </div>
+    </fieldset>

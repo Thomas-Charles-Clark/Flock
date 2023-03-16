@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<h4 class="page-heading">Overview</h4>
+
+@{
+    if (ViewData["MertexLoginResult"] != null)
+    {
+        <h6>@(ViewData["MertexLoginResult"])</h6>
+    }
+    else
+    {
+        <h6>Mertex login successful</h6>
+    }
+    
+    if (ViewData["MertexStockRawResult"] != null)
+    {
+        @(ViewData["MertexStockRawResult"])
+    }
+    else
+    {
+        <h6>Mertex Stock Raw Result null</h6>
+    }
+}

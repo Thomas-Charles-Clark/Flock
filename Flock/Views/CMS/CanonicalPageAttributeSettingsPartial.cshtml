@@ -1,0 +1,86 @@
+﻿@model Flock.ViewModels.CanonicalPageAttributeSettingsViewModel
+@if (Model.FilterIndexingEnabled == false)
+{
+    <h3>
+        No advanced settings are available for this page.
+    </h3>
+}
+else
+{
+    <div id="page-pod-model">
+        <h3>
+            <span data-bind="text: nameDisplay">
+                @(Model.Page.Name)
+            </span>
+            <span class="pull-right small">
+                Don't forget to save using the button below
+            </span>
+        </h3>
+        <h4>
+            URL: <span data-bind="text: urlDisplay"></span>
+        </h4>
+        <div id="attribute-group-availability">
+           @foreach(var ag in Model.AttributeGroups.Where(ag => ag.Attributes.Any(a => a.EnableFilterIndexing)).OrderBy(ag => ag.SortOrder))
+            { 
+                <div class="attribute-group-wrapper" data-bind="with: getAttributeGroup(@(ag.AttributeGroupID))">
+                    <h4 class="alert-title">
+                        @ag.Name
+                    </h4>
+                    <div class="attribute-list">
+                        <ul>
+                           @foreach (var a in ag.Attributes.Where(at => at.EnableFilterIndexing).OrderBy(at => at.SortOrder))
+                            {
+                                var isChecked = Model.AttributeIDs.Any(at => at.id == a.AttributeID);
+                                <li>
+                                   @if (isChecked)
+                                    {
+                                        <span style="display: none;" data-bind="init: { convert: parseInt, field: attributeId }, text: attributeId">
+                                            @(a.AttributeID)
+                                        </span>
+                                    }
+                                    <label class="form-control">
+                                        <input type="radio" name="attribute-group-@(ag.AttributeGroupID)" value="@(a.AttributeID)" @(isChecked ? "checked" : "") data-bind="checkedValue: @(a.AttributeID), checked: attributeId"/>
+                                        <span>
+                                            @a.Name
+                                        </span>
+                                        <!-- ko if: attributeId() == @(a.AttributeID) -->
+                                        <span class="pointer close" data-bind="click: () => { attributeId(undefined); }">
+                                            &times;
+                                        </span>
+                                        <!-- /ko -->
+                                    </label>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+        <div id="save-btn-wrapper">
+            <button class="btn btn-success" data-bind="click: save">
+                Save
+            </button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        window.getAttributes = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.Attributes));
+        }
+        
+        window.getAttributeGroups = () => {
+            return @Html.Raw(JsonConvert.SerializeObject(Model.AttributeGroups));
+        }
+
+        window.getProductTypeURLKeywords = () => {
+            return '@(Model.Page.ProductType?.URLKeywords)'
+        }
+
+        window.getProductTypeNamePlural = () => {
+            return '@(Model.Page.ProductType?.NamePlural)'
+        }
+
+        window.canonicalPagePodModel = canonicalPagePodViewModel(@(Model.PageID), @(Model.ParentPageID));
+        ko.cleanNode(document.querySelector('#page-pod-model'));
+        ko.applyBindings(window.canonicalPagePodModel, document.querySelector('#page-pod-model'));
+    </script>
+}

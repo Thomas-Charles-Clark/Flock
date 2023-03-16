@@ -1,0 +1,22 @@
+﻿@Html.DevExpress().DateEdit(settings =>
+{
+    settings.Name = "WeekBeginning";
+    settings.Properties.NullText = "Week Beginning";
+    settings.CallbackRouteValues = new { Controller = "Notes", Action = "WeekBeginningDateEdit" };
+    settings.Height = 35;
+    settings.Properties.CalendarProperties.ShowWeekNumbers = false;
+    settings.Init = (s, e) =>
+    {
+        MVCxDateEdit de = (MVCxDateEdit)s;
+        de.CalendarCustomDisabledDate += (sender, args) =>
+        {
+            if (args.Date.DayOfWeek != DayOfWeek.Monday)
+                args.IsDisabled = true;
+        };
+    };
+    settings.Properties.ClientSideEvents.DateChanged = @"function(s, e) {
+        TryGetRecord();
+    }";
+    settings.Properties.CalendarProperties.ShowTodayButton = false;
+    settings.Properties.CalendarProperties.ShowClearButton = false;
+}).GetHtml()

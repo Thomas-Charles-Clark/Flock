@@ -1,0 +1,225 @@
+﻿@{
+    ViewBag.Title = "Checkout History";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    @Styles.Render("~/bundles/composer")
+
+    <style type="text/css">
+        #container {
+            width: 1670px !important;
+        }
+        .dxb {
+            padding-top: 5px !important;
+            padding-bottom: 5px !important;
+        }
+        .dxgvDetailCell_MetropolisBlue {
+            padding: 0 !important;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        var isDetailRowExpanded = new Array();
+        function OnRowClick(s, e) {
+            if (isDetailRowExpanded[e.visibleIndex] != true)
+                s.ExpandDetailRow(e.visibleIndex);
+            else
+                s.CollapseDetailRow(e.visibleIndex);
+        }
+        function OnDetailRowExpanding(s, e) {
+
+            var id = s.GetRowKey(e.visibleIndex);
+
+            $("#selected-checkout-id").val(id);
+
+            isDetailRowExpanded[e.visibleIndex] = true;
+        }
+        function OnDetailRowCollapsing(s, e) {
+            isDetailRowExpanded[e.visibleIndex] = false;
+        }
+        function copyToClipboard(text) {
+            cancelBubble();
+            window.prompt("Copy to Clipboard: Ctrl+C, Enter", text);
+        }
+        function cancelBubble(e) {
+            var evt = e ? e : window.event;
+            if (evt.stopPropagation) evt.stopPropagation();
+            if (evt.cancelBubble != null) evt.cancelBubble = true;
+        }
+    </script>
+}
+
+<h4 class="page-heading">Checkout History</h4>
+
+<input type="hidden" id="selected-checkout-id" />
+
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "SearchBox";
+    settings.Properties.NullDisplayText = "Search";
+    settings.Properties.NullText = "Search";
+    settings.Width = 180;
+    settings.Style.Add("margin-bottom", "20px");
+    settings.Style.Add("margin-right", "1em");
+    settings.Style.Add("float", "left");
+    settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) {
+
+        var fd = FromDate.GetDate();
+        if(fd != null)
+            fd = fd.toGMTString();
+
+        var td = ToDate.GetDate();
+        if(td != null)
+            td = td.toGMTString();
+
+        if(e.htmlEvent.keyCode == 13) {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '" + Url.Action("CheckoutSearchPartial", "eCommerce") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    SearchString: s.GetValue(),
+                    CountryID: CountrySelector.GetValue(),
+                    Trade: TradeAccountComboBox.GetValue(),
+                    FromDate: fd,
+                    ToDate: td
+                },
+                success: function(data) {
+                    $('#checkout-search-grid-container').html(data);
+                    $('#checkout-log-grid-container').html('');
+                    LoadingPanel.Hide();
+                },
+                timeout: 60000
+            });
+        }
+    }";
+}).GetHtml()
+
+@Html.Action("CountryComboBoxPartial", "eCommerce")
+
+@Html.DevExpress().DateEdit(settings => {
+    settings.Name = "FromDate";
+    settings.Properties.NullDisplayText = "From Date";
+    settings.Properties.NullText = "From Date";
+    settings.Height = 32;
+    settings.Date = DateTime.Now.AddDays(-1);
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin-right", "1em");
+}).GetHtml()
+
+@Html.DevExpress().DateEdit(settings =>
+{
+    settings.Name = "ToDate";
+    settings.Properties.NullDisplayText = "To Date";
+    settings.Properties.NullText = "To Date";
+    settings.Height = 32;
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin-right", "1em");
+}).GetHtml()
+
+@Html.DevExpress().ComboBox(settings => {
+    settings.Name = "TradeAccountComboBox";
+    settings.Properties.Items.Add("Non-Trade", false);
+    settings.Properties.Items.Add("Trade", true);
+    settings.Properties.Items.Add("Both", null);
+    settings.Properties.ValueType = typeof(bool?);
+    settings.SelectedIndex = 2;
+    settings.Height = 32;
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin-right", "1em");
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        var fd = FromDate.GetDate();
+        if(fd != null)
+            fd = fd.toGMTString();
+
+        var td = ToDate.GetDate();
+        if(td != null)
+            td = td.toGMTString();
+
+        LoadingPanel.Show();
+        $.ajax({
+            url: '" + Url.Action("CheckoutSearchPartial", "eCommerce") + @"',
+            type: 'POST',
+            traditional: true,
+            data: {
+                SearchString: SearchBox.GetValue(),
+                CountryID: CountrySelector.GetValue(),
+                Trade: TradeAccountComboBox.GetValue(),
+                FromDate: fd,
+                ToDate: td
+            },
+            success: function(data) {
+                $('#checkout-search-grid-container').html(data);
+                $('#checkout-log-grid-container').html('');
+                LoadingPanel.Hide();
+            },
+            timeout: 60000
+        });
+    }";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "SearchBtn";
+    settings.Text = "Search";
+    settings.Height = 34;
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin-right", "1em");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        var fd = FromDate.GetDate();
+        if(fd != null)
+            fd = fd.toGMTString();
+
+        var td = ToDate.GetDate();
+        if(td != null)
+            td = td.toGMTString();
+
+        LoadingPanel.Show();
+        $.ajax({
+            url: '" + Url.Action("CheckoutSearchPartial", "eCommerce") + @"',
+            type: 'POST',
+            traditional: true,
+            data: {
+                SearchString: SearchBox.GetValue(),
+                CountryID: CountrySelector.GetValue(),
+                Trade: TradeAccountComboBox.GetValue(),
+                FromDate: fd,
+                ToDate: td
+            },
+            success: function(data) {
+                $('#checkout-search-grid-container').html(data);
+                $('#checkout-log-grid-container').html('');
+                LoadingPanel.Hide();
+            },
+            timeout: 60000
+        });
+    }";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "ResetBtn";
+    settings.Text = "Reset";
+    settings.Height = 34;
+    settings.Style.Add("float", "left");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        SearchBox.SetValue(null)
+        $('#checkout-search-grid-container').html('');
+        $('#checkout-log-grid-container').html('');
+    }";
+}).GetHtml()
+
+<div style="clear:both;"></div>
+
+<div id="checkout-search-grid-container">
+    @Html.Action("CheckoutSearchInit")
+</div>
+
+<div style="clear: both;"></div>
+
+<div id="checkout-log-grid-container"></div>
+
+<div style="clear:both;"></div>

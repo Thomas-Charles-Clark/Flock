@@ -1,0 +1,232 @@
+﻿@{
+    Layout = null;
+}
+@model List<Flock.Models.PriceList>
+@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        settings.Text = "Price List";
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+        if (action == "PricesOverviewPriceListDropDownPartial")
+        {
+            settings.Name = "PricesOverviewPriceListDD";
+            settings.Style.Remove("margin");
+            settings.Style.Add("margin", "0 7px 0 0");
+        }
+        else if (action == "SalePricePriceListDropDownPartial")
+            settings.Name = "SalePricePriceListDD";
+        else if (action == "ProductSearchPriceListDropDownPartial")
+            settings.Name = "ProductSearchPriceListDD";
+        else if (action == "SalesOverviewPriceListDropDownPartial")
+            settings.Name = "SalesOverviewPriceListDD";
+        else if (action == "WeeklyPriceListDropDownPartial")
+        {
+            settings.Name = "WeekPriceListDD";
+            settings.Properties.NullText = "Price List";
+            settings.Text = null;
+        } else if (action == "BundlesPriceListDropDown")
+        {
+            settings.Name = "BundlesPriceListDD";
+        }
+
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='pricelists-listbox'>");
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/PriceListListBoxPartial.cshtml", Model));
+
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            if (action != "ProductSearchPriceListDropDownPartial")
+            {
+                @Html.DevExpress().Button(
+                    buttonSettings =>
+                    {
+                        if (action == "PricesOverviewPriceListDropDownPartial")
+                        {
+                            buttonSettings.Name = "PricesOverviewPriceListButtonClose";
+                            buttonSettings.Text = "Close";
+                            buttonSettings.Style.Add("float", "right");
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                PricesOverviewPriceListDD.HideDropDown();
+                            }";
+                        }
+                        else if (action == "SalePricePriceListDropDownPartial")
+                        {
+                            buttonSettings.Name = "SalePricePriceListButtonClose";
+                            buttonSettings.Text = "Close";
+                            buttonSettings.Style.Add("float", "right");
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                SalePricePriceListDD.HideDropDown();
+                            }";
+                        }
+                        else if (action == "SalesOverviewPriceListDropDownPartial")
+                        {
+                            buttonSettings.Name = "SalesOverviewPriceListButtonClose";
+                            buttonSettings.Text = "Close";
+                            buttonSettings.Style.Add("float", "right");
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                SalePricePriceListDD.HideDropDown();
+                            }";
+                        }
+                        else if (action == "WeeklyPriceListDropDownPartial")
+                        {
+                            buttonSettings.Name = "WeekPriceListButtonClose";
+                            buttonSettings.Text = "Close";
+                            buttonSettings.Style.Add("float", "right");
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                WeekPriceListDD.HideDropDown();
+                            }";
+                        }
+                        else if (action == "BundlesPriceListDropDown")
+                        {
+                            buttonSettings.Name = "BundlesPriceListButtonClose";
+                            buttonSettings.Text = "Close";
+                            buttonSettings.Style.Add("float", "right");
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                BundlesPriceListDD.HideDropDown();
+                            }";
+                        }
+                    }
+                )
+                .Render();
+            }
+            else if (action == "ProductSearchPriceListDropDownPartial")
+            {
+                @Html.DevExpress().Button(
+                    buttonSettings =>
+                    {
+                        buttonSettings.Name = "ProductSearchPriceListButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                            ProductSearchPriceListListBox.UnselectAll();
+                            ProductSearchPriceListDD.HideDropDown(); 
+                            ProductSearchPriceListDD.SetText('Sold To');
+                            $('#product-searching-icon').fadeIn('fast');
+                            var SearchText = ProductSearchNameOrIDTextBox.GetText();
+                            if($('#product-search-small-marker').length > 0) {
+                                $.ajax({
+                                    url: '" + Url.Action("ProductSearchSmall", "Products") + @"',
+                                    traditional: true,
+                                    data: { 
+                                        ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                                        BrandID: ProductSearchBrandListBox.GetValue(),
+                                        LaunchID: ProductSearchLaunchListBox.GetValue(),
+                                        PatternID: ProductSearchPatternListBox.GetValue(),
+                                        Status: ProductSearchStatusListBox.GetValue(),
+                                        StatusID: ProductSearchWebStatusListBox.GetValue(),
+                                        StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                                        CollectionID: ProductSearchCollectionListBox.GetValue(),
+                                        ColourID: ProductSearchColourListBox.GetValue(),
+                                        SearchString: SearchText,
+                                        ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                                        PriceListID: ProductSearchPriceListListBox.GetValue()
+                                    },
+                                    success: function(data) {
+                                        $('#product-data-view-container').html(data);
+                                        $('#product-searching-icon').fadeOut('slow');
+                                    },
+                                    error: function(e, s, a) {
+                                        $('#product-searching-icon').fadeOut('slow');
+                                        alert(e.responseText);
+                                    },
+                                    timeout: 60000
+                                });
+                            }
+                            else {
+                                $.ajax({
+                                    url: '" + Url.Action("ProductSearch", "Products") + @"',
+                                    traditional: true,
+                                    data: { 
+                                        ProductTypeID: ProductSearchProductTypeListBox.GetValue(),
+                                        BrandID: ProductSearchBrandListBox.GetValue(),
+                                        LaunchID: ProductSearchLaunchListBox.GetValue(),
+                                        PatternID: ProductSearchPatternListBox.GetValue(),
+                                        Status: ProductSearchStatusListBox.GetValue(),
+                                        StatusID: ProductSearchWebStatusListBox.GetValue(),
+                                        StockStatusID: ProductSearchStockStatusListBox.GetValue(),
+                                        CollectionID: ProductSearchCollectionListBox.GetValue(),
+                                        ColourID: ProductSearchColourListBox.GetValue(),
+                                        SearchString: SearchText,
+                                        ProductPageAssociation: ProductSearchAssociatedListBox.GetValue(),
+                                        PriceListID: ProductSearchPriceListListBox.GetValue()
+                                    },
+                                    success: function(data) {
+                                        $('#product-data-view-container').html(data);
+                                        $('#product-searching-icon').fadeOut('slow');
+                                    },
+                                    error: function(e, s, a) {
+                                        $('#product-searching-icon').fadeOut('slow');
+                                        alert(e.responseText);
+                                    },
+                                    timeout: 60000
+                                });
+                            }
+                        }";
+                        buttonSettings.Text = "Clear";
+                        buttonSettings.Style.Add("float", "left");
+                    }
+                )
+                .Render();
+
+                @Html.DevExpress().Button(
+                    buttonSettings =>
+                    {
+                        if (action == "PricesOverviewPriceListDropDownPartial")
+                        {
+                            buttonSettings.Name = "PricesOverviewPriceListButtonClose";
+                            buttonSettings.Text = "Close";
+                            buttonSettings.Style.Add("float", "right");
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                PricesOverviewPriceListDD.HideDropDown();
+                            }";
+                        }
+                        else if (action == "ProductSearchPriceListDropDownPartial")
+                        {
+                            buttonSettings.Name = "ProductSearchPriceListButtonClose";
+                            buttonSettings.Text = "Close";
+                            buttonSettings.Style.Add("float", "right");
+                            buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                                ProductSearchPriceListDD.HideDropDown();
+                            }";
+                        }
+                    }
+                )
+                .Render();
+            }
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+        settings.Properties.ClientSideEvents.TextChanged = "";// "SynchronizeListBoxValues";
+        settings.Properties.ClientSideEvents.DropDown = "";// "SynchronizeListBoxValues";
+    }
+).GetHtml()
+
+<script type="text/javascript">
+    window.PriceLists = new Array();
+    @{
+        var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+        
+        for(var i = 0; i < Model.Count(); i++)
+        {
+            var curr = UoW.GetRepository<Flock.Models.Currency>().GetAll().Where(p => p.CurrencyID == Model[i].CurrencyID).Single();
+        
+            @: var thisList = [];
+            @: thisList.push(@Model[i].PriceListID);
+            @: thisList.push('@Model[i].Name');
+            @: thisList.push('@curr.SterlingExchangeRate');
+            @: thisList.push('@curr.Name');
+            @: thisList.push('@curr.Symbol');
+            @: window.PriceLists.push(thisList)
+        }
+    }
+</script>

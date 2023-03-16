@@ -1,0 +1,55 @@
+﻿<div class="resource-panel-container">
+    <fieldset id="video-search-fieldset">
+        <legend onclick="$('.hideable-dataview').not('#video-dataview').slideUp('fast'); $('#video-dataview').slideToggle('fast');">Video Search (click to expand / contract)</legend>
+        <div id="video-dataview" class="hideable-dataview" style="display: none;">
+            <div style="width: 100%; background-color: white; padding: 1em; padding-bottom: 0;">
+                @Html.Action("VideoSearchBrandDropDownPartial", "Video")
+                @Html.Action("VideoSearchLaunchDropDownPartial", "Video")
+                @Html.Action("VideoSearchNameOrIDTextBoxPartial", "Video")
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "VideoSearchClearFiltersButton";
+                    settings.Text = "Reset";
+                    settings.Style.Add("line-height", "32px");
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        PerformVideoSearch();
+                    }";
+                }).GetHtml()
+                <img id="video-searching-icon" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both;"></div>
+
+            </div>
+            <div id="video-data-view-container" style="width: 100%; overflow-y: auto; background-color: white;">
+                @Html.Action("VideoSearch", "Video")
+            </div>
+        </div>
+    </fieldset>
+    <div style="clear: both;"></div>
+</div>
+
+<script type="text/javascript">
+    function PerformVideoSearch() {
+
+        $('#video-searching-icon').fadeIn('fast');
+
+        $.ajax({
+            url: '@Url.Action("VideoSearch", "Video")',
+            traditional: true,
+            data: {
+                BrandID: VideoSearchBrandListBox.GetValue(),
+                LaunchID: VideoSearchLaunchListBox.GetValue(),
+                NameOrID: VideoSearchNameOrIDTextBox.GetValue(),
+            },
+            success: function (data) {
+                $('#video-data-view-container').html(data);
+                $('#video-searching-icon').fadeOut('slow');
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a, function () { $('#video-searching-icon').fadeOut('slow'); });
+            },
+            timeout: 20000
+        });
+    }
+</script>

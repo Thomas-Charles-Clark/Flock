@@ -1,0 +1,157 @@
+﻿@using Flock.ViewModels
+@model SnippetViewModel
+@{
+    ViewBag.Title = "Snippets";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/Content/snippets.css")
+}
+@section scripts {
+    <script type="text/javascript">
+        function InitCountryDragDrop() {
+            $("#country-restriction-section").sortable({
+                helper: "clone",
+                connectWith: ".country-restriction-flag",
+                placeholder: ".ui-state-highlight-country-restriction",
+                update: function (ev, ui) {
+                    if ($(ui.item).hasClass('country-flag')) {
+                        $("#country-restriction-section").sortable("refresh");
+                        window.CountryRestrictions = new Array();
+                        if ($("#country-restriction-placeholder").length > 0)
+                            $("#country-restriction-placeholder").remove();
+                        $("#country-restriction-section").children("div").each(function (index) {
+                            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                        });
+                        UpdateCountryRestrictions();
+                    }
+                }
+            });
+            $(".country-flag").draggable({
+                helper: "clone",
+                start: function (e, ui) {
+                    $(ui.helper).css("z-index", "300000");
+                },
+                connectToSortable: "#country-restriction-section"
+            });
+        }
+
+        function UpdateCountryRestrictions() {
+            $("#country-restriction-busy").fadeIn("fast");
+            $.ajax({
+                url: '@Url.Action("UpdateSnippetCountryRestrictions", "CMS")',
+                type: "POST",
+                traditional: true,
+                data: { SnippetID: $('#selected-snippet-id').val(), Countries: JSON.stringify(window.CountryRestrictions) },
+                success: function (data) {
+                    $("#country-restriction-busy").fadeOut("fast");
+                    $("#country-restriction-container").html(data);
+                },
+                error: function (e, s, a) {
+                    $("#country-restriction-busy").fadeOut("fast");
+                    alert(e.responseText);
+                },
+                timeout: 20000
+            });
+        }
+
+        function RemoveCountryFromRestriction() {
+            $("#country-restriction-section").sortable("refresh");
+            window.CountryRestrictions = new Array();
+            if ($("#country-restriction-placeholder").length > 0)
+                $("#country-restriction-placeholder").remove();
+            $("#country-restriction-section").children("div").each(function (index) {
+                window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+            });
+            UpdateCountryRestrictions();
+        }
+
+        function RemoveAllCountryRestrictions() {
+            $.confirm(function () {
+                window.CountryRestrictions = new Array();
+                UpdateCountryRestrictions();
+            }, function () { });
+        }
+
+        function SaveSnippetDetails()
+        {
+            var onDate = null;
+            if (OnDate.GetValue() != null)
+                onDate = OnDate.GetValue().toGMTString();
+            var offDate = null;
+            if (OffDate.GetValue() != null)
+                offDate = OffDate.GetValue().toGMTString();
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("SaveSnippetDetails", "CMS")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    SnippetID: $("#selected-snippet-id").val(),
+                    SnippetLocationID: SnippetLocationID.GetValue(),
+                    Name: Name.GetValue(),
+                    HTMLContent: HTMLEditor.getValue(),
+                    OnDate: onDate,
+                    OffDate: offDate
+                },
+                success: function (data) {
+                    $("#snippet-compose-container").html(data);
+                    LoadingPanel.Hide();
+                    SuccessFade($("#snippet-details-save"));
+                },
+                error: function (e, s, a) {
+                    $("#snippet-compose-container").html(e.responseText);
+                    LoadingPanel.Hide();
+                    FailureFade($("#snippet-details-save"));
+                },
+                timeout: 20000
+            });
+
+            $(document).ready(function () {
+                InitCountryDragDrop();
+            });
+        }
+    </script>
+}
+<input type="hidden" id="selected-snippet-id" value="@(Model.SnippetID)" />
+
+<h4 class="page-heading">
+    Snippets
+</h4>
+
+<div id="snippet-select-header-container" style="float: left; width: 986px; margin-right: 20px;">
+    <div class="content-panel-container">
+        <fieldset id="snippet-select-header">
+            <legend style="cursor: default;">
+                Snippets Grid
+            </legend>
+            <div id="snippet-select-header-inner">
+                @Html.Partial("Snippets/SnippetGridViewPartial")
+                @if(Model.SnippetID != null)
+                {
+                    @*<script type="text/javascript">
+                        SnippetGridView.AutoFilterByColumn(0, @(Model.SnippetID));
+                    </script>*@
+                }
+            </div>
+        </fieldset>
+    </div>
+
+    <div id="snippet-compose-container" style="width: 986px;">
+        @if (ViewData["InvalidSnippetIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidSnippetIDError"])</h5>
+        }
+        @if (Model.SnippetID != null)
+        {
+            @Html.Partial("Snippets/SnippetDetailPartial", Model)
+            
+        }
+    </div>
+
+</div> 
+<div style="float: left; width: 986px;">
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+</div>
+<div style="clear: both"></div>

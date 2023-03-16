@@ -1,0 +1,63 @@
+﻿@model List<Flock.Models.PageSection_ArticleSubType>
+@using Flock.DAL;
+@using Flock.Models;
+
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    
+    var articleTypeID =  Convert.ToByte(ViewData["ArticleTypeID"]);
+    var articleType = UoW.GetRepository<ArticleType>().GetAll().Where(p => p.ArticleTypeID == articleTypeID).Single();
+    var subTypes = UoW.GetRepository<ArticleSubType>().GetAll().Where(p => p.ArticleTypeID == articleTypeID).ToList();
+    if(subTypes.Count > 0)
+    {
+        <p style="font-style: italic; text-align: center; margin-top: 10px;">or @(articleType.Name) Sub Types</p>
+
+        Html.DevExpress().CheckBoxList(settings => {
+            settings.Name = "PageSection" + ViewData["PageSectionID"].ToString() + "AutoPopulateArticleSubTypes" + ViewData["ArticleTypeID"].ToString();
+            settings.Properties.RepeatDirection = System.Web.UI.WebControls.RepeatDirection.Horizontal;
+            settings.Properties.RepeatColumns = 4;
+            settings.Properties.ValueField = "ArticleSubTypeID";
+            settings.Properties.ValueType = typeof(byte);
+            settings.Properties.TextField = "Name";
+            settings.Width = 352;
+            settings.Style.Add("margin", "0 auto");
+            settings.PreRender = (sender, e) =>
+            {
+                ASPxCheckBoxList cbl = (ASPxCheckBoxList)sender;
+                foreach (ListEditItem item in cbl.Items)
+                {
+                    item.Selected = Model.Select(p => p.ArticleSubTypeID).Contains((byte)item.Value);
+                }
+            };
+            settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+                LoadingPanel.Show();
+                s.UnselectAll();
+                if (e.isSelected)
+                    s.SetSelectedIndex(e.index);
+                else
+                    s.UnselectIndices(e.index);
+                PageSection" + ViewData["PageSectionID"].ToString() + @"AutoPopulateArticleTypes.UnselectAll();
+                $.ajax({
+                    url: '" +Url.Action("UpdatePageSectionArticleSubTypeAutoPopulate", "CMS")+@"',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        PageSectionID: " + ViewData["PageSectionID"].ToString() + @",
+                        ArticleSubTypes: s.GetSelectedValues().toString()
+                    },
+                    success: function(data) { 
+                        LoadingPanel.Hide();
+                    },
+                    timeout: 20000
+                });
+            }";
+        
+        }).BindList(UoW.GetRepository<ArticleSubType>().GetAll().Where(p => p.ArticleTypeID == Convert.ToByte(ViewData["ArticleTypeID"])).ToList()).Render();               
+        
+
+    }
+}
+@*<script type="text/javascript">
+    $(".article-grid-container").sortable();
+    $(".article-grid-container").sortable('destroy');
+</script>*@

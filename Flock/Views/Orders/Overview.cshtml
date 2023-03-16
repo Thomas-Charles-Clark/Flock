@@ -1,0 +1,132 @@
+﻿@{
+    ViewBag.Title = "Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles {
+    <style type="text/css">
+        #container {
+            width: 1275px;
+        }
+    </style>
+    @Styles.Render("~/Content/composition-base.css")
+}
+
+<h4 class="page-heading">Overview</h4>
+
+<div id="test-stuff" style="display: none;">
+
+    @Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "StockCodeInput";
+    settings.Properties.NullDisplayText = "Product Code";
+    settings.Properties.NullText = "Product Code";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+    @Html.DevExpress().Button(settings =>
+{
+    settings.Name = "TestButton";
+    settings.Text = "Test Stock";
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '" + Url.Action("TestStockCheck", "Orders") + @"',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ProductCode: StockCodeInput.GetValue()
+            },
+            success: function(data) {
+                $('#test-stock-target').text(vkbeautify.xml(data));
+                $('.prettyprinted').removeClass('prettyprinted');
+                prettyPrint();
+                $('#stock-display-inner').show('fast');
+                LoadingPanel.Hide();
+            },
+            error: function(e, s, a) {
+                $.showError(e, s, a);
+            },
+            timeout: 120000
+        });
+    }";
+}).GetHtml()
+
+    <div style="clear: both;"></div>
+
+    <div class="content-panel-container">
+        <fieldset>
+            <legend onclick="$('#stock-display-inner').slideToggle('fast');">
+                Test Stock Check
+            </legend>
+            <div id="stock-display-inner" style="display: none;" class="fieldset-inner">
+                <pre id="test-stock-target" class="prettyprint lang-xml">
+                
+            </pre>
+                <div style="clear: both"></div>
+            </div>
+        </fieldset>
+    </div>
+
+    @Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "OrderNoInput";
+    settings.Properties.NullDisplayText = "Order No.";
+    settings.Properties.NullText = "Order No.";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+}).GetHtml()
+
+    @Html.DevExpress().Button(settings =>
+{
+    settings.Name = "OrderStatusButton";
+    settings.Text = "Fetch Status";
+    settings.Style.Add("float", "left");
+    settings.Style.Add("margin", "0 7px 7px 0");
+    settings.ClientSideEvents.Click = @"function(s, e) {
+        LoadingPanel.Show();
+        $.ajax({
+            url: '" + Url.Action("CheckOrderStatus", "Orders") + @"',
+            type: 'POST',
+            traditional: true,
+            data: {
+                OrderID: OrderNoInput.GetValue()
+            },
+            success: function(data) {
+                $('#test-order-status-target').text(vkbeautify.xml(data));
+                $('.prettyprinted').removeClass('prettyprinted');
+                prettyPrint();
+                $('#order-status-display-inner').show('fast');
+                LoadingPanel.Hide();
+            },
+            error: function(e, s, a) {
+                $.showError(e, s, a);
+            },
+            timeout: 120000
+        });
+    }";
+}).GetHtml()
+
+    <div style="clear: both;"></div>
+
+    <div class="content-panel-container">
+        <fieldset>
+            <legend onclick="$('#order-status-display-inner').slideToggle('fast');">
+                Order Status Check
+            </legend>
+            <div id="order-status-display-inner" style="display: none;" class="fieldset-inner">
+                <pre id="test-order-status-target" class="prettyprint lang-xml">
+                
+            </pre>
+                <div style="clear: both"></div>
+            </div>
+        </fieldset>
+    </div>
+
+</div>
+
+<div id="order-grid-container">
+    @Html.Action("OrderGridPartial", "Orders")
+</div>

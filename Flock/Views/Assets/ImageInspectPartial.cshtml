@@ -1,0 +1,196 @@
+﻿@using Flock.Models
+@model System.Data.Linq.IMultipleResults
+
+@{
+    using (var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>())
+    {
+        var ImageResult = Model.GetResult<Image>().Single();
+        <div id="content-panel-container" style="float: left; margin-right: 2em;">
+            <div class="content-panel-container">
+                <fieldset id="product-page-swap-fieldset">
+                    <legend>Image</legend>
+                    <div style="background-color: white; padding: 1em;">
+                        <div>
+                            <a href="javascript:;" onclick="$('#large-image-dialog').dialog('open')">
+                                <img src="https://flock.designersguild.com/imagelibrary/239/@(ImageResult.ImageID).jpeg" alt="@ImageResult.AltText" title="Click to View Larger" />
+                            </a>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="content-panel-container" style="float: left;">
+            <div class="content-panel-container">
+                <fieldset id="product-page-swap-fieldset">
+                <legend>Image Information</legend>
+                <div style="background-color: white; padding: 1em;">
+                    <div style="float: left;">
+                        <div style="float: left; width: 210px; margin-right: 20px;">
+                            <dl style="margin-top: 0;">
+                                <dt>
+                                    Image ID
+                                </dt>
+                                <dd>
+                                    @(ImageResult.ImageID)
+                                </dd>
+                                <dt>
+                                    Intranet Image ID
+                                </dt>
+                                <dd>
+                                    @(ImageResult.IntranetImageID)
+                                </dd>
+                                <dt>
+                                    Name
+                                </dt>
+                                <dd>
+                                    @(ImageResult.Name)
+                                </dd>
+                                <dt>
+                                    Description
+                                </dt>
+                                <dd>
+                                    @(ImageResult.Description)
+                                </dd>
+                                <dt>
+                                    Image Type
+                                </dt>
+                                <dd>
+                                    @(UoW.GetRepository<Flock.Models.ImageType>().GetAll().Where(p => p.ImageTypeID == ImageResult.ImageTypeID).Select(p => p.Name).SingleOrDefault())
+                                </dd>
+                                @if (ImageResult.ImageTypeID > 1)
+                                {
+                                    <dt>
+                                        Perspective
+                                    </dt>
+                                    <dd>
+                                        @(UoW.GetRepository<Flock.Models.Perspective>().GetAll().Where(p => p.PerspectiveID == ImageResult.PerspectiveID).Select(p => p.Name).SingleOrDefault())
+                                    </dd>
+                                }
+                                <dt>
+                                    Star Rating
+                                </dt>
+                                <dd>
+                                    @{
+                                decimal avg = 0.0M;
+                                decimal pixelShift = 0;
+
+                                avg = ImageResult.StarRating;
+
+                                //that ^ is out of 4, need out of 110
+                                pixelShift = (avg * 110) / 5;
+                                //pixelShift = avg * 2;
+                                avg = (avg * 100) / 5; // to percentage
+                                avg /= 20;
+                                var niceAvg = Math.Round(avg * 100) / 100;
+
+                                ViewContext.Writer.Write(@"
+                                            <div class='starRatingMaskWrapper'>
+                                                <div class='fiveStarRating'>
+                                                    <div class='whiteOut' style='background-position: " + pixelShift + @"px 0px'>
+                                                        <div class='starRatingMask'/> </div>
+                                                    </div>
+                                                </div>
+                                            </div>");
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        <div style="float: left; width: 640px;">
+                            <dl style="margin-top: 0;">
+                                <dt>
+                                    Alt Text
+                                </dt>
+                                <dd>
+                                    @(ImageResult.AltText == null ? "Not Configured" : ImageResult.AltText)
+                                </dd>
+                                <dt>
+                                    Title Text
+                                </dt>
+                                <dd>
+                                    @(ImageResult.TitleText == null ? "Not Configured" : ImageResult.TitleText)
+                                </dd>
+                                <dt>
+                                    Hotspots
+                                </dt>
+                                <dd>@{
+                                    var HotspotResults = Model.GetResult<ImageInspectHotspotsResult>().ToList();
+                                    //var Result_Product = Model.GetResult<imageinspectusageresult_product>().ToList();
+                                    //var Result_ProductPage = Model.GetResult<imageinspectusageresult_productpage>().ToList();
+                                    //var Result_Collection = Model.GetResult<imageinspectusageresult_collection>().ToList();
+                                    //var Result_Pods = Model.GetResult<imageinspectusageresult_pods>().ToList();
+                                    //var Result_Slideshow = Model.GetResult<imageinspectusageresult_slideshow>().ToList();
+
+                                        if (HotspotResults.Count > 0)
+                                        {
+                                            <table id="hotspots-list">
+                                                <tr>
+                                                    <th>Product ID</th>
+                                                    <th>Product Name</th>
+                                                    <th>Code</th>
+                                                    <th>Hotspot Image</th>
+                                                    <th>Product Page ID</th>
+                                                    <th>Product Page Name</th>
+                                                    <th>Product Page URL Keywords</th>
+                                                    <th>Product Page Deleted Date</th>
+                                                    <th>Web Status</th>
+                                                </tr>
+
+                                                @foreach (var HotspotResult in HotspotResults)
+                                                {
+                                                    <tr>
+                                                        <td>@(HotspotResult.ProductID)</td>
+                                                        <td>@(HotspotResult.ProductName)</td>
+                                                        <td>@(HotspotResult.Code)</td>
+                                                        <td><img src="https://flock.designersguild.com/imagelibrary/156/@(HotspotResult.Front).jpeg" /></td>
+                                                        <td>@(HotspotResult.ProductPageID)</td>
+                                                        <td>@(HotspotResult.ProductPageName)</td>
+                                                        <td>@(HotspotResult.URLKeywords)</td>
+                                                        <td>@(HotspotResult.DeletedDT)</td>
+                                                        <td>
+                                                            @{
+                                                    var WebStatus = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == HotspotResult.WebStatusID).Select(p => p.Name).Single();
+                                                    var colour = "black";
+                                                    switch (HotspotResult.WebStatusID)
+                                                    {
+                                                        case 0:
+                                                            colour = "green";
+                                                            break;
+                                                        case 1:
+                                                            colour = "orange";
+                                                            break;
+                                                        case 2:
+                                                            colour = "orange";
+                                                            break;
+                                                        case 3:
+                                                            colour = "green";
+                                                            break;
+                                                        case 4:
+                                                            colour = "red";
+                                                            break;
+                                                        default: break;
+                                                    }
+                                                    <span style="color: @(colour)">@(WebStatus)</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        }
+                                        else
+                                        {
+                                            ViewContext.Writer.Write("This image has no hotspots.");
+                                        }
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                </fieldset>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+    }
+}

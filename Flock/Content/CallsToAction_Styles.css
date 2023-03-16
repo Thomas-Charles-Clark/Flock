@@ -1,0 +1,45 @@
+﻿.container {
+    width: auto;
+}
+
+label {
+    margin-bottom: unset;
+}
+
+#selector-grid-container { 
+    margin-bottom: 20px;
+}
+
+.content-panel-container fieldset legend {
+    cursor: default;
+}
+
+.form-wrapper {
+    float: left;
+}
+
+.form-wrapper > table.dxeRoot_MetropolisBlue,
+.form-wrapper div.sp-replacer {
+    margin-bottom: 10px;
+}
+
+label.colour-label {
+    margin-right: 4px;
+    top: -4px;
+    position: relative;
+    width: 122px;
+}
+
+#preview-container {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+#style-preview {
+    height: 50px;
+    width: 250px;
+    font-size: 12px;
+    border: none;
+    background-color: #f2f2f2;
+    color: black;
+}

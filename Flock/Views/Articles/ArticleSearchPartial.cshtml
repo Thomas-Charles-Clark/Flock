@@ -1,0 +1,55 @@
+﻿<div class="resource-panel-container">
+    <fieldset id="article-search-fieldset">
+        <legend onclick="$('.hideable-dataview').not('#article-dataview').slideUp('fast'); $('#article-dataview').slideToggle('fast');">Article Search (click to expand / contract)</legend>
+        <div id="article-dataview" class="hideable-dataview" style="display: none;">
+            <div style="width: 100%; background-color: white; padding: 1em; padding-bottom: 0;">
+                @Html.Action("ArticleSearchArticleTypeDropDownPartial", "Articles")
+                @Html.Action("ArticleSearchNameOrIDTextBoxPartial", "Articles")
+
+                @Html.DevExpress().Button(settings =>
+                {
+                    settings.Name = "ArticleSearchClearFiltersButton";
+                    settings.Text = "Reset";
+                    settings.Style.Add("line-height", "32px");
+                    settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(75);
+                    //settings.ControlStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0072C6");
+                    settings.ClientSideEvents.Click = @"function(s, e) {
+                        ArticleSearchArticleTypeListBox.UnselectAll();
+                        ArticleSearchArticleTypeDD.SetText('Article Type');
+                        ArticleSearchNameOrIDTextBox.SetText('Name, Code or ID');
+
+                        $('#article-searching-icon').fadeIn('fast');
+                        $.ajax({
+                            url: '" + Url.Action("ArticleSearch", "Articles") + @"',
+                            traditional: true,
+                            data: {
+                                ArticleTypeID: ArticleSearchArticleTypeListBox.GetValue(),
+                                NameOrID: ArticleSearchNameOrIDTextBox.GetValue()
+                            },
+                            success: function(data) {
+                                $('#article-data-view-container').html(data);
+                                $('#article-searching-icon').fadeOut('slow');
+                                if(typeof(InitArticleDragDrop) == 'function')
+                                    InitArticleDragDrop();
+                                if(typeof(InitRelatedArticleDragDrop) == 'function')
+                                    InitRelatedArticleDragDrop();
+                            },
+                            error: function(e, s, a) {
+                                $.showError(e, s, a, function() { $('#article-searching-icon').fadeOut('slow'); });
+                            },
+                            timeout: 20000
+                        });
+                    }";
+                }).GetHtml()
+                <img id="article-searching-icon" src="/Images/SystemIcons/searching-icon.gif" alt="searching" />
+                <div style="clear: both;"></div>
+            </div>
+            <div id="article-data-view-container">
+                @Html.Action("ArticleSearch", "Articles")
+            </div>
+        </div>
+
+    </fieldset>
+    <div style="clear: both;"></div>
+</div>

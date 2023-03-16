@@ -1,0 +1,48 @@
+﻿@model List<Flock.Models.Continent>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+    if (action == "CountrySearchContinentDropDownPartial")
+    {
+        listBoxSettings.Name = "CountrySearchContinentListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            $('#country-searching-icon').fadeIn('fast');
+            CountrySearchContinentDD.SetText(s.GetSelectedItem().text);
+            CountrySearchContinentDD.HideDropDown();
+            $.ajax({
+                url: '" + Url.Action("Search", "CountrySearch") + @"',
+                traditional: true,
+                data: { 
+                    MarketID: CountrySearchMarketListBox.GetValue(),
+                    ContinentID: CountrySearchContinentListBox.GetValue(),
+                    RegionID: CountrySearchRegionListBox.GetValue(),
+                    LanguageID: CountrySearchLanguageListBox.GetValue(),
+                    SearchString: CountrySearchNameTextBox.GetText(),
+                    TableLock: CountrySearchCLTableLock.GetValue()
+                },
+                success: function(data) {
+                    $('#country-search-data-view-container').html(data);
+                    $('#country-searching-icon').fadeOut('slow');
+                    if (typeof (InitCountryDragDrop) == 'function')
+                        InitCountryDragDrop();
+                },
+                error: function(e, s, a) {
+                    $.showError(e, s, a, function() { $('#country-searching-icon').fadeOut('slow'); });
+                },
+                timeout: 60000
+            });
+        }";
+    }
+    
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "ContinentID";
+}
+).BindList(Model).GetHtml()

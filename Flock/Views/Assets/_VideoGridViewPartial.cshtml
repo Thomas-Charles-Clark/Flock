@@ -1,0 +1,268 @@
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+    
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "VideoGridView";
+        settings.CallbackRouteValues = new { Controller = "Assets", Action = "VideoGridViewPartial" };
+
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Assets", Action = "VideoGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Assets", Action = "VideoGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Assets", Action = "VideoGridViewPartialDelete" };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 100;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        settings.CommandColumn.ShowEditButton = true;
+
+        settings.KeyFieldName = "VideoID";
+
+        settings.SettingsPager.Visible = true;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.Columns.Add(column => {
+            column.Name = "VideoID";
+            column.FieldName = "VideoID";
+            column.Caption = "ID";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SortDescending();
+        });
+        settings.Columns.Add(column => {
+            column.Name = "Name";
+            column.FieldName = "Name";
+            column.Caption = "Name";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            var nProp = column.PropertiesEdit as TextBoxProperties;
+            nProp.MaxLength = 50;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(column => {
+            column.Name = "Description";
+            column.FieldName = "Description";
+            column.Caption = "Description";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            var dProp = column.PropertiesEdit as TextBoxProperties;
+            dProp.MaxLength = 255;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            
+        });
+        settings.Columns.Add(column => {
+            column.Name = "EmbedCode";
+            column.FieldName = "EmbedCode";
+            column.Caption = "EmbedCode";
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            var ecProp = column.PropertiesEdit as TextBoxProperties;
+            ecProp.MaxLength = 500;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Visible = false;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+        });
+        settings.Columns.Add(column => {
+            column.Name = "RunningTime";
+            column.FieldName = "RunningTime";
+            column.Caption = "Running Time";
+            column.ColumnType = MVCxGridViewColumnType.TimeEdit;
+            var rtProp = column.PropertiesEdit as TimeEditProperties;
+            rtProp.EditFormat = EditFormat.Time;
+            rtProp.DisplayFormatString = "mm:ss";
+            rtProp.EditFormatString = "mm:ss";
+            rtProp.DisplayFormatInEditMode = true;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;                 
+        });
+        settings.Columns.Add(column => {
+            column.Name = "HD";
+            column.FieldName = "HD";
+            column.Caption = "HD";
+            column.ColumnType = MVCxGridViewColumnType.CheckBox;
+            var cbProp = column.PropertiesEdit as CheckBoxProperties;
+            cbProp.ValueChecked = true;
+            cbProp.ValueUnchecked = false;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        });
+        settings.Columns.Add(column => {
+            column.Name = "BrandID";
+            column.FieldName = "BrandID";
+            column.Caption = "Brand";
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            var lProp = column.PropertiesEdit as ComboBoxProperties;
+            lProp.TextField = "Name";
+            lProp.ValueField = "BrandID";
+            lProp.ValueType = typeof(byte);
+            lProp.DataSource = UoW.GetRepository<Flock.Models.Brand>().GetAll().ToList();
+        });
+        settings.Columns.Add(column => {
+            column.Name = "LaunchID";
+            column.FieldName = "LaunchID";
+            column.Caption = "Launch";
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            var lProp = column.PropertiesEdit as ComboBoxProperties;
+            lProp.TextField = "Name";
+            lProp.ValueField = "LaunchID";
+            lProp.ValueType = typeof(short);
+            lProp.DataSource = UoW.GetRepository<Flock.Models.Launch>().GetAll().OrderByDescending(p => p.LaunchDate).ToList();
+        });
+        //settings.Columns.Add(column => {
+        //    column.Name = "LanguageID";
+        //    column.FieldName = "LanguageID";
+        //    column.Caption = "Language";
+        //    column.Width = 65;
+        //    column.EditFormSettings.Visible = DefaultBoolean.True;
+        //    column.Settings.AllowAutoFilter = DefaultBoolean.False;
+        //    column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        //    column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        //    column.ColumnType = MVCxGridViewColumnType.ComboBox;
+        //    var lProp = column.PropertiesEdit as ComboBoxProperties;
+        //    lProp.TextField = "Name";
+        //    lProp.ValueField = "LanguageID";
+        //    lProp.ValueType = typeof(byte);
+        //    lProp.DataSource = UoW.GetRepository<Flock.Models.Language>().GetAll().ToList();
+        //});
+        settings.Columns.Add(column => {
+            column.Name = "CreatedDT";
+            column.FieldName = "CreatedDT";
+            column.Caption = "Created";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+        settings.Columns.Add(column => {
+            column.Name = "OnDate";
+            column.FieldName = "OnDate";
+            column.Caption = "OnDate";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+        });
+        settings.Columns.Add(column => {
+            column.Name = "OffDate";
+            column.FieldName = "OffDate";
+            column.Caption = "OffDate";
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+        });
+        settings.Columns.Add(column => {
+            column.Name = "WebStatus";
+            column.FieldName = "WebStatus";
+            column.Caption = "Web Status";
+            column.Settings.HeaderFilterMode = HeaderFilterMode.List;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var i = Convert.ToByte(DataBinder.Eval(c.DataItem, "WebStatus"));
+                string colour = "black";
+                string statusText = "unknown";
+                statusText = UoW.GetRepository<Flock.Models.Status>().GetAll().Where(p => p.StatusID == i).Select(p => p.Name).Single();
+                switch (i)
+                {
+                    case 0:
+                        colour = "green";
+                        break;
+                    case 1:
+                        colour = "orange";
+                        break;
+                    case 2:
+                        colour = "orange";
+                        break;
+                    case 3:
+                        colour = "green";
+                        break;
+                    case 4:
+                        colour = "red";
+                        break;
+                    default: break;
+                }
+                string res = "<span style='color: " + colour + " '>" + statusText + "</span>";
+                ViewContext.Writer.Write(res);
+            });
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "HD":
+                    e.Values.Clear();
+                    e.AddValue("True", "1");
+                    e.AddValue("False", "0");
+                    e.AddShowAll();
+                    break;
+                    
+                case "BrandID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Brand>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.BrandID.ToString());
+                    }
+                    e.AddShowAll();
+                break;
+
+                case "LaunchID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Launch>().GetAll().OrderByDescending(p => p.LaunchDate))
+                    {
+                        e.AddValue(pt.Name, pt.LaunchID.ToString());
+                    }
+                    e.AddShowAll();
+                break;
+
+                case "LanguageID":
+                    e.Values.Clear();
+                    foreach (var v in UoW.GetRepository<Flock.Models.Language>().GetAll().OrderBy(p => p.LanguageID))
+                    {
+                        e.AddValue(v.Name, v.LanguageID.ToString());
+                    }
+                    e.AddShowAll();
+                break;
+                    
+                case "WebStatus":
+                e.Values.Clear();
+                    foreach (var s in UoW.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID))
+                    {
+                        e.AddValue(s.Name, s.StatusID.ToString());                        
+                    }
+                e.AddShowAll();
+                break;
+            }
+        };
+    });
+	if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

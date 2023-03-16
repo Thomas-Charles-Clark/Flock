@@ -1,0 +1,373 @@
+﻿@using Flock.DAL;
+@using Flock.Models;
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new UnitOfWork<FlockDataContext>();
+
+        var productTypes = UoW.GetRepository<ProductType>().GetAll().OrderBy(p => p.ProductTypeID);
+        foreach (var pt in productTypes)
+        {
+            pt.Name = pt.ProductTypeID + ": " + pt.Name;
+        }
+
+        var namingConventions = UoW.GetRepository<NamingConvention>().GetAll().OrderBy(p => p.NamingConventionID);
+        foreach (var nc in namingConventions)
+        {
+            nc.Name = nc.NamingConventionID + ": " + nc.Name;
+        }
+
+        var templates = UoW.GetRepository<Template>().GetAll().Where(p => p.TemplateTypeID == 1);
+        foreach (var t in templates)
+        {
+            t.Name = t.TemplateID + ": " + t.Name;
+        }
+
+        settings.ClientSideEvents.BeginCallback = @"function(s, e) {
+            e.customArgs['LaunchID'] = ProductPageGenerateLaunchListBox.GetValue();
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+            $('[data-toggle=""tooltip""]').tooltip({
+                position: { my: ""left top"", at: ""left bottom"", collision: ""flipfit"" },
+                content: function () {
+                    return $(this).prop('title');
+                }
+            });
+        }";
+
+        settings.Name = "ErrorInspectorGridView";
+        settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "ErrorInspectorGridViewPartial" };
+
+        settings.CommandColumn.Visible = false;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.ShowDeleteButton = false;
+        settings.CommandColumn.ShowEditButton = false;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.KeyFieldName = "ProductID";
+
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        var codeColumn = new MVCxGridViewColumn();
+        var nameColumn = new MVCxGridViewColumn();
+        var productStatusColumn = new MVCxGridViewColumn();
+        var groupCodeColumn = new MVCxGridViewColumn();
+        var typeCodeColumn = new MVCxGridViewColumn();
+        var basketNameColumn = new MVCxGridViewColumn();
+        var launchDateColumn = new MVCxGridViewColumn();
+        var launchIDColumn = new MVCxGridViewColumn();
+        var productIDColumn = new MVCxGridViewColumn();
+        var productPageIDColumn = new MVCxGridViewColumn();
+        var merchandiserIDColumn = new MVCxGridViewColumn();
+        var coMerchandiserIDColumn = new MVCxGridViewColumn();
+        var namingConventionColumn = new MVCxGridViewColumn();
+        var productTypeColumn = new MVCxGridViewColumn();
+        var templateIDColumn = new MVCxGridViewColumn();
+        var statusColumn = new MVCxGridViewColumn();
+        var errorsColumn = new MVCxGridViewColumn();
+
+        codeColumn.Name = "Code";
+        codeColumn.Caption = "Code";
+        codeColumn.FieldName = "Code";
+        codeColumn.Width = System.Web.UI.WebControls.Unit.Percentage(10);
+
+        nameColumn.Name = "Name";
+        nameColumn.Caption = "Name";
+        nameColumn.FieldName = "Name";
+        nameColumn.Width = System.Web.UI.WebControls.Unit.Percentage(30);
+
+        settings.SettingsText.EmptyDataRow = "Please select a Launch";
+
+        /* Add total ideally at top AND bottom... */
+
+        productStatusColumn.Name = "Status";
+        productStatusColumn.Caption = "Product Status";
+        productStatusColumn.FieldName = "ProductStatus";
+        productStatusColumn.SetDataItemTemplateContent(c =>
+        {
+            char enabledState = '?';
+            if (DataBinder.Eval(c.DataItem, "Status") != DBNull.Value && DataBinder.Eval(c.DataItem, "Status") != null)
+                enabledState = (char)DataBinder.Eval(c.DataItem, "Status");
+            switch (enabledState)
+            {
+                case 'C':
+                    ViewContext.Writer.Write("<span style='color: green'>" + enabledState + "</span>");
+                    break;
+                case 'D':
+                    ViewContext.Writer.Write("<span style='color: red'>" + enabledState + "</span>");
+                    break;
+                case 'L':
+                    ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+                    break;
+                case 'Y':
+                    ViewContext.Writer.Write("<span style='color: orange'>" + enabledState + "</span>");
+                    break;
+                default:
+                    ViewContext.Writer.Write("<span style='color: black'>" + enabledState + "</span>");
+                    break;
+            }
+        });
+
+        groupCodeColumn.Name = "GroupCode";
+        groupCodeColumn.Caption = "Group Code";
+        groupCodeColumn.FieldName = "ProductGroupCode";
+        groupCodeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        groupCodeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+
+        typeCodeColumn.Name = "TypeCode";
+        typeCodeColumn.Caption = "Type Code";
+        typeCodeColumn.FieldName = "ItemTypeCode";
+        typeCodeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        typeCodeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+
+        basketNameColumn.Name = "BasketName";
+        basketNameColumn.Caption = "Basket Name";
+        basketNameColumn.FieldName = "BasketName";
+
+        launchDateColumn.Name = "LaunchDate";
+        launchDateColumn.Caption = "Launch Date";
+        launchDateColumn.FieldName = "LaunchDate";
+        launchDateColumn.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+        launchIDColumn.Name = "LaunchID";
+        launchIDColumn.Caption = "Launch";
+        launchIDColumn.FieldName = "LaunchID";
+        launchIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        launchIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        launchIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        launchIDColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        launchIDColumn.SetDataItemTemplateContent(c =>
+        {
+            int LaunchID = 0;
+            string Launch = "<i>Unknown!</i>";
+
+            if (DataBinder.Eval(c.DataItem, "LaunchID") != DBNull.Value && DataBinder.Eval(c.DataItem, "LaunchID") != null)
+            {
+                LaunchID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "LaunchID"));
+                Launch = UoW.GetRepository<Flock.Models.Launch>().GetAll().Where(p => p.LaunchID == LaunchID).Select(p => p.Name).Single();
+            }
+
+            ViewContext.Writer.Write("<span>" + Launch + "</span>");
+        });
+
+        productIDColumn.Name = "ProductID";
+        productIDColumn.Caption = "Product ID";
+        productIDColumn.FieldName = "ProductID";
+
+        productPageIDColumn.Name = "ProductPageID";
+        productPageIDColumn.Caption = "Product Page ID";
+        productPageIDColumn.FieldName = "ProductPageID";
+
+        merchandiserIDColumn.Name = "MerchandiserID";
+        merchandiserIDColumn.Caption = "Merchandiser";
+        merchandiserIDColumn.FieldName = "MerchandiserID";
+
+        coMerchandiserIDColumn.Name = "CorrespondingMerchandiserID";
+        coMerchandiserIDColumn.Caption = "Corresponding Merchandiser";
+        coMerchandiserIDColumn.FieldName = "CorrespondingMerchandiserID";
+
+        namingConventionColumn.Name = "NamingConventionID";
+        namingConventionColumn.Caption = "Naming Convention";
+        namingConventionColumn.FieldName = "NamingConventionID";
+        namingConventionColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        namingConventionColumn.SetDataItemTemplateContent(c =>
+        {
+            var thisNc = namingConventions.Where(p => p.NamingConventionID == (byte?)DataBinder.Eval(c.DataItem, "NamingConventionID")).SingleOrDefault();
+            if (thisNc != null)
+            {
+                ViewContext.Writer.Write("<span>" + thisNc.Name + "</span>");
+                ViewContext.Writer.Write("<span class='glyphicon glyphicon-info-sign' style='float: right;' data-toggle='tooltip' data-placement='left' title='<strong>Sources</strong><br/><br/>" + Html.Raw(thisNc.DataSource) + "<br/><br/><br/><br/><strong>Formulae</strong><br/><br/><strong>Heading:</strong> " + thisNc.HeadingFormula + "<br/><br/><strong>SubHeading:</strong> " + thisNc.SubHeadingFormula + "<br/><br/><strong>Title Tag:</strong> " + thisNc.TitleTagFormula + "<br/><br/><strong>URL Keywords:</strong> " + thisNc.URLKeywordsFormula + "<br/><br/><strong>Basket Name:</strong> " + thisNc.BasketNameFormula + "'></span>");
+            }
+        });
+
+        productTypeColumn.Name = "ProductTypeID";
+        productTypeColumn.Caption = "Product Type";
+        productTypeColumn.FieldName = "ProductTypeID";
+        productTypeColumn.SetDataItemTemplateContent(c =>
+        {
+            int ProductTypeID = 0;
+            string ProductType = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "ProductTypeID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ProductTypeID") != null)
+            {
+                ProductTypeID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "ProductTypeID"));
+                ProductType = UoW.GetRepository<Flock.Models.ProductType>().GetAll().Where(p => p.ProductTypeID == ProductTypeID).Select(p => p.Name).Single();
+            }
+
+            ViewContext.Writer.Write("<span style='color: black'>" + ProductType + "</span>");
+        });
+
+        templateIDColumn.Name = "TemplateID";
+        templateIDColumn.Caption = "Template";
+        templateIDColumn.FieldName = "TemplateID";
+
+        statusColumn.Name = "Status";
+        statusColumn.Caption = "Status";
+        statusColumn.FieldName = "Status";
+        statusColumn.Width = System.Web.UI.WebControls.Unit.Percentage(25);
+        statusColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        statusColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        statusColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+
+        errorsColumn.Name = "Errors";
+        errorsColumn.Caption = "Errors";
+        errorsColumn.FieldName = "Errors";
+        errorsColumn.Width = System.Web.UI.WebControls.Unit.Percentage(40);
+        errorsColumn.SetDataItemTemplateContent(c => {
+            string err = null;
+            if (DataBinder.Eval(c.DataItem, "Errors") != null)
+            {
+                err = (string)DataBinder.Eval(c.DataItem, "Errors");
+            }
+            if(err != null)
+            {
+                err = err.Replace("; ", "<br/>");
+                if(err.EndsWith("<br/>"))
+                    err = err.Substring(0, err.LastIndexOf("<br/>"));
+                ViewContext.Writer.Write(Html.Raw(err));
+            }
+        });
+
+        settings.Columns.Add(codeColumn);
+        settings.Columns.Add(nameColumn);
+        //settings.Columns.Add(statusColumn);
+        //settings.Columns.Add(groupCodeColumn);
+        //settings.Columns.Add(typeCodeColumn);
+        //settings.Columns.Add(basketNameColumn);
+        //settings.Columns.Add(launchDateColumn);
+        //settings.Columns.Add(launchIDColumn);
+        //settings.Columns.Add(productIDColumn);
+        //settings.Columns.Add(productPageIDColumn);
+        //settings.Columns.Add(merchandiserIDColumn);
+        //settings.Columns.Add(coMerchandiserIDColumn);
+        //settings.Columns.Add(namingConventionColumn);
+        //settings.Columns.Add(productTypeColumn);
+        //settings.Columns.Add(templateIDColumn);
+        settings.Columns.Add(statusColumn);
+        settings.Columns.Add(errorsColumn);
+
+        //settings.Columns.Add("ProductCategoryID").EditFormSettings.Visible = DefaultBoolean.False;
+        //settings.Columns.Add("Name").EditFormSettings.Visible = DefaultBoolean.False;
+        //var nColumn = settings.Columns["Name"] as MVCxGridViewColumn;
+        //nColumn.Caption = "Product Category";
+        //nColumn.Width = System.Web.UI.WebControls.Unit.Percentage(20);
+        //nColumn.CellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#f2f2f2");
+
+        //settings.Columns.Add("ProductTypeID");
+        //settings.Columns.Add("NamingConventionID");
+        //settings.Columns.Add("TemplateID");
+
+        //var ptColumn = settings.Columns["ProductTypeID"] as MVCxGridViewColumn;
+        //ptColumn.Name = "ProductTypeID";
+        //ptColumn.Caption = "Product Type";
+        //ptColumn.Width = System.Web.UI.WebControls.Unit.Percentage(20);
+        //ptColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        //ptColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        //ptColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        //ptColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        //ptColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        //var ptProp = ptColumn.PropertiesEdit as ComboBoxProperties;
+        //ptProp.TextField = "Name";
+        //ptProp.ValueField = "ProductTypeID";
+        //ptProp.ValueType = typeof(byte);
+        //ptProp.DataSource = productTypes;
+
+        //var ncColumn = settings.Columns["NamingConventionID"] as MVCxGridViewColumn;
+        //ncColumn.Name = "NamingConventionID";
+        //ncColumn.Caption = "Naming Convention";
+        //ncColumn.Width = System.Web.UI.WebControls.Unit.Percentage(40);
+        //ncColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        //ncColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        //ncColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        //ncColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        //ncColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        //ncColumn.SetDataItemTemplateContent(c =>
+        //{
+        //    var thisNc = namingConventions.Where(p => p.NamingConventionID == (byte?)DataBinder.Eval(c.DataItem, "NamingConventionID")).SingleOrDefault();
+        //    if (thisNc != null)
+        //    {
+        //        ViewContext.Writer.Write("<span>" + thisNc.Name + "</span>");
+        //        ViewContext.Writer.Write("<span class='glyphicon glyphicon-info-sign' style='float: right;' data-toggle='tooltip' data-placement='left' title='<strong>Sources</strong><br/><br/>" + Html.Raw(thisNc.DataSource) + "<br/><br/><br/><br/><strong>Formulae</strong><br/><br/><strong>Heading:</strong> " + thisNc.HeadingFormula + "<br/><br/><strong>SubHeading:</strong> " + thisNc.SubHeadingFormula + "<br/><br/><strong>Title Tag:</strong> " + thisNc.TitleTagFormula + "<br/><br/><strong>URL Keywords:</strong> " + thisNc.URLKeywordsFormula + "<br/><br/><strong>Basket Name:</strong> " + thisNc.BasketNameFormula + "'></span>");
+        //    }
+        //});
+
+        //var ncProp = ncColumn.PropertiesEdit as ComboBoxProperties;
+        //ncProp.TextField = "Name";
+        //ncProp.ValueField = "NamingConventionID";
+        //ncProp.ValueType = typeof(byte);
+        //ncProp.DataSource = namingConventions;
+
+
+        //var tColumn = settings.Columns["TemplateID"] as MVCxGridViewColumn;
+        //tColumn.Name = "TemplateID";
+        //tColumn.Caption = "Template";
+        //tColumn.Width = System.Web.UI.WebControls.Unit.Percentage(20);
+        //tColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        //tColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        //tColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        //tColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        //tColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        //var tProp = tColumn.PropertiesEdit as ComboBoxProperties;
+        //tProp.TextField = "Name";
+        //tProp.ValueField = "TemplateID";
+        //tProp.ValueType = typeof(byte);
+        //tProp.DataSource = templates;
+
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "ProductTypeID":
+                    e.Values.Clear();
+                    foreach (var v in productTypes)
+                    {
+                        e.AddValue(v.Name, v.ProductTypeID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "LaunchID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Launch>().GetAll().OrderByDescending(p => p.LaunchDate))
+                    {
+                        e.AddValue(pt.Name, pt.LaunchID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "NamingConventionID":
+                    e.Values.Clear();
+                    foreach (var v in namingConventions)
+                    {
+                        e.AddValue(v.Name, v.NamingConventionID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                case "TemplateID":
+                    e.Values.Clear();
+                    foreach (var v in templates)
+                    {
+                        e.AddValue(v.Name, v.TemplateID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+            }
+        };
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

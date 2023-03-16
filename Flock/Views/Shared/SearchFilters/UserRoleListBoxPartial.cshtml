@@ -1,0 +1,33 @@
+﻿@model List<Flock.Models.UserRole>
+@Html.DevExpress().ListBox(
+listBoxSettings =>
+{
+    string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+
+    if (action == "AdminOverviewUserRoleDropDownPartial")
+    {
+        listBoxSettings.Name = "AdminOverviewUserRoleListBox";
+        listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            if(s.GetSelectedItem() != null)
+                AdminOverviewUserRoleDD.SetText(s.GetSelectedItem().text);
+            else
+                AdminOverviewUserRoleDD.SetText('User Role');
+            AdminOverviewUserRoleDD.HideDropDown();
+            AdminOverviewGridView.PerformCallback();
+        }";
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            AdminOverviewUserRoleDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+
+    listBoxSettings.SelectedIndex = 0;
+    listBoxSettings.Properties.TextField = "Name";
+    listBoxSettings.Properties.ValueField = "Id";
+}
+).BindList(Model).GetHtml()

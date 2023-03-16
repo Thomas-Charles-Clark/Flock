@@ -1,0 +1,165 @@
+﻿@model Flock.ViewModels.AttributeAssignmentViewModel
+@using Flock.ViewModels;
+@{
+    Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewBag.Title = "Product Attribute Assignment";
+}
+@section styles {
+    
+    @Styles.Render("~/Content/attributes.css")
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #ProductPageAttributeGridSelector_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+    </style>
+}
+@section scripts {
+    
+    <script type="text/javascript">
+        function SaveAttributes() {
+            $("#attribute-header-busy-icon").fadeIn("fast");
+
+            var AttributeGroups = [];
+            $("#attribute-groups-container input:checked").each(function (index) {
+                AttributeGroups.push($(this).val());
+            });
+
+            $.ajax({
+                url: '@Url.Action("UpdateAttributes", "ProductPages")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: $("#selected-product-page-id").val(),
+                    ProductTypeID: AttributeDetailProductTypeListBox.GetValue(),
+                    BrandID: AttributeDetailBrandListBox.GetValue(),
+                    LaunchID: AttributeDetailLaunchListBox.GetValue(),
+                    ColourID: AttributeDetailColourListBox.GetValue(),
+                    PatternID: AttributeDetailPatternListBox.GetValue(),
+                    AttributeIDs: JSON.stringify(AttributeGroups)
+                },
+                success: function (data) {
+                    $("#attribute-header-busy-icon").fadeOut("fast");
+                    SuccessFade($("#save-attribute-button"));
+                    ProductPageAttributeGridSelector.Refresh();
+                },
+                error: function (e, s, a) {
+                    $("#attribute-header-busy-icon").fadeOut("fast");
+                    alert(s);
+                    FailureFade($("#save-attribute-button"));
+                    // log e
+                },
+                timeout: 20000
+            });
+        }
+
+        function ReloadProductPageAttributes() {
+
+            $("#attribute-header-busy-icon").fadeIn("fast");
+            $.ajax({
+                url: '@Url.Action("ReloadProductPageAttributes", "ProductPages")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: $("#selected-product-page-id").val()
+                },
+                success: function (data) {
+                    $("#product-page-attributes-fieldset").html(data);
+                },
+                error: function (e, s, a) {
+                    alert(s + ", reset was not successful.");
+                    $("#attribute-header-busy-icon").fadeOut("fast");
+                    // log e
+                }
+            });
+        }
+
+        function LoadSuggestions() {
+            $("#attribute-header-busy-icon").fadeIn("fast");
+            $.ajax({
+                url: '@Url.Action("SuggestAttributes", "ProductPages")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ID: Number($("#selected-product-page-id").val())
+                },
+                success: function (data) {
+                    if (data.ProductTypeID == null) {
+                        $("#attribute-header-busy-icon").fadeOut("fast");
+                        $("#no-suggestions").dialog("open");
+                        return;
+                    }
+                    var e = new ASPxClientProcessingModeEventArgs();
+                    window.Suggestions = data;
+                    AttributeDetailProductTypeListBox.SetSelectedItem(AttributeDetailProductTypeListBox.FindItemByValue(data.ProductTypeID));
+                    AttributeDetailProductTypeListBox.SelectedIndexChanged.FireEvent(AttributeDetailProductTypeListBox, e);
+                },
+                error: function (e, s, a) {
+                    alert(s + ' suggestion failure');
+                    $("#attribute-header-busy-icon").fadeOut("fast");
+                },
+                timeout: 20000
+            });
+        }
+
+        function ClearAttributes() {
+            $('#product-page-attributes input:checked').removeAttr('checked');
+            $('#product-page-attributes input').parent().css('background-color', 'white');
+            AttributeDetailProductTypeListBox.UnselectAll();
+            AttributeDetailProductTypeDD.SetText("Product Type");
+            AttributeDetailBrandListBox.UnselectAll();
+            AttributeDetailBrandDD.SetText("Brand");
+            AttributeDetailLaunchListBox.UnselectAll();
+            AttributeDetailLaunchDD.SetText("Launch");
+            $("#attribute-groups-container").html("<label style='font-weight: 700;'>No attributes specified. Please begin by selecting a Product Type, or clicking Suggest.</label>");
+            //var e = new ASPxClientProcessingModeEventArgs();
+            //AttributeProductTypeListBox.SelectedIndexChanged.FireEvent(AttributeProductTypeListBox, e);
+        }
+
+        $(document).ready(function () {
+            $("#no-suggestions").dialog({
+                title: "No Suggestions",
+                autoOpen: false,
+                height: "auto",
+                width: 250,
+                modal: true,
+                buttons: {
+                    'Ok': function() { 
+                        $(this).dialog("close");
+                    } 
+                }
+            });
+        });
+    </script>
+}
+
+<input id="selected-product-page-id" type="hidden" value="@(Model.ID)">
+
+<h4 class="page-heading">
+    Product Page Attributes
+    <a class="productpage-compose link-img" style="float: right;" title="Compose" href="/admin/productpages/compose/@(Model.ID)"></a>
+</h4>
+
+<div class="page-subheading">
+    <div id="attribute-filter-header">
+        @Html.Partial("ProductPageAttributeGridSelectorPartial")
+    </div>
+    <img id="attribute-product-page-select-busy" src="/images/systemicons/busy-icon-grey-white.gif" />
+    <div style="clear: both;"></div>
+</div>
+
+<div id="attribute-main-target">
+    @if (ViewData["InvalidProductPageIDError"] != null)
+    {
+        <h5>@(ViewData["InvalidProductPageIDError"])</h5>
+    }
+    @if (Model.ID != null)
+    {
+        @Html.Partial("AttributeMainPartial", Model)
+    }
+</div>
+
+<div id="no-suggestions">
+    <h5 style="font-size: 1em; margin-top: 0;">No suggestions could be generated for this Product Page.</h5>
+    <p style="line-height: 1.3em;">This is either because there are no Primary Products associated to this page, or because the associated Primary Products have not been classified.</p>
+</div>

@@ -1,0 +1,52 @@
+﻿@model List<Flock.Models.Country_Language>
+@Html.DevExpress().ListBox(listBoxSettings =>
+{
+    listBoxSettings.Name = "TranslationTargetLanguageListBox";
+    listBoxSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+        if(typeof DetectUnsavedChanges === 'function') {
+            if(DetectUnsavedChanges()) {
+                $.unsavedWarning(function() { 
+                    TranslationTargetLanguageDD.HideDropDown();
+                    TranslationTargetLanguageDD.SetText(s.GetSelectedItem().text);
+                    $('#ajax-container').html('');
+                    TranslateGridView.Refresh();
+                }, function() { 
+                    
+                }, null);
+            }
+            else {
+                TranslationTargetLanguageDD.HideDropDown();
+                TranslationTargetLanguageDD.SetText(s.GetSelectedItem().text);
+                $('#ajax-container').html('');
+                TranslateGridView.Refresh();
+            }
+            return;
+        }
+        else {
+            TranslationTargetLanguageDD.HideDropDown();
+            TranslationTargetLanguageDD.SetText(s.GetSelectedItem().text);
+            $('#ajax-container').html('');
+            TranslateGridView.Refresh();
+        }
+    }";
+
+    if(ViewBag.TargetCountryLanguageID != null)
+    {
+        listBoxSettings.Properties.ClientSideEvents.Init = @"function(s, e) { 
+            s.SetSelectedItem(s.FindItemByValue(" + ViewBag.TargetCountryLanguageID + @"));
+            if(s.GetSelectedItem() != null && s.GetSelectedItem() != false)
+                TranslationTargetLanguageDD.SetText(s.GetSelectedItem().text);
+        }";
+    }
+
+    listBoxSettings.Height = System.Web.UI.WebControls.Unit.Pixel(300);
+    listBoxSettings.ControlStyle.Border.BorderWidth = 0;
+    listBoxSettings.ControlStyle.BorderBottom.BorderWidth = 1;
+    listBoxSettings.ControlStyle.BorderBottom.BorderColor = System.Drawing.Color.FromArgb(0xDCDCDC);
+    listBoxSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    //listBoxSettings.SelectedIndex = 0;
+    listBoxSettings.Properties.SelectionMode = ListEditSelectionMode.Single;
+    listBoxSettings.Properties.ValueField = "Country_Language_ID";
+    listBoxSettings.Properties.TextField = "LanguageText";
+}).BindList(Model.OrderBy(p => p.Language.Name).ThenBy(p => p.Country.Name).ToList()).GetHtml()

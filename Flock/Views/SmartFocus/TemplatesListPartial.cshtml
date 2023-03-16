@@ -1,0 +1,54 @@
+﻿@using Flock.Classes.SmartFocus
+@model List<APITemplate>
+@{
+    if (Model != null)
+    {
+        <table>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    From
+                </th>
+                <th>
+                    From Email
+                </th>
+                <th>
+                    Reply To
+                </th>
+                <th>
+                    Sent
+                </th>
+            </tr>
+
+            @foreach (APITemplate t in Model)
+            {
+                <tr>
+                    <td>
+                        @(t.ID)
+                    </td>
+                    <td>
+                        @(t.Name)
+                    </td>
+                    <td>
+                        @(t.From)
+                    </td>
+                    <td>
+                        @(t.Email)
+                    </td>
+                    <td>
+                        @(t.ReplyAddress)
+                    </td>
+                    <td>
+                        @(t.Sent)
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+}

@@ -1,0 +1,24 @@
+﻿@model Flock.ViewModels.PageComposeViewModel
+@{
+    ViewBag.Title = "Compose Page";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/collection-composition.css")
+    @Styles.Render("~/Content/collections.css") @* Definitely should not have to include 'collections' CSS files in here. Fix this. *@
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/Content/themes/base/css")
+}
+
+<h4 class="page-heading">
+    Compose Page
+</h4>
+
+<div id="page-compose-section" data-page-id="@Model.PageID" style="float: left; width: 986px;">
+    <div id="page-select-header-container">
+        @Html.Partial("PageComposePageSelectHeaderPartial", Model.PageSearchHeader)
+    </div>
+    <h4>Please select a Page.</h4>
+</div>
+
+<div style="clear: both;"></div>

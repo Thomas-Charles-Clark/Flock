@@ -1,0 +1,39 @@
+@Html.DevExpress().DataView(settings =>
+{
+    settings.Name = "ProductToCollection_ProductDataView";
+    
+    settings.CallbackRouteValues = new { Controller = "Products", Action = "ProductToCollection_ProductDataViewFilter" };
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['Brands'] = BrandCheckComboBox.GetSelectedValues().toString();
+        e.customArgs['Launches'] = LaunchCheckComboBox.GetSelectedValues().toString();
+        e.customArgs['ProductTypes'] = ProductTypeCheckComboBox.GetSelectedValues().toString();
+        e.customArgs['TextSearch'] = ProductCollectionFreeTextSearchBox.GetValue().toString();
+    }";
+    settings.CustomActionRouteValues = new { Controller = "Products", Action = "ProductToCollection_ProductDataViewFilter" };
+    settings.AllowPaging = true;
+    settings.SettingsTableLayout.RowsPerPage = 5;
+    settings.SettingsTableLayout.ColumnCount = 3;
+    settings.ClientSideEvents.EndCallback = @"function(s, e) { 
+        initDragDrop();
+    }";
+    settings.SetItemTemplateContent(
+    c =>
+    {
+        var discID = "";
+        if (DataBinder.Eval(c.DataItem, "ImageID") != DBNull.Value && DataBinder.Eval(c.DataItem, "ImageID") != null)
+            discID = DataBinder.Eval(c.DataItem, "ImageID").ToString();
+        ViewContext.Writer.Write(
+            "<div id='image-box-" + DataBinder.Eval(c.DataItem, "ImageID") + "' class='draggable' data-product-id='"+DataBinder.Eval(c.DataItem, "ProductID")+"'>" +
+            "<div style=\"height: 156px;\">" +
+                "<img id=\"" + "img" + discID + "\" src=\"" + Url.Content("~/ImageLibrary/156/" + discID + ".jpeg") + "\" alt=\"\" />" +
+            "</div>" +
+            "<label>" + DataBinder.Eval(c.DataItem, "Code").ToString() + "</label>" +
+            "<div class=\"DataViewItemTitle\">" +
+                "<a class=\"NoWrap\" href=\"" + "javascript:void(" + discID + ");\">" + DataBinder.Eval(c.DataItem, "Name").ToString() + "</a>" +
+            "</div>" +
+            "</div>"
+        );
+    }
+
+); 
+}).Bind(Model).GetHtml()

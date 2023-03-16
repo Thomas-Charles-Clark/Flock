@@ -1,0 +1,211 @@
+﻿@{
+    var db = new Flock.Models.FlockDataContext();
+
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        settings.Name = "ColourGridView";
+        settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "ColourGridViewPartial" };
+
+        settings.SettingsEditing.BatchUpdateRouteValues = new { Controller = "ProductPages", Action = "ColourGridViewBatchEditingUpdate" };
+
+        settings.ClientSideEvents.CallbackError = @"function(s, e) {
+        $.showError('Error', e.message);
+        }";
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+        settings.SettingsBehavior.AllowSelectSingleRowOnly = false;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        //settings.CommandColumn.VisibleIndex = 100;
+        //settings.CommandColumn.Visible = true;
+
+        settings.Styles.Row.CssClass = "data-row";
+
+        //settings.CommandColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        //settings.CommandColumn.ShowNewButton = false;
+        //settings.CommandColumn.ShowDeleteButton = false;
+        //settings.CommandColumn.ShowEditButton = false;
+        //settings.CommandColumn.ShowUpdateButton = false;
+        //settings.CommandColumn.ShowCancelButton = false;
+        //settings.CommandColumn.ShowClearFilterButton = true;
+        //settings.CommandColumn.ShowSelectCheckbox = true;
+        //settings.CommandColumn.Width = 70;
+
+        settings.KeyFieldName = "ProductPageID";
+
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        settings.Settings.ShowHeaderFilterButton = true;
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "10", "20", "50", "100", "200", "500" };
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ProductPageID";
+            column.Name = "ProductPageID";
+            column.Caption = "Product Page ID";
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.SortDescending();
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Name";
+            column.Name = "Name";
+            column.Caption = "Name";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ProductType.Name";
+            column.Name = "ProductType";
+            column.Caption = "Product Type";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.SettingsHeaderFilter.Mode = GridHeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.ReadOnly = true;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Launch.Name";
+            column.Name = "Launch";
+            column.Caption = "Launch";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.SettingsHeaderFilter.Mode = GridHeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.ReadOnly = true;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "Brand.Name";
+            column.Name = "Brand";
+            column.Caption = "Brand";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.SettingsHeaderFilter.Mode = GridHeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.ReadOnly = true;
+        });
+
+        settings.Columns.Add(column => {
+            column.FieldName = "Image";
+            column.Name = "Image";
+            column.Caption = "Image";
+            column.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Width = 240;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var img = db.ProductPage_Images.Where(p => p.ProductPageID == Convert.ToInt32(c.KeyValue) && p.TemplateImageID == 1 && p.SortOrder == 0).SingleOrDefault();
+
+                if (img != null)
+                {
+                    var imgId = img.ImageID;
+
+                    ViewContext.Writer.Write("<img src='https://flock.designersguild.com/imagelibrary/322/" + imgId + ".jpeg' style='width: 100%; height: auto;' />");
+                }
+                else
+                    ViewContext.Writer.Write("<img src='/Images/admin/image-not-set.png' style='width: 100%; height: auto' />");
+            });
+            column.ReadOnly = true;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ColourID";
+            column.Name = "Colour";
+            column.Caption = "Colour";
+            column.UnboundType = DevExpress.Data.UnboundColumnType.Object;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            column.Width = 180;
+            column.SetDataItemTemplateContent(c =>
+            {
+                var img = DataBinder.Eval(c.DataItem, "ColourID") as byte?;
+
+                if (img != null)
+                {
+                    ViewContext.Writer.Write("<img src='/content/images/" + img + ".jpg' style='width: 100%; height: auto;' />");
+                }
+            });
+            column.ReadOnly = true;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "ColourID";
+            column.Name = "Colour";
+            column.Caption = "Colour";
+            column.ColumnType = MVCxGridViewColumnType.ComboBox;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.True;
+            column.SettingsHeaderFilter.Mode = GridHeaderFilterMode.CheckedList;
+            column.Settings.AllowAutoFilter = DefaultBoolean.False;
+            var prop = column.PropertiesEdit as ComboBoxProperties;
+            prop.DataSource = Flock.ViewModels.LargeDatabaseDataProvider.GetColours(null);
+            prop.ValueField = "ColourID";
+            prop.TextField = "Name";
+            prop.ValueType = typeof(byte?);
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "Colour":
+                    e.Values.Add(FilterValue.CreateShowBlanksValue(gridView.DataColumns["ColourID"], "Not Set"));
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+            }
+        };
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            gridView.FilterExpression = new DevExpress.Data.Filtering.NullOperator("ColourID").ToString();// InOperator("FirstName", new object[] { "David", "Michael", "Amy" }).ToString();
+        };
+
+        settings.DataBound = (sender, e) =>
+        {
+            var gridView = sender as MVCxGridView;
+            foreach (GridViewDataColumn col in gridView.DataColumns)
+            {
+                if (col.ReadOnly == true)
+                    col.EditFormSettings.Visible = DefaultBoolean.False;
+            }
+        };
+    });
+
+    if (ViewData["UpdateErrors"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["UpdateErrors"]);
+    }
+}
+@grid.BindToLINQ(string.Empty, string.Empty, (s, e) =>
+{
+    //var source = db.ProductPages.Select(p => new
+    //{
+    //    ProductPageID = p.ProductPageID,
+    //    Launch = p.Launch,
+    //    Colour = p.Colour
+    //});
+
+    e.QueryableSource = db.ProductPages.Where(p => p.Deleted == false);
+    e.KeyExpression = "ProductPageID";
+
+}).GetHtml()

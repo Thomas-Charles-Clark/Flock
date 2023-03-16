@@ -1,0 +1,18 @@
+﻿@model Flock.ViewModels.CollectionTranslateViewModelHeader
+<div class="content-panel-container">
+    <fieldset id="collection-select-header">
+        <legend>Translate Collection - Page Selector</legend>
+        <div class="select-header-inner" style="background-color: #e1e1e1;">
+            @Html.Action("TranslateCollectionHeaderProductTypeDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateCollectionHeaderBrandDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateCollectionHeaderLaunchDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateCollectionHeaderWebStatusDropDown", "Translations", new { Filters = Model })
+            @Html.Action("TranslateCollectionHeaderTranslationStatusDropDown", "Translations", new { Filters = Model })
+            <div id="translate-collection-header-product-page-drop-down-container">
+                @Html.Action("TranslateCollectionHeaderCollectionDropDown", "Translations", new { Filters = Model })
+            </div>
+            <img id="translate-collection-header-searching-icon" class="busy-icon" src="/images/systemicons/translate-busy.gif"/>
+            <div style="clear: both"></div>
+        </div>
+    </fieldset>
+</div>

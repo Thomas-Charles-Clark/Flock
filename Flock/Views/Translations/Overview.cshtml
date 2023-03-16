@@ -1,0 +1,25 @@
+﻿@model Flock.ViewModels.BaseViewModel
+@{
+    ViewBag.Title = "Translation Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/translations.css")
+
+    <style type="text/css">
+        #container {
+            width: 1260px;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Translation Overview</h4>
+
+<div class="page-subheading">
+    @Html.Action("TranslationOverviewLanguageDropDownPartial", "Translations", new { TargetLanguageID = ViewBag.TargetLanguageID })
+    <div class="clearfix"></div>
+</div>
+
+@Html.Action("TranslationOverviewGridView", "Translations", new { TargetLanguageID = ViewBag.TargetLanguageID })

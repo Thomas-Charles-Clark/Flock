@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = "Promotional Codes";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/promotional-codes.css")
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+        #container { 
+            width: 1275px;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        function InitMemberDragDrop() {
+            $("#member-restrictions").sortable({
+                helper: "clone",
+                connectWith: ".member-icon",
+                placeholder: ".ui-state-highlight-country-restriction",
+                update: function (ev, ui) {
+                    $("#member-restrictions-placeholder").remove();
+                    if ($(ui.item).hasClass('member-icon')) {
+                        $("#member-restrictions").sortable("refresh");
+                        window.MemberRestrictions = new Array();
+                        $("#member-restrictions").children("div").each(function (index) {
+                            window.MemberRestrictions.push($(this).data("member-id"));
+                        });
+                        UpdateMemberRestrictions();
+                    }
+                }
+            });
+            $(".member-icon").draggable({
+                helper: "clone",
+                start: function (e, ui) {
+                    $(ui.helper).css("z-index", "300000");
+                },
+                connectToSortable: "#member-restrictions"
+            });
+        }
+
+        function UpdateMemberRestrictions() {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("UpdatePromoCodeMemberRestrictions", "Promotions")',
+                type: "POST",
+                traditional: true,
+                data: { promotionCodeID: PromotionCodeGridView.GetRowKey(PromotionCodeGridView.editItemVisibleIndex), members: window.MemberRestrictions.toString() },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#member-restrictions").html(data);
+                },
+                timeout: 20000
+            });
+        }
+
+        function removeMemberRestriction(ele) {
+            $.confirm(function () {
+                $(ele).parent().remove();
+                RemoveMemberFromRestriction()
+            }, function () {
+
+            });
+        }
+
+        function RemoveMemberFromRestriction() {
+            $("#member-restrictions").sortable("refresh");
+            window.MemberRestrictions = new Array();
+            if ($(".member-restriction-placeholder").length > 0)
+                $(".member-restriction-placeholder").remove();
+            $("#member-restrictions").children("div").each(function (index) {
+                window.MemberRestrictions.push($(this).data("member-id"));
+            });
+            UpdateMemberRestrictions();
+        }
+
+        function InitProductDragDrop() {
+            $("#product-restrictions").sortable({
+                helper: "clone",
+                connectWith: ".product",
+                placeholder: ".ui-state-highlight-country-restriction",
+                update: function (ev, ui) {
+                    $("#product-restriction-placeholder").remove();
+                    if ($(ui.item).hasClass('product')) {
+                        $("#product-restrictions").sortable("refresh");
+                        window.ProductRestrictions = new Array();
+                        $("#product-restrictions").children("div").each(function (index) {
+                            window.ProductRestrictions.push($(this).data("product-id"));
+                        });
+                        UpdateProductRestrictions();
+                    }
+                }
+            });
+            $(".product").draggable({
+                helper: "clone",
+                start: function (e, ui) {
+                    $(ui.helper).css("z-index", "300000");
+                },
+                connectToSortable: "#product-restrictions"
+            });
+        }
+
+        function UpdateProductRestrictions() {
+            LoadingPanel.Show();
+            $.ajax({
+                url: '@Url.Action("UpdatePromoCodeProductRestrictions", "Promotions")',
+                type: "POST",
+                traditional: true,
+                data: { promotionCodeID: PromotionCodeGridView.GetRowKey(PromotionCodeGridView.editingRowVisibleIndex), products: window.ProductRestrictions.toString() },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    $("#product-restrictions").html(data);
+                },
+                timeout: 20000
+            });
+        }
+
+        function removeProductRestriction(ele) {
+            $.confirm(function () {
+                $(ele).parent().remove();
+                RemoveProductFromRestriction()
+            }, function () {
+
+            });
+        }
+
+        function RemoveProductFromRestriction() {
+            $("#product-restrictions").sortable("refresh");
+            window.ProductRestrictions = new Array();
+            if ($(".product-restriction-placeholder").length > 0)
+                $(".product-restriction-placeholder").remove();
+            $("#product-restrictions").children("div").each(function (index) {
+                window.ProductRestrictions.push($(this).data("product-id"));
+            });
+            UpdateProductRestrictions();
+        }
+    </script>
+}
+
+<h4 class="page-heading">Promotional Codes</h4>
+<p style="margin: 8px 0px; font-style: italic;">Promotional Codes will be inactive on the Off Date set. E.G. To be valid through the 10th, set Off Date to the 11th.</p>
+@Html.Partial("Codes/PromoCodeGridViewPartial")
+
+<div id="product-panel-start-marker" style="height: 0px; width: 100%; overflow: hidden;">
+    <div id="product-panel">
+        @Html.Partial("~/Views/Products/ProductSearchPartialSmall.cshtml")
+    </div>
+</div>
+

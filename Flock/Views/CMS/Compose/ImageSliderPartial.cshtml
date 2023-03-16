@@ -1,0 +1,92 @@
+﻿@using Flock.Controllers
+
+@model Flock.Models.ContentItems.SlideShowItem
+
+@Html.DevExpress().ImageSlider(
+settings =>
+{
+    settings.Name = Model.Record.Name + Model.Record.SlideShowID.ToString();
+    
+    settings.EnableTheming = Model.Settings.EnableTheming;
+
+    settings.ShowNavigationBar = Model.Settings.ShowNavigationBar;
+
+    settings.SettingsImageArea.ImageSizeMode = Model.Settings.ImageSizeMode;
+    settings.SettingsImageArea.ItemTextVisibility = Model.Settings.ItemTextVisibility;
+    settings.SettingsImageArea.NavigationButtonVisibility = Model.Settings.NavigationButtonVisibility;
+    settings.SettingsImageArea.NavigationDirection = Model.Settings.NavigationDirection;
+    settings.SettingsImageArea.AnimationDuration = Model.Settings.AnimationDuration;
+    
+    settings.SettingsBehavior.AllowMouseWheel = Model.Settings.AllowMouseWheel;
+    settings.SettingsBehavior.EnablePagingByClick = Model.Settings.EnablePagingByClick;
+    settings.SettingsBehavior.EnablePagingGestures = Model.Settings.EnablePagingGestures;
+    settings.SettingsBehavior.ExtremeItemClickMode = Model.Settings.ExtremeItemClickMode;
+    settings.SettingsBehavior.ImageLoadMode = Model.Settings.ImageLoadMode;
+
+    settings.SettingsNavigationBar.ItemSpacing = Model.Settings.NavigationBarImageSpacing;
+    settings.SettingsNavigationBar.Mode = Model.Settings.NavigationBarMode;
+    settings.SettingsNavigationBar.PagingMode = Model.Settings.NavigationBarPagingMode;
+    settings.SettingsNavigationBar.Position = Model.Settings.NavigationPosition;
+    settings.SettingsNavigationBar.ThumbnailsModeNavigationButtonVisibility = Model.Settings.NavigationThumbnailVisibilityMode;
+    settings.SettingsNavigationBar.VisibleItemsCount = Model.Settings.NavigationItemsVisibleCount;
+
+    settings.SettingsSlideShow.AutoPlay = Model.Settings.AutoPlay;
+    settings.SettingsSlideShow.Interval = Model.Settings.Interval;
+    settings.SettingsSlideShow.PausePlayingWhenMouseOver = Model.Settings.PausePlayingWhenMouseOver;
+    settings.SettingsSlideShow.PlayPauseButtonVisibility = Model.Settings.PlayPauseButtonVisibility;
+    settings.SettingsSlideShow.StopPlayingWhenPaging = Model.Settings.StopPlayingWhenPaging;
+              
+    settings.ClientSideEvents.Init = @"function(s, e) { 
+        window.slideshow = s;
+    }";
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    
+    for (int i = 0; i < Model.Settings.Images.Count; i++)
+    {
+        settings.Items.Add(
+        item =>
+        {
+            string folder = "";
+            // switch beneath obsolete - replace with .Contains() logic
+            //
+            //switch (Model.Record.Class)
+            //{
+            //    case "pure-u-1":
+            //        folder = "986/";
+            //        break;
+            //    default:
+            //        folder = "195/";
+            //        break; 
+            //}
+            folder = "986/";
+            item.ImageUrl = Url.Content("~/ImageLibrary/"+folder+Model.Settings.Images[i].ImageID+".jpeg");
+            item.NavigateUrl = "2";
+            item.SetTextTemplateContent(
+                "<h3 class='isdemoH3'>Title</h3>" +
+                "<p>Description. <a tabindex=\"-1\" href='javascript:;'>Link »</a></p>"
+            );
+        });
+    }
+    if (Model.Settings.Images.Count == 0)
+    {
+        settings.Items.Add(
+            item =>
+            {
+                item.ImageUrl = Url.Content("~/Images/admin/image-not-set.png");
+                item.NavigateUrl = "0";
+                item.SetTextTemplateContent("<h3>Please assign images.</h3>");
+            }
+        );
+    }
+}).GetHtml()
+<script type="text/javascript">
+    if (typeof (window.slideShows) != "undefined" && window.slideShows != false) {
+        window.slideShows.push(ASPxClientControl.GetControlCollection().GetByName('@Model.Record.Name' + '@Model.Record.SlideShowID.ToString()'));
+    }
+    else {
+        window.slideShows = new Array();
+        window.slideShows.push(ASPxClientControl.GetControlCollection().GetByName('@Model.Record.Name' + '@Model.Record.SlideShowID.ToString()'));
+    }
+</script>

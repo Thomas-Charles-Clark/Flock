@@ -1,0 +1,20 @@
+﻿@model Flock.ViewModels.PromoCodeViewModel
+@Html.DevExpress().CheckBoxList(settings =>
+{
+    settings.Name = "PromoCodeDeliveryBandsUnbound";
+    settings.Properties.RepeatLayout = System.Web.UI.WebControls.RepeatLayout.Table;
+    settings.Properties.RepeatDirection = System.Web.UI.WebControls.RepeatDirection.Vertical;
+    settings.Properties.RepeatColumns = 1;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "DeliveryBandID";
+    settings.Properties.ValueType = typeof(byte);
+    settings.PreRender = (sender, e) =>
+    {
+        ASPxCheckBoxList cbl = (ASPxCheckBoxList)sender;
+        foreach (ListEditItem item in cbl.Items)
+        {
+            item.Selected = Model.PromoCode_DeliveryBands.Select(p => p.DeliveryBandID).Contains((byte)item.Value);
+        }
+    };
+}).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetDeliveryBandsForPriceList(Convert.ToByte(ViewData["PriceListID"]))).GetHtml()

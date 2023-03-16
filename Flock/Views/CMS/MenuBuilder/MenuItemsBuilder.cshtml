@@ -1,0 +1,273 @@
+﻿@{
+    Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewBag.Title = "Menu Items Builder";
+}
+
+@section scripts {
+    <script type="text/javascript">
+        function InitalizejQuery() {
+            $('.draggable').draggable({
+                helper: 'clone',
+                start: function (ev, ui) {
+                    var $draggingElement = $(ui.helper);
+                    $draggingElement.width(window[$(this).closest('[data-grid-view-name]').data("grid-view-name")].GetWidth());
+                }
+            });
+
+            $('.draggable').droppable({
+                activeClass: "menu-hover",
+                tolerance: "intersect",
+                hoverClass: "menu-activeHover",
+                drop: function (event, ui) {
+                    var draggingSortIndex = ui.draggable.data("sort-order");
+                    var targetSortIndex = $(this).data("sort-order");
+
+                    if (targetSortIndex == undefined || targetSortIndex == null)
+                        targetSortIndex = 0;
+
+                    var menuItemID = ui.draggable.data("menu-item-id");
+
+                    window.ForceUpdate = true;
+                    window.ForceUpdateGridView = $(ui.draggable).closest('[data-grid-view-name]').data("grid-view-name");
+
+                    window[$(this).closest('[data-grid-view-name]').data("grid-view-name")].PerformCallback({ CommandType: "DragRow", MenuItemID: menuItemID, DraggingSI: draggingSortIndex, TargetSI: targetSortIndex });
+                    //"DRAGROW|" + draggingSortIndex + '|' + targetSortIndex);
+                }
+            });
+        }
+
+        //function UpdatedGridViewButtonsState(grid) {
+        //    btMoveUp.SetEnabled(grid.cpbtMoveUp_Enabled);
+        //    btMoveDown.SetEnabled(grid.cpbtMoveDown_Enabled);
+        //}
+
+        function gridView_Init(s, e) {
+            UpdatedGridViewButtonsState(s);
+        }
+
+        function gridView_EndCallback(s, e) {
+            UpdatedGridViewButtonsState(s);
+        }
+
+        function btMoveUp_Click(s, e) {
+            gridView.PerformCallback("MOVEUP");
+        }
+
+        function btMoveDown_Click(s, e) {
+            gridView.PerformCallback("MOVEDOWN");
+        }
+    </script>
+}
+
+@section styles{
+    @Styles.Render("~/bundles/composer")
+
+    @Styles.Render("~/Content/menu-builder.css")
+    <style type="text/css">
+        input.dxb-hb {
+            font-size: 0 !important;
+        }
+
+        .dxgvFooter_MetropolisBlue td.dxgv {
+            border-top: 1px solid #c0c0c0 !important;
+        }
+
+
+    </style>
+
+
+}
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var Linker = UoW.GetRepository<Flock.Models.Country_Language>().GetAll().Select(p => p.CountryID).ToList();
+
+    // get all menus who do not feature in menu_country table
+    // display all of these
+    // get all menus who do feature in menu_country where countryid == x
+
+
+    var Menus = UoW.GetRepository<Flock.Models.Menu>().GetAll().Where(p => p.DeletedDT == null && (UoW.Context.fnc_DateControl(p.OnDate, p.OffDate, DateTime.Now) == true)).ToList();
+    /* where countryrestrictions are null or countryrestrictions contains country */
+    var MenuLinker = UoW.GetRepository<Flock.Models.Menu_Country>().GetAll().ToList();
+
+    var unrestrictedMenuIDs = Menus.Select(p => p.MenuID).Where(p => !MenuLinker.Select(q => q.MenuID).Contains(p)).ToList();
+
+    var restrictedMenuIDs = MenuLinker.Where(p => p.CountryID == 81).Select(p => p.MenuID).ToList();
+
+    var menusToDisplay = unrestrictedMenuIDs.Concat(restrictedMenuIDs).Distinct().ToList();
+
+    Menus = Menus.Where(p => menusToDisplay.Contains(p.MenuID)).OrderBy(p => p.SortOrder).ToList();
+}
+
+<h4 class="page-heading">Menu Items Builder</h4>
+
+<div class="page-subheading">
+    @{
+        @* && (UoW.Context.fnc_DateControl(p.OnDate, p.OffDate, DateTime.Now) == true)*@
+    var countryList = UoW.GetRepository<Flock.Models.Country_Language>().GetAll().Where(p => (Linker.Contains(p.CountryID) || p.CountryID == 73 || p.CountryID == 175)).Select(p => new { CountryID = p.CountryID, Name = p.Country.Name + " " + p.Language.Code.ToUpper() }).ToList();
+
+    countryList.Insert(0, new { CountryID = Convert.ToInt16(-1), Name = "Unrestricted" });
+    var index = countryList.IndexOf(countryList.Where(p => p.Name == "United Kingdom EN").SingleOrDefault());
+
+
+    }
+    @Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "CountryPrefilter";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "CountryID";
+    settings.Properties.ValueType = typeof(short);
+    settings.Style.Add("float", "left");
+    settings.SelectedIndex = index;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            LoadingPanel.Show();
+
+            var useDate = null;
+            if (UseDate.GetDate() != null)
+                useDate = UseDate.GetDate().toDateString()
+
+            $.ajax({
+                url: '" + Url.Action("MenuItemsBuilderWrapperPartial", "CMS") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    CountryID: s.GetSelectedItem().value,
+                    UseDate: useDate,
+                    TradeSwitch: TradeSwitchPrefilter.GetSelectedItem().value
+                },
+                success: function(data) {
+                    $('#ajax-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 30000
+            });
+        }";
+}).BindList(
+        countryList
+    ).GetHtml()
+
+    @Html.DevExpress().DateEdit(settings =>
+    {
+        settings.Name = "UseDate";
+        settings.Date = DateTime.Today;
+        settings.Style.Add("float", "left");
+        settings.Properties.ClientSideEvents.DateChanged = @"function(s, e) {
+            LoadingPanel.Show();
+
+            var useDate = null;
+            if (UseDate.GetDate() != null)
+                useDate = UseDate.GetDate().toDateString()
+
+            $.ajax({
+                url: '" + Url.Action("MenuItemsBuilderWrapperPartial", "CMS") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    CountryID: CountryPrefilter.GetSelectedItem().value,
+                    UseDate: useDate,
+                    TradeSwitch: TradeSwitchPrefilter.GetSelectedItem().value
+                },
+                success: function(data) {
+                    $('#ajax-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 30000
+            });
+        }";
+    }).GetHtml()
+
+        @Html.DevExpress().ComboBox(cbSettings =>
+   {
+       cbSettings.Name = "TradeSwitchPrefilter";
+       cbSettings.Style.Add("float", "left");
+       cbSettings.Properties.TextField = "name";
+       cbSettings.Properties.ValueField = "value";
+       cbSettings.Properties.ValueType = typeof(bool?);
+       cbSettings.Style.Add("margin-right", "1em");
+       cbSettings.SelectedIndex = 0;
+       cbSettings.ShowModelErrors = false;
+       cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+            LoadingPanel.Show();
+
+            var useDate = null;
+            if (UseDate.GetDate() != null)
+                useDate = UseDate.GetDate().toDateString()
+
+            $.ajax({
+                url: '" + Url.Action("MenuItemsBuilderWrapperPartial", "CMS") + @"',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    CountryID: CountryPrefilter.GetSelectedItem().value,
+                    UseDate: useDate,
+                    TradeSwitch: s.GetSelectedItem().value
+                },
+                success: function(data) {
+                    $('#ajax-container').html(data);
+                    LoadingPanel.Hide();
+                },
+                timeout: 30000
+            });
+        }";
+   }).BindList(new List<object> {
+                        new { name = "Both", value = (bool?)null },
+                        new { name = "Retail", value = (bool?)false },
+                        new { name = "Trade", value = (bool?)true } }).GetHtml()
+        
+    <div class="clearfix"></div>
+</div>
+
+@*<div id="resource-panels" style="float: right; width: 986px;">
+        @Html.Partial("~/Views/Pages/PageSearchPartial.cshtml")
+    </div>*@
+
+<div id="ajax-container">
+    @Html.Partial("MenuBuilder/MenuItemsBuilderWrapperPartial", Menus.OrderBy(p => p.SortOrder).ToList())
+</div>
+
+<script type="text/javascript">
+    function RevealLinkSelector(index) {
+        $(".link-selector").hide();
+        $("#link-selector-" + index).show();
+        switch (index) {
+            case 1:
+                MenuBuilderPageSelectorGrid.AdjustControl();
+                break;
+            case 2:
+                MenuBuilderProductPageSelectorGrid.AdjustControl();
+                break;
+            case 3:
+                MenuBuilderCollectionSelectorGrid.AdjustControl();
+                break;
+            case 4:
+                MenuBuildArticleSelectorGrid.AdjustControl();
+                break;
+            default: break;
+        }
+    }
+
+    function InitPageDragDrop() {
+        $(".page").draggable({
+            helper: 'clone',
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#menu-builder-container"
+        });
+
+        $("#menu-builder-container").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-cms-page",
+            connectWith: ".page",
+            update: function (ev, ui) {
+                $("#menu-builder-container").sortable("refresh");
+                UpdateMenu();
+            }
+        });
+    }
+
+    function UpdateMenu() {
+
+    }
+</script>

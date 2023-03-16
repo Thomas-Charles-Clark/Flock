@@ -1,0 +1,64 @@
+﻿@model string
+@Html.DevExpress().Memo(
+    settings =>
+    {
+        settings.Name = "ProductPageHtmlEditor";
+        settings.Properties.MaxLength = 3000;
+//        settings.ClientSideEvents.BeginCallback = @"function OnBeginCallback(s, e) {
+//            e.customArgs['ProductPageID'] = $('#selected-product-page-id').val();
+//            e.customArgs['Html'] = ProductPageHtmlEditor.GetHtml();
+//        }";
+
+//        settings.ClientSideEvents.EndCallback = @"function OnEndCallback(s, e) {
+//            if(window.wasSaveButtonHit == true) {
+//                window.wasSaveButtonHit = false;
+//                return false;
+//            }
+//            else
+//                return false;
+//        }";
+
+        //settings.CallbackRouteValues = new { Controller = "ProductPages", Action = "ProductPageEditorSavePartial" };
+        //settings.CustomDataActionRouteValues = new { Controller = "ProductPages", Action = "ProductPageEditorSavePartial" };
+
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(120);
+
+        //settings.SettingsHtmlEditing.AllowScripts = true;
+        //settings.SettingsHtmlEditing.AllowIFrames = true;
+        //settings.SettingsHtmlEditing.AllowFormElements = true;
+        //settings.SettingsHtmlEditing.UpdateDeprecatedElements = true;
+        //settings.SettingsHtmlEditing.UpdateBoldItalic = true;
+        //settings.SettingsHtmlEditing.EnterMode = HtmlEditorEnterMode.BR;
+        //settings.Settings.AllowContextMenu = DefaultBoolean.True;
+        //settings.Settings.AllowDesignView = true;
+        //settings.Settings.AllowHtmlView = true;
+        //settings.Settings.AllowPreview = true;
+        //settings.ActiveView = HtmlEditorView.Design;
+
+//        settings.ClientSideEvents.CustomCommand = @"
+//            function SendSaveCommand(s, e) {
+//                switch(e.commandName) {
+//                    case 'save':
+//                        window.wasSaveButtonHit = true;
+//                        s.PerformDataCallback();
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//        ";
+        
+        //settings.Toolbars.CreateDefaultToolbars();
+
+        //settings.Toolbars[0].Items.Add<CustomToolbarButton>(button =>
+        //{
+        //    button.BeginGroup = true;
+        //    button.ToolTip = "save";
+        //    button.Image.Url = "~/Images/SystemIcons/save-icon.gif";
+        //    button.CommandName = "save";
+        //});
+
+        settings.Text = Model;
+    }).GetHtml()

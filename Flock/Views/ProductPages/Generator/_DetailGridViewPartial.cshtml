@@ -1,0 +1,175 @@
+﻿@using Flock.ViewModels
+@model ProductPageGenerateDetailGridViewModel
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "Merchandiser-" + Model.MerchandiserID + "-DetailGridView";
+
+    settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+        e.customArgs['MerchandiserID'] = " + Model.MerchandiserID + @";
+    }";
+    
+    settings.Settings.ShowFilterRow = false;
+    settings.Settings.ShowFilterRowMenu = false;
+
+    settings.KeyFieldName = "ProductCode";
+
+    settings.SettingsBehavior.AllowSort = false;
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Styles.Header.BackColor = System.Drawing.ColorTranslator.FromHtml("#f1f1f1");
+    settings.Styles.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#f1f1f1");
+
+    MVCxGridViewColumn ProductCodeColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn BasketNameColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn DesignColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ColourwayColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ProductCategoryColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn LaunchColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn NamingConventionColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+    MVCxGridViewColumn BrandColumn = new MVCxGridViewColumn();
+
+    settings.Styles.Header.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    settings.Styles.Row.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+    settings.CommandColumn.Visible = false;
+
+    settings.Style.Add("border", "0");
+    settings.Style.Add("border-right", "1px solid #c0c0c0");
+    settings.Style.Add("border-bottom", "0");
+    
+    
+    ProductCodeColumn.Caption = "Product Code";
+    ProductCodeColumn.FieldName = "ProductCode";
+    ProductCodeColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    BasketNameColumn.Caption = "Basket Name";
+    BasketNameColumn.FieldName = "BasketName";
+    BasketNameColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    DesignColumn.Caption = "Design";
+    DesignColumn.FieldName = "Design";
+    DesignColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    ColourwayColumn.Caption = "Colourway";
+    ColourwayColumn.FieldName = "Colourway";
+    ColourwayColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    ProductCategoryColumn.Caption = "Product Category";
+    ProductCategoryColumn.FieldName = "ProductCategory";
+    ProductCategoryColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+
+    BrandColumn.Name = "BrandID";
+    BrandColumn.Caption = "Brand";
+    BrandColumn.FieldName = "BrandID";
+    BrandColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    BrandColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+    BrandColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    BrandColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    BrandColumn.SetDataItemTemplateContent(c =>
+    {
+        var bID = Convert.ToByte(DataBinder.Eval(c.DataItem, "BrandID"));
+        var b = Model.Brands.Where(p => p.BrandID == bID).Select(p => p.Name).Single();
+        ViewContext.Writer.Write(b);
+    });
+
+    ProductTypeColumn.Name = "ProductTypeID";
+    ProductTypeColumn.Caption = "Product Type";
+    ProductTypeColumn.FieldName = "ProductTypeID";
+    ProductTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    ProductTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+    ProductTypeColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    ProductTypeColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    ProductTypeColumn.SetDataItemTemplateContent(c =>
+    {
+        var ptID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "ProductTypeID"));
+        var pt = Model.ProductTypes.Where(p => p.ProductTypeID == ptID).Select(p => p.Name).Single();
+        ViewContext.Writer.Write(pt);
+    });
+
+    NamingConventionColumn.Name = "NamingConventionID";
+    NamingConventionColumn.Caption = "NC";
+    NamingConventionColumn.FieldName = "NamingConventionID";
+    NamingConventionColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    NamingConventionColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    NamingConventionColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+    NamingConventionColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    NamingConventionColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    //NamingConventionColumn.SetDataItemTemplateContent(c =>
+    //{
+    //    var ncID = Convert.ToByte(DataBinder.Eval(c.DataItem, "NamingConventionID"));
+    //    if (ncID != null)
+    //    {
+    //        var nc = Model.NamingConventions.Where(p => p.NamingConventionID == ncID).Select(p => p.Name).SingleOrDefault();
+    //        ViewContext.Writer.Write(nc);
+    //    }
+    //});
+
+    LaunchColumn.Name = "LaunchID";
+    LaunchColumn.Caption = "Launch";
+    LaunchColumn.FieldName = "LaunchID";
+    LaunchColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+    LaunchColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+    LaunchColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+    LaunchColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+    LaunchColumn.SetDataItemTemplateContent(c =>
+    {
+        var lID = Convert.ToInt16(DataBinder.Eval(c.DataItem, "LaunchID"));
+        var l = Model.Launches.Where(p => p.LaunchID == lID).Select(p => p.Name).Single();
+        ViewContext.Writer.Write(l);
+    });
+
+    settings.Columns.Add(ProductCodeColumn);
+    settings.Columns.Add(BasketNameColumn);
+    settings.Columns.Add(DesignColumn);
+    settings.Columns.Add(ColourwayColumn);
+    settings.Columns.Add(ProductCategoryColumn);
+    settings.Columns.Add(BrandColumn);
+    settings.Columns.Add(ProductTypeColumn);
+    settings.Columns.Add(LaunchColumn);
+    settings.Columns.Add(NamingConventionColumn);
+
+    settings.HeaderFilterFillItems = (sender, e) =>
+    {
+        MVCxGridView gridView = (MVCxGridView)sender;
+        switch (e.Column.Name)
+        {
+            case "BrandID":
+                e.Values.Clear();
+                foreach (var b in Model.Brands.OrderBy(p => p.Name))
+                {
+                    e.AddValue(b.Name, b.BrandID.ToString());
+                }
+                e.AddShowAll();
+                break;
+            case "ProductTypeID":
+                e.Values.Clear();
+                foreach (var pt in Model.ProductTypes.OrderBy(p => p.Name))
+                {
+                    e.AddValue(pt.Name, pt.ProductTypeID.ToString());
+                }
+                e.AddShowAll();
+                break;
+            case "NamingConventionID":
+                e.Values.Clear();
+                foreach (var nc in Model.NamingConventions.OrderBy(p => p.Name))
+                {
+                    e.AddValue(nc.Name, nc.NamingConventionID.ToString());
+                }
+                e.AddShowAll();
+                break;
+            case "LaunchID":
+                e.Values.Clear();
+                foreach (var l in Model.Launches.OrderByDescending(p => p.LaunchDate))
+                {
+                    e.AddValue(l.Name, l.LaunchID.ToString());
+                }
+                e.AddShowAll();
+                break;
+            default: break;
+        }
+    };
+
+}).Bind(Model.Products).GetHtml()

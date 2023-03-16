@@ -1,0 +1,136 @@
+﻿@model Flock.ViewModels.ReportingManagerViewModel
+@{
+    ViewBag.Title = "Reporting Manager";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/Content/reporting.css")
+}
+@section scripts {
+    <script type="text/javascript">
+    
+    function InitialiseJQuery() {
+        $('.lbItem').draggable(
+            {
+                helper: 'clone'
+            }
+        );
+
+        $('.listBoxLeft').droppable(
+        {
+            activeClass: "hover",
+            drop: function (ev, ui) {
+                /* do nothing when the parent == destination */
+                if ($(ui.draggable).parents(".listBoxLeft").length != 0 && ($(this)).hasClass("listBoxLeft") ||
+                    $(ui.draggable).parents(".listBoxRight").length != 0 && ($(this)).hasClass("listBoxRight"))
+                    return;
+
+                var itemIndex = $(ui.draggable).parent().index(); // this is a fragile part of the application
+
+                var fromListBox, toListBox;
+
+                if ($(this).hasClass("listBoxLeft")) { // determine a source and a destination
+                    toListBox = lbChosen;
+                    fromListBox = lbAvailable;
+                }
+                else {
+                    toListBox = lbAvailable;
+                    fromListBox = lbChosen;
+                }
+
+                toListBox.AddItem(fromListBox.GetItem(itemIndex).text,
+                                    fromListBox.GetItem(itemIndex).value);
+
+                InitialiseJQuery(); // repeat the initialization for new items
+            }
+        });
+    }
+
+    function SaveReport() {
+        ReportGroup.Validate();
+        if (ReportGroup.GetIsValid()) {
+            LoadingPanel.Show();
+            lbChosen.SelectAll();
+            $.ajax({
+                url: '@Url.Action("SaveReport", "Reporting")',
+                type: 'POST',
+                traditional: true,
+                async: false,
+                data: {
+                    ReportID: $("#selected-report-id").val(),
+                    ReportGroupID: ReportGroup.GetValue(),
+                    Name: Name.GetValue(),
+                    Description: Description.GetValue(),
+                    EmployeeIDs: lbChosen.GetSelectedValues()
+                },
+                success: function (data) {
+                    LoadingPanel.Hide();
+                    lbChosen.UnselectAll();
+                    ReportsComboBox.PerformCallback();
+                    $('#report-detail-ajax-container').html(data);
+                    GreenFade($("#save-btn"));
+                },
+                error: function (e, s, a) {
+                    RedFade($("#save-btn"));
+                    lbChosen.UnselectAll();
+                    $.showError(e, s, a);
+                },
+                timeout: 30000
+            });
+        }
+    }
+
+        function CreateReport() {
+            $.ajax({
+                url: '@Url.Action("CreateReportPartial", "Reporting")',
+                type: 'POST',
+                traditional: true,
+                async: false,
+                data: {
+                },
+                success: function (data) {
+                    $('#report-detail-ajax-container').html(data);
+                },
+                timeout: 30000
+            });
+        }
+    </script>
+}
+
+<h4 class="page-heading">Reporting Configuration</h4>
+<div class="row">
+    <div class="col-lg-12">
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="active"><a href="#reports" data-toggle="tab">Reports</a></li>
+            <li role="presentation"><a href="#report-groups" data-toggle="tab">Report Groups</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="reports" role="tabpanel" class="tab-pane filter-pane active">
+                <div class="panel-inner">
+                    <div class="panel-col-50" style="padding-right: 1em;">
+                        @Html.Action("ReportsComboBoxPartial", "Reporting")
+                        <div id="create-report-btn" class="btn btn-primary" onclick="CreateReport()">Create Report</div>
+                        <div id="report-detail-ajax-container"></div>
+                    </div>
+                    <div class="panel-col-50" style="padding-left: 1em;">
+                        @Html.Action("EmployeeListBoxPartial", "Reporting")
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="report-groups" role="tabpanel" class="tab-pane filter-pane">
+                <div class="panel-inner">
+                    <div class="panel-col-50">
+                        @Html.Action("ReportGroupGridViewPartial", "Reporting")
+                    </div>
+                    <div class="panel-col-50">
+
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>

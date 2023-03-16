@@ -1,0 +1,110 @@
+﻿@model List<Flock.Models.Translation_OverviewResult>
+@Html.DevExpress().GridView(settings => {
+    settings.Name = "TranslationOverviewGridView";
+    settings.CallbackRouteValues = new { Controller = "Translations", Action = "TranslationOverviewGridView" };
+    settings.ClientSideEvents.BeginCallback = @"function(s ,e) { 
+        e.customArgs['TargetCountryLanguageID'] = TranslationTargetLanguageListBox.GetValue();
+    }";
+    settings.Settings.ShowFilterRow = true;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.Settings.ShowFilterRowMenu = true;
+
+    MVCxGridViewColumn ContentTypeColumn = new MVCxGridViewColumn();
+    ContentTypeColumn.Name = "ContentType";
+    ContentTypeColumn.FieldName = "ContentType";
+    ContentTypeColumn.Caption = "Content Type";
+    ContentTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    ContentTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    //ContentTypeColumn.SetDataItemTemplateContent(c => {
+    //    string ContentType = DataBinder.Eval(c.DataItem, "ContentType").ToString();
+    //    string LangCode = DataBinder.Eval(c.DataItem, "Code").ToString();
+    //    if (ContentType.Contains("TechInfo"))
+    //    {
+    //        ViewContext.Writer.Write("<a href='/admin/translations/" + ContentType.ToLower() + "' target='_blank'/>" + ContentType.Replace("Statuse", "Status") + "</a>");
+    //    }
+    //    else if (ContentType.Contains("Finish"))
+    //    {
+    //        ViewContext.Writer.Write("<a href='/admin/translations/" + ContentType.ToLower() + "es' target='_blank'/>" + ContentType.Replace("Statuse", "Status") + "</a>");
+    //    }
+    //    else
+    //    {
+    //        ViewContext.Writer.Write("<a href='/admin/translations/" + ContentType.ToLower() + "s' target='_blank'/>" + ContentType.Replace("Statuse", "Status") + "</a>");
+    //    }
+    //});
+    settings.Columns.Add(ContentTypeColumn);
+
+    settings.SettingsDetail.ShowDetailButtons = true;
+    settings.SettingsDetail.ShowDetailRow = true;
+    settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+
+    settings.KeyFieldName = "PrimaryKey";
+
+    settings.SetDetailRowTemplateContent(c =>
+    {
+        if (DataBinder.Eval(c.DataItem, "DrilldownSP") != null)
+        {
+            ViewContext.Writer.Write(Html.Action("DrilldownDetailGridViewPartial", new { TargetCountryLanguageID = ViewBag.TargetCountryLanguageID, DrilldownSP = DataBinder.Eval(c.DataItem, "DrilldownSP").ToString() }));
+        }
+    });
+
+    settings.PreRender = settings.BeforeGetCallbackResult = (s, e) =>
+    {
+        MVCxGridView grid = (MVCxGridView)s;
+        grid.DetailRowGetButtonVisibility += (sender, args) =>
+        {
+            if (Model.Where(p => p.PrimaryKey == (byte)args.KeyValue).Select(p => p.DrilldownSP).SingleOrDefault() == null)
+                args.ButtonState = GridViewDetailRowButtonState.Hidden;
+        };
+    };
+
+    MVCxGridViewColumn LanguageColumn = new MVCxGridViewColumn();
+    LanguageColumn.Name = "Language";
+    LanguageColumn.FieldName = "Language";
+    LanguageColumn.Caption = "Language";
+    LanguageColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+    LanguageColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+    settings.Columns.Add(LanguageColumn);
+
+    MVCxGridViewColumn TotalColumn = new MVCxGridViewColumn();
+    TotalColumn.Name = "Total";
+    TotalColumn.FieldName = "Total";
+    TotalColumn.Caption = "Total";
+    settings.Columns.Add(TotalColumn);
+
+    MVCxGridViewColumn PreLaunchColumn = new MVCxGridViewColumn();
+    PreLaunchColumn.Name = "PreLaunch";
+    PreLaunchColumn.FieldName = "PreLaunch";
+    PreLaunchColumn.Caption = "PreLaunch";
+    settings.Columns.Add(PreLaunchColumn);
+
+    MVCxGridViewColumn OnColumn = new MVCxGridViewColumn();
+    OnColumn.Name = "On";
+    OnColumn.FieldName = "On";
+    OnColumn.Caption = "On";
+    settings.Columns.Add(OnColumn);
+
+    MVCxGridViewColumn OffColumn = new MVCxGridViewColumn();
+    OffColumn.Name = "Off";
+    OffColumn.FieldName = "Off";
+    OffColumn.Caption = "Off";
+    settings.Columns.Add(OffColumn);
+
+    MVCxGridViewColumn NotTranslatedColumn = new MVCxGridViewColumn();
+    NotTranslatedColumn.Name = "NotTranslated";
+    NotTranslatedColumn.FieldName = "NotTranslated";
+    NotTranslatedColumn.Caption = "Not Translated";
+    settings.Columns.Add(NotTranslatedColumn);
+
+    MVCxGridViewColumn ManualTranslatedColumn = new MVCxGridViewColumn();
+    ManualTranslatedColumn.Name = "ManualTranslated";
+    ManualTranslatedColumn.FieldName = "ManualTranslated";
+    ManualTranslatedColumn.Caption = "Manually Translated";
+    settings.Columns.Add(ManualTranslatedColumn);
+
+    MVCxGridViewColumn ReviewColumn = new MVCxGridViewColumn();
+    ReviewColumn.Name = "Review";
+    ReviewColumn.FieldName = "Review";
+    ReviewColumn.Caption = "Review";
+    settings.Columns.Add(ReviewColumn);
+
+}).Bind(Model).GetHtml()

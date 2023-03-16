@@ -1,0 +1,154 @@
+﻿@model Flock.ViewModels.ProductPageComposeViewModel
+<div class="content-panel-container">
+    <fieldset>
+        <legend style="color: black; border-bottom-color: #929292;" onclick="$('#product-page-info-inner').slideToggle('fast');">
+            Product Page Info (click to expand / contract)
+            <span style="float: right; margin: 0 0.5em">Product Page ID: @Model.ProductPageID</span>
+            <img id="product-page-info-busy" class="busy" src="/images/systemicons/busy-icon.gif" />
+        </legend>
+        <div id="product-page-info-inner" style="background-color: white; padding: 1em; position: relative;">
+
+            @if (Model.Clearance)
+            {
+                <div id="product-page-clearance-label" style="border: 1px solid #808080; padding: 10px 20px; position: absolute; top: 5px; right: 5px; background-color: orange; font-size: 2em; color: black;">
+                    CLEARANCE
+                </div>
+            }
+
+            <label style="float: left; line-height: 20px; margin-right: 1em; width: 100px;">Template: </label>
+            <label style="float: left; line-height: 20px; margin-right: 1em; width: 100px;">@(Model.TemplateName)</label>
+            <div style="clear: both;"></div>
+            @*<h5 style="float: left;">@Model.Name - @Model.Brand - @Model.ProductTypeName</h5>*@
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 20px; margin-right: 1em; width: 100px;">Page Name:</label>
+            @Html.HiddenFor(m => Model.ProductPageID)
+            @Html.DevExpress().TextBoxFor(m => Model.Name, settings =>
+            {
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.Width = System.Web.UI.WebControls.Unit.Pixel(400);
+                settings.Properties.MaxLength = 100;
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 20px; margin-right: 1em; width: 100px;">Brochure: </label>
+            @Html.DevExpress().ComboBoxFor(m => Model.BrochureID, settings =>
+       {
+           settings.Style.Add("float", "left");
+           settings.Style.Add("margin", "0 7px 7px 0");
+           settings.Width = 400;
+           settings.Properties.ValueField = "BrochureID";
+           settings.Properties.ValueType = typeof(short);
+           settings.Properties.TextField = "Name";
+       }).BindList(Flock.ViewModels.LargeDatabaseDataProvider.GetNullableBrochures()).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 20px; margin-right: 1em; width: 100px;">On Date:</label>
+            @Html.DevExpress().DateEditFor(m => Model.OnDate, settings =>
+            {
+                settings.Properties.DisplayFormatString = "d";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 20px; margin-right: 1em; width: 100px;">Off Date:</label>
+            @Html.DevExpress().DateEditFor(m => Model.OffDate, settings =>
+            {
+                settings.Properties.DisplayFormatString = "d";
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "0 7px 7px 0");
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            }).GetHtml()
+            @Html.ValidationMessageFor(m => Model.OffDate)
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 20px; margin-right: 1em; width: 100px;">Trade / Retail:</label>
+            @{
+                var tradeSource = new List<object> {
+                    new { name = "Both", value = (bool?)null },
+                    new { name = "Retail", value = (bool?)false },
+                    new { name = "Trade", value = (bool?)true } };
+
+                var tradeSwitchIndex = 0;
+
+                var tradeSwitchValue = Model.TradeSwitch;
+
+                switch (tradeSwitchValue)
+                {
+                    case true:
+                        tradeSwitchIndex = 2;
+                        break;
+                    case false:
+                        tradeSwitchIndex = 1;
+                        break;
+                    default:
+                        tradeSwitchIndex = 0;
+                        break;
+                }
+
+                Html.DevExpress().ComboBox(cbSettings =>
+                {
+                    cbSettings.Name = "TradeSwitch";
+                    cbSettings.Style.Add("float", "left");
+                    cbSettings.Properties.TextField = "name";
+                    cbSettings.Properties.ValueField = "value";
+                    cbSettings.Properties.ValueType = typeof(bool?);
+                    cbSettings.SelectedIndex = tradeSwitchIndex;
+                    cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                    cbSettings.ShowModelErrors = true;
+                    cbSettings.Width = 167;
+                }).BindList(tradeSource).Render();
+            }
+            <div style="clear: both"></div>
+            @{
+                var i = Model.WebStatusID;
+                var colour = "black";
+                if (i != null)
+                {
+                    switch (i)
+                    {
+                        case 0:
+                            colour = "green";
+                            break;
+                        case 1:
+                            colour = "orange";
+                            break;
+                        case 2:
+                            colour = "orange";
+                            break;
+                        case 3:
+                            colour = "green";
+                            break;
+                        case 4:
+                            colour = "red";
+                            break;
+                        default: break;
+                    }
+                }
+                <label style="float: left; line-height: 20px; margin-right: 1em; width: 300px;">Web Status: <span style="margin-left: 19px;color: @(colour)">@(Model.WebStatus)</span></label>
+            }
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 20px; margin-right: 1em; width: 100px;">New Status:</label>
+            @Html.DevExpress().CheckBoxFor(m => Model.New, settings =>
+       {
+           settings.Style.Add("float", "left");
+           settings.Style.Add("margin", "4px 7px 7px 0");
+
+           settings.ShowModelErrors = true;
+           settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       }).GetHtml()
+            @Html.ValidationMessageFor(m => Model.New)
+            <div style="clear: both;"></div>
+            @if (ViewData["EditError"] != null)
+            {
+                <span style="float: left; margin: 8px 0;" class="field-validation-error">@(ViewData["EditError"])</span>
+                <div style="clear: both;"></div>
+            }
+            <img id="product-page-info-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveProductPageInfo();" />
+            <div style="clear: both;"></div>
+        </div>
+    </fieldset>
+
+</div>

@@ -1,0 +1,29 @@
+﻿@model Flock.ViewModels.MenuBuilderDetailViewModel
+<div class="content-panel-container" style="margin-bottom: 0; margin-top: 1em;">
+    <fieldset id="country-restriction-fieldset">
+        <legend>Country Restrictions<a id="country-restriction-remove-all" href="#" onclick="RemoveAllCountryRestrictions();return false;">Remove All</a></legend>
+        <img id="country-restriction-busy" src="~/Images/SystemIcons/busy-icon-grey.gif" style="width: 22px;"/>
+        @if (Model.CountryRestrictions.Count == 0)
+        {
+            <div id="country-restriction-section" style="height: 104px;" data-menu-id="@(Model.MenuID)">
+                <div id="country-restriction-placeholder" style="font-size: 1.0em; background-color: white;">
+                    By default, Menus are available to all countries.<br /><br />Only add countries to this list if you want to restrict which countries can view this Menu.
+                </div>
+            </div>
+        }
+        else
+        {
+            <div id="country-restriction-section" data-menu-id="@(Model.MenuID)">
+                @foreach (Flock.Models.Country Country in Model.CountryRestrictions)
+                {
+                    <div class="country-restriction-flag" data-country-id="@(Country.CountryID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
+                        <img class="flag" src="~/Images/Icons/CountryFlags/256px/@(Country.CountryID).png" title="@(Country.LocalName)" />
+                        <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="$(this).parent().remove(); RemoveCountryFromRestriction()" />
+                        <br />
+                        <label style="margin-top: 5px">@(Country.LocalName)</label>
+                    </div>
+                }
+            </div>
+        }
+    </fieldset>
+</div>

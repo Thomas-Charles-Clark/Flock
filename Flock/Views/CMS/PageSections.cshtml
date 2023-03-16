@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "Page Sections";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section Styles {
+    
+}
+@section scripts {
+    
+}
+
+<h4 class="page-heading">
+    Page Sections
+</h4>
+
+<div id="PageSectionGridContainer" style="float: left;">
+    @Html.Action("PageSectionOverviewGridViewPartial", "CMS")
+    
+    <div id="bulk-action-panel">
+        <h4>Bulk Action Panel</h4>
+        <ul>
+            <li>
+                <a href="javascript:;" title="Enable" onclick="$('#date-picker-modal').data('for-date', 'on').dialog('open'); BulkActionDatePicker.ShowDropDown();">Set On Date</a>
+            </li>
+            <li>
+                <a href="javascript:;" title="Disable" onclick="$('#date-picker-modal').data('for-date', 'off').dialog('open'); BulkActionDatePicker.ShowDropDown();">Set Off Date</a>
+            </li>
+            <li>
+                <a href="javascript:;" title="Delete" onclick="DeleteSelectedPageSections()">Delete</a>
+            </li>
+        </ul>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+
+<div id="date-picker-modal" style="width: 342px; height: 340px;" data-for-date="null">
+    @Html.DevExpress().Label(settings =>
+    {
+        settings.Text = "Date: ";
+    }).GetHtml()
+    @Html.DevExpress().DateEdit(settings =>
+    {
+        settings.Name = "BulkActionDatePicker";
+        settings.Properties.DisplayFormatString = "d";
+    }).GetHtml()
+    <div style="clear: both;"></div>
+</div>
+
+<div style="clear: both;"></div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#date-picker-modal").dialog({
+            autoOpen: false,
+            height: 442,
+            width: 348,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    switch ($(this).data("for-date")) {
+                        case "on":
+                            SetOnDateForPageSections();
+                            break;
+                        case "off":
+                            SetOffDateForPageSections();
+                            break;
+                    }
+                    $(this).data("for-date", "null")
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    });
+
+    function SetOnDateForPageSections() {
+        var keys = null;
+
+        if (typeof (PageSectionOverviewGridView) != "undefined" && PageSectionOverviewGridView != false)
+            keys = PageSectionOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false)
+            if (typeof (PageSectionOverviewGridView) != "undefined" && PageSectionOverviewGridView != false)
+                PageSectionOverviewGridView.PerformCallback({ commandType: 'Enable', keyString: keys.toString(), dateString: BulkActionDatePicker.GetDate().toUTCString() });
+            else
+                alert("Select at least one page section.");
+        return false;
+    }
+
+    function SetOffDateForPageSections() {
+        var keys = null;
+
+        if (typeof (PageSectionOverviewGridView) != "undefined" && PageSectionOverviewGridView != false)
+            keys = PageSectionOverviewGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false)
+            if (typeof (PageSectionOverviewGridView) != "undefined" && PageSectionOverviewGridView != false)
+                PageSectionOverviewGridView.PerformCallback({ commandType: 'Disable', keyString: keys.toString(), dateString: BulkActionDatePicker.GetDate().toUTCString() });
+            else
+                alert("Select at least one page section.")
+        return false;
+    }
+
+    function DeleteSelectedPageSections() {
+        var conf = confirm("Are you sure?");
+        if (conf) {
+            var keys = null;
+
+            if (typeof (PageSectionOverviewGridView) != "undefined" && PageSectionOverviewGridView != false)
+                keys = PageSectionOverviewGridView.GetSelectedKeysOnPage();
+
+            if (typeof (keys) != "undefined" && keys != false)
+                if (typeof (PageSectionOverviewGridView) != "undefined" && PageSectionOverviewGridView != false)
+                    PageSectionOverviewGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+        }
+    }
+
+    function OpenComposer(PageID) {
+
+    }
+</script>

@@ -1,0 +1,46 @@
+﻿.basket-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1em;
+    border: 1px solid #cdcdcd;
+}
+
+    .basket-table th {
+        text-align: left;
+    }
+
+    .basket-table th, .basket-table td {
+        padding: 0.5em;
+        border: 1px solid #cdcdcd;
+    }
+
+.visitor-instance-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1em;
+    border: 1px solid #cdcdcd;
+}
+
+    .visitor-instance-table th.top {
+        text-align: left;
+    }
+
+    .visitor-instance-table th, .visitor-instance-table td {
+        padding: 0.5em;
+        border: 1px solid #cdcdcd;
+    }
+
+.member-address-container {
+
+}
+
+.member-address-container td, .member-address-container th {
+    padding: 2px;
+}
+
+.member-address-display {
+    width: 185px;
+    height: 240px;
+    display: inline-block;
+    padding: 1em;
+}

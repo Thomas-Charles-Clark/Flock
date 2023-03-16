@@ -1,0 +1,37 @@
+﻿@model Flock.ViewModels.Video_PageSection
+@{
+    var UoW = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+}
+<div style="background-color: white; padding: 0; width: 100%;" class="page-section-hideable">
+    <div id="article-video" style="width: 100%; position: relative; margin-bottom: 1em;">
+        @Html.Raw(Model.VideoEmbedCode)
+    </div>
+    <div style="position: relative;">
+
+        @Html.DevExpress().LabelFor(m => Model.VideoID, settings =>
+        {
+            settings.Style.Add("float", "left");
+            settings.Style.Add("margin", "0 7px 7px 0");
+            settings.Style.Add("line-height", "32px");
+        }).GetHtml()
+        @Html.DevExpress().ComboBoxFor(m => Model.VideoID, settings =>
+        {
+            settings.Name = "ComposePageVideoComboBox" + Model.PageSectionID.ToString();
+            settings.Properties.ClientInstanceName = "ComposePageVideoComboBox" + Model.PageSectionID.ToString();
+            settings.Properties.ValueType = typeof(short);
+            settings.Properties.ValueField = "VideoID";
+            settings.Properties.TextField = "Name";
+
+            if (Model.VideoID != null)
+            {
+                settings.Properties.ClientSideEvents.Init = @"function(s, e) {
+                    s.SetSelectedItem(s.FindItemByValue(" + Model.VideoID + @"));
+                    s.SetText(s.GetSelectedItem().text);
+                }";
+            }
+        }).BindList(UoW.GetRepository<Flock.Models.Video>().GetAll().ToList()).GetHtml()
+
+        <img id="video-section-@(Model.PageSectionID)-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveVideoSection(@(Model.PageSectionID));" />
+        <div style="clear: both;"></div>
+    </div>
+</div>

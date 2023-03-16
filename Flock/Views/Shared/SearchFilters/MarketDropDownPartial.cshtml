@@ -1,0 +1,191 @@
+﻿@Html.DevExpress().DropDownEdit(
+    settings =>
+    {
+        settings.Style.Add("float", "left");
+        settings.Style.Add("margin", "0 7px 7px 0");
+
+        string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
+
+        if (action == "CountrySearchMarketDropDownPartial")
+        {
+            settings.Name = "CountrySearchMarketDD";
+        }
+        else if (action == "ProductOverviewMarketDropDownPartial")
+        {
+            settings.Name = "ProductOverviewMarketDD";
+            settings.Style.Remove("margin");
+            settings.Style.Add("margin", "0px 7px 0px 0px");
+        }
+        else if (action == "ProductDimensionsMarketDropDownPartial")
+        {
+            settings.Name = "ProductDimensionsMarketDD";
+            settings.Style.Remove("margin");
+            settings.Style.Add("margin", "0px 7px 0px 0px");
+        }
+        else if (action == "ProductReviewsMarketDropDownPartial")
+        {
+            settings.Name = "ProductReviewsMarketDD";
+        }
+        else if (action == "SalePricesMarketDropDownPartial")
+        {
+            settings.Name = "SalePricesMarketDD";
+        }
+
+        settings.Text = "Markets";
+        settings.Properties.DropDownWindowStyle.BackColor = System.Drawing.Color.FromArgb(0xEDEDED);
+
+        settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+        settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
+
+        settings.Properties.EnableClientSideAPI = true;
+
+        settings.SetDropDownWindowTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div id='market-listbox'>");
+            if (action == "CountrySearchMarketDropDownPartial")
+                ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/MarketListBoxPartial.cshtml", (List<Flock.Models.Market>)Model));
+            else if (action == "ProductOverviewMarketDropDownPartial" || action == "ProductDimensionsMarketDropDownPartial" || action == "ProductReviewsMarketDropDownPartial" || action == "SalePricesMarketDropDownPartial")
+                ViewContext.Writer.Write(@Html.Partial("~/Views/Shared/SearchFilters/MarketListBoxPartial.cshtml", (List<Flock.Models.PriceList>)Model));
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "CountrySearchMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "CountrySearchMarketButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                            CountrySearchMarketListBox.UnselectAll();
+                            CountrySearchMarketDD.HideDropDown();
+                            CountrySearchMarketDD.SetText('Market');
+                            $('#country-searching-icon').fadeIn('fast');
+                            $.ajax({
+                                url: '" + Url.Action("Search", "CountrySearch") + @"',
+                                traditional: true,
+                                data: {
+                                    MarketID: CountrySearchMarketListBox.GetValue(),
+                                    ContinentID: CountrySearchContinentListBox.GetValue(),
+                                    RegionID: CountrySearchRegionListBox.GetValue(),
+                                    LanguageID: CountrySearchLanguageListBox.GetValue(),
+                                    SearchString: CountrySearchNameTextBox.GetText(),
+                                    TableLock: CountrySearchCLTableLock.GetValue()
+                                },
+                                success: function(data) {
+                                    $('#country-search-data-view-container').html(data);
+                                    $('#country-searching-icon').fadeOut('slow');
+                                    if (typeof (InitCountryDragDrop) == 'function')
+                                        InitCountryDragDrop();
+                                },
+                                error: function(e, s, a) {
+                                    $.showError(e, s, a, function() { $('#country-searching-icon').fadeOut('slow'); });
+                                },
+                                timeout: 60000
+                            });
+                        }";
+                    }
+                    else if (action == "ProductOverviewMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductOverviewMarketButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ProductOverviewMarketListBox.UnselectAll();
+                            ProductOverviewMarketDD.HideDropDown();
+                            ProductOverviewMarketDD.SetText('Markets');
+                            ProductOverviewGridView.Refresh();
+                        }";
+                    }
+                    else if (action == "ProductDimensionsMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductDimensionsMarketButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ProductDimensionsMarketListBox.UnselectAll();
+                            ProductDimensionsMarketDD.HideDropDown();
+                            ProductDimensionsMarketDD.SetText('Markets');
+                            ProductDimensionsGridView.Refresh();
+                        }";
+                    }
+                    else if (action == "ProductReviewsMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductReviewsMarketButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            ProductReviewsMarketListBox.UnselectAll();
+                            ProductReviewsMarketDD.HideDropDown();
+                            ProductReviewsMarketDD.SetText('Markets');
+
+                            $.ajax({
+                                url: '" + Url.Action("ProductReviewsMarketListBoxSetSessionVariable", "Reviews") + @"',
+                                type: 'POST',
+                                traditional: true,
+                                data: { MarketIDs: ProductReviewsMarketListBox.GetSelectedValues() },
+                                success: function(data) {
+                                    ProductReviewsGridView.Refresh();
+                                },
+                                error: function(e, s, a) {
+                                    $.showError(e, s, a);
+                                },
+                                timeout: 60000
+                            });
+                        }";
+                    }
+                    else if (action == "SalePricesMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "SalePricesMarketButtonClear";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) {
+                            if(changePrefilterCheck()) {
+                                window.priceListId = null;
+                                SalePricesMarketListBox.SetValue(null);
+                                SalePricesMarketDD.SetText('Market');
+                                SalePricesMarketDD.HideDropDown();
+                                loadSalePrices();
+                            }
+                        }";
+                    }
+                    buttonSettings.Text = "Clear";
+                    buttonSettings.Style.Add("float", "left");
+                }).Render();
+            @Html.DevExpress().Button(
+                buttonSettings =>
+                {
+                    if (action == "CountrySearchMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "CountrySearchMarketButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                            CountrySearchMarketDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ProductOverviewMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductOverviewMarketButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                            ProductOverviewMarketDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ProductDimensionsMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductDimensionsMarketButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                            ProductDimensionsMarketDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "ProductReviewsMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "ProductReviewsMarketButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e){
+                            ProductReviewsMarketDD.HideDropDown();
+                        }";
+                    }
+                    else if (action == "SalePricesMarketDropDownPartial")
+                    {
+                        buttonSettings.Name = "SalePricesMarketButtonClose";
+                        buttonSettings.ClientSideEvents.Click = @"function(s, e) { 
+                            SalePricesMarketDD.HideDropDown();
+                        }";
+                    }
+                    buttonSettings.Text = "Close";
+                    buttonSettings.Style.Add("float", "right");
+                }).Render();
+            ViewContext.Writer.Write("<div style='clear: both;'></div></div>");
+        });
+        settings.Properties.AnimationType = AnimationType.None;
+    }
+).GetHtml()

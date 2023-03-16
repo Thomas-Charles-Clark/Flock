@@ -1,0 +1,182 @@
+﻿@using Flock.Models
+@model string
+@{
+    var mod = Model == null ? "" : Model;
+
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<FlockDataContext>();
+
+
+        settings.Name = mod + "MenuBuilderArticleSelectorGrid";
+        settings.CallbackRouteValues = new { Controller = "CMS", Action = "MenuBuilderArticleSelectorGridPartial" };
+
+        if(mod != "")
+        {
+            settings.ClientSideEvents.BeginCallback = @"function(s, e) { 
+                e.customArgs['extraName'] = '"+mod+@"';
+            }";
+        }
+        
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+            if($('#page-selector-grid').length > 0) {
+                s.GetRowValues(e.visibleIndex, 'URLKeywords;ArticleID', OnArticleGridGetRowValues);
+            }
+            else {
+                " + mod + @"MenuBuilderPageSelectorGrid.SetFocusedRowIndex(-1);
+                " + mod + @"MenuBuilderCollectionSelectorGrid.SetFocusedRowIndex(-1);
+                " + mod + @"MenuBuilderProductPageSelectorGrid.SetFocusedRowIndex(-1);
+                $('#" + mod + @"article-id-hidden').val(s.GetRowKey(e.visibleIndex));
+                $('#" + mod + @"page-id-hidden').val('nothing');
+                $('#" + mod + @"product-page-id-hidden').val('nothing');
+                $('#" + mod + @"collection-id-hidden').val('nothing');
+                " + mod + @"ExternalURL.SetText('');
+                " + mod + @"ExternalURL.SetValue(null);
+            }
+        }";
+
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "ArticleID").DisplayFormat = "Total: {0:n0}";
+        settings.Settings.ShowFooter = true;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.Styles.Row.Cursor = "pointer";
+        settings.CommandColumn.Visible = false;
+        settings.CommandColumn.ShowClearFilterButton = false;
+        settings.Settings.ShowFilterRow = true;
+
+        settings.SettingsPager.Mode = GridViewPagerMode.EndlessPaging;
+        // property to EndlessPaging, and the Settings.VerticalScrollBarMode
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Visible;
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.CommandColumn.ShowSelectCheckbox = false;
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        settings.SettingsPager.PageSizeItemSettings.Visible = false;
+        settings.SettingsPager.PageSize = 10;
+
+        settings.SettingsBehavior.AllowFocusedRow = true;
+
+        settings.KeyFieldName = "ArticleID";
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ArticleID";
+            column.FieldName = "ArticleID";
+            column.Caption = "ID";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Width = 50;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Name";
+            column.FieldName = "Name";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.Width = 280;
+            column.SetEditItemTemplateContent(c =>
+            {
+                Html.DevExpress().TextBox(
+                    edtSettings =>
+                    {
+                        edtSettings.Name = "Name";
+                        edtSettings.Properties.NullDisplayText = "Product Page Name";
+                        edtSettings.ShowModelErrors = true;
+                        edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    }
+                )
+                .Bind(DataBinder.Eval(c.DataItem, "Name"))
+                .Render();
+            });
+
+            column.EditFormCaptionStyle.CssClass = "editform-label";
+            column.EditCellStyle.CssClass = "editform-cell";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "CreatedDT";
+            column.FieldName = "CreatedDT";
+            column.Caption = "Created DT";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = 70;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ModifiedDT";
+            column.FieldName = "ModifiedDT";
+            column.Caption = "Modified DT";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.DateEdit;
+            column.Width = 70;
+            column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "LaunchID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Launch>().GetAll().OrderByDescending(p => p.LaunchDate))
+                    {
+                        e.AddValue(pt.Name, pt.LaunchID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+                    
+                case "StatusID":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.Status>().GetAll().OrderBy(p => p.StatusID).ToList())
+                    {
+                        e.AddValue(pt.Name, pt.StatusID.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+            }
+        };
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ("", "", (s, e) =>
+{
+    var dataContext = new Flock.DAL.UnitOfWork<Flock.Models.FlockDataContext>();
+
+    var source = dataContext.GetRepository<Flock.Models.Article>().GetAll().Where(p => p.Deleted == false);
+
+    e.QueryableSource = source;
+
+    e.KeyExpression = "ArticleID";
+}).GetHtml()
+
+

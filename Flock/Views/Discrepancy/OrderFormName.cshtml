@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewBag.Title = "OrderFormName";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/content/discrepancies.css")
+}
+
+<h4 class="page-heading">Order Form Name &raquo; Basket Name Discrepancies</h4>
+
+<div id="page-subheading" class="page-subheading">
+    @Html.DevExpress().Label(settings => {
+        settings.Text = "Ignore Case";
+    }).GetHtml()
+    @Html.DevExpress().CheckBox(settings => {
+    settings.Name = "IgnoreCaseCheckbox";
+        settings.Checked = true;
+        settings.Properties.ValueChecked = true;
+        settings.Properties.ValueUnchecked = false;
+        settings.Properties.ClientSideEvents.CheckedChanged = @"function(s, e) { 
+        
+        }";
+    }).GetHtml()
+</div>
+
+<div id="grid-container">
+    @Html.Action("GridViewPartial")
+</div>

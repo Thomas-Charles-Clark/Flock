@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Dimensions";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+<h4 class="page-heading">Product Text</h4>
+
+<div class="page-subheading">
+        @Html.Action("ProductDimensionsCollectionDropDownPartial", "Products")
+        @Html.Action("ProductDimensionsPatternDropDownPartial", "Products")
+        @Html.Action("ProductDimensionsColourDropDownPartial", "Products")
+        @Html.Action("ProductDimensionsMarketDropDownPartial", "Products")
+    <div style="clear: both;"></div>
+</div>
+
+@Html.Action("ProductDimensionsGridViewPartial")
+

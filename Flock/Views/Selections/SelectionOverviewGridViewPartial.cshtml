@@ -1,0 +1,122 @@
+﻿@using Flock.DAL
+@using Flock.Models
+
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+
+        settings.Name = "SelectionOverviewGridView";
+        settings.CallbackRouteValues = new { Controller = "Selections", Action = "SelectionOverviewGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Selections", Action = "SelectionOverviewGridViewAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Selections", Action = "SelectionOverviewGridViewUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Selections", Action = "SelectionOverviewGridViewDelete" };
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditForm;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 1000;
+        settings.CommandColumn.ShowNewButtonInHeader = true;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowDeleteButton = true;
+        
+        settings.SettingsBehavior.ConfirmDelete = true;
+        
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.KeyFieldName = "SelectionID";
+        
+        MVCxGridViewColumn IDColumn = new MVCxGridViewColumn();
+        IDColumn.Name = "SelectionID";
+        IDColumn.FieldName = "SelectionID";
+        IDColumn.Caption = "ID";
+        IDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(IDColumn);
+        
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Name";
+        var nameProp = NameColumn.PropertiesEdit as TextBoxProperties;
+        nameProp.MaxLength = 100;
+        nameProp.ValidationSettings.RequiredField.IsRequired = true;
+        nameProp.ValidationSettings.RequiredField.ErrorText = "Please provide a Name.";
+        settings.Columns.Add(NameColumn);
+
+        MVCxGridViewColumn HeadingColumn = new MVCxGridViewColumn();
+        HeadingColumn.Name = "Heading";
+        HeadingColumn.FieldName = "Heading";
+        HeadingColumn.Caption = "Heading";
+        var headingProp = HeadingColumn.PropertiesEdit as TextBoxProperties;
+        headingProp.MaxLength = 70;
+        settings.Columns.Add(HeadingColumn);
+
+        MVCxGridViewColumn SubHeadingColumn = new MVCxGridViewColumn();
+        SubHeadingColumn.Name = "SubHeading";
+        SubHeadingColumn.FieldName = "SubHeading";
+        SubHeadingColumn.Caption = "Sub Heading";
+        var subHeadingProp = SubHeadingColumn.PropertiesEdit as TextBoxProperties;
+        subHeadingProp.MaxLength = 150;
+        settings.Columns.Add(SubHeadingColumn);
+        
+        //MVCxGridViewColumn DescriptonColumn = new MVCxGridViewColumn();
+        //var descriptionProp = DescriptonColumn.PropertiesEdit as TextBoxProperties;
+        //descriptionProp.MaxLength = 2000;
+        //settings.Columns.Add(DescriptonColumn);
+        
+        MVCxGridViewColumn URLKeywordsColumn = new MVCxGridViewColumn();
+        URLKeywordsColumn.Name = "URLKeywords";
+        URLKeywordsColumn.FieldName = "URLKeywords";
+        URLKeywordsColumn.Caption = "URL Keywords";
+        var urlKeywordsProp = URLKeywordsColumn.PropertiesEdit as TextBoxProperties;
+        /*
+         [RegularExpression("^([a-z]|[a-z]-|[a-z]/)+[a-z]$", ErrorMessage = @"Regular Expression Validation Failed.
+    URLs must not begin or end with a slash.
+    URL segments must not contain accented characters, such as é or ë.
+    URL segments may only contain the lower case letters 'a' through 'z', as well as hyphens.
+    URL segments must not begin or end with a hyphen.")]
+         */
+        urlKeywordsProp.ValidationSettings.RegularExpression.ValidationExpression = "^([a-z]|[a-z]-|[a-z]/)+[a-z]$";
+        urlKeywordsProp.ValidationSettings.RegularExpression.ErrorText = @"Regular Expression Validation Failed.
+    URLs must not begin or end with a slash.
+    URL segments must not contain accented characters, such as é or ë.
+    URL segments may only contain the lower case letters 'a' through 'z', as well as hyphens.
+    URL segments must not begin or end with a hyphen.";
+        urlKeywordsProp.MaxLength = 100;
+        settings.Columns.Add(URLKeywordsColumn);
+        
+        //MVCxGridViewColumn TitleTagColumn = new MVCxGridViewColumn();
+        //MVCxGridViewColumn MetaDescriptionColumn = new MVCxGridViewColumn();
+        
+        //MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
+        //MVCxGridViewColumn ModifiedDTColumn = new MVCxGridViewColumn();
+        
+        MVCxGridViewColumn OnDate = new MVCxGridViewColumn();
+        OnDate.Name = "OnDate";
+        OnDate.FieldName = "OnDate";
+        OnDate.Caption = "On Date";
+        OnDate.ColumnType = MVCxGridViewColumnType.DateEdit;
+        var onProp = OnDate.PropertiesEdit as DateEditProperties;
+        onProp.AllowNull = true;
+        onProp.ValidationSettings.RequiredField.IsRequired = false;
+        settings.Columns.Add(OnDate);
+
+        MVCxGridViewColumn OffDate = new MVCxGridViewColumn();
+        OffDate.Name = "OffDate";
+        OffDate.FieldName = "OffDate";
+        OffDate.Caption = "Off Date";
+        OffDate.ColumnType = MVCxGridViewColumnType.DateEdit;
+        var offProp = OffDate.PropertiesEdit as DateEditProperties;
+        offProp.AllowNull = true;
+        offProp.ValidationSettings.RequiredField.IsRequired = false;
+        settings.Columns.Add(OffDate);
+        
+        settings.BeforeHeaderFilterFillItems = (s, e) => {
+            var _grid = s as MVCxGridView;
+        };
+    }); 
+}
+@grid.BindToLINQ("", "", (s, e) => {
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var source = UoW.GetRepository<Selection>().GetAll().Where(p => p.DeletedDT == null);
+
+    e.KeyExpression = "SelectionID";
+    e.QueryableSource = source;
+}).GetHtml()

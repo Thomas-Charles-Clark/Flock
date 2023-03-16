@@ -1,0 +1,131 @@
+﻿<div style="padding: 2em;">
+
+    <div style="float: left;">
+        <div style="margin-right: 2em;">
+            <label style="color: white; margin-bottom: 0.5em; background-color: #0072C6; line-height: 30px; width: 296px; padding-left: 0.5em;">Sale Name*:</label>
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Name = "SaleGroupName";
+                settings.Text = "Sale Name";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Properties.ClientSideEvents.GotFocus = @"function(s, e) {
+                        $(s.GetInputElement()).css('color', 'black');
+                        if(s.GetText() == 'Sale Name')
+                            s.SetText('');
+                    }";
+                settings.Properties.ClientSideEvents.LostFocus = @"function(s, e) {
+                        if(s.GetText() == '') {
+                            $(s.GetInputElement()).css('color', 'darkgray');
+                            s.SetText('Sale Name');
+                        }
+                        VerifyCriteria();
+                    }";
+                settings.ControlStyle.ForeColor = System.Drawing.Color.DarkGray;
+            }).GetHtml()
+            <div style="clear: both;"></div>
+
+            <label style="color: white; display: block; margin-bottom: 0.5em; background-color: #0072C6; line-height: 30px; padding-left: 0.5em; margin-top: 2em;">Discount*:</label>
+            <label style="float: left; line-height: 30px; margin-right: 1em; margin-bottom: 0.5em; width: 80px;">Type*:</label>
+            @Html.DevExpress().DropDownEdit(settings =>
+            {
+                settings.Name = "DiscountType";
+                settings.Width = 202;
+                settings.Style.Add("margin-bottom", "0.5em");
+                settings.ReadOnly = true;
+                settings.Properties.ClientSideEvents.KeyDown = @"function(s, e) { 
+                    s.ShowDropDown();
+                }";
+                settings.SetDropDownWindowTemplateContent(c =>
+                {
+                    Html.DevExpress().ListBox(lb =>
+                    {
+                        lb.Name = "DiscountTypeListBox";
+                        lb.Properties.Items.Add("Percent Off", 1);
+                        lb.Properties.Items.Add("Amount Off", 2);
+                        lb.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        lb.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) {
+                            DiscountType.SetText(s.GetSelectedItem().text);
+                            DiscountType.HideDropDown();
+                            if(s.GetSelectedItem().value == 2)
+                                $('#maxima-label').show();
+                            VerifyCriteria();
+                        }";
+                        lb.SelectedIndex = -1;
+                    }).Render();
+                });
+            }).GetHtml()
+            <div style="clear: both;"></div>
+            <label style="float: left; line-height: 30px; margin-right: 1em; margin-bottom: 0.5em; width: 80px;">Amount*:</label>
+            @Html.DevExpress().SpinEdit(settings =>
+            {
+                settings.Name = "Discount";
+                settings.Width = 202;
+                settings.Style.Add("margin-bottom", "0.5em");
+                settings.Properties.NullDisplayText = "No Change";
+                settings.Properties.SpinButtons.ShowLargeIncrementButtons = true;
+                settings.Properties.Increment = 0.01M;
+                settings.Properties.LargeIncrement = 1.0M;
+                settings.Properties.MinValue = 0.01M;
+                settings.Properties.MaxValue = 2147483647;
+                settings.Properties.NumberType = SpinEditNumberType.Float;
+                settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                    VerifyCriteria();
+                }";
+                settings.Properties.DisplayFormatString = "{0:F2}";
+                settings.Properties.DisplayFormatInEditMode = true;
+
+            }).GetHtml()
+            <label id="maxima-label" style="display: none; float: left; line-height: 30px; margin-left: 1em; width: 112px; text-align: left; font-style: italic">Max: <span id="discount-amount-max"></span></label>
+            <div style="clear: both;"></div>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+
+    <div style="float: left;">
+        <div style="float: left; margin-right: 2em;">
+            <label style="color: white; background-color: #0072C6; line-height: 30px; display: block; padding-left: 0.5em;">On Date*:</label>
+            @Html.DevExpress().Calendar(settings =>
+        {
+            settings.Name = "SaleOnDate";
+            settings.Properties.DisplayFormatString = "d";
+            settings.Properties.NullDisplayText = "Not Set";
+            settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) { VerifyCriteria(); }";
+        }).GetHtml()
+            <div style="clear: both;"></div>
+        </div>
+        <div style="float: left; margin-right: 2em;">
+            <label style="color: white; background-color: #0072C6; line-height: 30px; display: block; padding-left: 0.5em;">Off Date:</label>
+            @Html.DevExpress().Calendar(settings =>
+        {
+            settings.Name = "SaleOffDate";
+            settings.Properties.DisplayFormatString = "d";
+            settings.Properties.NullDisplayText = "Not Set";
+            settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) { 
+                VerifyCriteria();
+            }";
+        }).GetHtml()
+            <div style="clear: both;"></div>
+        </div>
+    </div>
+    <div style="float: left;">
+        <label style="color: white; background-color: #0072C6; line-height: 30px; margin-bottom: 0.5em; padding-left: 0.5em; width: 296px; display: block;">Stock:</label>
+        <label style="float: left; line-height: 30px; margin-right: 1em; width: 80px;">Minimum:</label>
+        @Html.DevExpress().SpinEdit(settings =>
+        {
+            settings.Name = "StockMinimum";
+            settings.Width = 202;
+            settings.Properties.NullDisplayText = "No Change";
+            settings.Properties.SpinButtons.ShowLargeIncrementButtons = false;
+            settings.Properties.Increment = 1;
+            settings.Properties.NumberType = SpinEditNumberType.Integer;
+            settings.Properties.ClientSideEvents.ValueChanged = @"function(s, e) {
+                VerifyCriteria();
+            }";
+            settings.Properties.MinValue = 0;
+            settings.Properties.MaxValue = 2147483647;
+            settings.Properties.DisplayFormatString = "{0}";
+            settings.Properties.DisplayFormatInEditMode = true;
+        }).GetHtml()
+    </div>
+    <div style="clear: both;"></div>
+</div>

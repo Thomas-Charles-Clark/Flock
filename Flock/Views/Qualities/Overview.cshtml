@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Quality Overview";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles{
+    @Styles.Render("~/bundles/composer")
+
+    @Styles.Render("~/Content/quality-compose.css")
+    <style type="text/css">
+        #container {
+            width: 1862px !important;
+        }
+    </style>
+}
+
+<h4 class="page-heading">Quality Overview</h4>
+
+<div id="QualityOverviewGridContainer">
+    @Html.Action("QualityOverviewGridViewPartial")
+</div>
+
+
+
+@section scripts {
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+           
+        });
+
+        /*
+        right, further-info-panel needs:
+        to be catered for in a .css file
+        to have a solid border
+        to be white backgrounded
+        to have a definite but subtle external shadow all around
+        to contain a loading gif in the center
+        to start at a certain size
+        to resize to fit the content
+        to reveal at the cursor, facing south-west
+        */
+
+        function FetchQualityFurtherInfo(ele) {
+            var result = "failed to fetch info";
+            $.ajax({
+                url: '@Url.Action("GetQualityFurtherInformation", "Qualities")',
+                type: 'POST',
+                traditional: true,
+                asynch: false,
+                data: {
+                    QualityID: ele.data('quality-id')
+                },
+                success: function (data) {
+                    result = data;
+                },
+                error: function (e, s, a) {
+                    return result;
+                },
+                timeout: 20000
+            }).always(
+            function (data, textStatus, errorThrown) {
+                $(ele).tooltip('option', 'content', data);
+            });
+        }
+    </script>
+}

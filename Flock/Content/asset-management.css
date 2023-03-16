@@ -1,0 +1,22 @@
+﻿input {
+    padding: 0 !important;
+}
+
+.container {
+    /*width: 1260px;*/
+}
+
+#hotspots-list {
+    border-collapse: collapse;
+    border: 1px solid #ededed;
+}
+
+    #hotspots-list th {
+        padding: 0.5em;
+    border: 1px solid #ededed;
+    }
+
+    #hotspots-list td {
+        padding: 0.5em;
+    border: 1px solid #ededed;
+    }

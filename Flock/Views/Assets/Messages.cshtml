@@ -1,0 +1,294 @@
+﻿@model Flock.ViewModels.MessageViewModel
+@{
+    ViewBag.Title = "Messages";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+    #container {
+        /*width: 1275px;*/
+    }
+    #MessageGridView_tcFC1 {
+        text-align: center;
+    }
+    #MessageGridView_DXFooterRow .dxgv {
+        border-top: 1px solid #C0C0C0;
+    }
+    </style >
+}
+
+<input id="selected-message-id" type="hidden" value="@(Model.MessageID)"/>
+
+<h4 class="page-heading">Messages</h4>
+
+<div style="float: right; width: 986px;">
+    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+
+    <div id="bulk-action-panel" style="width: 20% !important; margin-left: 0; float: left;">
+        <h4>Bulk Action Panel</h4>
+        <ul>
+            <li>
+                <a href="javascript:;" title="Enable" onclick="$('#date-picker-modal').data('for-date', 'on'); $('#date-picker-modal').dialog('option', 'title', 'Set On Date'); $('#date-picker-modal').dialog('open');">Set On Date</a>
+            </li>
+            <li>
+                <a href="javascript:;" title="Disable" onclick="$('#date-picker-modal').data('for-date', 'off'); $('#date-picker-modal').dialog('option', 'title', 'Set Off Date'); $('#date-picker-modal').dialog('open');">Set Off Date</a>
+            </li>
+            <li>
+                <a href="javascript:;" title="Delete" onclick="$.confirm(DeleteSelectedMessages, function () { });">Delete</a>
+            </li>
+        </ul>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+
+<div style="float: left; width: 986px; margin-left: 20px;">
+    <div style="width: 100%;">
+        <div id="message-select-header-container">
+            <div class="content-panel-container">
+                <fieldset id="message-select-header">
+                    <legend style="color: black; border-bottom-color: #929292; cursor: default;">Messages Grid</legend>
+                    <div id="message-select-header-inner" style="">
+                        <div id="message-header-grid-container">
+                            @Html.Partial("MessagesGridViewPartial")
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="message-compose-container">
+            @if (ViewData["InvalidMessageIDError"] != null)
+            {
+                <h5>@(ViewData["InvalidMessageIDError"])</h5>
+            }
+            @if (Model.MessageID != null)
+            {
+                @Html.Partial("MessageComposePartial", Model)
+                <script type="text/javascript">
+                    MessageGridView.AutoFilterByColumn(2, '@(Model.MessageID)');
+                </script>
+            }
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+
+<div style="clear: both;"></div>
+
+<div id="date-picker-modal" style="width: 342px; height: 340px;" data-for-date="null">
+    <div id="date-picker-modal-inner" style="display: none;">
+        @Html.DevExpress().Calendar(settings =>
+        {
+            settings.Name = "BulkActionDatePicker";
+            settings.Properties.DisplayFormatString = "d";
+        }).GetHtml()
+        <div style="clear: both;"></div>
+    </div>
+</div>
+
+<div id="bad-selection-dialog">
+    <h5 style="display: none;">You must select at least one Message.</h5>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#bad-selection-dialog").dialog({
+            title: "Bad Selection",
+            width: 240,
+            height: "auto",
+            resizable: false,
+            modal: true,
+            autoOpen: false,
+            buttons: {
+                Ok: function () {
+                    $(this).dialog('close');
+                }
+            }
+        })
+        $("#bad-selection-dialog > h5").css("display", "block");
+
+        $("#date-picker-modal").dialog({
+            autoOpen: false,
+            title: "Select Date",
+            height: "auto",
+            width: 400,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    switch ($(this).data("for-date")) {
+                        case "on":
+                            SetOnDateForMessages();
+                            break;
+                        case "off":
+                            SetOffDateForMessages();
+                            break;
+                    }
+                    $(this).data("for-date", "null")
+                    $(this).dialog("close");
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+        $("#date-picker-modal-inner").show();
+    });
+
+    function SetOnDateForMessages() {
+        var keys = null;
+
+        if (typeof (MessageGridView) != "undefined" && MessageGridView != false)
+            keys = MessageGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            MessageGridView.PerformCallback({ commandType: 'SetOnDate', keyString: keys.toString(), dateString: BulkActionDatePicker.GetValue().toGMTString() });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return false;
+    }
+
+    function SetOffDateForMessages() {
+        var keys = null;
+
+        if (typeof (MessageGridView) != "undefined" && MessageGridView != false)
+            keys = MessageGridView.GetSelectedKeysOnPage();
+
+        if (typeof (keys) != "undefined" && keys != false) {
+            MessageGridView.PerformCallback({ commandType: 'SetOffDate', keyString: keys.toString(), dateString: BulkActionDatePicker.GetValue().toGMTString() });
+        }
+        else
+            $("#bad-selection-dialog").dialog("open");
+        return false;
+    }
+    function DeleteSelectedMessages() {
+        var keys = null;
+
+        if (typeof (MessageGridView) != "undefined" && MessageGridView != false)
+            keys = MessageGridView.GetSelectedKeysOnPage();
+
+        if (keys[$('#selected-message-id').val()]) {
+            $("#selected-message-id").val(null);
+            $("#message-compose-container").html("");
+        }
+
+        if (typeof (keys) != "undefined" && keys != false)
+            MessageGridView.PerformCallback({ commandType: 'Delete', keyString: keys.toString() });
+        else
+            $("#bad-selection-dialog").dialog("open");
+    }
+
+    function ConfirmedDelete(args) {
+        if (MessageGridView.GetRowKey(args[0]) == $("#selected-message-id").val()) {
+            $("#selected-message-id").val(null);
+            $("#message-compose-container").html("");
+        }
+        MessageGridView.DeleteRow(args[0]);
+    }
+
+
+    function InitCountryDragDrop() {
+        $("#country-restriction-section").sortable({
+            helper: "clone",
+            connectWith: ".country-restriction-flag",
+            placeholder: ".ui-state-highlight-country-restriction",
+            update: function (ev, ui) {
+                if ($(ui.item).hasClass('country-flag')) {
+                    $("#country-restriction-section").sortable("refresh");
+                    window.CountryRestrictions = new Array();
+                    if ($("#country-restriction-placeholder").length > 0)
+                        $("#country-restriction-placeholder").remove();
+                    $("#country-restriction-section").children("div").each(function (index) {
+                        window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+                    });
+                    UpdateCountryRestrictions();
+                }
+            }
+        });
+        $(".country-flag").draggable({
+            helper: "clone",
+            start: function (e, ui) {
+                $(ui.helper).css("z-index", "300000");
+            },
+            connectToSortable: "#country-restriction-section"
+        });
+    }
+
+    function UpdateCountryRestrictions() {
+        $("#country-restriction-busy").fadeIn("fast");
+        $.ajax({
+            url: '@Url.Action("UpdateMessageCountryRestrictions", "Assets")',
+            type: "POST",
+            traditional: true,
+            data: { MessageID: $('#selected-message-id').val(), Countries: JSON.stringify(window.CountryRestrictions) },
+            success: function (data) {
+                $("#country-restriction-busy").fadeOut("fast");
+                $("#country-restriction-container").html(data);
+            },
+            error: function (e, s, a) {
+                $("#country-restriction-busy").fadeOut("fast");
+                alert(e.responseText);
+            },
+            timeout: 20000
+        });
+    }
+
+    function RemoveCountryFromRestriction() {
+        $("#country-restriction-section").sortable("refresh");
+        window.CountryRestrictions = new Array();
+        if ($("#country-restriction-placeholder").length > 0)
+            $("#country-restriction-placeholder").remove();
+        $("#country-restriction-section").children("div").each(function (index) {
+            window.CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+        });
+        UpdateCountryRestrictions();
+    }
+
+    function RemoveAllCountryRestrictions() {
+        $.confirm(function () {
+            window.CountryRestrictions = new Array();
+            UpdateCountryRestrictions();
+        }, function () { });
+    }
+
+    function SaveMessageDetails() {
+        var onDate = null;
+        if (OnDate.GetValue() != null)
+            onDate = OnDate.GetValue().toISOString();
+        var offDate = null;
+        if (OffDate.GetValue() != null)
+            offDate = OffDate.GetValue().toISOString();
+        LoadingPanel.Show();
+        $.ajax({
+            url: '@Url.Action("SaveMessageDetails", "Assets")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                MessageID: $("#selected-message-id").val(),
+                PriceListID: PriceListID.GetValue(),
+                LanguageID: LanguageID.GetValue(),
+                Threshold: Threshold.GetValue(),
+                BelowThresholdMessage: BelowThresholdMessage.GetValue(),
+                AboveThresholdMessage: AboveThresholdMessage.GetValue(),
+                NoThresholdMessage: NoThresholdMessage.GetValue(),
+                OnDate: onDate,
+                OffDate: offDate,
+                TradeSwitch: TradeSwitch.GetValue()
+            },
+            success: function (data) {
+                LoadingPanel.Hide();
+                SuccessFade($("#message-details-save"));
+                $("#message-compose-container").empty();
+            },
+            error: function (e, s, a) {
+                LoadingPanel.Hide();
+                $("#message-compose-container").html(e.responseText);
+                FailureFade($("#message-details-save"));
+            },
+            timeout: 30000
+        });
+    }
+
+</script>

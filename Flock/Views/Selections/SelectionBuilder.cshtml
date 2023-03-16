@@ -1,0 +1,208 @@
+﻿@using Flock.ViewModels
+@model SelectionComposeViewModel
+@{
+    ViewBag.Title = "SelectionBuilder";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+
+@section styles{
+    
+    @Styles.Render("~/bundles/composer")
+    @Styles.Render("~/content/selections.css")
+    <style type="text/css">
+        #SelectionSelectorGridView_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+    </style>
+}
+@section scripts{
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        });
+
+        function SaveSelectionDetails() {
+            URLKeywords.Validate();
+            if (URLKeywords.GetIsValid()) {
+                $.ajax({
+                    url: '@Url.Action("SaveSelectionDetails", "Selections")',
+                    type: 'POST',
+                    traditional: true,
+                    data: {
+                        SelectionID: Number($("#selected-selection-id").val()),
+                        Name: Name.GetValue(),
+                        TitleTag: TitleTag.GetValue(),
+                        URLKeywords: URLKeywords.GetValue(),
+                        MetaDescription: MetaDescription.GetValue(),
+                        Heading: Heading.GetValue(),
+                        SubHeading: SubHeading.GetValue(),
+                        Description: Description.GetValue()
+                    },
+                    success: function (data) {
+                        $("#selection-details-container").html(data);
+                        SuccessFade($("#selection-details-save"));
+                    },
+                    error: function (e, s, a) {
+                        $("#selection-details-container").html(e.responseText);
+                        FailureFade($("#selection-details-save"));
+                    },
+                    timeout: 20000
+                });
+            }
+        }
+
+        function InitPodDragDrop() {
+            $('.draggable').draggable({
+                helper: 'clone',
+                start: function (e, ui) {
+                    $(ui.helper).css("z-index", "300000");
+                }//,
+                //connectToSortable: ".sortable-list"
+            });
+
+            $('.ar1').draggable({
+                helper: 'clone',
+                connectToSortable: '.sortable-list',
+                start: function (e, ui) {
+                    $(ui.helper).css("z-index", "300000");
+                }
+            });
+
+            $("#pod-list").sortable({
+                helper: 'clone',
+                placeholder: "ui-state-highlight-pod",
+                connectWith: '.ar1',
+                update: function (ev, ui) {
+                    //if ($(ui.item).hasClass("draggable")) {
+                    $("#pod-list").sortable("refresh");
+                    window.podImages = new Array();
+                    if ($("#selection-pod-placeholder").length > 0)
+                        $("#selection-pod-placeholder").remove();
+                    $("#pod-list").children("div").each(function (index) {
+                        window.podImages.push({ ID: $(this).data("image-id"), SortOrder: index });
+                    });
+                    UpdateSelectionImageArea(1);
+                    //}
+                }
+            });
+        }
+
+        function UpdateSelectionImageArea(TemplateImageID) {
+            switch (TemplateImageID) {
+                case 1:
+                    $("#selection-pod-busy").fadeIn("fast");
+                    $.ajax({
+                        url: '@Url.Action("UpdateSelectionImageArea", "Selections")',
+                        traditional: true,
+                        type: "POST",
+                        data: { SelectionID: Number($("#selected-selection-id").val()), Images: JSON.stringify(window.podImages), TemplateImageID: TemplateImageID },
+                        success: function (data) {
+                            $("#selection-pod-busy").fadeOut("fast");
+                            $('#pod-list').html(data)
+                            return false;
+                        },
+                        error: function (e, s, a) {
+                            $("#selection-pod-busy").fadeOut("fast");
+                            alert(e.responseText);
+                            return false;
+                        },
+                        timeout: 20000
+                    });
+                    break;
+                default: break;
+            }
+        }
+
+        function RemoveImageFromSelectionArea(TemplateImageID, ImageID) {
+            switch (TemplateImageID) {
+                case 1: $("#selection-pod-busy").fadeIn("fast"); break;
+                default: return;
+            }
+            var confirm = window.confirm("Are you sure?");
+            if (confirm) {
+                $.ajax({
+                    url: '@Url.Action("RemoveImageFromSelectionArea", "Selections")',
+                    traditional: true,
+                    type: "POST",
+                    data: { SelectionID: Number($("#selected-selection-id").val()), TemplateImageID: TemplateImageID, ImageID: ImageID },
+                    success: function (data) {
+                        switch (TemplateImageID) {
+                            case 1:
+                                $("#selection-pod-busy").fadeOut("fast");
+                                $('#pod-list').html(data); break;
+                            default: return false;
+                        }
+                        return false;
+                    },
+                    error: function (e, s, a) {
+                        switch (TemplateImageID) {
+                            case 1:
+                                $("#selection-pod-busy").fadeOut("fast");
+                                break;
+                            default: return false;
+                        }
+                        alert(e.responseText);
+                        return false;
+                    },
+                    timeout: 20000
+                });
+            }
+            else {
+                switch (TemplateImageID) {
+                    case 1: $("#selection-pod-busy").fadeOut("fast"); break;
+                    default: return false;
+                }
+            }
+        }
+
+        function InitProductPagesDragDrop() {
+            $(".productpage").draggable({
+                helper: "clone",
+                start: function (e, ui) {
+                    $(ui.helper).css("z-index", "300000");
+                }
+            });
+        }
+    </script>
+}
+
+<input type="hidden" id="selected-selection-id" value="@(Model.SelectionID)"/>
+
+<h4 class="page-heading">Compose Selection</h4>
+
+<div class="page-subheading">Drag Product Pages to Selection</div>
+
+<div id="selection-compose-lhs">
+    <div id="selection-select-header-container">
+        <div class="content-panel-container">
+            <fieldset id="selection-select-header">
+                <legend style="color: black; border-bottom-color: #929292;" onclick="$('#selection-select-header-inner').slideToggle('fast');">Selection Selector (click to expand / contract)</legend>
+                <div id="selection-select-header-inner" style="">
+                    <div id="selection-header-selection-drop-down-container">
+                        @Html.Action("ComposeSelectionGridSelectorPartial", "Selections")
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div id="selection-details-container">
+        @if (ViewData["InvalidSelectionIDError"] != null)
+        {
+            <h5>@(ViewData["InvalidSelectionIDError"])</h5>
+        }
+        @if (Model.SelectionID != null)
+        {
+            @Html.Partial("SelectionComposePartial", Model)
+        }
+    </div>
+</div>
+
+<div id="selection-compose-rhs">    
+    @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+    @Html.Partial("~/Views/ProductPages/ProductPageSearchPartial.cshtml")
+</div>
+
+<div style="clear: both;"></div>

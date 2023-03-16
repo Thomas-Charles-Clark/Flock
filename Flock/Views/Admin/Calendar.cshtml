@@ -1,0 +1,66 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Calendar</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/bundles/css/ribbon")
+    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/bundles/css/calendar")
+    @Scripts.Render("~/bundles/js/calendar")
+</head>
+<body onload="init()">
+
+    @Html.Partial("~/Views/Admin/_NavigationPartial.cshtml")
+
+    <div class="container" id="container">
+        <hr />
+
+        <h1>Calendar</h1>
+
+        <script type="text/javascript">
+            function init() {
+                //2013-02-18 00:00:00
+                scheduler.config.xml_date = "%Y-%n-%d %H:%i:%s";
+                scheduler.locale.labels.year_tab = "Year";
+                scheduler.init("scheduler_here", new Date(), "month");
+                scheduler.load("/Admin/CalendarData");  //path to the newly created action
+
+                var dp = new dataProcessor("/Admin/CalendarSave");
+                dp.init(scheduler);
+                dp.setTransactionMode("POST", false);
+
+            };
+        </script>
+        <div id="scheduler_here" class="dhx_cal_container" style="width: 100%; min-height: 600px;">
+            <div class="dhx_cal_navline">
+                <div class="dhx_cal_prev_button">Prev</div>
+                <div class="dhx_cal_next_button">Next</div>
+                <div class="dhx_cal_today_button"></div>
+                <div class="dhx_cal_date"></div>
+                <div class="dhx_cal_tab" name="day_tab" style="removed:204px;"></div>
+                <div class="dhx_cal_tab" name="week_tab" style="removed:140px;"></div>
+                <div class="dhx_cal_tab" name="month_tab" style="removed:76px;"></div>
+                <div class="dhx_cal_tab" name="year_tab" style="right:280px;"></div>
+            </div>
+            <div class="dhx_cal_header">
+            </div>
+            <div class="dhx_cal_data">
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Designers Guild</p>
+        </footer>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/js/ribbon")
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+</body>
+</html>

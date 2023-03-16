@@ -1,0 +1,61 @@
+
+	Quick Sign Up
+	
+	
+	Ensure that change of email == change of username
+	
+	
+	password creation client side restriction
+	
+	
+	
+	
+	- 	Email
+	-	Language
+	-	Country
+	- 	Sign-Up Source
+			(& Source Detail)
+			
+			
+	Initial Sign-Up
+		Thanks. We've sent you an email 
+		containing a link with which you 
+		can create a password for your 
+		account if you should so desire.
+		
+	
+	- Ignore that email, go to sign in weeks
+		later, we've already got you on file,
+		please click here to send another
+		password creation email
+		
+		
+		
+	
+			
+
+			
+	Email Confirmation Screen
+	+= Password Creation 
+	
+	
+	
+	
+	SMART FOCUS INTEGRATION
+		Trigger Email
+			- On User confirming email address, there must be a scheduled process
+			(every 2/3 minutes) which submits the new user to SmartFocus in order to
+			cause the send of our Welcome Email
+			
+			
+		UserSource
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

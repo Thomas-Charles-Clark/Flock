@@ -1,0 +1,216 @@
+﻿@using Flock.ViewModels
+@using Flock.Models
+@using Flock.DAL
+@model RelatedProductPagePartialViewModel
+@{
+    <div id="primary-product-pages-table">
+        @foreach (PPRPPS_One a in Model.PrimaryResultSet)
+        {
+            <div class="pp-tbody">
+                <div class="pp-tr">
+                    <div class="pp-th">
+                        <div style="position: relative; width: 100%; height: 100%;">
+                            @{
+                                var status = "Unknown";
+
+                                var colour = "white";
+                                switch (a.StatusID)
+                                {
+                                    case 0:
+                                        colour = "#2BFF2B";
+                                        break;
+                                    case 1:
+                                        colour = "orange";
+                                        break;
+                                    case 2:
+                                        colour = "orange";
+                                        break;
+                                    case 3:
+                                        colour = "green";
+                                        break;
+                                    case 4:
+                                        colour = "red";
+                                        break;
+                                    default: break;
+                                }
+
+                                var clearance = a.Clearance;
+                                
+                                if (clearance)
+                                {
+                                    colour = "darkviolet";
+                                }
+
+                                var ProductType = a.ProductType;
+
+                                if (a.ImageID != null)
+                                {
+                                    <div class="primary-product-page-status-strip" style="background-color: @(colour);" title="@(status)"></div>
+
+                                    <div style="float: left; width: 50%; padding: 2px;">
+                                        <div class="primary-product-page-text-wrapper">
+                                            <span class="primary-product-name" style="">@(a.Name)</span>
+                                            <label>@(ProductType)</label>
+                                        </div>
+                                    </div>
+                                    <div style="float: left; width: 50%;">
+                                        <img class="primary-product-page-img" src="https://flock.designersguild.com/imagelibrary/156/@(a.ImageID).jpeg" title="Product Page ID: @(a.ProductPageID)" />
+                                    </div>
+                                    <img src="~/Images/Icons/32/o_collection/graph_connection_directed.png" class="product-page-copy-button" onclick="ShareRelatedProductPages(@(a.ProductPageID))" title="Copy Related Products to Each Other" />
+                                }
+                                else
+                                {
+                                    <div class="primary-product-page-status-strip" style="background-color: @(colour);" title="@(status)"></div>
+
+                                    <div style="float: left; width: 50%; padding: 2px;">
+                                        <div class="primary-product-page-text-wrapper">
+                                            <span class="primary-product-name" style="">@(a.Name)</span>
+                                            <label>@(ProductType)</label>
+                                        </div>
+                                    </div>
+
+                                    <div style="float: left; width: 50%;">
+                                        <img class="related-product-page-img-not-set" src="/images/admin/image-not-set.png" title="Product Page ID: @(a.ProductPageID)" />
+                                    </div>
+                                    <img src="~/Images/Icons/32/o_collection/graph_connection_directed.png" class="product-page-copy-button" onclick="sharerelatedproductpages(@(a.ProductPageID))" title="Copy Related Products to Each Other" />
+                                }
+                            }
+                            <div style="clear: both;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                                }
+    </div>
+    <div id="related-scroll-wrapper" style="overflow-x: auto; overflow-y: hidden;">
+        <div id="related-product-pages-table">
+            @foreach (PPRPPS_One a in Model.PrimaryResultSet)
+            {
+                <div id="product-page-@(a.ProductPageID)" class="rpp-tbody product-page">
+                    <div id="product-page-@(a.ProductPageID)-related-row" data-product-page-id="@(a.ProductPageID)" class="rpp-tr related-product-page-row multidraggable-container" style="position: relative;">
+                        @{
+                            var list = Model.SecondaryResultSet.Where(p => p.ProductPageID == a.ProductPageID).ToList();
+
+                            for (var i = 0; i < list.Count(); i++)
+                            {
+                                var b = list[i];
+
+                                var status = "Unknown";
+
+                                var colour = "white";
+                                switch (b.RPP_StatusID)
+                                {
+                                    case 0:
+                                        colour = "#2BFF2B";
+                                        break;
+                                    case 1:
+                                        colour = "orange";
+                                        break;
+                                    case 2:
+                                        colour = "orange";
+                                        break;
+                                    case 3:
+                                        colour = "green";
+                                        break;
+                                    case 4:
+                                        colour = "red";
+                                        break;
+                                    default: break;
+                                }
+
+                                var clearance = b.Clearance;
+                                
+                                if (clearance)
+                                {
+                                    colour = "darkviolet";
+                                }
+
+                                var ProductType = b.RPP_ProductType;
+
+                                if (b.RPP_ImageID != null)
+                                {
+                                    <div class="rpp-td productpage related-productpage" data-product-page-id="@(b.RPP_ProductPageID)" data-parent-product-page-id="@(b.ProductPageID)" onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                        <div style="position: relative; width: 100%; height: 118px;">
+                                            <div class="related-product-page-status-strip" style="background-color: @(colour);" title="@(status)"></div>
+                                            <img src="~/Images/SystemIcons/remove-icon.png" class="remove-icon" onclick="RemoveRelatedProductPage(@(a.ProductPageID), @(b.RPP_ProductPageID))" />
+
+                                            <div class="related-product-page-img-wrap">
+                                                <img style="width: 65%;" src="https://flock.designersguild.com/imagelibrary/156/@(b.RPP_ImageID).jpeg" title="Product Page ID: @(b.RPP_ProductPageID) - @(b.RPP_Name)" />
+                                            </div>
+                                            <div style="">
+                                                @*<span style="width: 100%; display: block; margin-bottom: 3px; ">@(b.RPP_Name)</span>*@
+                                                <label class="related-product-page-product-type">@(ProductType)</label>
+                                            </div>
+                                            <div style="clear: both;"></div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="rpp-td productpage" data-i="@(i)" data-product-page-id="@(b.RPP_ProductPageID)" data-parent-product-page-id="@(b.ProductPageID)" onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                        <div style="position: relative; width: 100%; height: 118px;">
+                                            <div class="related-product-page-status-strip" style="background-color: @(colour);" title="@(status)"></div>
+                                            <img src="~/Images/SystemIcons/remove-icon.png" class="remove-icon" onclick="RemoveRelatedProductPage(@(a.ProductPageID), @(b.RPP_ProductPageID))" />
+
+                                            <div class="related-product-page-img-wrap">
+                                                <img style="width: 65%;" src="/images/admin/image-not-set.png" title="Product Page ID: @(b.RPP_ProductPageID) - @(b.RPP_Name)" />
+                                            </div>
+                                            <div style="">
+                                                @*<span style="width: 100%; display: block; margin-bottom: 3px; ">@(b.RPP_Name)</span>*@
+                                                <label class="related-product-page-product-type">@(ProductType)</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            if (Model.SecondaryResultSet.Where(p => p.ProductPageID == a.ProductPageID).Count() == 0)
+                            {
+                                <div class="rpp-td productpage placeholder">
+
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                            }
+        </div>
+    </div>
+
+}
+
+<script type="text/javascript">
+    $("#current-page").val('@(Model.CurrentPage)');
+    if (Number('@(Model.PrimaryResultSet.Count())') >= 25)
+        $("#ajax-target").height(1085);
+    else
+        $("#ajax-target").height('auto');
+
+    $("#ajax-target").css("border-bottom", "1px solid #cdcdcd");
+    $("#product-page-dataview").slideDown();
+
+    InitRelatedProductPagesDragDrop();
+
+    $("#pagination").pagination(Number('@(Model.PrimaryResultSetTotal[0].TotalCount)'), {
+        callback: PageChangeCallback,
+        items_per_page: PageLimit.GetValue(),
+        num_display_entries: 10,
+        num_edge_entries: 2,
+        prev_text: "Previous",
+        next_text: "Next",
+        current_page: Number('@Model.CurrentPage')
+    });
+
+    $("#top-scroll-holder").css("width", $("#related-product-pages-table").width() + 'px');
+
+    $("#top-scroll-wrapper").scroll(function () {
+        $("#related-scroll-wrapper")
+            .scrollLeft($("#top-scroll-wrapper").scrollLeft());
+    });
+    $("#related-scroll-wrapper").scroll(function () {
+        $("#top-scroll-wrapper")
+            .scrollLeft($("#related-scroll-wrapper").scrollLeft());
+    });
+
+    $("#total-results").html('@(Model.PrimaryResultSetTotal[0].TotalCount.ToString("N0"))');
+</script>

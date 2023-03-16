@@ -1,0 +1,201 @@
+﻿@using Flock.Models
+@using Flock.DAL
+@model List<DeliveryMatrix_SelectResult>
+@if (Model != null)
+{
+    using (var UoW = new UnitOfWork<FlockDataContext>())
+    {
+        <div id="courier-product-type-rhs">
+            <div class="option-container">
+                <h5>
+                    Courier
+                </h5>
+                <ul>
+                    @foreach (var c in UoW.GetRepository<Courier>().GetAll().Where(p => !Model.Select(x => x.CourierID).ToList().Contains(p.CourierID)).OrderBy(p => p.Name).ToList())
+                    {
+                        <li class="courier-draggable" data-courier-name="@(c.Name)" data-courier-id="@(c.CourierID)">
+                            <label>@(c.Name)</label>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="option-container">
+                <h5>
+                    Product Type
+                </h5>
+                <ul id="available-product-types">
+                    @foreach(var pt in UoW.GetRepository<ProductType>().GetAll().Where(p => !Model.Select(x => x.ProductTypeID).ToList().Contains(p.ProductTypeID)).OrderBy(p => p.Name).ToList())
+                    {
+                        <li class="product-type-draggable" data-product-type-id="@(pt.ProductTypeID)">
+                            <label>@*@(pt.ProductTypeID):*@@(pt.Name)</label>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    
+        <div id="delivery-matrix">
+            @{
+                foreach(var x in Model.GroupBy(p => p.CourierName, (key, ProductTypes) => new { CourierName = key, Values = ProductTypes.ToList() })) 
+                {
+                    <div class="courier-product-type-container">
+                        <div class="courier-product-type-droppable" data-courier-id="@(x.Values[0].CourierID)" style="height: 100%; min-height: 400px;">
+                            <h5 style="float: left;">
+                                @(x.CourierName)
+                            </h5>
+                            <a href="javascript:;" style="float: right; line-height: 20px; margin: 10px; font-size: 1em;" 
+                               onclick="$.confirm(function () { AddAvailableProductTypesToCourier(@(x.Values[0].CourierID)) }, function () { })">Add All</a>
+                            <div style="clear: both;"></div>
+                            <div class="courier-product-type-list" data-courier-id="@(x.Values[0].CourierID)">
+                                <ul>
+                                    @foreach (var pt in x.Values)
+                                    {
+                                        <li class="product-type" data-product-type-id="@(pt.ProductTypeID)" onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+                                            <label>@*@(pt.ProductTypeID):*@@(pt.ProductTypeName)</label>
+                                            <img src="/images/systemicons/remove-icon.png" onclick="$.confirm(function() { RemoveProductType(@(pt.ProductTypeID), @(pt.CourierID)) }, function() { });" class="remove-icon" style="cursor: pointer; opacity: 0.0; float: right; width: 18px;" />
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                            <div style="width: 100%; height: 40px;">&nbsp;</div>
+                            <a href="javascript:;" style="position: absolute; margin: 10px; bottom: 0px; right: 0px; line-height: 20px; font-size: 1em;"
+                               onclick="$.confirm(function () { RemoveCourier(@(x.Values[0].CourierID)) }, function () { })">Remove All</a>
+                        </div>
+                    </div>
+                }
+            }
+            <div id="clear-placeholder" style="clear: both;"></div>
+        </div>
+    
+        <script type="text/javascript">
+            $(".courier-draggable").draggable({
+                helper: 'clone',
+                revert: 'invalid'
+            });
+
+            $("#delivery-matrix").droppable({
+                activeClass: "ui-state-highlight-matrix",
+                accept: '.courier-draggable',
+                drop: function (ev, ui) {
+                    $("#clear-placeholder").remove();
+                    $("#delivery-matrix").append("<div class='courier-product-type-container'><div class='courier-product-type-droppable' data-courier-id='" + $(ui.draggable).data("courier-id") + "' style='height: 100%; min-height: 400px;'>"
+                        + "<h5 style='float: left;'>" + $(ui.draggable).data("courier-name") + "</h5>"
+                        + " <a href='javascript:;' style='float: right; line-height: 20px; margin: 10px; font-size: 1em;'"
+                            +  "onclick='$.confirm(function () { AddAvailableProductTypesToCourier(" + $(ui.draggable).data("courier-id") + ") }, function () { })'>Add All</a>"
+                        + "<div style='clear: both;'></div>"
+                        + "<div class='courier-product-type-list'><ul><li><label>&nbsp;</label></li></ul></div>"
+                        + "<div style='width: 100%; height: 40px;'>&nbsp;</div>"
+                        + "<a href='javascript:;' style='position: absolute; margin: 10px; bottom: 0px; right: 0px; line-height: 20px; font-size: 1em;'"
+                            + "onclick='$.confirm(function () { RemoveCourier(" + $(ui.draggable).data("courier-id") + ") }, function () { })'>Remove All</a>"
+                        + "</div><div id='clear-placeholder' style='clear: both;'></div>");
+
+                    $(ui.draggable).remove();
+
+                    $(".courier-product-type-droppable").droppable({
+                        activeClass: "ui-state-highlight-courier",
+                        accept: '.product-type-draggable',
+                        drop: function (ev, ui) {
+
+                            var CountryID = CountrySelector.GetSelectedItem().value;
+                            var DeliveryOptionID = DeliveryOptionSelector.GetSelectedItem().value;
+
+                            var CourierProductTypes = new Array();
+
+                            $(".courier-product-type-list").each(function () {
+                                var CourierID = $(this).data("courier-id");
+                                $(this).find('.product-type').each(function () {
+                                    CourierProductTypes.push({
+                                        CountryID: CountryID,
+                                        DeliveryOptionID: DeliveryOptionID,
+                                        ProductTypeID: $(this).data("product-type-id"),
+                                        CourierID: CourierID
+                                    });
+                                });
+                            });
+
+                            CourierProductTypes.push({
+                                CountryID: CountryID,
+                                DeliveryOptionID: DeliveryOptionID,
+                                ProductTypeID: $(ui.draggable).data("product-type-id"),
+                                CourierID: $(this).data("courier-id")
+                            });
+
+                            LoadingPanel.Show();
+                            $.ajax({
+                                url: '@Url.Action("DeliveryMatrixMerge", "eCommerce")',
+                                type: 'POST',
+                                traditional: true,
+                                data: {
+                                    CountryID: CountryID,
+                                    DeliveryOptionID: DeliveryOptionID,
+                                    CourierProductTypes: JSON.stringify(CourierProductTypes)
+                                },
+                                success: function (data) {
+                                    $("#delivery-matrix-container").html(data);
+                                    LoadingPanel.Hide();
+                                },
+                                timeout: 20000
+                            });
+                        }
+                    });
+                }
+            });
+
+            $(".product-type-draggable").draggable({
+                helper: 'clone',
+                revert: 'invalid'
+            });
+
+            $(".courier-product-type-droppable").droppable({
+                activeClass: "ui-state-highlight-courier",
+                accept: '.product-type-draggable',
+                drop: function (ev, ui) {
+
+                    var CountryID = CountrySelector.GetSelectedItem().value;
+                    var DeliveryOptionID = DeliveryOptionSelector.GetSelectedItem().value;
+
+                    var CourierProductTypes = new Array();
+
+                    $(".courier-product-type-list").each(function () {
+                        var CourierID = $(this).data("courier-id");
+                        $(this).find('.product-type').each(function () {
+                            CourierProductTypes.push({
+                                CountryID: CountryID,
+                                DeliveryOptionID: DeliveryOptionID,
+                                ProductTypeID: $(this).data("product-type-id"),
+                                CourierID: CourierID
+                            });
+                        });
+                    });
+
+                    CourierProductTypes.push({
+                        CountryID: CountryID,
+                        DeliveryOptionID: DeliveryOptionID,
+                        ProductTypeID: $(ui.draggable).data("product-type-id"),
+                        CourierID: $(this).data("courier-id")
+                    });
+
+                    LoadingPanel.Show();
+                    $.ajax({
+                        url: '@Url.Action("DeliveryMatrixMerge", "eCommerce")',
+                        type: 'POST',
+                        traditional: true,
+                        data: {
+                            CountryID: CountryID,
+                            DeliveryOptionID: DeliveryOptionID,
+                            CourierProductTypes: JSON.stringify(CourierProductTypes)
+                        },
+                        success: function (data) {
+                            $("#delivery-matrix-container").html(data);
+                            LoadingPanel.Hide();
+                        },
+                        timeout: 20000
+                    });
+
+                    //$("#delivery-matrix").append("<div class='courier-product-type-container'><h5>" + $(ui.draggable).data("courier-name") + "</h5>"
+                    //    + "<div class='courier-product-type-list'><ul data-courier-id='" + $(ui.draggable).data("courier-id") + "'></ul></div></div><div id='clear-placeholder' style='clear: both;'></div>");
+                }
+            });
+</script>
+    }
+}

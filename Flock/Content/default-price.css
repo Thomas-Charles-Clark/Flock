@@ -1,0 +1,42 @@
+﻿#container {
+    width: auto;
+}
+
+.control-label {
+    font-size: 14px;
+    line-height: 20px;
+    margin-bottom: 0;
+}
+
+.col-form-label {
+    color: #333;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    font-weight: bold;
+    float: left;
+    font-size: 12px;
+    line-height: 34px;
+}
+
+.form-control {
+    font-size: 13px;
+    display: inline-block;
+    width: auto;
+}
+
+#pricing-table {
+    width: 600px;
+}
+
+#pricing-table td {
+    vertical-align: middle;
+}
+
+.unsaved-changes {
+    background-color: #ffe892 !important;
+}
+
+#save-changes-top {
+    margin-left: 225px;
+}
