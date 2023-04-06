@@ -37,9 +37,9 @@
     c =>
     {
         ViewContext.Writer.Write(
-            "<div id='country-box-" + DataBinder.Eval(c.DataItem, "CountryID") + "' class='draggable country-flag' data-country-id='" + DataBinder.Eval(c.DataItem, "CountryID") + "' data-language-id='" + DataBinder.Eval(c.DataItem, "LanguageID") + "'>" +
+            "<div id='country-box-" + DataBinder.Eval(c.DataItem, "CountryID") + "' class='draggable country-flag' data-country-id='" + DataBinder.Eval(c.DataItem, "CountryID") + "'>" +
             "<div style=\"height: 50px;\">" +
-                "<img style='width: 30px; height: 30px;' title=\"Country ID: " + DataBinder.Eval(c.DataItem, "CountryID") + ", LanguageID: " + DataBinder.Eval(c.DataItem, "LanguageID") + "\" src=\"" + Url.Content("~/images/icons/countryflags/30px/" + DataBinder.Eval(c.DataItem, "CountryID") + ".png") + "\" />" +
+                "<img style='width: 30px; height: 30px;' title=\"Country ID: " + DataBinder.Eval(c.DataItem, "CountryID") + "\" src=\"" + Url.Content("~/images/icons/countryflags/30px/" + DataBinder.Eval(c.DataItem, "CountryID") + ".png") + "\" />" +
             "</div>" +
             "<div class=\"DataViewItemTitle\">" + DataBinder.Eval(c.DataItem, "Name").ToString() + "</div>" +
             "</div>"

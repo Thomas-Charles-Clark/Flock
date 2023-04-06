@@ -73,19 +73,24 @@ namespace Flock.Controllers
         }
 
         [AllowAnonymous]
+        public ActionResult CountryLanguageSearchNameTextBox()
+        {
+            return PartialView("~/Views/Shared/SearchFilters/NameOrIDTextBoxPartial.cshtml");
+        }
+
+        [AllowAnonymous]
         public ActionResult Search(byte? MarketID, byte? ContinentID, byte? RegionID, byte? LanguageID, string SearchString, Boolean? TableLock, int? ColumnCount)
         {
             ViewBag.ColumnCount = ColumnCount;
 
-            if (TableLock == null)
-                TableLock = true;
             if (SearchString == "Country Name" || SearchString == "")
                 SearchString = null;
-            System.Data.Linq.ISingleResult<Country_Language_SearchResult> Results = null;
-            var Model = new List<Country_Language_SearchResult>();
+
+            System.Data.Linq.ISingleResult<Country_SearchResult> Results = null;
+            var Model = new List<Country_SearchResult>();
             using(var fdc = new FlockDataContext())
             {
-                Results = fdc.Country_Language_Search(MarketID, ContinentID, RegionID, LanguageID, SearchString, TableLock);
+                Results = fdc.Country_Search(MarketID, ContinentID, RegionID, LanguageID, SearchString, TableLock);
 
                 foreach (var csr in Results)
                 {
@@ -93,6 +98,26 @@ namespace Flock.Controllers
                 }
             }
             return PartialView("~/Views/Shared/CountrySearchDataViewPartial.cshtml", Model);
+        }
+
+        [AllowAnonymous]
+        public ActionResult SiteSearch(string SearchString)
+        {
+            if (SearchString == "Country Name" || SearchString == "")
+                SearchString = null;
+
+            System.Data.Linq.ISingleResult<Country_Language_SearchResult> Results = null;
+            var Model = new List<Country_Language_SearchResult>();
+            using (var fdc = new FlockDataContext())
+            {
+                Results = fdc.Country_Language_Search(null, null, null, null, SearchString);
+
+                foreach (var csr in Results)
+                {
+                    Model.Add(csr);
+                }
+            }
+            return PartialView("~/Views/Shared/SiteSearchDataViewPartial.cshtml", Model);
         }
     }
 }

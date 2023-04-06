@@ -1368,15 +1368,25 @@ function InitCountryDragDrop() {
         scroll: false
     });
 
-    $(".country-restriction-section").sortable({
+    $(".country-flag").draggable({
         helper: "clone",
-        connectWith: ".country-restriction-flag",
+        start: function (e, ui) {
+            $(ui.helper).css("z-index", "300000");
+        },
+        connectToSortable: "#country-restriction-section"
+    });
+}
+
+function InitCountryLanguageDragDrop() {
+    $(".country-language-restriction-section").sortable({
+        helper: "clone",
+        connectWith: ".country-language-restriction-flag",
         placeholder: ".ui-state-highlight-country-restriction",
         update: function (ev, ui) {
-            if ($(ui.item).hasClass('country-flag')) {
-                $(".country-restriction-section").sortable("refresh");
+            if ($(ui.item).hasClass('country-language-flag')) {
+                $(".country-language-restriction-section").sortable("refresh");
                 var countryLanguageRestrictions = new Array();
-                    
+
                 $(this).find(".country-restriction-placeholder").first().remove();
                 $(this).children("div").each(function (index) {
                     countryLanguageRestrictions.push({
@@ -1390,7 +1400,7 @@ function InitCountryDragDrop() {
                     url: '/admin/cms/UpdatePageSectionCountryRestrictions',
                     type: "POST",
                     traditional: true,
-                    data: { pageSectionID: $(this).parent().data("page-section-id"), countryRestrictions: JSON.stringify(countryLanguageRestrictions) },
+                    data: { pageSectionID: $(this).parent().data("page-section-id"), countryLanguageRestrictions: JSON.stringify(countryLanguageRestrictions) },
                     success: function (data) {
                         $(targ).html(data);
                     },
@@ -1401,22 +1411,23 @@ function InitCountryDragDrop() {
         scroll: false
     })
 
-    $(".country-flag").draggable({
+    $(".country-language-flag").draggable({
         helper: "clone",
         start: function (e, ui) {
             $(ui.helper).css("z-index", "300000");
         },
-        connectToSortable: "#country-restriction-section, .country-restriction-section"
+        connectToSortable: ".country-language-restriction-section"
     });
 }
 
 function UpdatePageSectionCountryRestrictions(container) {
-    $(".country-restriction-section").sortable("refresh");
-    var CountryRestrictions = new Array();
+    $("#add-all-country-language-dialog").dialog("close");
+    $(".country-language-restriction-section").sortable("refresh");
+    var countryLanguageRestrictions = new Array();
 
     $(container).find(".country-restriction-placeholder").first().remove();
     $(container).children(0).children("div").each(function (index) {
-        CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+        countryLanguageRestrictions.push({ CountryID: $(this).data("country-id"), LanguageID: $(this).data("language-id"), SortOrder: 0 });
     });
 
     var targ = container;
@@ -1425,7 +1436,7 @@ function UpdatePageSectionCountryRestrictions(container) {
         url: '/admin/cms/UpdatePageSectionCountryRestrictions',
         type: "POST",
         traditional: true,
-        data: { pageSectionID: targ.data("page-section-id"), countryRestrictions: JSON.stringify(CountryRestrictions) },
+        data: { pageSectionID: targ.data("page-section-id"), countryLanguageRestrictions: JSON.stringify(countryLanguageRestrictions) },
         success: function (data) {
             $(targ).html(data);
         },
@@ -1715,6 +1726,8 @@ function ReloadSectionsForEdit() {
                 InitPodDragDrop();
             if (typeof (InitCountryDragDrop) == "function")
                 InitCountryDragDrop();
+            if (typeof (InitCountryLanguageDragDrop) == "function")
+                InitCountryLanguageDragDrop();
             if (typeof (InitSlideshowDragDrop) == "function")
                 InitSlideshowDragDrop();
             if (typeof (InitProductPagesDragDrop) == "function")
@@ -1747,26 +1760,29 @@ function RefreshPageOptions()
     $("#pagesection-productpage-merge-dialog-buttons").html("");
     $("#add-all-country-dialog").html('<button type="button" onclick="AddAllCountriesToPage();">To Page</button>');
 
+    $("#add-all-country-language-dialog").html("");
+
     $('.content-panel-container[data-page-section-type="1"]').each(function () {
-        $("#add-all-country-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountriesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-dialog\").dialog(\"close\");'>HTML Section - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>HTML Section - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
     });
 
     $('.content-panel-container[data-page-section-type="2"]').each(function () {
-        $("#add-all-country-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountriesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-dialog\").dialog(\"close\");'>Slideshow - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Slideshow - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
     });
 
     $('.content-panel-container[data-page-section-type="3"]').each(function () {
-        $("#add-all-country-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountriesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-dialog\").dialog(\"close\");'>Form - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Form - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
     });
 
     $('.content-panel-container[data-page-section-type="4"]').each(function () {
-        $("#add-all-country-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountriesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-dialog\").dialog(\"close\");'>ProductPage Grid - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>ProductPage Grid - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
         $("#pagesection-productpage-merge-dialog-buttons").append("<input type='button' data-page-section-id=" + $(this).data('page-section-id') + " style='display: block; margin-top: 8px;' onclick='$.confirm(function() { PageSectionProductPageMerge(" + $(this).data('page-section-id') + ") }, function() { });'  value='ProductPage Grid - " + (window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() == null ? "Unnamed" : window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue()) + " - (PageSectionID: " + $(this).data("page-section-id") + ")'/>");
     });
 
     $('.content-panel-container[data-page-section-type="6"]').each(function () {
-        $("#add-all-country-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountriesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-dialog\").dialog(\"close\");'>Page Grid - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Page Grid - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
     });
+
 }
 
     function UpdatePageSectionSortOrder() {
@@ -2024,16 +2040,24 @@ function AddAllCountriesToSlideshow(SlideshowID, PageSectionID) {
     });
 }
 
-function AddAllCountriesToPageSection(PageSectionID) {
+function AddAllCountryLanguagesToPageSection(PageSectionID) {
     $("div [data-page-section-id='" + PageSectionID + "']").find(".country-restriction-section").sortable("refresh");
-    var CountryRestrictions = new Array();
+    var restrictions = new Array();
 
-    $('.country-flag').each(function (index) {
-        CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+    $('.country-language-flag').each(function (index) {
+        restrictions.push({
+            CountryID: $(this).data("country-id"),
+            LanguageID: $(this).data("language-id"),
+            SortOrder: 0
+        });
     });
 
-    $("div [data-page-section-id='" + PageSectionID + "']").find(".country-restriction-section .country-restriction-flag").each(function () {
-        CountryRestrictions.push({ ID: $(this).data("country-id"), SortOrder: 0 });
+    $("div [data-page-section-id='" + PageSectionID + "']").find(".country-restriction-section .country-language-restriction-flag").each(function () {
+        restrictions.push({
+            CountryID: $(this).data("country-id"),
+            LanguageID: $(this).data("language-id"),
+            SortOrder: 0
+        });
     });
 
     $("div [data-page-section-id='" + PageSectionID + "']").find(".country-restriction-placeholder").first().remove();
@@ -2044,7 +2068,7 @@ function AddAllCountriesToPageSection(PageSectionID) {
         url: '/admin/cms/updatepagesectioncountryrestrictions',//'@Url.Action("UpdatePageSectionCountryRestrictions", "CMS")',
         type: "POST",
         traditional: true,
-        data: { pageSectionID: PageSectionID, countryRestrictions: JSON.stringify(CountryRestrictions) },
+        data: { pageSectionID: PageSectionID, countryLanguageRestrictions: JSON.stringify(restrictions) },
         success: function (data) {
             $("#page-section-" + PageSectionID + "-country-restriction-container").html(data);
             LoadingPanel.Hide();
@@ -2464,9 +2488,21 @@ $(document).ready(function () {
         }
     });
 
-
     $("#add-all-country-dialog").dialog({
         title: 'Add All Countries',
+        width: 'auto',
+        height: 'auto',
+        autoResize: true,
+        autoOpen: false,
+        buttons: {
+            Cancel: function (ev, ui) {
+                $(this).dialog("close");
+            }
+        }
+    });
+
+    $("#add-all-country-language-dialog").dialog({
+        title: 'Add All Sites',
         width: 'auto',
         height: 'auto',
         autoResize: true,

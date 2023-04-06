@@ -806,7 +806,7 @@ namespace Flock.Controllers
 
             if (promotionCodeID == null)
             {
-                var Model = UnitOfWork.GetRepository<vwProductImage>().GetAll().Where(p => Desired.Contains(p.ProductID)).ToList();
+                var Model = UnitOfWork.GetRepository<vwPromoCodeProductImage>().GetAll().Where(p => Desired.Contains(p.ProductID)).ToList();
 
                 return PartialView("Codes/PromoCodeProductRestrictionsPartial", Model);
             }
@@ -832,7 +832,7 @@ namespace Flock.Controllers
                 }
                 UnitOfWork.Save();
 
-                var Model = UnitOfWork.GetRepository<vwProductImage>().GetAll().Where(p => Desired.Contains(p.ProductID)).ToList();
+                var Model = UnitOfWork.GetRepository<vwPromoCodeProductImage>().GetAll().Where(p => Desired.Contains(p.ProductID)).ToList();
 
                 return PartialView("Codes/PromoCodeProductRestrictionsPartial", Model);
             }

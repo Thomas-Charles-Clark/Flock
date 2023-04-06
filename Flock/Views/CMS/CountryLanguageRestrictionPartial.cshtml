@@ -1,15 +1,15 @@
 ﻿@model List<Flock.Models.PageSection_Country_Language>
 @if (Model.Count == 0)
 {
-    <div class="country-restriction-section" style="padding: 1em; border: 1px solid #c0c0c0; min-height: 108px; position: relative;">
+    <div class="country-language-restriction-section" style="padding: 1em; border: 1px solid #c0c0c0; min-height: 108px; position: relative;">
         <div class="country-restriction-placeholder" style="font-size: 1.0em; background-color: white;">
-            By default, PageSections are available to all countries.<br /><br />Only add countries to this list if you want to restrict which countries can view this PageSection.
+            By default, PageSections are available to all sites.<br /><br />Only add sites to this list if you want to restrict which sites can view this PageSection.
         </div>
     </div>
 }
 else
 {
-    <div class="country-restriction-section" style="padding: 1em; border: 1px solid #c0c0c0; min-height: 108px; position: relative;">
+    <div class="country-language-restriction-section" style="padding: 1em; border: 1px solid #c0c0c0; min-height: 108px; position: relative;">
         <span style="position: absolute; top: 6px; right: 6px; line-height: 130%; cursor: pointer;" onclick="var container = $(this).parent().parent(); var toEmpty = $(this).parent(); $.confirm(function () { toEmpty.empty(); UpdatePageSectionCountryRestrictions(container) }, function () { })">Remove All</span>
 
         @foreach (var restriction in Model)
@@ -27,6 +27,6 @@ else
 <div style='clear: both'></div>
 
 <script type="text/javascript">
-    if (typeof (InitCountryDragDrop) == "function")
-        InitCountryDragDrop();
+    if (typeof (InitCountryLanguageDragDrop) == "function")
+        InitCountryLanguageDragDrop();
 </script>

@@ -15,6 +15,7 @@ using Flock.ViewModels;
 using System.Data.Linq;
 using Newtonsoft.Json;
 using System.Net;
+using NLog.Internal;
 
 namespace Flock.Controllers
 {
@@ -1839,7 +1840,7 @@ namespace Flock.Controllers
         public PartialViewResult PageSectionSaveBasicSettings(PageSection section, string pageSectionID)
         {
             // must update the target page section with the new data in the input object.
-            using (FlockDataContext db = new FlockDataContext())
+            using (FlockDataContext db = new FlockDataContext(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString))
             {
                 PageSection toUpdate = db.PageSections.Single(p => p.PageSectionID == section.PageSectionID);
                 toUpdate = section;
@@ -2077,9 +2078,9 @@ namespace Flock.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdatePageSectionCountryRestrictions(long pageSectionID, string countryRestrictions)
+        public ActionResult UpdatePageSectionCountryRestrictions(long pageSectionID, string countryLanguageRestrictions)
         {
-            var incomingRestrictions = JsonConvert.DeserializeObject<List<CountryLanguageSortDatum>>(countryRestrictions);
+            var incomingRestrictions = JsonConvert.DeserializeObject<List<CountryLanguageSortDatum>>(countryLanguageRestrictions ?? "[]");
 
             var currentRestrictions = UnitOfWork.GetRepository<PageSection_Country_Language>().GetAll().Where(p => p.PageSectionID == pageSectionID).ToList();
 

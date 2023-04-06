@@ -49,7 +49,7 @@
                 <div class="tab left @isActiveController(new string[] { "attributes" }, new string[] { "manage", "map", "ProductTypes" }, "active", "inactive")" id="tab_Attributes">
                     <span class="title">Attributes</span>
                 </div>
-                <div class="tab left  @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "inactive")" id="tab_CMS">
+                <div class="tab left  @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "inactive")" id="tab_CMS">
                     <span class="title">CMS</span>
                 </div>
                 <div class="tab left @isActiveController(new string[] { "ecommerce", "paypaltest", "bronto", "radford", "icontextiles" }, new string[] { "index", "overview", "giftvouchers", "deliverybands", "deliveryzones", "checkouthistory", "deliverymatrix", "salesoverview", "lists", "orderexport", "googleproductfeeddelivery", "deliveryexceptions" }, "active", "inactive")" id="tab_eCommerce">
@@ -316,7 +316,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="groupHolder @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "banners", "cms", "compose", "overview", "images", "brochures", "videos", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "inactive")" id="group_tab_CMS">
+                <div class="groupHolder @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "banners", "cms", "compose", "overview", "images", "brochures", "videos", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "inactive")" id="group_tab_CMS">
                     <div class="group">
                         <div class="sections">
                             <span>Pages</span>
@@ -324,6 +324,7 @@
                                 <li>@Html.ActionLink("Compose", "compose", "cms")</li>
                                 <li>@Html.ActionLink("Overview", "index", "cms")</li>
                                 <li>@Html.ActionLink("Page Sections", "pagesections", "cms")</li>
+                                <li>@Html.ActionLink("Filter Indexing", "index", "filterindexrestrictions")</li>
                             </ul>
                         </div>
                         <div class="legend">

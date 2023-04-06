@@ -106,7 +106,7 @@
                 url: '@Url.Action("UpdatePromoCodeProductRestrictions", "Promotions")',
                 type: "POST",
                 traditional: true,
-                data: { promotionCodeID: PromotionCodeGridView.GetRowKey(PromotionCodeGridView.editingRowVisibleIndex), products: window.ProductRestrictions.toString() },
+                data: { promotionCodeId: PromotionCodeGridView.GetRowKey(PromotionCodeGridView.editingItemVisibleIndex), products: window.ProductRestrictions.toString() },
                 success: function (data) {
                     LoadingPanel.Hide();
                     $("#product-restrictions").html(data);
@@ -117,7 +117,8 @@
 
         function removeProductRestriction(ele) {
             $.confirm(function () {
-                $(ele).parent().remove();
+                let toRemove = $(ele).closest('.product-restriction-icon');
+                toRemove.remove();
                 RemoveProductFromRestriction()
             }, function () {
 

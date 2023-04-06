@@ -516,6 +516,7 @@
     <Compile Include="Controllers\BundlePriceImportController.cs" />
     <Compile Include="Controllers\ProductPages_ColourController.cs" />
     <Compile Include="Controllers\IconTextilesController.cs" />
+    <Compile Include="Controllers\FilterIndexRestrictionsController.cs" />
     <Compile Include="Controllers\SampleOrderEmailMessagesController.cs" />
     <Compile Include="Controllers\ImagesController.cs" />
     <Compile Include="Controllers\MailingListImportController.cs" />
@@ -4818,9 +4819,6 @@
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Properties\PublishProfiles\Flock-Dev-Admin.pubxml" />
-    <None Include="Properties\PublishProfiles\FlockDevPublish.pubxml" />
-    <None Include="Properties\PublishProfiles\FlockPublish.pubxml" />
     <Content Include="Images\admin\designers-guild.png" />
     <Content Include="Images\admin\green-fade.png" />
     <None Include="OpenXmlPowerToolsEx.dll">
@@ -5250,7 +5248,8 @@
     <Content Include="Scripts\globalize\globalize.js" />
     <Content Include="Scripts\googleAddress.js" />
     <Content Include="Scripts\colorpicker\colorpicker.zip" />
-    <None Include="Properties\PublishProfiles\VM-WEB1 - Flock.pubxml" />
+    <None Include="Properties\PublishProfiles\VM-WEB1-DEV.pubxml" />
+    <None Include="Properties\PublishProfiles\VM-WEB1.pubxml" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="Scripts\imagesLoaded.pkgd.js" />
     <Content Include="Scripts\jquery-2.0.3.js" />
@@ -6125,7 +6124,8 @@
     <Content Include="Views\BundlePriceImport\UploadResultsPanelPartial.cshtml" />
     <Content Include="Views\MailingListImport\DotDigitalAccountComboBoxPartial.cshtml" />
     <Content Include="Views\Shared\SiteSearch.cshtml" />
-    <Content Include="Views\Shared\CountrySearchDataViewPartial - Copy.cshtml" />
+    <Content Include="Views\Shared\SiteSearchDataViewPartial.cshtml" />
+    <Content Include="Views\FilterIndexRestrictions\FilterIndexRestrictions.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

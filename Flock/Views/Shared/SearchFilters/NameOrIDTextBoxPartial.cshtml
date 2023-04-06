@@ -5,11 +5,11 @@
     settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
 
     settings.Properties.NullText = "Name, Code or ID";
-    
+
     settings.Properties.NullDisplayText = "Name, Code or ID";
 
     settings.Properties.ConvertEmptyStringToNull = true;
-    
+
     string action = ViewContext.Controller.ValueProvider.GetValue("action").AttemptedValue;
 
     settings.Properties.ClientSideEvents.GotFocus = @"function(s, e) {
@@ -20,7 +20,7 @@
         if(s.GetValue() == '' || s.GetValue() == null || s.GetValue() == false)
             s.SetText('Name, Code or ID');
     }";
-    
+
     if (action == "ImageSearchNameOrIDTextBoxPartial")
     {
         settings.Name = "ImageSearchNameOrIDTextBox";
@@ -201,6 +201,45 @@
             }
         }";
     }
+    else if (action == "CountryLanguageSearchNameTextBox")
+    {
+        settings.Name = "CountryLanguageSearchNameTextBox";
+        settings.Text = "Site Name";
+        settings.Properties.ClientSideEvents.GotFocus = @"function(s, e) { 
+            if(s.GetValue() == 'Site Name')
+                s.SetText('');
+        }";
+        settings.Properties.ClientSideEvents.LostFocus = @"function(s, e){
+            if(s.GetValue() == '' || s.GetValue() == null || s.GetValue() == false)
+                s.SetText('Site Name');
+        }";
+        settings.Properties.ClientSideEvents.KeyUp = @"function(s, e) { 
+            if(e.htmlEvent.keyCode == 13) {
+                $('#country-language-searching-icon').fadeIn('fast');
+                var nameCodeID = null;
+                if(CountryLanguageSearchNameTextBox.GetValue() != 'Site Name')
+                    nameCodeID = CountryLanguageSearchNameTextBox.GetValue();
+                 $.ajax({
+                    url: '" + Url.Action("SiteSearch", "CountrySearch") + @"',
+                    traditional: true,
+                    data: { 
+                        SearchString: nameCodeID
+                    },
+                    success: function(data) {
+                        $('#country-language-search-data-view-container').html(data);
+                        $('#country-language-searching-icon').fadeOut('slow');
+                        if (typeof (InitCountryLanguageDragDrop) == 'function')
+                            InitCountryLanguageDragDrop();
+                    },
+                    error: function(e, s, a) {
+                        $('#country-language-searching-icon').fadeOut('slow');
+                        alert(e.responseText);
+                    },
+                    timeout: 60000
+                });
+            }
+        }";
+    }
     else if (action == "ProductPageSearchNameTextBox")
     {
         settings.Name = "ProductPageSearchNameTextBox";
@@ -249,7 +288,7 @@
     else if (action == "PageSearchNameOrIDTextPartial")
     {
         settings.Name = "PageSearchNameTextBox";
-        
+
         settings.Properties.ClientSideEvents.KeyUp = @"function(s, e) { 
             if(e.htmlEvent.keyCode == 13) {
                 $('#page-searching-icon').fadeIn('fast');
@@ -320,5 +359,5 @@
             }
         }";
     }
-    
+
 }).GetHtml()

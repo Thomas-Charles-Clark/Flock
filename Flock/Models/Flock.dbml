@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?><Database Name="FlockDev" Class="FlockDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=vm-sql1;Initial Catalog=FlockDev;Integrated Security=False;Persist Security Info=True;User ID=dg" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="FlockConnectionString" Provider="System.Data.SqlClient" />
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Flock" Class="FlockDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Table Name="dbo.Admin" Member="Admins">
     <Type Name="Admin">
       <Column Name="AdminID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -292,6 +291,7 @@
       <Association Name="Language_Member" Member="Members" ThisKey="LanguageID" OtherKey="LanguageID" Type="Member" />
       <Association Name="Language_Member1" Member="Members1" ThisKey="LanguageID" OtherKey="MarketingLanguageID" Type="Member" />
       <Association Name="Language_PageSection_Country_Language" Member="PageSection_Country_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="PageSection_Country_Language" />
+      <Association Name="Language_FilterIndexRestriction_Language" Member="FilterIndexRestriction_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="FilterIndexRestriction_Language" />
     </Type>
   </Table>
   <Table Name="dbo.Region" Member="Regions">
@@ -1831,6 +1831,7 @@
       <Association Name="ProductType_AttributeGroup_ProductType" Member="AttributeGroup_ProductTypes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="AttributeGroup_ProductType" />
       <Association Name="ProductType_Article" Member="Articles" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Article" />
       <Association Name="ProductType_Collection" Member="Collections" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Collection" />
+      <Association Name="ProductType_FilterIndexRestriction" Member="FilterIndexRestrictions" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexRestriction" />
       <Association Name="StockLocation_ProductType" Member="StockLocation" ThisKey="StockLocationID" OtherKey="StockLocationID" Type="StockLocation" IsForeignKey="true" />
     </Type>
   </Table>
@@ -5045,6 +5046,7 @@
       <Association Name="Member_Member_Brochure" Member="Member_Brochures" ThisKey="MemberID" OtherKey="MemberID" Type="Member_Brochure" />
       <Association Name="Member_Member_SubAccount" Member="Member_SubAccounts" ThisKey="MemberID" OtherKey="MemberID" Type="Member_SubAccount" />
       <Association Name="Member_Transaction" Member="Transactions" ThisKey="MemberID" OtherKey="MemberID" Type="Transaction" />
+      <Association Name="Member_FilterIndexRestriction_Language" Member="FilterIndexRestriction_Languages" ThisKey="MemberID" OtherKey="ModifiedMemberID" Type="FilterIndexRestriction_Language" />
       <Association Name="Country_Member" Member="Country" ThisKey="CountryID" OtherKey="CountryID" Type="Country" IsForeignKey="true" />
       <Association Name="Language_Member" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
       <Association Name="Country_Member1" Member="Country1" ThisKey="MarketingCountryID" OtherKey="CountryID" Type="Country" IsForeignKey="true" />
@@ -5193,6 +5195,34 @@
       <Association Name="Country_PageSection_Country_Language" Member="Country" ThisKey="CountryID" OtherKey="CountryID" Type="Country" IsForeignKey="true" />
       <Association Name="Language_PageSection_Country_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
       <Association Name="PageSection_PageSection_Country_Language" Member="PageSection" ThisKey="PageSectionID" OtherKey="PageSectionID" Type="PageSection" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FilterIndexRestrictions" Member="FilterIndexRestrictions">
+    <Type Name="FilterIndexRestriction">
+      <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeGroupSignature" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeGroupDescription" Type="System.String" DbType="NVarChar(500) NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="DeletedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Enabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="FilterIndexRestrictionID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Association Name="FilterIndexRestriction_FilterIndexRestriction_Language" Member="FilterIndexRestriction_Languages" ThisKey="FilterIndexRestrictionID" OtherKey="FilterIndexRestrictionID" Type="FilterIndexRestriction_Language" />
+      <Association Name="ProductType_FilterIndexRestriction" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FilterIndexRestriction_Language" Member="FilterIndexRestriction_Languages">
+    <Type Name="FilterIndexRestriction_Language">
+      <Column Name="FilterIndexRestrictionID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="FooterText" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedMemberID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ChatGPTRequestID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Association Name="FilterIndexRestriction_FilterIndexRestriction_Language" Member="FilterIndexRestriction" ThisKey="FilterIndexRestrictionID" OtherKey="FilterIndexRestrictionID" Type="FilterIndexRestriction" IsForeignKey="true" />
+      <Association Name="Language_FilterIndexRestriction_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+      <Association Name="Member_FilterIndexRestriction_Language" Member="Member" ThisKey="ModifiedMemberID" OtherKey="MemberID" Type="Member" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.PageSection_ClearPage" Method="PageSection_ClearPage">
@@ -6520,12 +6550,10 @@
     <Parameter Name="RegionID" Parameter="regionID" Type="System.Byte" DbType="TinyInt" />
     <Parameter Name="LanguageID" Parameter="languageID" Type="System.Byte" DbType="TinyInt" />
     <Parameter Name="CountryName" Parameter="countryName" Type="System.String" DbType="NVarChar(50)" />
-    <Parameter Name="TableLock" Parameter="tableLock" Type="System.Boolean" DbType="Bit" />
     <ElementType Name="Country_Language_SearchResult">
       <Column Name="CountryID" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
-      <Column Name="Name1" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
     </ElementType>
   </Function>
 </Database>
