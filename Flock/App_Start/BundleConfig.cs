@@ -92,17 +92,17 @@ namespace Flock
                       "~/Scripts/bootstrap.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap-theme.css",
-                      "~/Content/bootstrap.css",
-                      "~/Content/bootstrap-overrides.css",
+                      //"~/Content/bootstrap-theme.css",
+                      //"~/Content/bootstrap.css",
+                      //"~/Content/bootstrap-overrides.css",
                       "~/Content/site.css"
                       //"~/Content/bootstrap-responsive.css",
                       //"~/Content/bootstrap-overrides.css"
                       ));
 
             bundles.Add(new StyleBundle("~/bundles/css/samples").Include(
-                      "~/Content/bootstrap-theme.css",
-                      "~/Content/bootstrap.css",
+                      //"~/Content/bootstrap-theme.css",
+                      //"~/Content/bootstrap.css",
                       "~/Content/samples-ui.css",
                       "~/Content/samples.css"
                     ));
@@ -193,9 +193,69 @@ namespace Flock
                 "~/Scripts/cms/cms-compose-page.js"
                 ));
 
-            #if !DEBUG
+#if !DEBUG
             BundleTable.EnableOptimizations = true;
-            #endif
+#endif
+
+
+
+#if DEBUG
+            var cssPrefix = "~/css/dist";
+            var cssSuffix = ".css";
+
+            var jsPrefix = "~/js/src";
+            var jsSuffix = ".js";
+#else
+            var cssPrefix = "~/css/dist";
+            var cssSuffix = ".min.css";
+
+            var jsPrefix = "~/js/dist";
+            var jsSuffix = ".min.js";
+#endif
+            //
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //
+            // Styles
+            //
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //
+
+            bundles.Add(new StyleBundle("~/bundles/css/common").Include(
+                    $"{cssPrefix}/models/common.css"
+                ));
+
+            bundles.Add(new StyleBundle("~/bundles/css/bootstrap-5.3.1").Include(
+                    $"{cssPrefix}/lib/bootstrap-5.3.1/scss/bootstrap-5.3.1.css"
+                ));
+
+            bundles.Add(new StyleBundle("~/bundles/css/filter-index-restrictions").Include(
+                      $"{cssPrefix}/models/filter-index-restrictions{cssSuffix}"
+                ));
+
+            //  
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //
+            // Scripts
+            //
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //
+
+            bundles.Add(new ScriptBundle("~/bundles/js/bootstrap-5.3.1").Include(
+                      $"{jsPrefix}/lib/bootstrap-5.3.1/bootstrap.bundle-5.3.1{jsSuffix}"
+                ));
+
+            bundles.Add(new ScriptBundle("~/bundles/js/code-mirror").Include(
+                      $"{jsPrefix}/lib/codemirror/code-mirror.bundle{jsSuffix}"
+                ));
+
+            bundles.Add(new ScriptBundle("~/bundles/js/filter-index-restrictions").Include(
+                      $"{jsPrefix}/models/filter-index-restrictions{jsSuffix}"
+                ));
+
+            foreach (var b in BundleTable.Bundles)
+            {
+                b.Transforms.Clear();
+            }
         }
     }
 }

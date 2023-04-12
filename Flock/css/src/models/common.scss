@@ -1,0 +1,124 @@
+﻿@import "../lib/bootstrap-5.3.1/scss/mixins/breakpoints";
+@import "../lib/bootstrap-5.3.1/scss/functions";
+@import "../lib/bootstrap-5.3.1/scss/variables";
+
+$xs-gutter: 0.1rem;
+$vsm-gutter: 0.25rem;
+$sm-gutter: 0.5rem;
+$m-gutter: 0.75rem;
+$l-gutter: 1.0rem;
+$mxl-gutter: 1.5rem;
+$xl-gutter: 2.0rem;
+$xxl-gutter: 3.0rem;
+$disco-color: #e51f7c;
+$letter-spacing-slight: 0.05rem;
+$page-heading-colour: #44546b;
+
+$font-size-xs: 0.85rem;
+$font-size-md: 1.15rem;
+$font-size-regular: 1.0rem;
+$mdc-error-color: #db0028;
+
+$menu-background-color: #8bbfe5;
+
+:root {
+    --vsm-gutter: #{$vsm-gutter};
+    --sm-gutter: #{$sm-gutter};
+    --m-gutter: #{$m-gutter};
+    --l-gutter: #{$l-gutter};
+    --mxl-gutter: #{$mxl-gutter};
+    --xl-gutter: #{$xl-gutter};
+    --xxl-gutter: #{$xxl-gutter};
+    --disco-color: #{$disco-color};
+    --letter-spacing-slight: #{$letter-spacing-slight};
+    --page-heading-colour: #{$page-heading-colour};
+}
+
+#main-menu-nav {
+    background-color: $menu-background-color;
+    padding: $m-gutter;
+    padding-bottom: 0;
+
+    li {
+
+        &:hover {
+            border-bottom: 0;
+        }
+
+        .nav-link {
+            background-color: $white;
+            padding: calc($nav-link-padding-y - $vsm-gutter) $nav-link-padding-x;
+
+            &:not(.active) {
+                opacity: 0.65;
+                box-shadow: $box-shadow-inset;
+            }
+
+            &:hover {
+                border-color: $white;
+
+                &:not(.active) {
+                    opacity: 0.85;
+                }
+            }
+        }
+
+        & + li {
+            margin-left: $vsm-gutter;
+        }
+    }
+}
+
+#main-menu-tab-content {
+    border-bottom: 1px solid $gray-300;
+
+    .tab-pane {
+        .menu-tab {
+            font-size: $small-font-size;
+            display: flex;
+            padding: $m-gutter 0;
+            gap: 0;
+            align-items: flex-start;
+
+            .sub-menu {
+                display: flex;
+                flex-direction: column;
+                text-align: center;
+                justify-content: flex-start;
+                gap: $vsm-gutter;
+                padding: $vsm-gutter $l-gutter $l-gutter $l-gutter;
+                /*
+                flex: 1;
+                width: auto;
+                flex-grow: 1;
+                white-space: normal;*/
+
+                > div {
+                    display: flex;
+                    justify-content: center;
+                    gap: $m-gutter;
+
+                    > div {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: flex-start;
+                        gap: $vsm-gutter;
+                    }
+                    /*
+                    flex: 1;
+                    height: 100px;
+                    flex-flow: column wrap;*/
+                }
+
+                & + div {
+                    border-left: 1px solid $gray-300;
+                }
+            }
+        }
+    }
+}
+
+.cm-matchingBracket {
+    background-color: #92929245 !important;
+}

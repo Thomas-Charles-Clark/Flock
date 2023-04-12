@@ -16,8 +16,10 @@
     @*@Scripts.Render("~/Scripts/knockout-3.2.0.js")*@
     @Scripts.Render("~/Scripts/Globalize/Globalize.js")
     @Styles.Render("~/bundles/css/grids")
-    @Styles.Render("~/bundles/css/ribbon")
+    @*@Styles.Render("~/bundles/css/ribbon")*@
     @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/bundles/css/common")
+    @Styles.Render("~/bundles/css/bootstrap-5.3.1")
     @Scripts.Render("~/bundles/js/page-composition")
     <script type="text/javascript">
         $.extend({
@@ -56,10 +58,10 @@
 
                 var message = $("<div></div>");
                 if (e) {
-                        $(message).html(
-                            "<dl style='margin-bottom: 0'><dt>Status</dt><dd>" + s + "</dd>"
-                            + "<dt>Description</dt><dd>" + a + "</dd>"
-                            + "</dl>");
+                    $(message).html(
+                        "<dl style='margin-bottom: 0'><dt>Status</dt><dd>" + s + "</dd>"
+                        + "<dt>Description</dt><dd>" + a + "</dd>"
+                        + "</dl>");
 
                     var $frame = $('<iframe style="width: 100%; min-height: 400px;">');
                     $(message).append($frame);
@@ -130,7 +132,7 @@
             info: function (title, message, onClose) {
                 var ttl = "Info";
 
-                if(typeof title !== "undefined") {
+                if (typeof title !== "undefined") {
                     ttl = title;
                 }
 
@@ -159,7 +161,7 @@
                     resizable: false,
                     modal: true
                 });
-                
+
                 result.html(text);
 
                 return result;
@@ -248,11 +250,11 @@
                 {
                     ExtensionSuite = ExtensionSuite.TreeList
                 }
-//                new Script()
-//                {
-//ExtensionSuite = ExtensionSuite.All
-//                }
-            }
+                //                new Script()
+                //                {
+                //ExtensionSuite = ExtensionSuite.All
+                //                }
+                    }
         );
         Html.DevExpress().GetStyleSheets(
             new StyleSheet() { ExtensionSuite = ExtensionSuite.Editors },
@@ -275,9 +277,9 @@
      new StyleSheet() { ExtensionSuite = ExtensionSuite.GridView, Theme = "Aqua" }
  );
 
-        @RenderSection("lateStyles", required: false)
-        Html.EnableClientValidation();
-        Html.EnableUnobtrusiveJavaScript();
+@RenderSection("lateStyles", required: false)
+Html.EnableClientValidation();
+Html.EnableUnobtrusiveJavaScript();
     }
     @RenderSection("afterDevExpressScripts", required: false)
     @if (User.Identity.IsAuthenticated)
@@ -303,7 +305,7 @@
 
     @Html.Partial("~/Views/Admin/_NavigationPartial.cshtml")
 
-    <div class="container" id="container">
+    <div id="container">
         @RenderBody()
         <hr />
         @Html.AntiForgeryToken()
@@ -337,5 +339,7 @@
         settings.Name = "LoadingPanel";
         settings.Modal = true;
     }).GetHtml()
+
+    @Scripts.Render("~/bundles/js/bootstrap-5.3.1")
 </body>
 </html>

@@ -5225,6 +5225,20 @@
       <Association Name="Member_FilterIndexRestriction_Language" Member="Member" ThisKey="ModifiedMemberID" OtherKey="MemberID" Type="Member" IsForeignKey="true" />
     </Type>
   </Table>
+  <Table Name="adm.vwFilterIndexRestriction_Language" Member="vwFilterIndexRestriction_Languages">
+    <Type Name="vwFilterIndexRestriction_Language">
+      <Column Name="FilterIndexRestrictionID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="FooterText" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedMemberID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ChatGPTRequestID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Column Name="ProductTypeName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeGroupSignature" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeGroupDescription" Type="System.String" DbType="NVarChar(500) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
   <Function Name="dbo.PageSection_ClearPage" Method="PageSection_ClearPage">
     <Parameter Name="PageID" Parameter="pageID" Type="System.Int64" DbType="BigInt" />
     <Return Type="System.Int32" />

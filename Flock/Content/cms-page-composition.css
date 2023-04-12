@@ -52,12 +52,13 @@
 
 
 #related-pages {
-    min-height: 60px;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 1em;
     white-space: nowrap;
-    width: 978px;
+}
+
+#related-page-placeholder {
+    padding: 1rem;
 }
 
 .related-page-sortable {

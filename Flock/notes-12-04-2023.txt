@@ -1,0 +1,7 @@
+Why did it hold the thing?
+
+base paint orders getting "stuck" in the Portal
+
+because of stock problems
+
+have removed the Paint virtual UNION bit from portal.Mertex_Stock_Merge

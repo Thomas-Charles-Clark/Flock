@@ -1,9 +1,15 @@
-﻿
+﻿@model  Flock.ViewModels.FilterIndexRestrictionsViewModel
 @{
     ViewBag.Title = "Filter Index Restrictions";
     Layout = "~/Views/Admin/_Layout.cshtml";
 }
-
+@Scripts.Render("~/bundles/js/filter-index-restrictions")
+@Scripts.Render("~/bundles/js/code-mirror")
+@Styles.Render("~/bundles/css/filter-index-restrictions")
 <h4 class="page-heading">
     Filter Index Restrictions
 </h4>
+<div class="hstack align-items-start">
+    @Html.Action("GridViewPartial", new { targetLanguageId = Model.LanguageID })
+    @Html.Action("FilterIndexRestrictionsTargetLanguageDropDown", new { targetLanguageId = Model.LanguageID })
+</div>

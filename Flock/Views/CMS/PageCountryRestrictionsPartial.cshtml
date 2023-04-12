@@ -1,8 +1,13 @@
 ﻿@model List<Flock.Models.Country>
 <div class="content-panel-container">
     <fieldset id="country-restriction-fieldset">
-        <legend onclick="$('#country-restriction-section').slideToggle('fast');">Country Restrictions (click to expand / contract)<a id="country-restriction-remove-all" href="#" onclick="RemoveAllCountryRestrictions(); return false;">Remove All</a></legend>
-        <img id="country-restriction-busy" src="~/Images/SystemIcons/busy-icon-purple.gif" />
+        <legend onclick="$('#country-restriction-section').slideToggle('fast');">
+            Country Restrictions (click to expand / contract)
+            <img id="country-restriction-busy" src="~/Images/SystemIcons/busy-icon-purple.gif" />
+            <a id="country-restriction-remove-all" href="#" onclick="RemoveAllCountryRestrictions(); return false;">
+                Remove All
+            </a>
+        </legend>
         @if (Model.Count == 0)
         {
             <div id="country-restriction-section" class="fieldset-inner">

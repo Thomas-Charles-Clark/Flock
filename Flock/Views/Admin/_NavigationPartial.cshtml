@@ -9,795 +9,1134 @@
     var isActiveController = new Func<string[], string[], string, string, string>((ctrl, act, activeStyle, inactiveStyle) => ctrl.Contains(currentController.ToLower()) && act.Contains(currentAction.ToLower()) ? activeStyle : inactiveStyle);
 }
 
-<!--<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            @Html.ActionLink("Application name", "Index", "Home", null, new { @class = "brand" })
-            <div class="nav-collapse collapse">
-                <ul class="nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                </ul>
-                @Html.Partial("_LoginPartial")
+<ul class="nav nav-tabs" id="main-menu-nav" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @isActiveController(new string[] { "home", "admin", "menu", "account", "notes", "tracking", "reporting" }, new string[] { "index", "accessdenied", "login", "register", "confirmemail", "setpassword", "weekly", "manage" }, "active", "")"
+                id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard-tab-content" type="button" role="tab" aria-controls="dashboard-tab-content" aria-selected="true">
+            Dashboard
+        </button>
+    </li>
+    <li class="nav-item @isActiveController(new string[] { "products", "calendar", "collections", "productpages", "designs", "qualities", "relatedproductpages", "reviews", "selections", "modularproducts", "searchimpact", "bundles", "bundlepriceimport" }, new string[] { "index", "colourways", "selectionbuilder", "dimensions", "attributes", "stock", "images", "overview", "prices", "productpages", "countrysearchtestpage", "productassociation", "collections", "reviews", "calendar", "compose", "classifier", "imageexporter", "modules", "generate", "colour" }, "active", "")" role="presentation">
+        <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-tab-content" type="button" role="tab" aria-controls="products-tab-content">
+            Products
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @isActiveController(new string[] { "attributes" }, new string[] { "manage", "map", "ProductTypes" }, "active", "")" id="attributes-tab" data-bs-toggle="tab" data-bs-target="#attributes-tab-content" type="button" role="tab" aria-controls="attributes-tab-content">
+            Attributes
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "")" id="cms-tab" data-bs-toggle="tab" data-bs-target="#cms-tab-content" type="button" role="tab" aria-controls="cms-tab-content">
+            CMS
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @isActiveController(new string[] { "ecommerce", "paypaltest", "bronto", "radford", "icontextiles" }, new string[] { "index", "overview", "giftvouchers", "deliverybands", "deliveryzones", "checkouthistory", "deliverymatrix", "salesoverview", "lists", "orderexport", "googleproductfeeddelivery", "deliveryexceptions" }, "active", "")" id="ecommerce-tab" data-bs-toggle="tab" data-bs-target="#ecommerce-tab-content" type="button" role="tab" aria-controls="ecommerce-tab-content">
+            eCommerce
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @isActiveController(new string[] { "promotions", "events", "sampleorderemailmessages" }, new string[] { "index", "overview", "saleprices", "createsaleprices", "competitions", "marketingpartners", "codes" }, "active", "")" id="promotions-tab" data-bs-toggle="tab" data-bs-target="#promotions-tab-content" type="button" role="tab" aria-controls="promotions-tab-content">
+            Promotions
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @isActiveController(new string[] { "articles", "assetdeliverysystem" }, new string[] { "index", "overview", "compose", "advertisingimages", "mertexmarkets", "users", "announcements" }, "active", "")" id="press-trade-tab" data-bs-toggle="tab" data-bs-target="#press-trade-tab-content" type="button" role="tab" aria-controls="press-trade-tab-content">
+            Press &amp; Trade
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @isActiveController(new string[] { "members", "assets", "mailinglistimport", "gdpr" }, new string[] { "index", "overview", "admins", "details", "brochurerequests", "search", "bademails", "datasubjects" }, "active", "")" id="members-tab" data-bs-toggle="tab" data-bs-target="#members-tab-content" type="button" role="tab" aria-controls="members-tab-content">
+            Members
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @isActiveController(new string[] { "translations" }, new string[] { "index", "overview", "htmlsections", "slideshowimages", "productpages", "pagesections", "uploadspreadsheet", "images", "products", "ProductTypes", "sitesections", "products", "collections", "forms", "finishes", "producttypes", "colours", "pages", "patterns", "usages", "articlesubtypes", "articletypes", "articles", "emailtexts", "attributegroups", "attributes", "deliveryoptions", "menuitems", "menus", "giftvouchervalidations", "technicaldescriptions", "orderformgroups", "orderstatuses", "returnreasons", "stockstatuses", "techinfo_additionalinfo", "techinfo_aftercare", "techinfo_composition", "techinfo_contractfr", "techinfo_domesticfr", "techinfo_flamcode", "techinfo_patternmatch", "techinfo_test", "techinfo_type", "techinfo_usage", "resources", "modules", "moduleoptions", "moduleoptiongroups", "slideshowimages", "callstoaction", "announcements", "rooms", "snippets" }, "active", "")" id="translations-tab" data-bs-toggle="tab" data-bs-target="#translations-tab-content" type="button" role="tab" aria-controls="translations-tab-content">
+            Translations
+        </button>
+    </li>
+</ul>
+<div class="tab-content" id="main-menu-tab-content">
+    <div class="tab-pane fade @isActiveController(new string[] { "home", "admin", "menu", "account", "notes", "tracking", "reporting" }, new string[] { "index", "accessdenied", "login", "register", "confirmemail", "setpassword", "weekly", "manage" }, "show active", "")" id="dashboard-tab-content" role="tabpanel" aria-labelledby="dashboard-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    Dashboard
+                </label>
+                <div>
+                    <div>
+                        @{
+                            if (Request.IsAuthenticated)
+                            {
+                                @Html.ActionLink("Logout", "logoff", "account")
+                            }
+                            else
+                            {
+                                @Html.ActionLink("Login", "login", "account")
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Notes
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Weekly", "weekly", "notes")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Reports
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Manage", "manage", "reporting")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Cache Buster
+                </label>
+                <div>
+                    <div>
+                        <a data-toggle="modal" data-target="#cache-buster-modal" href="#">
+                            Cache Buster
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>-->
-
-<div id="OfficeControls">
-    <div class="ribbon">
-        <div class="header" @*style="background-color: #74c24b"*@>
-
-        </div>
-        <div class="ribbon_contents">
-            <!-- , "manage", "register", "externalloginfailure", "externalloginconfirmation", "setpasswordpartial", "removeexternalloginspartial", "externalloginspartial", "changepasswordpartial" -->
-            @*@if( currentController.ToLower() != "account")
-                {*@
-            <div class="tabs">
-                <div class="tab left @isActiveController(new string[] { "home", "admin", "menu", "account", "notes", "tracking", "reporting" }, new string[] { "index", "accessdenied", "login", "register", "confirmemail", "setpassword", "weekly", "manage" }, "active", "inactive")" id="tab_Main">
-                    <span class="title">Dashboard</span>
-                </div>
-                <div class="tab left @isActiveController(new string[] { "products", "calendar", "collections", "productpages", "designs", "qualities", "relatedproductpages", "reviews", "selections", "modularproducts", "searchimpact", "bundles", "bundlepriceimport" }, new string[] { "index", "colourways", "selectionbuilder", "dimensions", "attributes", "stock", "images", "overview", "prices", "productpages", "countrysearchtestpage", "productassociation", "collections", "reviews", "calendar", "compose", "classifier", "imageexporter", "modules", "generate", "colour" }, "active", "inactive")" id="tab_Products">
-                    <span class="title">Products</span>
-                </div>
-                <div class="tab left @isActiveController(new string[] { "attributes" }, new string[] { "manage", "map", "ProductTypes" }, "active", "inactive")" id="tab_Attributes">
-                    <span class="title">Attributes</span>
-                </div>
-                <div class="tab left  @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "inactive")" id="tab_CMS">
-                    <span class="title">CMS</span>
-                </div>
-                <div class="tab left @isActiveController(new string[] { "ecommerce", "paypaltest", "bronto", "radford", "icontextiles" }, new string[] { "index", "overview", "giftvouchers", "deliverybands", "deliveryzones", "checkouthistory", "deliverymatrix", "salesoverview", "lists", "orderexport", "googleproductfeeddelivery", "deliveryexceptions" }, "active", "inactive")" id="tab_eCommerce">
-                    <span class="title">eCommerce</span>
-                </div>
-                <div class="tab left @isActiveController(new string[] { "promotions", "events", "sampleorderemailmessages" }, new string[] { "index", "overview", "saleprices", "createsaleprices", "competitions", "marketingpartners", "codes" }, "active", "inactive")" id="tab_Promotions">
-                    <span class="title">Promotions</span>
-                </div>
-                <div class="tab left @isActiveController(new string[] { "articles", "assetdeliverysystem" }, new string[] { "index", "overview", "compose", "advertisingimages", "mertexmarkets", "users", "announcements" }, "active", "inactive")" id="tab_Press">
-                    <span class="title">Press &amp; Trade</span>
-                </div>
-                <div class="tab left @isActiveController(new string[] { "members", "assets", "mailinglistimport", "gdpr" }, new string[] { "index", "overview", "admins", "details", "brochurerequests", "search", "bademails", "datasubjects" }, "active", "inactive")" id="tab_Members">
-                    <span class="title">Members</span>
-                </div>
-                <div class="tab left @isActiveController(new string[] { "translations" }, new string[] {
-                                    "index",
-                                    "overview",
-                                    "htmlsections",
-                                    "slideshowimages",
-                                    "productpages",
-                                    "pagesections",
-                                    "uploadspreadsheet",
-                                    "images",
-                                    "products",
-                                    "ProductTypes",
-                                    "sitesections",
-                                    "products",
-                                    "collections",
-                                    "forms",
-                                    "finishes",
-                                    "producttypes",
-                                    "colours",
-                                    "pages",
-                                    "patterns",
-                                    "usages",
-                                    "articlesubtypes",
-                                    "articletypes",
-                                    "articles",
-                                    "emailtexts",
-                                    "attributegroups",
-                                    "attributes",
-                                    "deliveryoptions",
-                                    "menuitems",
-                                    "menus",
-                                    "giftvouchervalidations",
-                                    "technicaldescriptions",
-                                    "orderformgroups",
-                                    "orderstatuses",
-                                    "returnreasons",
-                                    "stockstatuses",
-                                    "techinfo_additionalinfo",
-                                    "techinfo_aftercare",
-                                    "techinfo_composition",
-                                    "techinfo_contractfr",
-                                    "techinfo_domesticfr",
-                                    "techinfo_flamcode",
-                                    "techinfo_patternmatch",
-                                    "techinfo_test",
-                                    "techinfo_type",
-                                    "techinfo_usage",
-                                    "resources",
-                                    "modules",
-                                    "moduleoptions",
-                                    "moduleoptiongroups",
-                                    "slideshowimages",
-                                    "callstoaction",
-                                    "announcements",
-                                    "rooms",
-                                    "snippets"
-                                }, "active", "inactive")" id="tab_Translations">
-                    <span class="title">Translations</span>
+    <div class="tab-pane fade @isActiveController(new string[] { "products", "calendar", "collections", "productpages", "designs", "qualities", "relatedproductpages", "reviews", "selections", "modularproducts", "searchimpact", "bundles", "bundlepriceimport" }, new string[] { "index", "colourways", "selectionbuilder", "dimensions", "attributes", "stock", "images", "overview", "prices", "productpages", "countrysearchtestpage", "productassociation", "collections", "reviews", "calendar", "compose", "classifier", "imageexporter", "modules", "generate", "colour" }, "show active", "")" id="products-tab-content" role="tabpanel" aria-labelledby="products-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    Products
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Overview", "overview", "products")
+                        @Html.ActionLink("Text", "dimensions", "products")
+                        @Html.ActionLink("Images", "images", "products")
+                        @Html.ActionLink("Bundles", "index", "bundles")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Stock", "stock", "products")
+                        @Html.ActionLink("Prices", "prices", "products")
+                        @Html.ActionLink("Reviews", "overview", "reviews")
+                        @Html.ActionLink("Bundle Prices", "index", "bundlepriceimport")
+                    </div>
                 </div>
             </div>
-            @*}*@
-            <div class="controls">
-                <div class="groupHolder @isActiveController(new string[] { "home", "admin", "menu", "account", "notes", "tracking", "reporting" }, new string[] { "index", "accessdenied", "login", "register", "confirmemail", "setpassword", "weekly", "manage" }, "active", "inactive")" id="group_tab_Main">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Dashboard</span>
-                            <ul class="vertical-list" style="float: none;">
-                                @{
-                                    if (Request.IsAuthenticated)
-                                    {
-                                        <li>@Html.ActionLink("Logout", "logoff", "account")</li>
-                                    }
-                                    else
-                                    {
-                                        <li>@Html.ActionLink("Login", "login", "account")</li>
-                                    }
-                                }
-                            </ul>
-
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Notes</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Weekly", "weekly", "notes")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Reports</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Manage", "manage", "reporting")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div class="group" style="border-right: none">
-                        <div class="sections">
-                            <span>Cache Buster</span>
-                            <ul class="vertical-list" style="float: none">
-                                <li>
-                                    <a data-toggle="modal" data-target="#cache-buster-modal" href="#">Cache Buster</a>
-                                </li>
-                            </ul>
-                        </div>
+            <div class="sub-menu">
+                <label>
+                    Modular Products
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Modular Products", "index", "modularproducts")
+                        @Html.ActionLink("Modules", "modules", "modularproducts")
                     </div>
                 </div>
-
-
-                <div class="groupHolder @isActiveController(new string[] { "products", "calendar", "collections", "productpages", "designs", "qualities", "relatedproductpages", "reviews", "selections", "modularproducts", "searchimpact", "bundles", "bundlepriceimport" }, new string[] { "index", "colourways", "selectionbuilder", "dimensions", "attributes", "stock", "overview", "images", "productpages", "collections", "productassociation", "prices", "countrysearchtestpage", "reviews", "calendar", "compose", "classifier", "imageexporter", "modules", "generate", "colour" }, "active", "inactive")" id="group_tab_Products">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Products</span>
-                            <ul class="vertical-list" style="margin-right: 1em;">
-                                <li>@Html.ActionLink("Overview", "overview", "products")</li>
-                                <li>@Html.ActionLink("Text", "dimensions", "products")</li>
-                                <li>@Html.ActionLink("Images", "images", "products")</li>
-                                <li>@Html.ActionLink("Bundles", "index", "bundles")</li>
-                            </ul>
-                            <ul class="vertical-list">
-                                <li>@Html.ActionLink("Stock", "stock", "products")</li>
-                                <li>@Html.ActionLink("Prices", "prices", "products")</li>
-                                <li>@Html.ActionLink("Reviews", "overview", "reviews")</li>
-                                <li>@Html.ActionLink("Bundle Prices", "index", "bundlepriceimport")</li>
-                            </ul>
-                            <div style="clear: both;"></div>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Product Pages
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Compose", "compose", "productpages")
+                        @Html.ActionLink("Overview", "overview", "productpages")
+                        @Html.ActionLink("Attributes", "attributes", "productpages")
+                        @Html.ActionLink("Generator", "generate", "productpages")
                     </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Modular Products</span>
-                            <ul class="vertical-list" style="margin-right: 1em;">
-                                <li>@Html.ActionLink("Modular Products", "index", "modularproducts")</li>
-                                <li>@Html.ActionLink("Modules", "modules", "modularproducts")</li>
-                            </ul>
-                            <div style="clear: both;"></div>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
+                    <div>
+                        @Html.ActionLink("Classifier", "classifier", "productpages")
+                        @Html.ActionLink("Colourways", "colourways", "productpages")
+                        @Html.ActionLink("Related Product Pages", "overview", "relatedproductpages")
+                        @Html.ActionLink("Search Impact", "index", "searchimpact")
                     </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Product Pages</span>
-                            <ul class="vertical-list" style="margin-right: 1em;">
-                                <li>@Html.ActionLink("Compose", "compose", "productpages")</li>
-                                <li>@Html.ActionLink("Overview", "overview", "productpages")</li>
-                                <li>@Html.ActionLink("Attributes", "attributes", "productpages")</li>
-                                <li>@Html.ActionLink("Generator", "generate", "productpages")</li>
-                            </ul>
-                            <ul class="vertical-list" style="margin-right: 1em;">
-                                <li>@Html.ActionLink("Classifier", "classifier", "productpages")</li>
-                                <li>@Html.ActionLink("Colourways", "colourways", "productpages")</li>
-                                <li>@Html.ActionLink("Related Product Pages", "overview", "relatedproductpages", null, new { style = "width: 90px; display: block;" })</li>
-                            </ul>
-                            <ul class="vertical-list">
-                                <li>@Html.ActionLink("Search Impact", "index", "searchimpact")</li>
-                                <li>@Html.ActionLink("Primary Colours", "colour", "productpages")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Designs</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Overview", "overview", "designs")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Qualities</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Overview", "overview", "qualities")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Collections</span>
-                            <ul class="vertical-list" style="margin-right: 1em;">
-                                <li>@Html.ActionLink("Compose", "compose", "collections")</li>
-                                <li>@Html.ActionLink("Overview", "overview", "collections")</li>
-                            </ul>
-                            <ul class="vertical-list">
-                                <li>@Html.ActionLink("Product Associations", "productassociation", "collections")</li>
-                                <li>@Html.ActionLink("Image Exporter", "imageexporter", "collections")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>Selections</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Compose", "selectionbuilder", "selections")</li>
-                                <li>@Html.ActionLink("Overview", "overview", "selections")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                        <div style="clear: both;"></div>
+                    <div>
+                        @Html.ActionLink("Primary Colours", "colour", "productpages")
                     </div>
                 </div>
-                <div class="groupHolder @isActiveController(new string[] { "attributes" }, new string[] { "manage", "map", "ProductTypes" }, "active", "inactive")" id="group_tab_Attributes">
-                    <div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>RESTRICTED ACCESS - ADMINS ONLY</span>
-                            <ul class="vertical-list" style="margin-right: 1em">
-                                <li>@Html.ActionLink("Map", "map", "attributes")</li>
-                                <li>@Html.ActionLink("Manage", "manage", "attributes")</li>
-                                <li>@Html.ActionLink("Product Types", "ProductTypes", "attributes")</li>
-                            </ul>
-                            <ul class="vertical-list">
-                                <li>
-                                    If you require any changes, 
-                                </li>
-                                <li>
-                                    please contact Matthew Christie on:
-                                </li>
-                                <li>
-                                    <a href="tel:+447971463704">+44 7971 463 704</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Designs
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Overview", "overview", "designs")
                     </div>
                 </div>
-                <div class="groupHolder @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "banners", "cms", "compose", "overview", "images", "brochures", "videos", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "inactive")" id="group_tab_CMS">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Pages</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Compose", "compose", "cms")</li>
-                                <li>@Html.ActionLink("Overview", "index", "cms")</li>
-                                <li>@Html.ActionLink("Page Sections", "pagesections", "cms")</li>
-                                <li>@Html.ActionLink("Filter Indexing", "index", "filterindexrestrictions")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Assets</span>
-                            <ul class="vertical-list" style="margin-right: 1em;">
-                                <li>@Html.ActionLink("Call to Action Styles", "styles", "callstoaction")</li>
-                            </ul>
-                            <ul class="vertical-list">
-                                <li>@Html.ActionLink("Images", "images", "assets")</li>
-                                <li>@Html.ActionLink("Messages", "messages", "assets")</li>
-                                <li>@Html.ActionLink("Brochures", "brochures", "assets")</li>
-                            </ul>
-                            <ul class="vertical-list">
-                                <li>@Html.ActionLink("Videos", "videos", "assets")</li>
-                                <li>@Html.ActionLink("Image Export", "imageexporter", "images")</li>
-                                <li>@Html.ActionLink("Image Version Checker", "versionchecker", "images", new { style = "width: 90px; display: block;" })</li>
-                            </ul>
-                            <div style="clear: both;"></div>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Articles</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Compose", "compose", "articles")</li>
-                                <li>@Html.ActionLink("Overview", "index", "articles")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Store Events</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Store Events", "index", "storeevents")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Menu Builder</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Menus", "menubuilder", "cms")</li>
-                                <li>@Html.ActionLink("Menu Items", "menuitemsbuilder", "cms")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Banners</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Compose", "compose", "banners")</li>
-                                <li>@Html.ActionLink("Overview", "overview", "banners")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Snippets</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Snippets", "snippets", "cms")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>Careers</span>
-                            <ul class="vertical-list" style="float: none;">
-                                <li>@Html.ActionLink("Career Listings", "index", "careers")</li>
-                            </ul>
-                            <div style="clear: both;"></div>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div style="clear: both;"></div>
-                </div>
-                <div class="groupHolder @isActiveController(new string[] { "ecommerce", "paypaltest", "bronto", "radford", "icontextiles" }, new string[] { "index", "overview", "giftvouchers", "deliverybands", "deliveryzones", "checkouthistory", "deliverymatrix", "salesoverview", "lists", "orderexport", "googleproductfeeddelivery", "deliveryexceptions" }, "active", "inactive")" id="group_tab_eCommerce">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Main</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0">
-                                <li>@Html.ActionLink("Overview", "index", "ecommerce")</li>
-                                <li>@Html.ActionLink("Gift Vouchers", "giftvouchers", "ecommerce")</li>
-                                @*</ul>
-                                    <ul class="vertical-list" style="margin-right: 0">*@
-                                <li>@Html.ActionLink("Sales Overview", "salesoverview", "ecommerce")</li>
-                                <li>@Html.ActionLink("Checkout History", "checkouthistory", "ecommerce")</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Delivery</span>
-                            <ul class="vertical-list">
-                                <li>@Html.ActionLink("Delivery Bands", "deliverybands", "ecommerce")</li>
-                                <li>@Html.ActionLink("Delivery Zones", "deliveryzones", "ecommerce")</li>
-                            </ul>
-                            <ul class="vertical-list">
-                                <li>@Html.ActionLink("Delivery Matrix", "deliverymatrix", "ecommerce")</li>
-                                <li>@Html.ActionLink("Google Delivery", "googleproductfeeddelivery", "ecommerce")</li>
-                                <li>@Html.ActionLink("Delivery Exceptions", "deliveryexceptions", "ecommerce")</li>
-                            </ul>
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Bronto</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0">
-                                <li>@Html.ActionLink("Lists", "lists", "bronto")</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Radford</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0">
-                                <li>@Html.ActionLink("Order Export", "orderexport", "radford")</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>Icon Textiles</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0">
-                                <li>@Html.ActionLink("Order Export", "orderexport", "icontextiles")</li>
-                            </ul>
-                        </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Qualities
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Overview", "overview", "qualities")
                     </div>
                 </div>
-                <div class="groupHolder @isActiveController(new string[] { "articles", "assetdeliverysystem" }, new string[] { "index", "overview", "compose", "advertisingimages", "mertexmarkets", "users", "announcements" }, "active", "inactive")" id="group_tab_Press">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Main</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Overview", "overview", "articles")</li>
-                                <li>@Html.ActionLink("Compose", "compose", "articles")</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>Asset Delivery</span>
-                            <ul class="horizontal-list">
-                                <li>
-                                    <ul class="vertical-list">
-                                        <li>@Html.ActionLink("Advertising Images", "advertisingimages", "assetdeliverysystem")</li>
-                                        <li>@Html.ActionLink("Mertex Markets", "mertexmarkets", "assetdeliverysystem")</li>
-                                        <li>@Html.ActionLink("Users", "users", "assetdeliverysystem")</li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <ul class="vertical-list">
-                                        <li>@Html.ActionLink("Announcements", "announcements", "assetdeliverysystem")</li>
-                                        <li>@Html.ActionLink("Announcement Translator", "announcements", "translations")</li>
-                                        <li>&nbsp;</li>
-                                    </ul>
-                                </li>
-                            </ul>
-
-                            <ul class="vertical-list" style="float: none; margin-right: 0">
-                            </ul>
-                        </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Collections
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Compose", "compose", "collections")
+                        @Html.ActionLink("Overview", "overview", "collections")
+                        @Html.ActionLink("Product Associations", "productassociation", "collections")
+                        @Html.ActionLink("Image Exporter", "imageexporter", "collections")
                     </div>
                 </div>
-                <div class="groupHolder @isActiveController(new string[] { "promotions", "events", "sampleorderemailmessages" }, new string[] { "index", "overview", "saleprices", "createsaleprices", "competitions", "marketingpartners", "codes" }, "active", "inactive")" id="group_tab_Promotions">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Sale Prices</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Overview", "index", "promotions")</li>
-                                <li>@Html.ActionLink("Create Sale Prices", "createsaleprices", "promotions")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Competitions</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Competitions", "competitions", "promotions")</li>
-                                <li>@Html.ActionLink("Marketing Partners", "marketingpartners", "promotions")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>Codes</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Promotional Codes", "codes", "promotions")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>Store Events</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Overview", "overview", "events")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    @*<div class="group">
-                        <div class="sections">
-                            <span>Sample Ordering System</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Email Messages", "index", "sampleorderemailmessages")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>*@
-                    @*<div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>New Sale Prices</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Sale Prices (New)", "saleprices", "promotions")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>*@
-                </div>
-                <div class="groupHolder @isActiveController(new string[] { "members", "assets", "mailinglistimport", "gdpr" }, new string[] { "index", "brochurerequests", "overview", "admins", "details", "search", "bademails", "datasubjects" }, "active", "inactive")" id="group_tab_Members">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Members</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Bad Emails", "bademails", "members")</li>
-                                <li>@Html.ActionLink("Details", "details", "members")</li>
-                                @*<li>@Html.ActionLink("Administrators", "admins", "members")</li>*@
-                                <li>@Html.ActionLink("Brochure Requests", "brochurerequests", "assets")</li>
-                            </ul>
-                        </div>
-                        <div class="legend">
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="sections">
-                            <span>GDPR</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Data Subjects", "datasubjects", "gdpr")</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>Mailing List Imports</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Upload", "index", "mailinglistimport")</li>
-                            </ul>
-                        </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Selections
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Compose", "selectionbuilder", "selections")
+                        @Html.ActionLink("Overview", "overview", "selections")
                     </div>
                 </div>
-                @*<div class="groupHolder @isActiveController(new string[] { "smartfocus" }, new string[] { "index", "overview", "transactional", "transactionalemailtemplates", "emailtext"  }, "active", "inactive")" id="group_tab_SmartFocus">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Overview</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Overview", "overview", "smartfocus")</li>
-                            </ul>
-                        </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade @isActiveController(new string[] { "attributes" }, new string[] { "manage", "map", "ProductTypes" }, "show active", "")" id="attributes-tab-content" role="tabpanel" aria-labelledby="attributes-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    RESTRICTED ACCESS - ADMINS ONLY
+                </label>
+                <div>
+                    <div>
+                        If you require any changes,
+                        please contact Matthew Christie on:
+                        <a href="tel:+447971463704">+44 7971 463 704</a>
                     </div>
-                    <div class="group" style="border-right: none;">
-                        <div class="sections">
-                            <span>Templates</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0">
-                                <li>@Html.ActionLink("Email Text", "emailtext", "smartfocus")</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>*@
-                <div class="groupHolder @isActiveController(new string[] { "translations" }, new string[] {
-                                    "index",
-                                    "htmlsections",
-                                    "overview",
-                                    "slideshowimages",
-                                    "productpages",
-                                    "pagesections",
-                                    "uploadspreadsheet",
-                                    "images",
-                                    "products",
-                                    "producttypes",
-                                    "products",
-                                    "collections",
-                                    "forms",
-                                    "sitesections",
-                                    "finishes",
-                                    "producttypes",
-                                    "colours",
-                                    "pages",
-                                    "patterns",
-                                    "emailtexts",
-                                    "usages",
-                                    "articlesubtypes",
-                                    "articletypes",
-                                    "articles",
-                                    "attributegroups",
-                                    "attributes",
-                                    "deliveryoptions",
-                                    "menuitems",
-                                    "menus",
-                                    "giftvouchervalidations",
-                                    "technicaldescriptions",
-                                    "orderformgroups",
-                                    "orderstatuses",
-                                    "returnreasons",
-                                    "stockstatuses",
-                                    "techinfo_additionalinfo",
-                                    "techinfo_aftercare",
-                                    "techinfo_composition",
-                                    "techinfo_contractfr",
-                                    "techinfo_domesticfr",
-                                    "techinfo_flamcode",
-                                    "techinfo_patternmatch",
-                                    "techinfo_test",
-                                    "techinfo_type",
-                                    "techinfo_usage",
-                                    "resources",
-                                    "modules",
-                                    "moduleoptions",
-                                    "moduleoptiongroups",
-                                    "slideshowimages",
-                                    "callstoaction",
-                                    "announcements",
-                                    "rooms",
-                                    "snippets"
-                                }, "active", "inactive")" id="group_tab_Translations">
-                    <div class="group">
-                        <div class="sections">
-                            <span>Main</span>
-                            <ul class="vertical-list" style="float: none; margin-right: 0;">
-                                <li>@Html.ActionLink("Overview", "overview", "translations")</li>
-                                <li>@Html.ActionLink("Upload Spreadsheet", "uploadspreadsheet", "translations")</li>
-                            </ul>
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div class="group" style="border-right: 0">
-	                    <div class="sections">
-		                    <ul class="horizontal-list">
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Additional Info", "techinfo_additionalinfo", "translations")</li>
-					                    <li>@Html.ActionLink("Aftercare", "techinfo_aftercare", "translations")</li>
-					                    <li>@Html.ActionLink("Announcements", "announcements", "translations")</li>
-					                    <li>@Html.ActionLink("Article Sub Types", "articlesubtypes", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Article Types", "articletypes", "translations")</li>
-					                    <li>@Html.ActionLink("Articles", "articles", "translations")</li>
-					                    <li>@Html.ActionLink("Attribute Groups", "attributegroups", "translations")</li>
-					                    <li>@Html.ActionLink("Attributes", "attributes", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Calls to Action", "callstoaction", "translations")</li>
-					                    <li>@Html.ActionLink("Collections", "collections", "translations")</li>
-					                    <li>@Html.ActionLink("Colours", "colours", "translations")</li>
-					                    <li>@Html.ActionLink("Composition", "techinfo_composition", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Contract FR", "techinfo_contractfr", "translations")</li>
-					                    <li>@Html.ActionLink("Delivery Options", "deliveryoptions", "translations")</li>
-					                    <li>@Html.ActionLink("Domestic FR", "techinfo_domesticfr", "translations")</li>
-					                    <li>@Html.ActionLink("Email Text", "emailtexts", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Finishes", "finishes", "translations")</li>
-					                    <li>@Html.ActionLink("Flamcodes", "techinfo_flamcode", "translations")</li>
-					                    <li>@Html.ActionLink("Forms", "forms", "translations")</li>
-					                    <li>@Html.ActionLink("Gift Voucher Validations", "giftvouchervalidations", "translations")</li>
-				                    </ul>
-			                    </li>
-		                    </ul>
-	                    </div>
-                    </div>
-                    <div class="group" style="border-right: 0;">
-	                    <div class="sections">
-		                    <ul class="horizontal-list">
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("HTML Sections", "htmlsections", "translations")</li>
-					                    <li>@Html.ActionLink("Images", "images", "translations")</li>
-					                    <li>@Html.ActionLink("Menu Items", "menuitems", "translations")</li>
-					                    <li>@Html.ActionLink("Menus", "menus", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("ModuleOptionGroups", "moduleoptiongroups", "translations")</li>
-					                    <li>@Html.ActionLink("ModuleOptions", "moduleoptions", "translations")</li>
-					                    <li>@Html.ActionLink("Modules", "modules", "translations")</li>
-					                    <li>@Html.ActionLink("Order Form Groups", "orderformgroups", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Order Statuses", "orderstatuses", "translations")</li>
-					                    <li>@Html.ActionLink("Page Sections", "pagesections", "translations")</li>
-					                    <li>@Html.ActionLink("Pages", "pages", "translations")</li>
-					                    <li>@Html.ActionLink("Pattern Matches", "techinfo_patternmatch", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Patterns", "patterns", "translations")</li>
-					                    <li>@Html.ActionLink("Product Pages", "productpages", "translations")</li>
-					                    <li>@Html.ActionLink("Product Types", "producttypes", "translations")</li>
-					                    <li>@Html.ActionLink("Products", "products", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Resources", "resources", "translations")</li>
-					                    <li>@Html.ActionLink("Return Reasons", "returnreasons", "translations")</li>
-					                    <li>@Html.ActionLink("Rooms", "rooms", "translations")</li>
-					                    <li>@Html.ActionLink("Site Sections", "sitesections", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Slideshow Images", "slideshowimages", "translations")</li>
-					                    <li>@Html.ActionLink("Snippets", "snippets", "translations")</li>
-					                    <li>@Html.ActionLink("Stock Statuses", "stockstatuses", "translations")</li>
-					                    <li>@Html.ActionLink("Technical Descriptions", "technicaldescriptions", "translations")</li>
-				                    </ul>
-			                    </li>
-			                    <li>
-				                    <ul class="vertical-list">
-					                    <li>@Html.ActionLink("Tests", "techinfo_test", "translations")</li>
-					                    <li>@Html.ActionLink("Types", "techinfo_type", "translations")</li>
-					                    <li>@Html.ActionLink("Usages", "techinfo_usage", "translations")</li>
-				                    </ul>
-			                    </li>
-		                    </ul>
-	                    </div>
-	                    <div class="legend">
-	                    </div>
-	                    <div style="clear: both;"></div>
+                    <div>
+                        @Html.ActionLink("Map", "map", "attributes")
+                        @Html.ActionLink("Manage", "manage", "attributes")
+                        @Html.ActionLink("Product Types", "ProductTypes", "attributes")
                     </div>
                 </div>
-                <div style="clear: both;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "show active", "")" id="cms-tab-content" role="tabpanel" aria-labelledby="cms-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    Pages
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Compose", "compose", "cms")
+                        @Html.ActionLink("Overview", "index", "cms")
+                        @Html.ActionLink("Page Sections", "pagesections", "cms")
+                        @Html.ActionLink("Filter Indexing", "index", "filterindexrestrictions")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Assets
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Call to Action Styles", "styles", "callstoaction")
+                        @Html.ActionLink("Images", "images", "assets")
+                        @Html.ActionLink("Messages", "messages", "assets")
+                        @Html.ActionLink("Brochures", "brochures", "assets")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Videos", "videos", "assets")
+                        @Html.ActionLink("Image Export", "imageexporter", "images")
+                        @Html.ActionLink("Image Version Checker", "versionchecker", "images")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Articles
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Compose", "compose", "articles")
+                        @Html.ActionLink("Overview", "index", "articles")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Store Events
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Store Events", "index", "storeevents")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Menu Builder
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Menus", "menubuilder", "cms")
+                        @Html.ActionLink("Menu Items", "menuitemsbuilder", "cms")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Banners
+                </label>
+                <div>
+                    @Html.ActionLink("Compose", "compose", "banners")
+                    @Html.ActionLink("Overview", "overview", "banners")
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Snippets
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Snippets", "snippets", "cms")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Careers
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Career Listings", "index", "careers")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade @isActiveController(new string[] { "ecommerce", "paypaltest", "bronto", "radford", "icontextiles" }, new string[] { "index", "overview", "giftvouchers", "deliverybands", "deliveryzones", "checkouthistory", "deliverymatrix", "salesoverview", "lists", "orderexport", "googleproductfeeddelivery", "deliveryexceptions" }, "show active", "")" id="ecommerce-tab-content" role="tabpanel" aria-labelledby="ecommerce-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    Main
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Overview", "index", "ecommerce")
+                        @Html.ActionLink("Gift Vouchers", "giftvouchers", "ecommerce")
+                        @Html.ActionLink("Sales Overview", "salesoverview", "ecommerce")
+                        @Html.ActionLink("Checkout History", "checkouthistory", "ecommerce")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Delivery
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Delivery Bands", "deliverybands", "ecommerce")
+                        @Html.ActionLink("Delivery Zones", "deliveryzones", "ecommerce")
+                        @Html.ActionLink("Delivery Matrix", "deliverymatrix", "ecommerce")
+                        @Html.ActionLink("Google Delivery", "googleproductfeeddelivery", "ecommerce")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Delivery Exceptions", "deliveryexceptions", "ecommerce")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Bronto
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Lists", "lists", "bronto")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Radford
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Order Export", "orderexport", "radford")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Icon Textiles
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Order Export", "orderexport", "icontextiles")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade @isActiveController(new string[] { "promotions", "events", "sampleorderemailmessages" }, new string[] { "index", "overview", "saleprices", "createsaleprices", "competitions", "marketingpartners", "codes" }, "show active", "")" id="promotions-tab-content" role="tabpanel" aria-labelledby="promotions-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    Sale Prices
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Overview", "index", "promotions")
+                        @Html.ActionLink("Create Sale Prices", "createsaleprices", "promotions")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Competitions
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Competitions", "competitions", "promotions")
+                        @Html.ActionLink("Marketing Partners", "marketingpartners", "promotions")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Codes
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Promotional Codes", "codes", "promotions")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Store Events
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Overview", "overview", "events")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade @isActiveController(new string[] { "articles", "assetdeliverysystem" }, new string[] { "index", "overview", "compose", "advertisingimages", "mertexmarkets", "users", "announcements" }, "show active", "")" id="press-trade-tab-content" role="tabpanel" aria-labelledby="press-trade-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    Main
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Overview", "overview", "articles")
+                        @Html.ActionLink("Compose", "compose", "articles")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Asset Delivery
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Advertising Images", "advertisingimages", "assetdeliverysystem")
+                        @Html.ActionLink("Mertex Markets", "mertexmarkets", "assetdeliverysystem")
+                        @Html.ActionLink("Users", "users", "assetdeliverysystem")
+                        @Html.ActionLink("Announcements", "announcements", "assetdeliverysystem")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Announcement Translator", "announcements", "translations")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade @isActiveController(new string[] { "members", "assets", "mailinglistimport", "gdpr" }, new string[] { "index", "overview", "admins", "details", "brochurerequests", "search", "bademails", "datasubjects" }, "show active", "")" id="members-tab-content" role="tabpanel" aria-labelledby="members-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    Members
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Bad Emails", "bademails", "members")
+                        @Html.ActionLink("Details", "details", "members")
+                        @Html.ActionLink("Brochure Requests", "brochurerequests", "assets")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    GDPR
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Data Subjects", "datasubjects", "gdpr")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Mailing List Imports
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Upload", "index", "mailinglistimport")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade @isActiveController(new string[] { "translations" }, new string[] { "index", "overview", "htmlsections", "slideshowimages", "productpages", "pagesections", "uploadspreadsheet", "images", "products", "ProductTypes", "sitesections", "products", "collections", "forms", "finishes", "producttypes", "colours", "pages", "patterns", "usages", "articlesubtypes", "articletypes", "articles", "emailtexts", "attributegroups", "attributes", "deliveryoptions", "menuitems", "menus", "giftvouchervalidations", "technicaldescriptions", "orderformgroups", "orderstatuses", "returnreasons", "stockstatuses", "techinfo_additionalinfo", "techinfo_aftercare", "techinfo_composition", "techinfo_contractfr", "techinfo_domesticfr", "techinfo_flamcode", "techinfo_patternmatch", "techinfo_test", "techinfo_type", "techinfo_usage", "resources", "modules", "moduleoptions", "moduleoptiongroups", "slideshowimages", "callstoaction", "announcements", "rooms", "snippets" }, "show active", "")" id="translations-tab-content" role="tabpanel" aria-labelledby="translations-tab">
+        <div class="menu-tab">
+            <div class="sub-menu">
+                <label>
+                    Main
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Overview", "overview", "translations")
+                        @Html.ActionLink("Upload Spreadsheet", "uploadspreadsheet", "translations")
+                    </div>
+                </div>
+            </div>
+            <div class="sub-menu">
+                <label>
+                    Translators
+                </label>
+                <div>
+                    <div>
+                        @Html.ActionLink("Additional Info", "techinfo_additionalinfo", "translations")
+                        @Html.ActionLink("Aftercare", "techinfo_aftercare", "translations")
+                        @Html.ActionLink("Announcements", "announcements", "translations")
+                        @Html.ActionLink("Article Sub Types", "articlesubtypes", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Article Types", "articletypes", "translations")
+                        @Html.ActionLink("Articles", "articles", "translations")
+                        @Html.ActionLink("Attribute Groups", "attributegroups", "translations")
+                        @Html.ActionLink("Attributes", "attributes", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Calls to Action", "callstoaction", "translations")
+                        @Html.ActionLink("Collections", "collections", "translations")
+                        @Html.ActionLink("Colours", "colours", "translations")
+                        @Html.ActionLink("Composition", "techinfo_composition", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Contract FR", "techinfo_contractfr", "translations")
+                        @Html.ActionLink("Delivery Options", "deliveryoptions", "translations")
+                        @Html.ActionLink("Domestic FR", "techinfo_domesticfr", "translations")
+                        @Html.ActionLink("Email Text", "emailtexts", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Finishes", "finishes", "translations")
+                        @Html.ActionLink("Flamcodes", "techinfo_flamcode", "translations")
+                        @Html.ActionLink("Forms", "forms", "translations")
+                        @Html.ActionLink("Gift Voucher Validations", "giftvouchervalidations", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("HTML Sections", "htmlsections", "translations")
+                        @Html.ActionLink("Images", "images", "translations")
+                        @Html.ActionLink("Menu Items", "menuitems", "translations")
+                        @Html.ActionLink("Menus", "menus", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("ModuleOptionGroups", "moduleoptiongroups", "translations")
+                        @Html.ActionLink("ModuleOptions", "moduleoptions", "translations")
+                        @Html.ActionLink("Modules", "modules", "translations")
+                        @Html.ActionLink("Order Form Groups", "orderformgroups", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Order Statuses", "orderstatuses", "translations")
+                        @Html.ActionLink("Page Sections", "pagesections", "translations")
+                        @Html.ActionLink("Pages", "pages", "translations")
+                        @Html.ActionLink("Pattern Matches", "techinfo_patternmatch", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Patterns", "patterns", "translations")
+                        @Html.ActionLink("Product Pages", "productpages", "translations")
+                        @Html.ActionLink("Product Types", "producttypes", "translations")
+                        @Html.ActionLink("Products", "products", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Resources", "resources", "translations")
+                        @Html.ActionLink("Return Reasons", "returnreasons", "translations")
+                        @Html.ActionLink("Rooms", "rooms", "translations")
+                        @Html.ActionLink("Site Sections", "sitesections", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Slideshow Images", "slideshowimages", "translations")
+                        @Html.ActionLink("Snippets", "snippets", "translations")
+                        @Html.ActionLink("Stock Statuses", "stockstatuses", "translations")
+                        @Html.ActionLink("Technical Descriptions", "technicaldescriptions", "translations")
+                    </div>
+                    <div>
+                        @Html.ActionLink("Tests", "techinfo_test", "translations")
+                        @Html.ActionLink("Types", "techinfo_type", "translations")
+                        @Html.ActionLink("Usages", "techinfo_usage", "translations")
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@*<div id="OfficeControls">
+        <div class="ribbon">
+            <div class="header">
+
+            </div>
+            <div class="ribbon_contents">
+                <!-- , "manage", "register", "externalloginfailure", "externalloginconfirmation", "setpasswordpartial", "removeexternalloginspartial", "externalloginspartial", "changepasswordpartial" -->
+                <div class="tabs">
+                    <div class="tab left @isActiveController(new string[] { "home", "admin", "menu", "account", "notes", "tracking", "reporting" }, new string[] { "index", "accessdenied", "login", "register", "confirmemail", "setpassword", "weekly", "manage" }, "active", "inactive")" id="tab_Main">
+                        <span class="title">Dashboard</span>
+                    </div>
+                    <div class="tab left @isActiveController(new string[] { "products", "calendar", "collections", "productpages", "designs", "qualities", "relatedproductpages", "reviews", "selections", "modularproducts", "searchimpact", "bundles", "bundlepriceimport" }, new string[] { "index", "colourways", "selectionbuilder", "dimensions", "attributes", "stock", "images", "overview", "prices", "productpages", "countrysearchtestpage", "productassociation", "collections", "reviews", "calendar", "compose", "classifier", "imageexporter", "modules", "generate", "colour" }, "active", "inactive")" id="tab_Products">
+                        <span class="title">Products</span>
+                    </div>
+                    <div class="tab left @isActiveController(new string[] { "attributes" }, new string[] { "manage", "map", "ProductTypes" }, "active", "inactive")" id="tab_Attributes">
+                        <span class="title">Attributes</span>
+                    </div>
+                    <div class="tab left  @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "inactive")" id="tab_CMS">
+                        <span class="title">CMS</span>
+                    </div>
+                    <div class="tab left @isActiveController(new string[] { "ecommerce", "paypaltest", "bronto", "radford", "icontextiles" }, new string[] { "index", "overview", "giftvouchers", "deliverybands", "deliveryzones", "checkouthistory", "deliverymatrix", "salesoverview", "lists", "orderexport", "googleproductfeeddelivery", "deliveryexceptions" }, "active", "inactive")" id="tab_eCommerce">
+                        <span class="title">eCommerce</span>
+                    </div>
+                    <div class="tab left @isActiveController(new string[] { "promotions", "events", "sampleorderemailmessages" }, new string[] { "index", "overview", "saleprices", "createsaleprices", "competitions", "marketingpartners", "codes" }, "active", "inactive")" id="tab_Promotions">
+                        <span class="title">Promotions</span>
+                    </div>
+                    <div class="tab left @isActiveController(new string[] { "articles", "assetdeliverysystem" }, new string[] { "index", "overview", "compose", "advertisingimages", "mertexmarkets", "users", "announcements" }, "active", "inactive")" id="tab_Press">
+                        <span class="title">Press &amp; Trade</span>
+                    </div>
+                    <div class="tab left @isActiveController(new string[] { "members", "assets", "mailinglistimport", "gdpr" }, new string[] { "index", "overview", "admins", "details", "brochurerequests", "search", "bademails", "datasubjects" }, "active", "inactive")" id="tab_Members">
+                        <span class="title">Members</span>
+                    </div>
+                    <div class="tab left @isActiveController(new string[] { "translations" }, new string[] {
+                                        "index",
+                                        "overview",
+                                        "htmlsections",
+                                        "slideshowimages",
+                                        "productpages",
+                                        "pagesections",
+                                        "uploadspreadsheet",
+                                        "images",
+                                        "products",
+                                        "ProductTypes",
+                                        "sitesections",
+                                        "products",
+                                        "collections",
+                                        "forms",
+                                        "finishes",
+                                        "producttypes",
+                                        "colours",
+                                        "pages",
+                                        "patterns",
+                                        "usages",
+                                        "articlesubtypes",
+                                        "articletypes",
+                                        "articles",
+                                        "emailtexts",
+                                        "attributegroups",
+                                        "attributes",
+                                        "deliveryoptions",
+                                        "menuitems",
+                                        "menus",
+                                        "giftvouchervalidations",
+                                        "technicaldescriptions",
+                                        "orderformgroups",
+                                        "orderstatuses",
+                                        "returnreasons",
+                                        "stockstatuses",
+                                        "techinfo_additionalinfo",
+                                        "techinfo_aftercare",
+                                        "techinfo_composition",
+                                        "techinfo_contractfr",
+                                        "techinfo_domesticfr",
+                                        "techinfo_flamcode",
+                                        "techinfo_patternmatch",
+                                        "techinfo_test",
+                                        "techinfo_type",
+                                        "techinfo_usage",
+                                        "resources",
+                                        "modules",
+                                        "moduleoptions",
+                                        "moduleoptiongroups",
+                                        "slideshowimages",
+                                        "callstoaction",
+                                        "announcements",
+                                        "rooms",
+                                        "snippets"
+                                    }, "active", "inactive")" id="tab_Translations">
+                        <span class="title">Translations</span>
+                    </div>
+                </div>
+                <div class="controls">
+                    <div class="groupHolder @isActiveController(new string[] { "home", "admin", "menu", "account", "notes", "tracking", "reporting" }, new string[] { "index", "accessdenied", "login", "register", "confirmemail", "setpassword", "weekly", "manage" }, "active", "inactive")" id="group_tab_Main">
+                        <div class="group">
+                            <div class="sections">
+                                <span>Dashboard</span>
+                                <ul class="vertical-list" style="float: none;">
+                                    @{
+                                        if (Request.IsAuthenticated)
+                                        {
+                                            <li>@Html.ActionLink("Logout", "logoff", "account")</li>
+                                        }
+                                        else
+                                        {
+                                            <li>@Html.ActionLink("Login", "login", "account")</li>
+                                        }
+                                    }
+                                </ul>
+
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Notes</span>
+                                <ul class="vertical-list" style="float: none;">
+                                    <li>@Html.ActionLink("Weekly", "weekly", "notes")</li>
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Reports</span>
+                                <ul class="vertical-list" style="float: none;">
+                                    <li>@Html.ActionLink("Manage", "manage", "reporting")</li>
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group" style="border-right: none">
+                            <div class="sections">
+                                <span>Cache Buster</span>
+                                <ul class="vertical-list" style="float: none">
+                                    <li>
+                                        <a data-toggle="modal" data-target="#cache-buster-modal" href="#">Cache Buster</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="groupHolder @isActiveController(new string[] { "products", "calendar", "collections", "productpages", "designs", "qualities", "relatedproductpages", "reviews", "selections", "modularproducts", "searchimpact", "bundles", "bundlepriceimport" }, new string[] { "index", "colourways", "selectionbuilder", "dimensions", "attributes", "stock", "overview", "images", "productpages", "collections", "productassociation", "prices", "countrysearchtestpage", "reviews", "calendar", "compose", "classifier", "imageexporter", "modules", "generate", "colour" }, "active", "inactive")" id="group_tab_Products">
+                        <div class="group">
+                            <div class="sections">
+                                <span>Products</span>
+                                <ul class="vertical-list" style="margin-right: 1em;">
+
+                                </ul>
+                                <ul class="vertical-list">
+
+                                </ul>
+                                <div style="clear: both;"></div>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Modular Products</span>
+                                <ul class="vertical-list" style="margin-right: 1em;">
+                                </ul>
+                                <div style="clear: both;"></div>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Product Pages</span>
+                                <ul class="vertical-list" style="margin-right: 1em;">
+                                </ul>
+                                <ul class="vertical-list" style="margin-right: 1em;">
+                                </ul>
+                                <ul class="vertical-list">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Designs</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Qualities</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Collections</span>
+                                <ul class="vertical-list" style="margin-right: 1em;">
+                                </ul>
+                                <ul class="vertical-list">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group" style="border-right: none;">
+                            <div class="sections">
+                                <span>Selections</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                    </div>
+                    <div class="groupHolder @isActiveController(new string[] { "attributes" }, new string[] { "manage", "map", "ProductTypes" }, "active", "inactive")" id="group_tab_Attributes">
+                        <div class="group" style="border-right: none;">
+                            <div class="sections">
+                                <span>RESTRICTED ACCESS - ADMINS ONLY</span>
+
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="groupHolder @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "banners", "cms", "compose", "overview", "images", "brochures", "videos", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "inactive")" id="group_tab_CMS">
+                        <div class="group">
+                            <div class="sections">
+                                <span>Pages</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Assets</span>
+                                <ul class="vertical-list" style="margin-right: 1em;">
+                                </ul>
+                                <ul class="vertical-list">
+                                </ul>
+                                <ul class="vertical-list">
+                                </ul>
+                                <div style="clear: both;"></div>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Articles</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Store Events</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Menu Builder</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Banners</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Snippets</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group" style="border-right: none;">
+                            <div class="sections">
+                                <span>Careers</span>
+                                <ul class="vertical-list" style="float: none;">
+                                </ul>
+                                <div style="clear: both;"></div>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                    <div class="groupHolder @isActiveController(new string[] { "ecommerce", "paypaltest", "bronto", "radford", "icontextiles" }, new string[] { "index", "overview", "giftvouchers", "deliverybands", "deliveryzones", "checkouthistory", "deliverymatrix", "salesoverview", "lists", "orderexport", "googleproductfeeddelivery", "deliveryexceptions" }, "active", "inactive")" id="group_tab_eCommerce">
+                        <div class="group">
+                            <div class="sections">
+                                <span>Main</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Delivery</span>
+                                <ul class="vertical-list">
+                                </ul>
+                                <ul class="vertical-list">
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Bronto</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Radford</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="group" style="border-right: none;">
+                            <div class="sections">
+                                <span>Icon Textiles</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="groupHolder @isActiveController(new string[] { "articles", "assetdeliverysystem" }, new string[] { "index", "overview", "compose", "advertisingimages", "mertexmarkets", "users", "announcements" }, "active", "inactive")" id="group_tab_Press">
+                        <div class="group">
+                            <div class="sections">
+                                <span>Main</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="group" style="border-right: none;">
+                            <div class="sections">
+                                <span>Asset Delivery</span>
+                                <ul class="horizontal-list">
+                                    <li>
+                                        <ul class="vertical-list">
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <ul class="vertical-list">
+                                            <li>&nbsp;</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                                <ul class="vertical-list" style="float: none; margin-right: 0">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="groupHolder @isActiveController(new string[] { "promotions", "events", "sampleorderemailmessages" }, new string[] { "index", "overview", "saleprices", "createsaleprices", "competitions", "marketingpartners", "codes" }, "active", "inactive")" id="group_tab_Promotions">
+                        <div class="group">
+                            <div class="sections">
+                                <span>Sale Prices</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Competitions</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>Codes</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group" style="border-right: none;">
+                            <div class="sections">
+                                <span>Store Events</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="groupHolder @isActiveController(new string[] { "members", "assets", "mailinglistimport", "gdpr" }, new string[] { "index", "brochurerequests", "overview", "admins", "details", "search", "bademails", "datasubjects" }, "active", "inactive")" id="group_tab_Members">
+                        <div class="group">
+                            <div class="sections">
+                                <span>Members</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="sections">
+                                <span>GDPR</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="group" style="border-right: none;">
+                            <div class="sections">
+                                <span>Mailing List Imports</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="groupHolder @isActiveController(new string[] { "translations" }, new string[] {
+                                        "index",
+                                        "htmlsections",
+                                        "overview",
+                                        "slideshowimages",
+                                        "productpages",
+                                        "pagesections",
+                                        "uploadspreadsheet",
+                                        "images",
+                                        "products",
+                                        "producttypes",
+                                        "products",
+                                        "collections",
+                                        "forms",
+                                        "sitesections",
+                                        "finishes",
+                                        "producttypes",
+                                        "colours",
+                                        "pages",
+                                        "patterns",
+                                        "emailtexts",
+                                        "usages",
+                                        "articlesubtypes",
+                                        "articletypes",
+                                        "articles",
+                                        "attributegroups",
+                                        "attributes",
+                                        "deliveryoptions",
+                                        "menuitems",
+                                        "menus",
+                                        "giftvouchervalidations",
+                                        "technicaldescriptions",
+                                        "orderformgroups",
+                                        "orderstatuses",
+                                        "returnreasons",
+                                        "stockstatuses",
+                                        "techinfo_additionalinfo",
+                                        "techinfo_aftercare",
+                                        "techinfo_composition",
+                                        "techinfo_contractfr",
+                                        "techinfo_domesticfr",
+                                        "techinfo_flamcode",
+                                        "techinfo_patternmatch",
+                                        "techinfo_test",
+                                        "techinfo_type",
+                                        "techinfo_usage",
+                                        "resources",
+                                        "modules",
+                                        "moduleoptions",
+                                        "moduleoptiongroups",
+                                        "slideshowimages",
+                                        "callstoaction",
+                                        "announcements",
+                                        "rooms",
+                                        "snippets"
+                                    }, "active", "inactive")" id="group_tab_Translations">
+                        <div class="group">
+                            <div class="sections">
+                                <span>Main</span>
+                                <ul class="vertical-list" style="float: none; margin-right: 0;">
+                                </ul>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div class="group" style="border-right: 0">
+                            <div class="sections">
+                                <ul class="horizontal-list">
+                                    <li>
+                                        <ul class="vertical-list">
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="legend">
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+*@

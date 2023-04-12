@@ -25,10 +25,6 @@ namespace Flock.Models
 	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="Flock")]
 	public partial class FlockDataContext : System.Data.Linq.DataContext
 	{
-		public FlockDataContext() : base(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString)
-		{
-
-		}
 		
 		private static System.Data.Linq.Mapping.MappingSource mappingSource = new AttributeMappingSource();
 		
@@ -3963,6 +3959,14 @@ namespace Flock.Models
 			get
 			{
 				return this.GetTable<FilterIndexRestriction_Language>();
+			}
+		}
+		
+		public System.Data.Linq.Table<vwFilterIndexRestriction_Language> vwFilterIndexRestriction_Languages
+		{
+			get
+			{
+				return this.GetTable<vwFilterIndexRestriction_Language>();
 			}
 		}
 		
@@ -107615,6 +107619,195 @@ namespace Flock.Models
 			if ((this.PropertyChanged != null))
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="adm.vwFilterIndexRestriction_Language")]
+	public partial class vwFilterIndexRestriction_Language
+	{
+		
+		private int _FilterIndexRestrictionID;
+		
+		private byte _LanguageID;
+		
+		private string _FooterText;
+		
+		private System.DateTime _CreatedDT;
+		
+		private System.DateTime _ModifiedDT;
+		
+		private int _ModifiedMemberID;
+		
+		private System.Nullable<long> _ChatGPTRequestID;
+		
+		private string _ProductTypeName;
+		
+		private string _AttributeGroupSignature;
+		
+		private string _AttributeGroupDescription;
+		
+		public vwFilterIndexRestriction_Language()
+		{
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FilterIndexRestrictionID", DbType="Int NOT NULL")]
+		public int FilterIndexRestrictionID
+		{
+			get
+			{
+				return this._FilterIndexRestrictionID;
+			}
+			set
+			{
+				if ((this._FilterIndexRestrictionID != value))
+				{
+					this._FilterIndexRestrictionID = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LanguageID", DbType="TinyInt NOT NULL")]
+		public byte LanguageID
+		{
+			get
+			{
+				return this._LanguageID;
+			}
+			set
+			{
+				if ((this._LanguageID != value))
+				{
+					this._LanguageID = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FooterText", DbType="NVarChar(4000)")]
+		public string FooterText
+		{
+			get
+			{
+				return this._FooterText;
+			}
+			set
+			{
+				if ((this._FooterText != value))
+				{
+					this._FooterText = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedDT", DbType="DateTime2 NOT NULL")]
+		public System.DateTime CreatedDT
+		{
+			get
+			{
+				return this._CreatedDT;
+			}
+			set
+			{
+				if ((this._CreatedDT != value))
+				{
+					this._CreatedDT = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ModifiedDT", DbType="DateTime2 NOT NULL")]
+		public System.DateTime ModifiedDT
+		{
+			get
+			{
+				return this._ModifiedDT;
+			}
+			set
+			{
+				if ((this._ModifiedDT != value))
+				{
+					this._ModifiedDT = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ModifiedMemberID", DbType="Int NOT NULL")]
+		public int ModifiedMemberID
+		{
+			get
+			{
+				return this._ModifiedMemberID;
+			}
+			set
+			{
+				if ((this._ModifiedMemberID != value))
+				{
+					this._ModifiedMemberID = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ChatGPTRequestID", DbType="BigInt")]
+		public System.Nullable<long> ChatGPTRequestID
+		{
+			get
+			{
+				return this._ChatGPTRequestID;
+			}
+			set
+			{
+				if ((this._ChatGPTRequestID != value))
+				{
+					this._ChatGPTRequestID = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ProductTypeName", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string ProductTypeName
+		{
+			get
+			{
+				return this._ProductTypeName;
+			}
+			set
+			{
+				if ((this._ProductTypeName != value))
+				{
+					this._ProductTypeName = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AttributeGroupSignature", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
+		public string AttributeGroupSignature
+		{
+			get
+			{
+				return this._AttributeGroupSignature;
+			}
+			set
+			{
+				if ((this._AttributeGroupSignature != value))
+				{
+					this._AttributeGroupSignature = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AttributeGroupDescription", DbType="NVarChar(500) NOT NULL", CanBeNull=false)]
+		public string AttributeGroupDescription
+		{
+			get
+			{
+				return this._AttributeGroupDescription;
+			}
+			set
+			{
+				if ((this._AttributeGroupDescription != value))
+				{
+					this._AttributeGroupDescription = value;
+				}
 			}
 		}
 	}

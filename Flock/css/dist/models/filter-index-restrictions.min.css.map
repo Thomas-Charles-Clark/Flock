@@ -1,0 +1,1 @@
+{"version":3,"sources":["models/filter-index-restrictions.css"],"names":[],"mappings":"AAAA,U,CACE,U,CAGF,oB,CACE,gB,CACA,iB","file":"filter-index-restrictions.min.css","sourcesContent":["#container {\n  width: auto;\n}\n\n.display-footer-text {\n  max-height: 240px;\n  overflow-y: scroll;\n}\n/*# sourceMappingURL=filter-index-restrictions.css.map */\n"]}

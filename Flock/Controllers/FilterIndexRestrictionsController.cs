@@ -7,6 +7,7 @@ using Flock.DAL;
 using Flock.ViewModels;
 using Flock.Models;
 using NLog;
+using DevExpress.Web.Mvc;
 
 namespace Flock.Controllers
 {
@@ -24,75 +25,54 @@ namespace Flock.Controllers
 
         public ActionResult Index()
         {
-            return View("FilterIndexRestrictions");
+            return View("FilterIndexRestrictions", new FilterIndexRestrictionsViewModel(1));
         }
 
-        public ActionResult LoadReviews(int ProductID, byte? MarketID)
+        public ActionResult FilterIndexRestrictionsTargetLanguageDropDown(byte? targetLanguageId)
         {
-            var Model = UnitOfWork.GetRepository<ProductReview>().GetAll().Where(p => p.ProductID == ProductID && p.DeletedDT == null).ToList();
+            var PreModel = UnitOfWork.GetRepository<FilterIndexRestriction_Language>().GetAll().OrderBy(p => p.LanguageID).ToList();
 
-            if(MarketID != null)
-                Model = Model.Where(p => p.PriceListID == MarketID).ToList();
+            var Model = UnitOfWork.GetRepository<Language>().GetAll().Where(p => PreModel.Select(q => q.LanguageID).Distinct().Contains(p.LanguageID)).ToList();
 
-            return PartialView("ReviewsPartial", Model);
+            ViewBag.TargetLanguageID = targetLanguageId;
+
+            return PartialView("~/Views/Translations/Shared/_TargetLanguageDropDown.cshtml", Model);
         }
 
-        public ActionResult ProductReviewsGridViewPartial(byte? MarketID)
+        public ActionResult GridViewPartial(byte? targetLanguageId)
         {
-            return PartialView("_ProductReviewsGridViewPartial", new ReviewGridSettings() { MarketID = MarketID });
+            return PartialView("_FilterIndexRestrictionsGridView", new FilterIndexRestrictionsGridSettings(targetLanguageId));
         }
 
-        public ActionResult ProductReviewsCollectionDropDownPartial()
+        [HttpPost, ValidateInput(false)]
+        public ActionResult GridViewPartialUpdate([ModelBinder(typeof(DevExpressEditorsBinder))] FilterIndexRestriction_LanguageEditModel item)
         {
-            List<Collection> Model = UnitOfWork.GetRepository<Collection>().GetAll().OrderBy(p => p.Name).ToList();
-            return PartialView("~/Views/Shared/SearchFilters/CollectionDropDownPartial.cshtml", Model);
-        }
+            var db = new FlockDataContext();
 
-        public ActionResult ProductReviewsPatternDropDownPartial()
-        {
-            List<Pattern> Model = UnitOfWork.GetRepository<Pattern>().GetAll().OrderBy(p => p.Name).ToList();
-            return PartialView("~/Views/Shared/SearchFilters/PatternDropDownPartial.cshtml", Model);
-        }
+            var model = db.FilterIndexRestriction_Languages;
 
-        public ActionResult ProductReviewsColourDropDownPartial()
-        {
-            List<Colour> Model = UnitOfWork.GetRepository<Colour>().GetAll().OrderBy(p => p.Name).ToList();
-            return PartialView("~/Views/Shared/SearchFilters/ColourDropDownPartial.cshtml", Model);
-        }
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var modelItem = model.FirstOrDefault(it => it.FilterIndexRestrictionID == item.FilterIndexRestrictionID && it.LanguageID == item.LanguageID);
 
-        public ActionResult ProductReviewsMarketDropDownPartial()
-        {
-            List<PriceList> Model = UnitOfWork.GetRepository<PriceList>().GetAll().OrderBy(p => p.PriceListID).ToList();
-            return PartialView("~/Views/Shared/SearchFilters/MarketDropDownPartial.cshtml", Model);
+                    if (modelItem != null)
+                    {
+                        this.UpdateModel(modelItem);
 
-        }
+                        db.SubmitChanges();
+                    }
+                }
+                catch (Exception e)
+                {
+                    ViewData["EditError"] = e.Message;
+                }
+            }
+            else
+                ViewData["EditError"] = "Please, correct all errors.";
 
-        [HttpPost]
-        public ActionResult ProductReviewsCollectionListBoxSetSessionVariable(string CollectionIDs)
-        {
-            Session["ProductReviewsCollectionIDs"] = CollectionIDs;
-            return Content("");
+            return PartialView("_FilterIndexRestrictionsGridView", new FilterIndexRestrictionsGridSettings(item.LanguageID));
         }
-
-        [HttpPost]
-        public ActionResult ProductReviewsPatternListBoxSetSessionVariable(string PatternIDs)
-        {
-            Session["ProductReviewsPatternIDs"] = PatternIDs;
-            return Content("");
-        }
-
-        [HttpPost]
-        public ActionResult ProductReviewsColourListBoxSetSessionVariable(string ColourIDs)
-        {
-            Session["ProductReviewsColourIDs"] = ColourIDs;
-            return Content("");
-        }
-
-        [HttpPost]
-        public ActionResult ProductReviewsMarketListBoxSetSessionVariable(string MarketIDs)
-        {
-            Session["ProductReviewsMarketIDs"] = MarketIDs;
-            return Content("");
-        }
-	}
+    }
 }

@@ -1484,6 +1484,11 @@ namespace Flock.Models
 
     public partial class FlockDataContext : System.Data.Linq.DataContext
     {
+        public FlockDataContext() : base(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString)
+        {
+
+        }
+
         partial void OnCreated()
         {
             this.CommandTimeout = 3600;

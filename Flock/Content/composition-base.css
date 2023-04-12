@@ -86,7 +86,7 @@ fieldset {
 
 fieldset legend {
     cursor: pointer;
-    font-size: 1.2em;
+    font-size: 1rem;
     line-height: 30px;
     margin-bottom: 0px;
     padding-left: 0.5em;
@@ -96,6 +96,11 @@ fieldset legend {
     color: black; 
     border-bottom-color: #929292;
 }
+
+    .content-panel-container fieldset legend + *:not(.pagesection-header) {
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
 
 .resource-panel-container fieldset legend {
     color: white;
@@ -316,6 +321,8 @@ fieldset legend {
 .fieldset-inner {
     background-color: white;
     padding: 1em;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 /********************************
@@ -340,10 +347,6 @@ fieldset legend {
 
 #country-restriction-fieldset {
     position: relative;
-}
-
-#country-restriction-placeholder {
-    font-size: 1.4em;
 }
 
 #country-restriction-busy {

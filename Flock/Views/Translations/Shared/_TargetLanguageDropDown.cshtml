@@ -21,7 +21,7 @@
         settings.SetDropDownWindowTemplateContent(c =>
         {
             ViewContext.Writer.Write("<div id='status-listbox'>");
-            ViewContext.Writer.Write(@Html.Partial("Shared/_TargetLanguageListBox", Model));
+            ViewContext.Writer.Write(@Html.Partial("~/Views/Translations/Shared/_TargetLanguageListBox.cshtml", Model));
             ViewContext.Writer.Write("</div>");
             ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
             

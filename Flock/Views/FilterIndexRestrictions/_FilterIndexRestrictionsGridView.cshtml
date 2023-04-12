@@ -1,0 +1,230 @@
+﻿@using Flock.ViewModels;
+@using Flock.Models;
+@model Flock.ViewModels.FilterIndexRestrictionsGridSettings
+@{
+    var grid = Html.DevExpress().GridView(settings =>
+    {
+        var UoW = new Flock.DAL.UnitOfWork<FlockDataContext>();
+
+        settings.Name = "TranslateGridView";
+        settings.CallbackRouteValues = new { Controller = "FilterIndexRestrictions", Action = "GridViewPartial" };
+        //settings.SettingsEditing.AddNewRowRouteValues = new { };// Controller = "Products", Action = "ProductOverviewGridViewPartialAddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "FilterIndexRestrictions", Action = "GridViewPartialUpdate" };// Controller = "Products", Action = "ProductOverviewGridViewPartialUpdate" };
+        //settings.SettingsEditing.DeleteRowRouteValues = new { };// Controller = "Products", Action = "ProductOverviewGridViewPartialDelete" };
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+        settings.Styles.Row.Cursor = "pointer";
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+
+        settings.ClientSideEvents.BeginCallback = @"function (s, e) {
+            e.customArgs['targetLanguageId'] = TranslationTargetLanguageListBox.GetValue();
+            if (document.querySelector('#footer-text-value')) {
+                e.customArgs['key'] = s.GetRowKey(s.editingItemVisibleIndex);
+                e.customArgs['footerText'] = document.querySelector('#footer-text-preview').innerHTML;
+            }
+        }";
+
+        settings.ClientSideEvents.EndCallback = @"function(s, e) {
+            if (s.IsEditing()) {
+                window.footerTextEditor = window.createJSCodeMirrorEditor(document.querySelector('#footer-text-editor'), {
+                    theme: 'basicDark',
+                    json: false,
+                    updateListener: (event) => {
+                        //console.log('updateListener', event, view);
+                        let value = event.view.state.doc.toString();
+                        document.querySelector('#footer-text-preview').innerHTML = value;
+                    },
+                    dropListener: (event, view) => {
+                        //console.log('dropListener', event, view);
+                    }
+                });
+                window.setTimeout(() => {
+                    window.footerTextEditor.clearTo(document.querySelector('#footer-text-value').value);
+                }, 0);
+            }
+        }";
+
+        //settings.ClientSideEvents.CallbackError = @"function(s, e) {
+        //    alert(e.message);
+        //    e.handled = true;
+        //}";
+
+        settings.ClientSideEvents.RowClick = @"function(s, e) {
+            s.StartEditRowByKey(s.GetRowKey(e.visibleIndex));
+        }";
+
+        settings.SettingsBehavior.ConfirmDelete = true;
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.ShowClearFilterButton = true;
+
+        settings.KeyFieldName = "FilterIndexRestrictionID;LanguageID";
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+
+        settings.Settings.ShowGroupPanel = false;
+        settings.Settings.ShowFilterRow = true;
+        settings.Settings.ShowFilterRowMenu = true;
+
+        //settings.SettingsDetail.ShowDetailRow = true;
+
+        settings.SettingsBehavior.AllowSelectByRowClick = true;
+        settings.SettingsBehavior.AllowSelectSingleRowOnly = true;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "FilterIndexRestrictionID";
+            column.Name = "FilterIndexRestrictionID";
+            column.Caption = "ID";
+            column.Visible = false;
+            column.Width = 40;
+            column.ReadOnly = true;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "LanguageID";
+            column.Name = "LanguageID";
+            column.Caption = "LanguageID";
+            column.Visible = false;
+            column.Width = 40;
+            column.ReadOnly = true;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+        });
+
+        MVCxGridViewColumn ProductTypeColumn = new MVCxGridViewColumn();
+
+        ProductTypeColumn.FieldName = "ProductTypeName";
+        ProductTypeColumn.Name = "ProductTypeName";
+        ProductTypeColumn.Caption = "Product Type";
+        ProductTypeColumn.Width = 160;
+        ProductTypeColumn.CellStyle.CssClass = "hideable-column";
+        ProductTypeColumn.FilterCellStyle.CssClass = "hideable-column";
+        ProductTypeColumn.HeaderStyle.CssClass = "hideable-column";
+        ProductTypeColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        ProductTypeColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        ProductTypeColumn.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        ProductTypeColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        ProductTypeColumn.SetDataItemTemplateContent(c =>
+        {
+            int ProductTypeID = 0;
+            string ProductType = "<i>Unknown</i>";
+
+            if (DataBinder.Eval(c.DataItem, "ProductTypeName") != DBNull.Value && DataBinder.Eval(c.DataItem, "ProductTypeName") != null)
+            {
+                ProductType = DataBinder.Eval(c.DataItem, "ProductTypeName").ToString();
+            }
+
+            ViewContext.Writer.Write("<span style='color: black'>" + ProductType + "</span>");
+        });
+        ProductTypeColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(ProductTypeColumn);
+
+        MVCxGridViewColumn AttributeGroupSignature = new MVCxGridViewColumn();
+        AttributeGroupSignature.FieldName = "AttributeGroupSignature";
+        AttributeGroupSignature.Name = "AttributeGroupSignature";
+        AttributeGroupSignature.Caption = "Attribute Group Signature";
+        AttributeGroupSignature.Width = 140;
+        AttributeGroupSignature.Settings.AllowAutoFilter = DefaultBoolean.False;
+        AttributeGroupSignature.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        AttributeGroupSignature.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        AttributeGroupSignature.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        AttributeGroupSignature.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(AttributeGroupSignature);
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "AttributeGroupDescription";
+            column.Name = "AttributeGroupDescription";
+            column.Caption = "Attribute Group Description";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Width = 100;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "FooterText";
+            column.Name = "FooterText";
+            column.Caption = "Footer Text";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.EditFormSettings.RowSpan = 5;
+            column.ColumnType = MVCxGridViewColumnType.Default;
+            column.SetEditItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write($@"<input id=""footer-text-value"" type=""hidden"" value=""{Html.Encode(DataBinder.Eval(c.DataItem, "FooterText"))}""/>");
+                ViewContext.Writer.Write($@"<div id=""footer-text-preview"">{Html.Raw(DataBinder.Eval(c.DataItem, "FooterText"))}</div>");
+                ViewContext.Writer.Write($@"<hr class=""separator""/>");
+                ViewContext.Writer.Write($@"<div id=""footer-text-editor""></div>");
+            });
+            column.EditCellStyle.CssClass = "edit-footer-text";
+            column.SetDataItemTemplateContent(c => {
+                ViewContext.Writer.Write($@"<div class=""display-footer-text"">{Html.Raw(DataBinder.Eval(c.DataItem, "FooterText"))}</div>");
+            });
+        });
+
+        settings.HeaderFilterFillItems = (sender, e) =>
+        {
+            MVCxGridView gridView = (MVCxGridView)sender;
+            switch (e.Column.Name)
+            {
+                case "ProductTypeName":
+                    e.Values.Clear();
+                    foreach (var pt in UoW.GetRepository<Flock.Models.ProductType>().GetAll().OrderBy(p => p.Name))
+                    {
+                        e.AddValue(pt.Name, pt.Name.ToString());
+                    }
+                    e.AddShowAll();
+                    break;
+
+                default: break;
+
+            }
+        };
+
+        //settings.DataBound = (sender, e) =>
+        //{
+        //    MVCxGridView g = (MVCxGridView)sender;
+        //    g.DetailRowGetButtonVisibility += (s, detailEvents) =>
+        //    {
+        //        //if (Convert.ToInt16(g.GetRowValuesByKeyValue(detailEvents.KeyValue, new string[] { "ReviewCount" })) == 0)
+        //        //{
+        //        //    detailEvents.ButtonState = GridViewDetailRowButtonState.Hidden;
+        //        //}
+        //    };
+        //};
+
+        //settings.ClientSideEvents.DetailRowExpanding = @"function(s, e) {
+        //    window.DetailRowProductID = s.GetRowKey(e.visibleIndex);
+        //}";
+
+        //settings.Settings.ShowHeaderFilterButton = true;
+        //settings.SettingsDetail.ShowDetailButtons = true;
+        //settings.SetDetailRowTemplateContent(c =>
+        //{
+        //    ViewContext.Writer.Write("<h1>Potato!</h1>");
+        //});
+    });
+    if (ViewData["EditError"] != null)
+    {
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.BindToLINQ(string.Empty, string.Empty, (s, e) =>
+{
+    var dataContext = new Flock.Models.FlockDataContext();
+    var source = dataContext.vwFilterIndexRestriction_Languages.AsQueryable();
+
+    if (Model.LanguageID != null)
+        source = source.Where(p => p.LanguageID == Model.LanguageID);
+
+    e.KeyExpression = "FilterIndexRestrictionID;LanguageID";
+    e.QueryableSource = source;
+}).GetHtml()
