@@ -142,7 +142,7 @@
 
             <tr data-product-id="@p.ProductID">
                 <td>
-                    @if (imgId != null)
+                    @if (imgId != null && imgId >= 0)
                     {
                         <img src="https://flock.designersguild.com/imagelibrary/32/@(imgId).jpeg" />
                     }
@@ -152,8 +152,8 @@
                 </td>
                 <td class="quantity">
                     <div class="bundle-qty">
-                        <span class="qty-inc-icon glyphicon glyphicon-plus" onclick="increaseQty($(this))" title="Add One"></span>
-                        <span class="qty-dec-icon glyphicon glyphicon-minus" onclick="decreaseQty($(this))" title="Remove One"></span>
+                        <span class="qty-inc-icon pointer material-icons" onclick="increaseQty($(this))" title="Add One">add</span>
+                        <span class="qty-dec-icon pointer material-icons" onclick="decreaseQty($(this))" title="Remove One">remove</span>
                     </div>
                 </td>
                 <td>
@@ -239,8 +239,8 @@
                 "<td class='qty quantity'>" + ui.item.quantity + "</td>" +
                 "<td class='quantity'>" +
                     "<div class='bundle-qty'>" +
-                        "<span class='qty-inc-icon glyphicon glyphicon-plus' onclick='increaseQty($(this))' title='Add One'></span>" +
-                        "<span class='qty-dec-icon glyphicon glyphicon-minus'  onclick='decreaseQty($(this))' title='Remove One'></span>" +
+                        "<span class='qty-inc-icon pointer material-icons' onclick='increaseQty($(this))' title='Add One'>add</span>" +
+                        "<span class='qty-dec-icon pointer material-icons'  onclick='decreaseQty($(this))' title='Remove One'>remove</span>" +
                     "</div>" +
                 "</td>" +
                 "<td>" + ui.item.value + "</td>" +

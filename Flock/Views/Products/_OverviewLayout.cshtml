@@ -6,18 +6,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/css")    
-    @Scripts.Render("~/bundles/modernizr")    
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
-    
+
     @Scripts.Render("~/bundles/bootstrap")
-    
+
     @Styles.Render("~/bundles/css/grids")
     @Styles.Render("~/bundles/css/ribbon")
     @Styles.Render("~/bundles/css/cms")
     @Styles.Render("~/Content/ProductOverview.css")
     @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
     @Scripts.Render("~/bundles/js/page-composition")
+    @Styles.Render("~/bundles/css/cms")
+    @Styles.Render("~/bundles/css/common")
+    @Styles.Render("~/bundles/css/bootstrap-5.3.1")
     @RenderSection("scripts", required: false)
 
     @{
@@ -43,7 +46,7 @@
                 {
                     ExtensionSuite = ExtensionSuite.TreeList
                 }
-           }
+               }
        );
 
         Html.DevExpress().GetStyleSheets(
@@ -55,7 +58,7 @@
         );
     }
     @RenderSection("styles", required: false)
-    
+
 </head>
 <body>
     

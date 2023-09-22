@@ -19,26 +19,46 @@ namespace Flock.Controllers
         [HttpPost]
         public object BustCache([FromBody]PassCacheBuster objCache)
         {
+            // only relevant to landing pages
+            var pageSectionIds = new long[] { };
+
+            if (objCache.ContentType == "landingPage")
+            {
+                pageSectionIds = UoW.GetRepository<PageSection>().GetAll().Where(ps => ps.PageID == objCache.ContentID && ps.Deleted == false)
+                    .Select(ps => ps.PageSectionID)
+                    .ToArray();
+            }
+
             if (objCache.Sites.Any())
             {
                 foreach (var s in objCache.Sites)
                 {
                     Buster.BustWebCache(new PassBust()
                     {
+#if DEBUG
+                        /// <summary>
+                        // 0 = Localhost
+                        // 1 = Dev
+                        // 2 = Preview
+                        // 3 = Production
+                        /// </summary>
+                        target = 0,
+#else
                         target = 3,
+#endif
                         items = new List<BustItem>()
                         {
-                            new BustItem()
-                            {
-                                templateId = null,
-                                explicitExpiry = null,
-                                contentDate = DateTime.Now,
-                                tradeSwitch = null,
-                                contentType = objCache.ContentType,
-                                contentId = objCache.ContentID,
-                                countryId = s.CountryID,
-                                languageId = s.LanguageID
-                            }
+                            new BustItem(
+                                templateId: null,
+                                explicitExpiry: null,
+                                contentDate: DateTime.Now,
+                                tradeSwitch: null,
+                                contentType: objCache.ContentType,
+                                contentId: objCache.ContentID,
+                                countryId: s.CountryID,
+                                languageId: s.LanguageID,
+                                pageSectionIds: pageSectionIds
+                            )
                         }
                     });
                 }
@@ -51,20 +71,24 @@ namespace Flock.Controllers
                     {
                         Buster.BustWebCache(new PassBust()
                         {
+#if DEBUG
+                            target = 0,
+#else
                             target = 3,
+#endif
                             items = new List<BustItem>()
                             {
-                                new BustItem()
-                                {
-                                    templateId = null,
-                                    explicitExpiry = null,
-                                    contentDate = DateTime.Now,
-                                    tradeSwitch = null,
-                                    contentType = objCache.ContentType,
-                                    contentId = objCache.ContentID,
-                                    countryId = s.CountryID,
-                                    languageId = s.LanguageID
-                                }
+                                new BustItem(
+                                    templateId: null,
+                                    explicitExpiry: null,
+                                    contentDate: DateTime.Now,
+                                    tradeSwitch: null,
+                                    contentType: objCache.ContentType,
+                                    contentId: objCache.ContentID,
+                                    countryId: s.CountryID,
+                                    languageId: s.LanguageID,
+                                    pageSectionIds: pageSectionIds
+                                )
                             }
                         });
                     });

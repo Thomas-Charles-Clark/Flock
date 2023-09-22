@@ -84,7 +84,7 @@ namespace Flock.Controllers
         {
             if(ModelState.IsValid)
             {
-                string subTypeText = UnitOfWork.GetRepository<ArticleSubType>().GetAll().Where(p => p.ArticleSubTypeID == item.ArticleSubTypeID).Select(p => p.Name).Single().ToLower().Replace(" ", "-");
+                string subTypeText = UnitOfWork.GetRepository<ArticleSubType>().GetAll().Where(p => p.Deleted == false && p.ArticleSubTypeID == item.ArticleSubTypeID).Select(p => p.Name).Single().ToLower().Replace(" ", "-");
 
                 var a = new Article()
                 {

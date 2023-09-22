@@ -68,7 +68,7 @@
                         }";
                    settings.Style.Add("float", "left");
                }).BindList(Model.AvailableCountries).GetHtml()
-                    <span class="remove-glyph glyphicon glyphicon-remove-circle" onclick="ClearMarket('@(m.Code)')"></span>
+                    <span class="remove-glyph bi bi-x-circle-fill" onclick="ClearMarket('@(m.Code)')"></span>
                 </td>
                 <td>
                     @Html.DevExpress().CheckBoxFor(c => m.DisplayPrices, settings =>

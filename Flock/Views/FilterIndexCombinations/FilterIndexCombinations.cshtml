@@ -1,0 +1,15 @@
+﻿@model  Flock.ViewModels.FilterIndexCombinationsViewModel
+@{
+    ViewBag.Title = "Filter Index Combinations";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@Scripts.Render("~/bundles/js/filter-index-combinations")
+@Scripts.Render("~/bundles/js/code-mirror")
+@Styles.Render("~/bundles/css/filter-index-combinations")
+<h4 class="page-heading">
+    Filter Index Restrictions
+</h4>
+<div class="hstack align-items-start">
+    @Html.Action("GridViewPartial", new { targetLanguageId = Model.LanguageID })
+    @Html.Action("FilterIndexCombinationsTargetLanguageDropDown", new { targetLanguageId = Model.LanguageID })
+</div>

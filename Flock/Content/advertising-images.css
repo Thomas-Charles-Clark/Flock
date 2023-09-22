@@ -21,10 +21,6 @@ td.checker {
     margin: 20px auto; 
 }
 
-.images-table span.glyphicon {
-    font-size: 14px;
-}
-
     .images-table > tbody > tr > td.description {
         width: 200px;
         max-width: 200px;
@@ -50,21 +46,32 @@ td.checker {
 .images-table > tbody > tr > td.yes {
     /*background-color: rgba(26, 208, 58, 0.50);*/
     text-align: center;
+    vertical-align: middle;
 }
 
 .images-table > tbody > tr > td.no {
     background-color: rgba(255, 0, 0, 0.6);
     color: black;
     text-align: center;
+    vertical-align: middle;
 }
 
 .images-table > tbody:not(.controls) > tr:hover > td:not(.no) {
     background-color: rgb(247, 247, 247);
 }
 
+td.delete span.bi {
+    color: rgba(255, 0, 0, 0.6);
+    font-size: 16px;
+}
+
+td.edit span.bi {
+    color: cornflowerblue;
+    font-size: 16px;
+}
+
 td.delete {
-    color: red;
-    font-size: 12px;
+
     cursor: pointer;
 }
 

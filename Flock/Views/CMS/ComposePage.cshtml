@@ -237,6 +237,7 @@
     @Html.Partial("~/Views/Pages/PageSearchPartial.cshtml")
     @Html.Partial("~/Views/Articles/ArticleSearchPartial.cshtml")
     @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+    @Html.Partial("~/Views/Shared/SiteSearch.cshtml")
     @Html.Partial("~/Views/Video/VideoSearchPartial.cshtml")
 </div>
 
@@ -526,9 +527,26 @@
     <button type="button" onclick="AddAllCountriesToPage();">To Page</button>
 </div>
 
-<div id="animation-dialog">
-    <div id="animation-edit-container">
+<div id="animation-modal" class="modal" data-bs-backdrop="false">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header pointer">
+                <h5 class="mb-0">
+                    Animation Editor
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="animation-edit-container">
 
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-bs-dismiss="modal">
+                    Done
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -842,7 +842,11 @@ namespace Flock.Models
         public short MenuItemID { get; set; }
         public byte LanguageID { get; set; }
         public string Name { get; set; }
+        public string ExternalURL { get; set; }
+        public string QueryStringParameters { get; set; }
         public string TranslatedName { get; set; }
+        public string TranslatedExternalURL { get; set; }
+        public string TranslatedQueryStringParameters { get; set; }
         public bool? Stage { get; set; }
         public byte FieldsToReview { get; set; }
     }
@@ -1484,11 +1488,6 @@ namespace Flock.Models
 
     public partial class FlockDataContext : System.Data.Linq.DataContext
     {
-        public FlockDataContext() : base(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString)
-        {
-
-        }
-
         partial void OnCreated()
         {
             this.CommandTimeout = 3600;
@@ -3296,16 +3295,20 @@ namespace Flock.Models
             DataTable OriginalText = new DataTable();
             OriginalText.Columns.Add("MenuItemID", typeof(short));
             OriginalText.Columns.Add("Name", typeof(string));
+            OriginalText.Columns.Add("ExternalURL", typeof(string));
+            OriginalText.Columns.Add("QueryStringParameters", typeof(string));
 
             DataTable TranslatedText = new DataTable();
             TranslatedText.Columns.Add("MenuItemID", typeof(short));
             TranslatedText.Columns.Add("Name", typeof(string));
+            TranslatedText.Columns.Add("ExternalURL", typeof(string));
+            TranslatedText.Columns.Add("QueryStringParameters", typeof(string));
 
             foreach (var mi in model.MenuItems)
             {
-                OriginalText.Rows.Add(new object[] { mi.MenuItemID, mi.Name });
+                OriginalText.Rows.Add(new object[] { mi.MenuItemID, mi.Name, mi.ExternalURL, mi.QueryStringParameters });
 
-                TranslatedText.Rows.Add(new object[] { mi.MenuItemID, mi.TranslatedName });
+                TranslatedText.Rows.Add(new object[] { mi.MenuItemID, mi.TranslatedName, mi.TranslatedExternalURL, mi.TranslatedQueryStringParameters });
             }
 
             SqlConnection con = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString);
@@ -6258,7 +6261,7 @@ namespace Flock.ViewModels
 
         public static object GetNullableCompetitions()
         {
-            var preModel = DB.Competitions.Where(p => p.DeletedDT == null && p.OffDate > DateTime.Now).OrderByDescending(p => p.CompetitionID).ToList();
+            var preModel = DB.Competitions.Where(p => p.DeletedDT == null && (p.OffDate == null || p.OffDate > DateTime.Now)).OrderByDescending(p => p.CompetitionID).ToList();
             var Model = new List<NullableCompetition>();
             Model.Add(new NullableCompetition() { CompetitionID = null, Name = "Not Set..." });
 

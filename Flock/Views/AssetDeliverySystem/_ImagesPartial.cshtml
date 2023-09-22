@@ -1,6 +1,6 @@
 ﻿@model List<Flock.Models.AdvertisingImage>
 
-<table class="images-table table-condensed table-bordered">
+<table class="table images-table table-condensed table-bordered">
     <thead>
         <tr>
             <th></th>
@@ -18,7 +18,7 @@
     <tbody class="controls">
         <tr>
             <td colspan="10">
-                <button class="btn btn-primary" id="add-new-btn" onclick="AddNewImagePopup.Show();"><span class="glyphicon glyphicon-plus-sign"></span> Add Image</button>
+                <button class="btn btn-primary" id="add-new-btn" onclick="AddNewImagePopup.Show();"><span class="bi bi-plus"></span> Add Image</button>
             </td>
         </tr>
     </tbody>
@@ -27,53 +27,53 @@
         {
             <tr id="image-record-@(i.AdvertisingImageID)" data-advertising-image-id="@(i.AdvertisingImageID)">
                 <td class="delete" onclick="OpenImageDeleteConfirmation(@(i.AdvertisingImageID))">
-                    <span class="glyphicon glyphicon-remove-circle" title="Delete"></span>
+                    <span class="bi bi-x-circle-fill" title="Delete"></span>
                 </td>
                 <td>@i.Name</td>
                 <td class="description">@i.Description</td>
                 @{
                     if (i.ThumbnailFilename != null)
                     {
-                        <td class="yes"><span class="glyphicon glyphicon-check"></span></td>
+                        <td class="yes"><span class="bi bi-check-square"></span></td>
                     }
                     else
                     {
-                        <td class="no"><span class="glyphicon glyphicon-unchecked"></span></td>
+                        <td class="no"><span class="bi bi-square"></span></td>
                     }
                     if (i.WebQualityFilename != null)
                     {
-                        <td class="yes"><span class="glyphicon glyphicon-check"></span></td>
+                        <td class="yes"><span class="bi bi-check-square"></span></td>
                     }
                     else
                     {
-                        <td class="no"><span class="glyphicon glyphicon-unchecked"></span></td>
+                        <td class="no"><span class="bi bi-square"></span></td>
                     }
                     if (i.PrintQualityFilename != null)
                     {
-                        <td class="yes"><span class="glyphicon glyphicon-check"></span></td>
+                        <td class="yes"><span class="bi bi-check-square"></span></td>
                     }
                     else
                     {
-                        <td class="no"><span class="glyphicon glyphicon-unchecked"></span></td>
+                        <td class="no"><span class="bi bi-square"></span></td>
                     }
-                        }
-                        <td>@(i.OnDate.HasValue ? i.OnDate.Value.ToString("dd/MM/yyyy") : "")</td>
-                        <td>@(i.OffDate.HasValue ? i.OffDate.Value.ToString("dd/MM/yyyy") : "")</td>
-                        @{
+                }
+                <td>@(i.OnDate.HasValue ? i.OnDate.Value.ToString("dd/MM/yyyy") : "")</td>
+                <td>@(i.OffDate.HasValue ? i.OffDate.Value.ToString("dd/MM/yyyy") : "")</td>
+                @{
                     if ((i.ThumbnailFilename != null) &&
                         (i.WebQualityFilename != null) &&
                         (i.PrintQualityFilename != null) &&
                         (i.WebEnabled == true))
                     {
-                        <td class="yes"><span class="glyphicon glyphicon-check"></span></td>
+                        <td class="yes"><span class="bi bi-check-square"></span></td>
                     }
                     else
                     {
-                        <td class="no"><span class="glyphicon glyphicon-unchecked"></span></td>
+                        <td class="no"><span class="bi bi-square"></span></td>
                     }
                 }
                 <td class="edit" onclick="OpenImageEditor(@(i.AdvertisingImageID))">
-                    <span class="glyphicon glyphicon-edit" title="Edit"></span>
+                    <span class="bi bi-pencil-square" title="Edit"></span>
                 </td>
             </tr>
         }
@@ -81,7 +81,7 @@
     <tbody class="controls">
         <tr>
             <td colspan="10">
-                <button class="btn btn-primary" id="add-new-btn" onclick="AddNewImagePopup.Show();"><span class="glyphicon glyphicon-plus-sign"></span> Add Image</button>
+                <button class="btn btn-primary" id="add-new-btn" onclick="AddNewImagePopup.Show();"><span class="bi bi-plus"></span> Add Image</button>
             </td>
         </tr>
     </tbody>

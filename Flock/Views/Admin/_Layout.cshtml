@@ -7,12 +7,12 @@
     @Styles.Render("~/bundles/css/prettify")
     @Scripts.Render("~/bundles/js/prettify")
     @Styles.Render("~/Content/css")
-    @Styles.Render("~/Content/themes/base/jquery-ui.css")
     @*@Styles.Render("~/Content/themes/base/css")*@
     @*@Scripts.Render("~/bundles/modernizr")*@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/js/common")
     @*@Scripts.Render("~/Scripts/knockout-3.2.0.js")*@
     @Scripts.Render("~/Scripts/Globalize/Globalize.js")
     @Styles.Render("~/bundles/css/grids")
@@ -20,7 +20,9 @@
     @Styles.Render("~/bundles/css/cms")
     @Styles.Render("~/bundles/css/common")
     @Styles.Render("~/bundles/css/bootstrap-5.3.1")
+    @Scripts.Render("~/bundles/js/bootstrap-5.3.1")
     @Scripts.Render("~/bundles/js/page-composition")
+    @Styles.Render("~/Content/themes/base/jquery-ui.css")
     <script type="text/javascript">
         $.extend({
             unsavedWarning: function (yesCallback, noCallback, args) {
@@ -92,39 +94,47 @@
         });
 
         $.extend({
-            confirm: function (yesCallback, noCallback, args, message) {
-                var text = "";
-                if (typeof message !== "undefined") {
-                    text = "<h6>" + message + "</h6>";
-                }
+            confirm: function (confirm, reject, args, message) {
 
-                $("<div class='confirm-dialog' style='min-width: 200px;'></div>").dialog({
-                    title: "Confirm",
-                    width: "auto",
-                    height: "auto",
-                    buttons: [{
-                        text: "Yes",
-                        click: function () {
-                            if (typeof yesCallback === 'function') {
-                                yesCallback(args);
-                            }
-                            $(this).remove();
-                        }
-                    },
-                    {
-                        text: "No",
-                        click: function () {
-                            if (typeof noCallback === 'function') {
-                                noCallback(args);
-                            }
-                            $(this).remove();
-                        }
-                    }
-                    ],
-                    close: function (event, ui) { $(this).remove(); },
-                    resizable: false,
-                    modal: true
-                }).html(text + "<h6>Are you sure?</h6>").parent().addClass("alert");
+                document.querySelector('#confirm-modal .modal-title').innerHTML = 'Are you sure?';
+                document.querySelector('#confirm-modal .modal-body').innerHTML = message ?? '';
+                window.confirmModalInstance.confirmFn = (() => {
+                    typeof confirm === 'function' ? confirm() : null;
+                    window.confirmModalInstance.hide();
+                });
+                window.confirmModalInstance.rejectFn = (() => {
+                    typeof reject === 'function' ? reject() : null;
+                    window.confirmModalInstance.hide();
+                });
+                window.confirmModalInstance.show();
+
+                //$("<div class='confirm-dialog' style='min-width: 200px;'></div>").dialog({
+                //    title: "Confirm",
+                //    width: "auto",
+                //    height: "auto",
+                //    buttons: [{
+                //        text: "Yes",
+                //        click: function () {
+                //            if (typeof yesCallback === 'function') {
+                //                yesCallback(args);
+                //            }
+                //            $(this).remove();
+                //        }
+                //    },
+                //    {
+                //        text: "No",
+                //        click: function () {
+                //            if (typeof noCallback === 'function') {
+                //                noCallback(args);
+                //            }
+                //            $(this).remove();
+                //        }
+                //    }
+                //    ],
+                //    close: function (event, ui) { $(this).remove(); },
+                //    resizable: false,
+                //    modal: true
+                //}).html(text + "<h6>Are you sure?</h6>").parent().addClass("alert");
             }
         });
 
@@ -254,7 +264,7 @@
                 //                {
                 //ExtensionSuite = ExtensionSuite.All
                 //                }
-                    }
+                            }
         );
         Html.DevExpress().GetStyleSheets(
             new StyleSheet() { ExtensionSuite = ExtensionSuite.Editors },
@@ -301,6 +311,15 @@ Html.EnableUnobtrusiveJavaScript();
 </head>
 <body style="width: 100%; height: 100%;">
 
+    <div id="main-loading-blocker" class="page-blocker d-none">
+        <div class="spinner-border"></div>
+        <h4>
+            Please Wait
+        </h4>
+    </div>
+
+    @Html.Partial("~/Views/Shared/_CommonModals.cshtml")
+
     @RenderSection("outsideContainer", required: false)
 
     @Html.Partial("~/Views/Admin/_NavigationPartial.cshtml")
@@ -339,7 +358,20 @@ Html.EnableUnobtrusiveJavaScript();
         settings.Name = "LoadingPanel";
         settings.Modal = true;
     }).GetHtml()
-
-    @Scripts.Render("~/bundles/js/bootstrap-5.3.1")
+    
+    <script type="text/javascript">
+        window.LoadingPanel = {
+            Show: () => {
+                let element = document.querySelector('#main-loading-blocker');
+                element.classList.remove('d-none');
+                element.classList.add('opacity-100');
+            },
+            Hide: () => {
+                let element = document.querySelector('#main-loading-blocker');
+                element.classList.remove('opacity-100');
+                setTimeout(() => element.classList.add('d-none'), 150);
+            }
+        }
+    </script>
 </body>
 </html>

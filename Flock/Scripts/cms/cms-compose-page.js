@@ -376,9 +376,19 @@ function SaveVideoSection(PageSectionID) {
 
 function LoadAnimationEditor(AnimationID) {
     $("#animation-edit-container").empty();
+    LoadingPanel.Show();
     $.get('/admin/animations/edit', { AnimationID: AnimationID }, function (data, status, jqxhr) {
         $("#animation-edit-container").html(data);
-        $("#animation-dialog").dialog("open");
+        let m = bootstrap.Modal.getOrCreateInstance(document.querySelector("#animation-modal"), {
+            backdrop: false
+        });
+        m._element.style.width = 'auto';
+        m._element.style.height = 'auto';
+        LoadingPanel.Hide();
+        m.show();
+        $("#animation-modal").draggable({
+            handle: ".modal-header"
+        }); 
     });
 }
 
@@ -696,6 +706,8 @@ function UpdateProductPageGrid(PageSectionID, onComplete) {
 function UpdateCollectionGrid(PageSectionID) {
     var collections = new Array();
 
+    LoadingPanel.Show();
+
     $("#page-section-" + PageSectionID + "-grid").find(".collection-placeholder").remove();
 
     $("#page-section-" + PageSectionID + "-grid").children("div").each(function (index) {
@@ -709,8 +721,11 @@ function UpdateCollectionGrid(PageSectionID) {
         data: { PageSectionID: PageSectionID, Collections: JSON.stringify(collections) },
         success: function (data) {
             $("#page-section-" + PageSectionID + "-grid").html(data);
+
+            LoadingPanel.Hide();
         },
         error: function (e, s, a) {
+            LoadingPanel.Hide();
             alert(e.responseText);
         },
         timeout: 20000
@@ -1634,12 +1649,13 @@ function LoadCanonicalPageAttributeSettings(pageId, parentPageId) {
                 parentPageId: parentPageId
             },
             success: function (data) {
-                LoadingPanel.Hide();
-                $('#page-pod-advanced-settings').html(data);
                 $('#page-pod-advanced-settings-modal').modal('show');
+                $('#page-pod-advanced-settings').html(data);
+                LoadingPanel.Hide();
             },
             error: function (xhr, s, a) {
                 LoadingPanel.Hide();
+                window.showInfo('Sorry', 'You can only specify pages which have filter indexing enabled for use as canon');
                 document.querySelector(`#page-${parentPageId}-canonical-name`).innerHTML = null;
                 // this will be hit if the selected canon page isn't filter indexing
             }

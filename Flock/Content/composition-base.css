@@ -271,8 +271,6 @@ fieldset legend {
 }
 
 .product-page-cell-five-across {
-    width: 175px;
-    min-width: 175px;
 }
 
 .product-page-cell img:not(.image-remove-icon) {
@@ -291,18 +289,14 @@ fieldset legend {
 }
 
 .collection-cell {
-    width: 305px;
-    height: 185px;
-    float: left;
     padding: 1em;
-    margin-right: 1em;
-    margin-bottom: 1em;
     position: relative;
 }
 
-.collection-cell img {
-    display: block;
-}
+    .collection-cell img {
+        display: block;
+        max-width: 100%;
+    }
 
 .form-details-table td select {
     height: auto;

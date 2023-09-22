@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Flock" Class="FlockDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="ConnectionString" ConnectionString="Data Source=VM-SQL1;Initial Catalog=Flock;Persist Security Info=True;User ID=dg;Password=mattm00" Provider="System.Data.SqlClient" />
   <Table Name="dbo.Admin" Member="Admins">
     <Type Name="Admin">
       <Column Name="AdminID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -266,7 +267,6 @@
       <Association Name="Language_HTMLSection_Language" Member="HTMLSection_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="HTMLSection_Language" />
       <Association Name="Language_Image_Language" Member="Image_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="Image_Language" />
       <Association Name="Language_Menu_Language" Member="Menu_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="Menu_Language" />
-      <Association Name="Language_MenuItem_Language" Member="MenuItem_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="MenuItem_Language" />
       <Association Name="Language_OrderStatus_Language" Member="OrderStatus_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="OrderStatus_Language" />
       <Association Name="Language_Page_Language" Member="Page_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="Page_Language" />
       <Association Name="Language_PageSection_Language" Member="PageSection_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="PageSection_Language" />
@@ -291,7 +291,8 @@
       <Association Name="Language_Member" Member="Members" ThisKey="LanguageID" OtherKey="LanguageID" Type="Member" />
       <Association Name="Language_Member1" Member="Members1" ThisKey="LanguageID" OtherKey="MarketingLanguageID" Type="Member" />
       <Association Name="Language_PageSection_Country_Language" Member="PageSection_Country_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="PageSection_Country_Language" />
-      <Association Name="Language_FilterIndexRestriction_Language" Member="FilterIndexRestriction_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="FilterIndexRestriction_Language" />
+      <Association Name="Language_MenuItem_Language" Member="MenuItem_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="MenuItem_Language" />
+      <Association Name="Language_FilterIndexCombination_Language" Member="FilterIndexCombination_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="FilterIndexCombination_Language" />
     </Type>
   </Table>
   <Table Name="dbo.Region" Member="Regions">
@@ -1832,6 +1833,7 @@
       <Association Name="ProductType_Article" Member="Articles" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Article" />
       <Association Name="ProductType_Collection" Member="Collections" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Collection" />
       <Association Name="ProductType_FilterIndexRestriction" Member="FilterIndexRestrictions" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexRestriction" />
+      <Association Name="ProductType_FilterIndexCombination" Member="FilterIndexCombinations" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexCombination" />
       <Association Name="StockLocation_ProductType" Member="StockLocation" ThisKey="StockLocationID" OtherKey="StockLocationID" Type="StockLocation" IsForeignKey="true" />
     </Type>
   </Table>
@@ -1855,9 +1857,10 @@
       <Column Name="ArticleTypeID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="Name" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
       <Association Name="ArticleType_PageSection_ArticleType" Member="PageSection_ArticleTypes" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="PageSection_ArticleType" />
-      <Association Name="ArticleType_ArticleSubType" Member="ArticleSubTypes" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleSubType" />
       <Association Name="ArticleType_ArticleType_Language" Member="ArticleType_Languages" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleType_Language" />
       <Association Name="ArticleType_Article" Member="Articles" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="Article" />
+      <Association Name="ArticleType_ArticleSubType" Member="ArticleSubTypes" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleSubType" />
+      <Association Name="ArticleType_ArticleSubType1" Member="ArticleSubTypes1" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleSubType" />
     </Type>
   </Table>
   <Table Name="art.Article_RelatedArticle" Member="Article_RelatedArticles">
@@ -2052,23 +2055,12 @@
       <Column Name="ArticleSubTypeID" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
     </Type>
   </Table>
-  <Table Name="art.ArticleSubType" Member="ArticleSubTypes">
-    <Type Name="ArticleSubType">
-      <Column Name="ArticleSubTypeID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="ArticleTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
-      <Column Name="PageID" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="SortOrder" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
-      <Association Name="ArticleSubType_ArticleSubType_Language" Member="ArticleSubType_Languages" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="ArticleSubType_Language" />
-      <Association Name="ArticleSubType_Article" Member="Articles" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="Article" />
-      <Association Name="ArticleType_ArticleSubType" Member="ArticleType" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleType" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.PageSection_ArticleSubType" Member="PageSection_ArticleSubTypes">
     <Type Name="PageSection_ArticleSubType">
       <Column Name="PageSectionID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="ArticleSubTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Association Name="PageSection_PageSection_ArticleSubType" Member="PageSection" ThisKey="PageSectionID" OtherKey="PageSectionID" Type="PageSection" IsForeignKey="true" />
+      <Association Name="ArticleSubType_PageSection_ArticleSubType" Member="ArticleSubType" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="ArticleSubType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Pattern" Member="Patterns">
@@ -3644,8 +3636,8 @@
       <Column Name="Stage" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
       <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
       <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
-      <Association Name="ArticleSubType_ArticleSubType_Language" Member="ArticleSubType" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="ArticleSubType" IsForeignKey="true" />
       <Association Name="Language_ArticleSubType_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+      <Association Name="ArticleSubType_ArticleSubType_Language" Member="ArticleSubType" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="ArticleSubType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="art.ArticleType_Language" Member="ArticleType_Languages">
@@ -3837,18 +3829,6 @@
       <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
       <Association Name="Language_Menu_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
       <Association Name="Menu_Menu_Language" Member="Menu" ThisKey="MenuID" OtherKey="MenuID" Type="Menu" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.MenuItem_Language" Member="MenuItem_Languages">
-    <Type Name="MenuItem_Language">
-      <Column Name="MenuItemID" Type="System.Int16" DbType="SmallInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
-      <Column Name="Stage" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
-      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
-      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
-      <Association Name="Language_MenuItem_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
-      <Association Name="MenuItem_MenuItem_Language" Member="MenuItem" ThisKey="MenuItemID" OtherKey="MenuItemID" Type="MenuItem" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="mod.Module_Language" Member="Module_Languages">
@@ -4886,10 +4866,10 @@
       <Association Name="Article_Article_Image" Member="Article_Images" ThisKey="ArticleID" OtherKey="ArticleID" Type="Article_Image" />
       <Association Name="Article_CallToAction" Member="CallToActions" ThisKey="ArticleID" OtherKey="ArticleID" Type="CallToAction" />
       <Association Name="Article_Article_Language" Member="Article_Languages" ThisKey="ArticleID" OtherKey="ArticleID" Type="Article_Language" />
-      <Association Name="ArticleSubType_Article" Member="ArticleSubType" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="ArticleSubType" IsForeignKey="true" />
       <Association Name="ArticleTemplate_Article" Member="ArticleTemplate" ThisKey="ArticleTemplateID" OtherKey="ArticleTemplateID" Type="ArticleTemplate" IsForeignKey="true" />
       <Association Name="ArticleType_Article" Member="ArticleType" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleType" IsForeignKey="true" />
       <Association Name="ProductType_Article" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
+      <Association Name="ArticleSubType_Article" Member="ArticleSubType" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="ArticleSubType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="adm.vwCollection" Member="vwCollections">
@@ -5046,7 +5026,7 @@
       <Association Name="Member_Member_Brochure" Member="Member_Brochures" ThisKey="MemberID" OtherKey="MemberID" Type="Member_Brochure" />
       <Association Name="Member_Member_SubAccount" Member="Member_SubAccounts" ThisKey="MemberID" OtherKey="MemberID" Type="Member_SubAccount" />
       <Association Name="Member_Transaction" Member="Transactions" ThisKey="MemberID" OtherKey="MemberID" Type="Transaction" />
-      <Association Name="Member_FilterIndexRestriction_Language" Member="FilterIndexRestriction_Languages" ThisKey="MemberID" OtherKey="ModifiedMemberID" Type="FilterIndexRestriction_Language" />
+      <Association Name="Member_FilterIndexCombination_Language" Member="FilterIndexCombination_Languages" ThisKey="MemberID" OtherKey="ModifiedMemberID" Type="FilterIndexCombination_Language" />
       <Association Name="Country_Member" Member="Country" ThisKey="CountryID" OtherKey="CountryID" Type="Country" IsForeignKey="true" />
       <Association Name="Language_Member" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
       <Association Name="Country_Member1" Member="Country1" ThisKey="MarketingCountryID" OtherKey="CountryID" Type="Country" IsForeignKey="true" />
@@ -5207,27 +5187,54 @@
       <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="Enabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="FilterIndexRestrictionID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Association Name="FilterIndexRestriction_FilterIndexRestriction_Language" Member="FilterIndexRestriction_Languages" ThisKey="FilterIndexRestrictionID" OtherKey="FilterIndexRestrictionID" Type="FilterIndexRestriction_Language" />
       <Association Name="ProductType_FilterIndexRestriction" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.FilterIndexRestriction_Language" Member="FilterIndexRestriction_Languages">
-    <Type Name="FilterIndexRestriction_Language">
-      <Column Name="FilterIndexRestrictionID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+  <Table Name="dbo.MenuItem_Language" Member="MenuItem_Languages">
+    <Type Name="MenuItem_Language">
+      <Column Name="MenuItemID" Type="System.Int16" DbType="SmallInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="Stage" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Column Name="ExternalURL" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="QueryStringParameters" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Association Name="Language_MenuItem_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+      <Association Name="MenuItem_MenuItem_Language" Member="MenuItem" ThisKey="MenuItemID" OtherKey="MenuItemID" Type="MenuItem" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FilterIndexCombinations" Member="FilterIndexCombinations">
+    <Type Name="FilterIndexCombination">
+      <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeSignature" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeDescription" Type="System.String" DbType="NVarChar(500) NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="DeletedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Enabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="FilterIndexCombinationID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Association Name="FilterIndexCombination_FilterIndexCombination_Language" Member="FilterIndexCombination_Languages" ThisKey="FilterIndexCombinationID" OtherKey="FilterIndexCombinationID" Type="FilterIndexCombination_Language" />
+      <Association Name="ProductType_FilterIndexCombination" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FilterIndexCombination_Language" Member="FilterIndexCombination_Languages">
+    <Type Name="FilterIndexCombination_Language">
+      <Column Name="FilterIndexCombinationID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="FooterText" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
       <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
       <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
       <Column Name="ModifiedMemberID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ChatGPTRequestID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
-      <Association Name="FilterIndexRestriction_FilterIndexRestriction_Language" Member="FilterIndexRestriction" ThisKey="FilterIndexRestrictionID" OtherKey="FilterIndexRestrictionID" Type="FilterIndexRestriction" IsForeignKey="true" />
-      <Association Name="Language_FilterIndexRestriction_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
-      <Association Name="Member_FilterIndexRestriction_Language" Member="Member" ThisKey="ModifiedMemberID" OtherKey="MemberID" Type="Member" IsForeignKey="true" />
+      <Association Name="FilterIndexCombination_FilterIndexCombination_Language" Member="FilterIndexCombination" ThisKey="FilterIndexCombinationID" OtherKey="FilterIndexCombinationID" Type="FilterIndexCombination" IsForeignKey="true" />
+      <Association Name="Language_FilterIndexCombination_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+      <Association Name="Member_FilterIndexCombination_Language" Member="Member" ThisKey="ModifiedMemberID" OtherKey="MemberID" Type="Member" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="adm.vwFilterIndexRestriction_Language" Member="vwFilterIndexRestriction_Languages">
-    <Type Name="vwFilterIndexRestriction_Language">
-      <Column Name="FilterIndexRestrictionID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+  <Table Name="adm.vwFilterIndexCombination_Language" Member="vwFilterIndexCombination_Languages">
+    <Type Name="vwFilterIndexCombination_Language">
+      <Column Name="FilterIndexCombinationID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
       <Column Name="FooterText" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
       <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
@@ -5235,8 +5242,24 @@
       <Column Name="ModifiedMemberID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ChatGPTRequestID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
       <Column Name="ProductTypeName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="AttributeGroupSignature" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="AttributeGroupDescription" Type="System.String" DbType="NVarChar(500) NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeSignature" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeDescription" Type="System.String" DbType="NVarChar(500) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="art.ArticleSubType" Member="ArticleSubTypes">
+    <Type Name="ArticleSubType">
+      <Column Name="ArticleSubTypeID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ArticleTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="PageID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="DeletedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
+      <Association Name="ArticleSubType_PageSection_ArticleSubType" Member="PageSection_ArticleSubTypes" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="PageSection_ArticleSubType" />
+      <Association Name="ArticleSubType_ArticleSubType_Language" Member="ArticleSubType_Languages" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="ArticleSubType_Language" />
+      <Association Name="ArticleSubType_Article" Member="Articles" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="Article" />
+      <Association Name="ArticleType_ArticleSubType" Member="ArticleType" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleType" IsForeignKey="true" />
+      <Association Name="ArticleType_ArticleSubType1" Member="ArticleType1" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleType" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.PageSection_ClearPage" Method="PageSection_ClearPage">

@@ -933,7 +933,7 @@ namespace Flock.Controllers
             byte InsertedOrder = 0;
 
             if (Position != 0)
-                InsertedOrder = Convert.ToByte(UnitOfWork.GetRepository<PageSection>().GetAll().Where(p => p.PageID == PageID).Count());
+                InsertedOrder = Convert.ToByte(UnitOfWork.GetRepository<PageSection>().GetAll().Where(p => p.PageID == PageID && p.Deleted == false).Count());
             else
             {
                 var currentSections = UnitOfWork.GetRepository<PageSection>().GetAll().Where(p => p.PageID == PageID).ToList();

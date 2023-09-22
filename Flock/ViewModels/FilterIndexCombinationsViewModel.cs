@@ -11,13 +11,13 @@ using System.Web;
 
 namespace Flock.ViewModels
 {
-    public class FilterIndexRestrictionsViewModel : BaseViewModel
+    public class FilterIndexCombinationsViewModel : BaseViewModel
     {
         public byte LanguageID { get; set; }
         public byte? ProductTypeID { get; set; }
         public byte? AttributeGroupID { get; set; }
 
-        public FilterIndexRestrictionsViewModel(byte languageId, byte? productTypeId = null, byte? attributeGroupId = null) 
+        public FilterIndexCombinationsViewModel(byte languageId, byte? productTypeId = null, byte? attributeGroupId = null) 
         {
             LanguageID = languageId;
             ProductTypeID = productTypeId;
@@ -25,24 +25,24 @@ namespace Flock.ViewModels
         }
     }
 
-    public class FilterIndexRestrictionsGridSettings
+    public class FilterIndexCombinationsGridSettings
     {
         public byte? LanguageID { get; set; }
 
-        public FilterIndexRestrictionsGridSettings(byte? languageId)
+        public FilterIndexCombinationsGridSettings(byte? languageId)
         {
             LanguageID = languageId;
         }
     }
 
-    public class FilterIndexRestriction_LanguageEditModel
+    public class FilterIndexCombination_LanguageEditModel
     {
         public string Key { get; set; }
 
         [StringLength(4000, ErrorMessage = "Cannot exceed 4,000 characters")]
         public string FooterText { get; set; }
 
-        public int FilterIndexRestrictionID 
+        public int FilterIndexCombinationID 
         { 
             get 
             {

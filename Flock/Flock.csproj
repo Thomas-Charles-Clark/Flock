@@ -516,7 +516,7 @@
     <Compile Include="Controllers\BundlePriceImportController.cs" />
     <Compile Include="Controllers\ProductPages_ColourController.cs" />
     <Compile Include="Controllers\IconTextilesController.cs" />
-    <Compile Include="Controllers\FilterIndexRestrictionsController.cs" />
+    <Compile Include="Controllers\FilterIndexCombinationsController.cs" />
     <Compile Include="Controllers\SampleOrderEmailMessagesController.cs" />
     <Compile Include="Controllers\ImagesController.cs" />
     <Compile Include="Controllers\MailingListImportController.cs" />
@@ -668,7 +668,7 @@
     <Compile Include="ViewModels\DeliveryBandViewModel.cs" />
     <Compile Include="ViewModels\EmailMessageViewModel.cs" />
     <Compile Include="ViewModels\EmailTextViewModel.cs" />
-    <Compile Include="ViewModels\FilterIndexRestrictionsViewModel.cs" />
+    <Compile Include="ViewModels\FilterIndexCombinationsViewModel.cs" />
     <Compile Include="ViewModels\GiftVoucherViewModel.cs" />
     <Compile Include="ViewModels\GoogleProductFeedDeliveryViewModel.cs" />
     <Compile Include="ViewModels\HtmlSectionTranslate.cs" />
@@ -956,11 +956,15 @@
     <Content Include="css\src\lib\bootstrap-5.3.1\js\src\util\swipe.js" />
     <Content Include="css\src\lib\bootstrap-5.3.1\js\src\util\template-factory.js" />
     <Content Include="css\src\lib\bootstrap-5.3.1\scss\bootstrap.css" />
-    <Content Include="css\src\models\filter-index-restrictions.scss" />
+    <Content Include="css\src\models\filter-index-combinations.scss" />
+    <Content Include="ExternalDependencies\CacheBuster.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="js\src\lib\bootstrap-5.3.1\bootstrap.bundle-5.3.1.js" />
     <Content Include="js\src\lib\codemirror\code-mirror.bundle.js" />
     <Content Include="js\src\lib\codemirror\code-mirror.rollup.js" />
-    <Content Include="js\src\models\filter-index-restrictions.js" />
+    <Content Include="js\src\models\common.js" />
+    <Content Include="js\src\models\filter-index-combinations.js" />
     <Content Include="Content\ADS_Users.css" />
     <Content Include="Content\advertising-images.css" />
     <Content Include="Content\Animation.css" />
@@ -5051,6 +5055,8 @@
     <Content Include="css\src\lib\bootstrap-5.3.1\scss\_variables-dark.scss" />
     <Content Include="css\src\lib\bootstrap-5.3.1\scss\_variables.scss" />
     <Content Include="css\src\models\common.scss" />
+    <Content Include="bundles\css\fonts\bootstrap-icons.woff" />
+    <Content Include="bundles\css\fonts\bootstrap-icons.woff2" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -6361,8 +6367,9 @@
     <Content Include="Views\MailingListImport\DotDigitalAccountComboBoxPartial.cshtml" />
     <Content Include="Views\Shared\SiteSearch.cshtml" />
     <Content Include="Views\Shared\SiteSearchDataViewPartial.cshtml" />
-    <Content Include="Views\FilterIndexRestrictions\FilterIndexRestrictions.cshtml" />
-    <Content Include="Views\FilterIndexRestrictions\_FilterIndexRestrictionsGridView.cshtml" />
+    <Content Include="Views\FilterIndexCombinations\FilterIndexCombinations.cshtml" />
+    <Content Include="Views\FilterIndexCombinations\_FilterIndexCombinationsGridView.cshtml" />
+    <Content Include="Views\Shared\_CommonModals.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -6373,6 +6380,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\Files\" />
+    <Folder Include="css\src\models\fonts\" />
     <Folder Include="FurniturePDFs\" />
     <Folder Include="FurniturePopupImages\" />
     <Folder Include="Images\admin\htmlsection\" />

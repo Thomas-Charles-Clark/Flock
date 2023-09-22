@@ -15,7 +15,7 @@
 
             if (Model.IsFullConfiguration)
             {
-                <div class="col-sm-2 result-cell" data-product-page-id="@(pp.ProductPageID)" onmouseover="$(this).find('.edit-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.edit-icon').stop().animate({opacity: 0.0}, 300)">
+                <div class="col-sm-2 result-cell" data-product-page-id="@(pp.ProductPageID)">
                     @if (pp.ImageID == null)
                     {
                         <img src="/images/admin/image-not-set.png" style="width: 100%;" title="Product Page ID: @(pp.ProductPageID) - @(pp.Name)" />
@@ -47,11 +47,11 @@
                                         <label style="cursor: pointer;" onclick="ToggleInput($('#@(a.Name)-CheckBox-@(pp.ProductPageID)'))">@(a.Name)</label>
                                     </div>
 
-                                    if ((j + 1) % 10 == 0)
+                                    @*if ((j + 1) % 10 == 0)
                                     {
                                         @:</div>
                                         @:<div class="config-part">
-                                    }
+                                    }*@
                                 }
                                 <div style="clear: both;"></div>
                             </div>
@@ -81,11 +81,11 @@
                                         </label>
                                     </div>
 
-                                    if ((j + 1) % 10 == 0)
+                                    @*if ((j + 1) % 10 == 0)
                                     {
                                         @:</div>
                                         @:<div class="config-part">
-                                    }
+                                    }*@
                                 }
                                 <div style="clear: both;"></div>
                             </div>

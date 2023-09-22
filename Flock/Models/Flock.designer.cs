@@ -435,9 +435,6 @@ namespace Flock.Models
     partial void InsertPageSection_Video(PageSection_Video instance);
     partial void UpdatePageSection_Video(PageSection_Video instance);
     partial void DeletePageSection_Video(PageSection_Video instance);
-    partial void InsertArticleSubType(ArticleSubType instance);
-    partial void UpdateArticleSubType(ArticleSubType instance);
-    partial void DeleteArticleSubType(ArticleSubType instance);
     partial void InsertPageSection_ArticleSubType(PageSection_ArticleSubType instance);
     partial void UpdatePageSection_ArticleSubType(PageSection_ArticleSubType instance);
     partial void DeletePageSection_ArticleSubType(PageSection_ArticleSubType instance);
@@ -795,9 +792,6 @@ namespace Flock.Models
     partial void InsertMenu_Language(Menu_Language instance);
     partial void UpdateMenu_Language(Menu_Language instance);
     partial void DeleteMenu_Language(Menu_Language instance);
-    partial void InsertMenuItem_Language(MenuItem_Language instance);
-    partial void UpdateMenuItem_Language(MenuItem_Language instance);
-    partial void DeleteMenuItem_Language(MenuItem_Language instance);
     partial void InsertModule_Language(Module_Language instance);
     partial void UpdateModule_Language(Module_Language instance);
     partial void DeleteModule_Language(Module_Language instance);
@@ -957,10 +951,26 @@ namespace Flock.Models
     partial void InsertFilterIndexRestriction(FilterIndexRestriction instance);
     partial void UpdateFilterIndexRestriction(FilterIndexRestriction instance);
     partial void DeleteFilterIndexRestriction(FilterIndexRestriction instance);
-    partial void InsertFilterIndexRestriction_Language(FilterIndexRestriction_Language instance);
-    partial void UpdateFilterIndexRestriction_Language(FilterIndexRestriction_Language instance);
-    partial void DeleteFilterIndexRestriction_Language(FilterIndexRestriction_Language instance);
+    partial void InsertMenuItem_Language(MenuItem_Language instance);
+    partial void UpdateMenuItem_Language(MenuItem_Language instance);
+    partial void DeleteMenuItem_Language(MenuItem_Language instance);
+    partial void InsertFilterIndexCombination(FilterIndexCombination instance);
+    partial void UpdateFilterIndexCombination(FilterIndexCombination instance);
+    partial void DeleteFilterIndexCombination(FilterIndexCombination instance);
+    partial void InsertFilterIndexCombination_Language(FilterIndexCombination_Language instance);
+    partial void UpdateFilterIndexCombination_Language(FilterIndexCombination_Language instance);
+    partial void DeleteFilterIndexCombination_Language(FilterIndexCombination_Language instance);
+    partial void InsertArticleSubType(ArticleSubType instance);
+    partial void UpdateArticleSubType(ArticleSubType instance);
+    partial void DeleteArticleSubType(ArticleSubType instance);
     #endregion
+		
+		public FlockDataContext() : 
+				base("Data Source=VM-SQL1;Initial Catalog=Flock;Persist Security Info=True;User ID=dg;P" +
+						"assword=mattm00", mappingSource)
+		{
+			OnCreated();
+		}
 		
 		public FlockDataContext(string connection) : 
 				base(connection, mappingSource)
@@ -2394,14 +2404,6 @@ namespace Flock.Models
 			}
 		}
 		
-		public System.Data.Linq.Table<ArticleSubType> ArticleSubTypes
-		{
-			get
-			{
-				return this.GetTable<ArticleSubType>();
-			}
-		}
-		
 		public System.Data.Linq.Table<PageSection_ArticleSubType> PageSection_ArticleSubTypes
 		{
 			get
@@ -3450,14 +3452,6 @@ namespace Flock.Models
 			}
 		}
 		
-		public System.Data.Linq.Table<MenuItem_Language> MenuItem_Languages
-		{
-			get
-			{
-				return this.GetTable<MenuItem_Language>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Module_Language> Module_Languages
 		{
 			get
@@ -3954,19 +3948,43 @@ namespace Flock.Models
 			}
 		}
 		
-		public System.Data.Linq.Table<FilterIndexRestriction_Language> FilterIndexRestriction_Languages
+		public System.Data.Linq.Table<MenuItem_Language> MenuItem_Languages
 		{
 			get
 			{
-				return this.GetTable<FilterIndexRestriction_Language>();
+				return this.GetTable<MenuItem_Language>();
 			}
 		}
 		
-		public System.Data.Linq.Table<vwFilterIndexRestriction_Language> vwFilterIndexRestriction_Languages
+		public System.Data.Linq.Table<FilterIndexCombination> FilterIndexCombinations
 		{
 			get
 			{
-				return this.GetTable<vwFilterIndexRestriction_Language>();
+				return this.GetTable<FilterIndexCombination>();
+			}
+		}
+		
+		public System.Data.Linq.Table<FilterIndexCombination_Language> FilterIndexCombination_Languages
+		{
+			get
+			{
+				return this.GetTable<FilterIndexCombination_Language>();
+			}
+		}
+		
+		public System.Data.Linq.Table<vwFilterIndexCombination_Language> vwFilterIndexCombination_Languages
+		{
+			get
+			{
+				return this.GetTable<vwFilterIndexCombination_Language>();
+			}
+		}
+		
+		public System.Data.Linq.Table<ArticleSubType> ArticleSubTypes
+		{
+			get
+			{
+				return this.GetTable<ArticleSubType>();
 			}
 		}
 		
@@ -9363,8 +9381,6 @@ namespace Flock.Models
 		
 		private EntitySet<Menu_Language> _Menu_Languages;
 		
-		private EntitySet<MenuItem_Language> _MenuItem_Languages;
-		
 		private EntitySet<OrderStatus_Language> _OrderStatus_Languages;
 		
 		private EntitySet<Page_Language> _Page_Languages;
@@ -9413,7 +9429,9 @@ namespace Flock.Models
 		
 		private EntitySet<PageSection_Country_Language> _PageSection_Country_Languages;
 		
-		private EntitySet<FilterIndexRestriction_Language> _FilterIndexRestriction_Languages;
+		private EntitySet<MenuItem_Language> _MenuItem_Languages;
+		
+		private EntitySet<FilterIndexCombination_Language> _FilterIndexCombination_Languages;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -9448,7 +9466,6 @@ namespace Flock.Models
 			this._HTMLSection_Languages = new EntitySet<HTMLSection_Language>(new Action<HTMLSection_Language>(this.attach_HTMLSection_Languages), new Action<HTMLSection_Language>(this.detach_HTMLSection_Languages));
 			this._Image_Languages = new EntitySet<Image_Language>(new Action<Image_Language>(this.attach_Image_Languages), new Action<Image_Language>(this.detach_Image_Languages));
 			this._Menu_Languages = new EntitySet<Menu_Language>(new Action<Menu_Language>(this.attach_Menu_Languages), new Action<Menu_Language>(this.detach_Menu_Languages));
-			this._MenuItem_Languages = new EntitySet<MenuItem_Language>(new Action<MenuItem_Language>(this.attach_MenuItem_Languages), new Action<MenuItem_Language>(this.detach_MenuItem_Languages));
 			this._OrderStatus_Languages = new EntitySet<OrderStatus_Language>(new Action<OrderStatus_Language>(this.attach_OrderStatus_Languages), new Action<OrderStatus_Language>(this.detach_OrderStatus_Languages));
 			this._Page_Languages = new EntitySet<Page_Language>(new Action<Page_Language>(this.attach_Page_Languages), new Action<Page_Language>(this.detach_Page_Languages));
 			this._PageSection_Languages = new EntitySet<PageSection_Language>(new Action<PageSection_Language>(this.attach_PageSection_Languages), new Action<PageSection_Language>(this.detach_PageSection_Languages));
@@ -9473,7 +9490,8 @@ namespace Flock.Models
 			this._Members = new EntitySet<Member>(new Action<Member>(this.attach_Members), new Action<Member>(this.detach_Members));
 			this._Members1 = new EntitySet<Member>(new Action<Member>(this.attach_Members1), new Action<Member>(this.detach_Members1));
 			this._PageSection_Country_Languages = new EntitySet<PageSection_Country_Language>(new Action<PageSection_Country_Language>(this.attach_PageSection_Country_Languages), new Action<PageSection_Country_Language>(this.detach_PageSection_Country_Languages));
-			this._FilterIndexRestriction_Languages = new EntitySet<FilterIndexRestriction_Language>(new Action<FilterIndexRestriction_Language>(this.attach_FilterIndexRestriction_Languages), new Action<FilterIndexRestriction_Language>(this.detach_FilterIndexRestriction_Languages));
+			this._MenuItem_Languages = new EntitySet<MenuItem_Language>(new Action<MenuItem_Language>(this.attach_MenuItem_Languages), new Action<MenuItem_Language>(this.detach_MenuItem_Languages));
+			this._FilterIndexCombination_Languages = new EntitySet<FilterIndexCombination_Language>(new Action<FilterIndexCombination_Language>(this.attach_FilterIndexCombination_Languages), new Action<FilterIndexCombination_Language>(this.detach_FilterIndexCombination_Languages));
 			OnCreated();
 		}
 		
@@ -9763,19 +9781,6 @@ namespace Flock.Models
 			set
 			{
 				this._Menu_Languages.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_MenuItem_Language", Storage="_MenuItem_Languages", ThisKey="LanguageID", OtherKey="LanguageID")]
-		public EntitySet<MenuItem_Language> MenuItem_Languages
-		{
-			get
-			{
-				return this._MenuItem_Languages;
-			}
-			set
-			{
-				this._MenuItem_Languages.Assign(value);
 			}
 		}
 		
@@ -10091,16 +10096,29 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_FilterIndexRestriction_Language", Storage="_FilterIndexRestriction_Languages", ThisKey="LanguageID", OtherKey="LanguageID")]
-		public EntitySet<FilterIndexRestriction_Language> FilterIndexRestriction_Languages
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_MenuItem_Language", Storage="_MenuItem_Languages", ThisKey="LanguageID", OtherKey="LanguageID")]
+		public EntitySet<MenuItem_Language> MenuItem_Languages
 		{
 			get
 			{
-				return this._FilterIndexRestriction_Languages;
+				return this._MenuItem_Languages;
 			}
 			set
 			{
-				this._FilterIndexRestriction_Languages.Assign(value);
+				this._MenuItem_Languages.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_FilterIndexCombination_Language", Storage="_FilterIndexCombination_Languages", ThisKey="LanguageID", OtherKey="LanguageID")]
+		public EntitySet<FilterIndexCombination_Language> FilterIndexCombination_Languages
+		{
+			get
+			{
+				return this._FilterIndexCombination_Languages;
+			}
+			set
+			{
+				this._FilterIndexCombination_Languages.Assign(value);
 			}
 		}
 		
@@ -10275,18 +10293,6 @@ namespace Flock.Models
 		}
 		
 		private void detach_Menu_Languages(Menu_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.Language = null;
-		}
-		
-		private void attach_MenuItem_Languages(MenuItem_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.Language = this;
-		}
-		
-		private void detach_MenuItem_Languages(MenuItem_Language entity)
 		{
 			this.SendPropertyChanging();
 			entity.Language = null;
@@ -10580,13 +10586,25 @@ namespace Flock.Models
 			entity.Language = null;
 		}
 		
-		private void attach_FilterIndexRestriction_Languages(FilterIndexRestriction_Language entity)
+		private void attach_MenuItem_Languages(MenuItem_Language entity)
 		{
 			this.SendPropertyChanging();
 			entity.Language = this;
 		}
 		
-		private void detach_FilterIndexRestriction_Languages(FilterIndexRestriction_Language entity)
+		private void detach_MenuItem_Languages(MenuItem_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.Language = null;
+		}
+		
+		private void attach_FilterIndexCombination_Languages(FilterIndexCombination_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.Language = this;
+		}
+		
+		private void detach_FilterIndexCombination_Languages(FilterIndexCombination_Language entity)
 		{
 			this.SendPropertyChanging();
 			entity.Language = null;
@@ -36611,6 +36629,8 @@ namespace Flock.Models
 		
 		private EntitySet<FilterIndexRestriction> _FilterIndexRestrictions;
 		
+		private EntitySet<FilterIndexCombination> _FilterIndexCombinations;
+		
 		private EntityRef<StockLocation> _StockLocation;
 		
     #region Extensibility Method Definitions
@@ -36653,6 +36673,7 @@ namespace Flock.Models
 			this._Articles = new EntitySet<Article>(new Action<Article>(this.attach_Articles), new Action<Article>(this.detach_Articles));
 			this._Collections = new EntitySet<Collection>(new Action<Collection>(this.attach_Collections), new Action<Collection>(this.detach_Collections));
 			this._FilterIndexRestrictions = new EntitySet<FilterIndexRestriction>(new Action<FilterIndexRestriction>(this.attach_FilterIndexRestrictions), new Action<FilterIndexRestriction>(this.detach_FilterIndexRestrictions));
+			this._FilterIndexCombinations = new EntitySet<FilterIndexCombination>(new Action<FilterIndexCombination>(this.attach_FilterIndexCombinations), new Action<FilterIndexCombination>(this.detach_FilterIndexCombinations));
 			this._StockLocation = default(EntityRef<StockLocation>);
 			OnCreated();
 		}
@@ -37011,6 +37032,19 @@ namespace Flock.Models
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ProductType_FilterIndexCombination", Storage="_FilterIndexCombinations", ThisKey="ProductTypeID", OtherKey="ProductTypeID")]
+		public EntitySet<FilterIndexCombination> FilterIndexCombinations
+		{
+			get
+			{
+				return this._FilterIndexCombinations;
+			}
+			set
+			{
+				this._FilterIndexCombinations.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="StockLocation_ProductType", Storage="_StockLocation", ThisKey="StockLocationID", OtherKey="StockLocationID", IsForeignKey=true)]
 		public StockLocation StockLocation
 		{
@@ -37180,6 +37214,18 @@ namespace Flock.Models
 		}
 		
 		private void detach_FilterIndexRestrictions(FilterIndexRestriction entity)
+		{
+			this.SendPropertyChanging();
+			entity.ProductType = null;
+		}
+		
+		private void attach_FilterIndexCombinations(FilterIndexCombination entity)
+		{
+			this.SendPropertyChanging();
+			entity.ProductType = this;
+		}
+		
+		private void detach_FilterIndexCombinations(FilterIndexCombination entity)
 		{
 			this.SendPropertyChanging();
 			entity.ProductType = null;
@@ -37442,11 +37488,13 @@ namespace Flock.Models
 		
 		private EntitySet<PageSection_ArticleType> _PageSection_ArticleTypes;
 		
-		private EntitySet<ArticleSubType> _ArticleSubTypes;
-		
 		private EntitySet<ArticleType_Language> _ArticleType_Languages;
 		
 		private EntitySet<Article> _Articles;
+		
+		private EntitySet<ArticleSubType> _ArticleSubTypes;
+		
+		private EntitySet<ArticleSubType> _ArticleSubTypes1;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -37461,9 +37509,10 @@ namespace Flock.Models
 		public ArticleType()
 		{
 			this._PageSection_ArticleTypes = new EntitySet<PageSection_ArticleType>(new Action<PageSection_ArticleType>(this.attach_PageSection_ArticleTypes), new Action<PageSection_ArticleType>(this.detach_PageSection_ArticleTypes));
-			this._ArticleSubTypes = new EntitySet<ArticleSubType>(new Action<ArticleSubType>(this.attach_ArticleSubTypes), new Action<ArticleSubType>(this.detach_ArticleSubTypes));
 			this._ArticleType_Languages = new EntitySet<ArticleType_Language>(new Action<ArticleType_Language>(this.attach_ArticleType_Languages), new Action<ArticleType_Language>(this.detach_ArticleType_Languages));
 			this._Articles = new EntitySet<Article>(new Action<Article>(this.attach_Articles), new Action<Article>(this.detach_Articles));
+			this._ArticleSubTypes = new EntitySet<ArticleSubType>(new Action<ArticleSubType>(this.attach_ArticleSubTypes), new Action<ArticleSubType>(this.detach_ArticleSubTypes));
+			this._ArticleSubTypes1 = new EntitySet<ArticleSubType>(new Action<ArticleSubType>(this.attach_ArticleSubTypes1), new Action<ArticleSubType>(this.detach_ArticleSubTypes1));
 			OnCreated();
 		}
 		
@@ -37520,19 +37569,6 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleType_ArticleSubType", Storage="_ArticleSubTypes", ThisKey="ArticleTypeID", OtherKey="ArticleTypeID")]
-		public EntitySet<ArticleSubType> ArticleSubTypes
-		{
-			get
-			{
-				return this._ArticleSubTypes;
-			}
-			set
-			{
-				this._ArticleSubTypes.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleType_ArticleType_Language", Storage="_ArticleType_Languages", ThisKey="ArticleTypeID", OtherKey="ArticleTypeID")]
 		public EntitySet<ArticleType_Language> ArticleType_Languages
 		{
@@ -37556,6 +37592,32 @@ namespace Flock.Models
 			set
 			{
 				this._Articles.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleType_ArticleSubType", Storage="_ArticleSubTypes", ThisKey="ArticleTypeID", OtherKey="ArticleTypeID")]
+		public EntitySet<ArticleSubType> ArticleSubTypes
+		{
+			get
+			{
+				return this._ArticleSubTypes;
+			}
+			set
+			{
+				this._ArticleSubTypes.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleType_ArticleSubType1", Storage="_ArticleSubTypes1", ThisKey="ArticleTypeID", OtherKey="ArticleTypeID")]
+		public EntitySet<ArticleSubType> ArticleSubTypes1
+		{
+			get
+			{
+				return this._ArticleSubTypes1;
+			}
+			set
+			{
+				this._ArticleSubTypes1.Assign(value);
 			}
 		}
 		
@@ -37591,18 +37653,6 @@ namespace Flock.Models
 			entity.ArticleType = null;
 		}
 		
-		private void attach_ArticleSubTypes(ArticleSubType entity)
-		{
-			this.SendPropertyChanging();
-			entity.ArticleType = this;
-		}
-		
-		private void detach_ArticleSubTypes(ArticleSubType entity)
-		{
-			this.SendPropertyChanging();
-			entity.ArticleType = null;
-		}
-		
 		private void attach_ArticleType_Languages(ArticleType_Language entity)
 		{
 			this.SendPropertyChanging();
@@ -37625,6 +37675,30 @@ namespace Flock.Models
 		{
 			this.SendPropertyChanging();
 			entity.ArticleType = null;
+		}
+		
+		private void attach_ArticleSubTypes(ArticleSubType entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleType = this;
+		}
+		
+		private void detach_ArticleSubTypes(ArticleSubType entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleType = null;
+		}
+		
+		private void attach_ArticleSubTypes1(ArticleSubType entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleType1 = this;
+		}
+		
+		private void detach_ArticleSubTypes1(ArticleSubType entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleType1 = null;
 		}
 	}
 	
@@ -41196,261 +41270,6 @@ namespace Flock.Models
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="art.ArticleSubType")]
-	public partial class ArticleSubType : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private byte _ArticleSubTypeID;
-		
-		private byte _ArticleTypeID;
-		
-		private string _Name;
-		
-		private System.Nullable<int> _PageID;
-		
-		private byte _SortOrder;
-		
-		private EntitySet<ArticleSubType_Language> _ArticleSubType_Languages;
-		
-		private EntitySet<Article> _Articles;
-		
-		private EntityRef<ArticleType> _ArticleType;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnArticleSubTypeIDChanging(byte value);
-    partial void OnArticleSubTypeIDChanged();
-    partial void OnArticleTypeIDChanging(byte value);
-    partial void OnArticleTypeIDChanged();
-    partial void OnNameChanging(string value);
-    partial void OnNameChanged();
-    partial void OnPageIDChanging(System.Nullable<int> value);
-    partial void OnPageIDChanged();
-    partial void OnSortOrderChanging(byte value);
-    partial void OnSortOrderChanged();
-    #endregion
-		
-		public ArticleSubType()
-		{
-			this._ArticleSubType_Languages = new EntitySet<ArticleSubType_Language>(new Action<ArticleSubType_Language>(this.attach_ArticleSubType_Languages), new Action<ArticleSubType_Language>(this.detach_ArticleSubType_Languages));
-			this._Articles = new EntitySet<Article>(new Action<Article>(this.attach_Articles), new Action<Article>(this.detach_Articles));
-			this._ArticleType = default(EntityRef<ArticleType>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ArticleSubTypeID", AutoSync=AutoSync.OnInsert, DbType="TinyInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public byte ArticleSubTypeID
-		{
-			get
-			{
-				return this._ArticleSubTypeID;
-			}
-			set
-			{
-				if ((this._ArticleSubTypeID != value))
-				{
-					this.OnArticleSubTypeIDChanging(value);
-					this.SendPropertyChanging();
-					this._ArticleSubTypeID = value;
-					this.SendPropertyChanged("ArticleSubTypeID");
-					this.OnArticleSubTypeIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ArticleTypeID", DbType="TinyInt NOT NULL", IsPrimaryKey=true)]
-		public byte ArticleTypeID
-		{
-			get
-			{
-				return this._ArticleTypeID;
-			}
-			set
-			{
-				if ((this._ArticleTypeID != value))
-				{
-					if (this._ArticleType.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnArticleTypeIDChanging(value);
-					this.SendPropertyChanging();
-					this._ArticleTypeID = value;
-					this.SendPropertyChanged("ArticleTypeID");
-					this.OnArticleTypeIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(20) NOT NULL", CanBeNull=false)]
-		public string Name
-		{
-			get
-			{
-				return this._Name;
-			}
-			set
-			{
-				if ((this._Name != value))
-				{
-					this.OnNameChanging(value);
-					this.SendPropertyChanging();
-					this._Name = value;
-					this.SendPropertyChanged("Name");
-					this.OnNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PageID", DbType="Int")]
-		public System.Nullable<int> PageID
-		{
-			get
-			{
-				return this._PageID;
-			}
-			set
-			{
-				if ((this._PageID != value))
-				{
-					this.OnPageIDChanging(value);
-					this.SendPropertyChanging();
-					this._PageID = value;
-					this.SendPropertyChanged("PageID");
-					this.OnPageIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SortOrder", DbType="TinyInt NOT NULL")]
-		public byte SortOrder
-		{
-			get
-			{
-				return this._SortOrder;
-			}
-			set
-			{
-				if ((this._SortOrder != value))
-				{
-					this.OnSortOrderChanging(value);
-					this.SendPropertyChanging();
-					this._SortOrder = value;
-					this.SendPropertyChanged("SortOrder");
-					this.OnSortOrderChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_ArticleSubType_Language", Storage="_ArticleSubType_Languages", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID")]
-		public EntitySet<ArticleSubType_Language> ArticleSubType_Languages
-		{
-			get
-			{
-				return this._ArticleSubType_Languages;
-			}
-			set
-			{
-				this._ArticleSubType_Languages.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_Article", Storage="_Articles", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID")]
-		public EntitySet<Article> Articles
-		{
-			get
-			{
-				return this._Articles;
-			}
-			set
-			{
-				this._Articles.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleType_ArticleSubType", Storage="_ArticleType", ThisKey="ArticleTypeID", OtherKey="ArticleTypeID", IsForeignKey=true)]
-		public ArticleType ArticleType
-		{
-			get
-			{
-				return this._ArticleType.Entity;
-			}
-			set
-			{
-				ArticleType previousValue = this._ArticleType.Entity;
-				if (((previousValue != value) 
-							|| (this._ArticleType.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._ArticleType.Entity = null;
-						previousValue.ArticleSubTypes.Remove(this);
-					}
-					this._ArticleType.Entity = value;
-					if ((value != null))
-					{
-						value.ArticleSubTypes.Add(this);
-						this._ArticleTypeID = value.ArticleTypeID;
-					}
-					else
-					{
-						this._ArticleTypeID = default(byte);
-					}
-					this.SendPropertyChanged("ArticleType");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_ArticleSubType_Languages(ArticleSubType_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.ArticleSubType = this;
-		}
-		
-		private void detach_ArticleSubType_Languages(ArticleSubType_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.ArticleSubType = null;
-		}
-		
-		private void attach_Articles(Article entity)
-		{
-			this.SendPropertyChanging();
-			entity.ArticleSubType = this;
-		}
-		
-		private void detach_Articles(Article entity)
-		{
-			this.SendPropertyChanging();
-			entity.ArticleSubType = null;
-		}
-	}
-	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.PageSection_ArticleSubType")]
 	public partial class PageSection_ArticleSubType : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -41462,6 +41281,8 @@ namespace Flock.Models
 		private byte _ArticleSubTypeID;
 		
 		private EntityRef<PageSection> _PageSection;
+		
+		private EntityRef<ArticleSubType> _ArticleSubType;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -41476,6 +41297,7 @@ namespace Flock.Models
 		public PageSection_ArticleSubType()
 		{
 			this._PageSection = default(EntityRef<PageSection>);
+			this._ArticleSubType = default(EntityRef<ArticleSubType>);
 			OnCreated();
 		}
 		
@@ -41514,6 +41336,10 @@ namespace Flock.Models
 			{
 				if ((this._ArticleSubTypeID != value))
 				{
+					if (this._ArticleSubType.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
 					this.OnArticleSubTypeIDChanging(value);
 					this.SendPropertyChanging();
 					this._ArticleSubTypeID = value;
@@ -41553,6 +41379,40 @@ namespace Flock.Models
 						this._PageSectionID = default(long);
 					}
 					this.SendPropertyChanged("PageSection");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_PageSection_ArticleSubType", Storage="_ArticleSubType", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID", IsForeignKey=true)]
+		public ArticleSubType ArticleSubType
+		{
+			get
+			{
+				return this._ArticleSubType.Entity;
+			}
+			set
+			{
+				ArticleSubType previousValue = this._ArticleSubType.Entity;
+				if (((previousValue != value) 
+							|| (this._ArticleSubType.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ArticleSubType.Entity = null;
+						previousValue.PageSection_ArticleSubTypes.Remove(this);
+					}
+					this._ArticleSubType.Entity = value;
+					if ((value != null))
+					{
+						value.PageSection_ArticleSubTypes.Add(this);
+						this._ArticleSubTypeID = value.ArticleSubTypeID;
+					}
+					else
+					{
+						this._ArticleSubTypeID = default(byte);
+					}
+					this.SendPropertyChanged("ArticleSubType");
 				}
 			}
 		}
@@ -73444,9 +73304,9 @@ namespace Flock.Models
 		
 		private System.Nullable<System.DateTime> _ModifiedDT;
 		
-		private EntityRef<ArticleSubType> _ArticleSubType;
-		
 		private EntityRef<Language> _Language;
+		
+		private EntityRef<ArticleSubType> _ArticleSubType;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -73468,8 +73328,8 @@ namespace Flock.Models
 		
 		public ArticleSubType_Language()
 		{
-			this._ArticleSubType = default(EntityRef<ArticleSubType>);
 			this._Language = default(EntityRef<Language>);
+			this._ArticleSubType = default(EntityRef<ArticleSubType>);
 			OnCreated();
 		}
 		
@@ -73601,40 +73461,6 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_ArticleSubType_Language", Storage="_ArticleSubType", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID", IsForeignKey=true)]
-		public ArticleSubType ArticleSubType
-		{
-			get
-			{
-				return this._ArticleSubType.Entity;
-			}
-			set
-			{
-				ArticleSubType previousValue = this._ArticleSubType.Entity;
-				if (((previousValue != value) 
-							|| (this._ArticleSubType.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._ArticleSubType.Entity = null;
-						previousValue.ArticleSubType_Languages.Remove(this);
-					}
-					this._ArticleSubType.Entity = value;
-					if ((value != null))
-					{
-						value.ArticleSubType_Languages.Add(this);
-						this._ArticleSubTypeID = value.ArticleSubTypeID;
-					}
-					else
-					{
-						this._ArticleSubTypeID = default(byte);
-					}
-					this.SendPropertyChanged("ArticleSubType");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_ArticleSubType_Language", Storage="_Language", ThisKey="LanguageID", OtherKey="LanguageID", IsForeignKey=true)]
 		public Language Language
 		{
@@ -73665,6 +73491,40 @@ namespace Flock.Models
 						this._LanguageID = default(byte);
 					}
 					this.SendPropertyChanged("Language");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_ArticleSubType_Language", Storage="_ArticleSubType", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID", IsForeignKey=true)]
+		public ArticleSubType ArticleSubType
+		{
+			get
+			{
+				return this._ArticleSubType.Entity;
+			}
+			set
+			{
+				ArticleSubType previousValue = this._ArticleSubType.Entity;
+				if (((previousValue != value) 
+							|| (this._ArticleSubType.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ArticleSubType.Entity = null;
+						previousValue.ArticleSubType_Languages.Remove(this);
+					}
+					this._ArticleSubType.Entity = value;
+					if ((value != null))
+					{
+						value.ArticleSubType_Languages.Add(this);
+						this._ArticleSubTypeID = value.ArticleSubTypeID;
+					}
+					else
+					{
+						this._ArticleSubTypeID = default(byte);
+					}
+					this.SendPropertyChanged("ArticleSubType");
 				}
 			}
 		}
@@ -77682,270 +77542,6 @@ namespace Flock.Models
 						this._MenuID = default(byte);
 					}
 					this.SendPropertyChanged("Menu");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MenuItem_Language")]
-	public partial class MenuItem_Language : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private short _MenuItemID;
-		
-		private byte _LanguageID;
-		
-		private string _Name;
-		
-		private System.Nullable<bool> _Stage;
-		
-		private System.DateTime _CreatedDT;
-		
-		private System.Nullable<System.DateTime> _ModifiedDT;
-		
-		private EntityRef<Language> _Language;
-		
-		private EntityRef<MenuItem> _MenuItem;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnMenuItemIDChanging(short value);
-    partial void OnMenuItemIDChanged();
-    partial void OnLanguageIDChanging(byte value);
-    partial void OnLanguageIDChanged();
-    partial void OnNameChanging(string value);
-    partial void OnNameChanged();
-    partial void OnStageChanging(System.Nullable<bool> value);
-    partial void OnStageChanged();
-    partial void OnCreatedDTChanging(System.DateTime value);
-    partial void OnCreatedDTChanged();
-    partial void OnModifiedDTChanging(System.Nullable<System.DateTime> value);
-    partial void OnModifiedDTChanged();
-    #endregion
-		
-		public MenuItem_Language()
-		{
-			this._Language = default(EntityRef<Language>);
-			this._MenuItem = default(EntityRef<MenuItem>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MenuItemID", DbType="SmallInt NOT NULL", IsPrimaryKey=true)]
-		public short MenuItemID
-		{
-			get
-			{
-				return this._MenuItemID;
-			}
-			set
-			{
-				if ((this._MenuItemID != value))
-				{
-					if (this._MenuItem.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnMenuItemIDChanging(value);
-					this.SendPropertyChanging();
-					this._MenuItemID = value;
-					this.SendPropertyChanged("MenuItemID");
-					this.OnMenuItemIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LanguageID", DbType="TinyInt NOT NULL", IsPrimaryKey=true)]
-		public byte LanguageID
-		{
-			get
-			{
-				return this._LanguageID;
-			}
-			set
-			{
-				if ((this._LanguageID != value))
-				{
-					if (this._Language.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnLanguageIDChanging(value);
-					this.SendPropertyChanging();
-					this._LanguageID = value;
-					this.SendPropertyChanged("LanguageID");
-					this.OnLanguageIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(300)")]
-		public string Name
-		{
-			get
-			{
-				return this._Name;
-			}
-			set
-			{
-				if ((this._Name != value))
-				{
-					this.OnNameChanging(value);
-					this.SendPropertyChanging();
-					this._Name = value;
-					this.SendPropertyChanged("Name");
-					this.OnNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Stage", DbType="Bit")]
-		public System.Nullable<bool> Stage
-		{
-			get
-			{
-				return this._Stage;
-			}
-			set
-			{
-				if ((this._Stage != value))
-				{
-					this.OnStageChanging(value);
-					this.SendPropertyChanging();
-					this._Stage = value;
-					this.SendPropertyChanged("Stage");
-					this.OnStageChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedDT", DbType="DateTime2 NOT NULL")]
-		public System.DateTime CreatedDT
-		{
-			get
-			{
-				return this._CreatedDT;
-			}
-			set
-			{
-				if ((this._CreatedDT != value))
-				{
-					this.OnCreatedDTChanging(value);
-					this.SendPropertyChanging();
-					this._CreatedDT = value;
-					this.SendPropertyChanged("CreatedDT");
-					this.OnCreatedDTChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ModifiedDT", DbType="DateTime2")]
-		public System.Nullable<System.DateTime> ModifiedDT
-		{
-			get
-			{
-				return this._ModifiedDT;
-			}
-			set
-			{
-				if ((this._ModifiedDT != value))
-				{
-					this.OnModifiedDTChanging(value);
-					this.SendPropertyChanging();
-					this._ModifiedDT = value;
-					this.SendPropertyChanged("ModifiedDT");
-					this.OnModifiedDTChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_MenuItem_Language", Storage="_Language", ThisKey="LanguageID", OtherKey="LanguageID", IsForeignKey=true)]
-		public Language Language
-		{
-			get
-			{
-				return this._Language.Entity;
-			}
-			set
-			{
-				Language previousValue = this._Language.Entity;
-				if (((previousValue != value) 
-							|| (this._Language.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Language.Entity = null;
-						previousValue.MenuItem_Languages.Remove(this);
-					}
-					this._Language.Entity = value;
-					if ((value != null))
-					{
-						value.MenuItem_Languages.Add(this);
-						this._LanguageID = value.LanguageID;
-					}
-					else
-					{
-						this._LanguageID = default(byte);
-					}
-					this.SendPropertyChanged("Language");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MenuItem_MenuItem_Language", Storage="_MenuItem", ThisKey="MenuItemID", OtherKey="MenuItemID", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
-		public MenuItem MenuItem
-		{
-			get
-			{
-				return this._MenuItem.Entity;
-			}
-			set
-			{
-				MenuItem previousValue = this._MenuItem.Entity;
-				if (((previousValue != value) 
-							|| (this._MenuItem.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._MenuItem.Entity = null;
-						previousValue.MenuItem_Languages.Remove(this);
-					}
-					this._MenuItem.Entity = value;
-					if ((value != null))
-					{
-						value.MenuItem_Languages.Add(this);
-						this._MenuItemID = value.MenuItemID;
-					}
-					else
-					{
-						this._MenuItemID = default(short);
-					}
-					this.SendPropertyChanged("MenuItem");
 				}
 			}
 		}
@@ -99196,13 +98792,13 @@ namespace Flock.Models
 		
 		private EntitySet<Article_Language> _Article_Languages;
 		
-		private EntityRef<ArticleSubType> _ArticleSubType;
-		
 		private EntityRef<ArticleTemplate> _ArticleTemplate;
 		
 		private EntityRef<ArticleType> _ArticleType;
 		
 		private EntityRef<ProductType> _ProductType;
+		
+		private EntityRef<ArticleSubType> _ArticleSubType;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -99263,10 +98859,10 @@ namespace Flock.Models
 			this._Article_Images = new EntitySet<Article_Image>(new Action<Article_Image>(this.attach_Article_Images), new Action<Article_Image>(this.detach_Article_Images));
 			this._CallToActions = new EntitySet<CallToAction>(new Action<CallToAction>(this.attach_CallToActions), new Action<CallToAction>(this.detach_CallToActions));
 			this._Article_Languages = new EntitySet<Article_Language>(new Action<Article_Language>(this.attach_Article_Languages), new Action<Article_Language>(this.detach_Article_Languages));
-			this._ArticleSubType = default(EntityRef<ArticleSubType>);
 			this._ArticleTemplate = default(EntityRef<ArticleTemplate>);
 			this._ArticleType = default(EntityRef<ArticleType>);
 			this._ProductType = default(EntityRef<ProductType>);
+			this._ArticleSubType = default(EntityRef<ArticleSubType>);
 			OnCreated();
 		}
 		
@@ -99817,40 +99413,6 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_Article", Storage="_ArticleSubType", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID", IsForeignKey=true)]
-		public ArticleSubType ArticleSubType
-		{
-			get
-			{
-				return this._ArticleSubType.Entity;
-			}
-			set
-			{
-				ArticleSubType previousValue = this._ArticleSubType.Entity;
-				if (((previousValue != value) 
-							|| (this._ArticleSubType.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._ArticleSubType.Entity = null;
-						previousValue.Articles.Remove(this);
-					}
-					this._ArticleSubType.Entity = value;
-					if ((value != null))
-					{
-						value.Articles.Add(this);
-						this._ArticleSubTypeID = value.ArticleSubTypeID;
-					}
-					else
-					{
-						this._ArticleSubTypeID = default(Nullable<byte>);
-					}
-					this.SendPropertyChanged("ArticleSubType");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleTemplate_Article", Storage="_ArticleTemplate", ThisKey="ArticleTemplateID", OtherKey="ArticleTemplateID", IsForeignKey=true)]
 		public ArticleTemplate ArticleTemplate
 		{
@@ -99949,6 +99511,40 @@ namespace Flock.Models
 						this._ProductTypeID = default(Nullable<byte>);
 					}
 					this.SendPropertyChanged("ProductType");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_Article", Storage="_ArticleSubType", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID", IsForeignKey=true)]
+		public ArticleSubType ArticleSubType
+		{
+			get
+			{
+				return this._ArticleSubType.Entity;
+			}
+			set
+			{
+				ArticleSubType previousValue = this._ArticleSubType.Entity;
+				if (((previousValue != value) 
+							|| (this._ArticleSubType.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ArticleSubType.Entity = null;
+						previousValue.Articles.Remove(this);
+					}
+					this._ArticleSubType.Entity = value;
+					if ((value != null))
+					{
+						value.Articles.Add(this);
+						this._ArticleSubTypeID = value.ArticleSubTypeID;
+					}
+					else
+					{
+						this._ArticleSubTypeID = default(Nullable<byte>);
+					}
+					this.SendPropertyChanged("ArticleSubType");
 				}
 			}
 		}
@@ -101748,7 +101344,7 @@ namespace Flock.Models
 		
 		private EntitySet<Transaction> _Transactions;
 		
-		private EntitySet<FilterIndexRestriction_Language> _FilterIndexRestriction_Languages;
+		private EntitySet<FilterIndexCombination_Language> _FilterIndexCombination_Languages;
 		
 		private EntityRef<Country> _Country;
 		
@@ -101920,7 +101516,7 @@ namespace Flock.Models
 			this._Member_Brochures = new EntitySet<Member_Brochure>(new Action<Member_Brochure>(this.attach_Member_Brochures), new Action<Member_Brochure>(this.detach_Member_Brochures));
 			this._Member_SubAccounts = new EntitySet<Member_SubAccount>(new Action<Member_SubAccount>(this.attach_Member_SubAccounts), new Action<Member_SubAccount>(this.detach_Member_SubAccounts));
 			this._Transactions = new EntitySet<Transaction>(new Action<Transaction>(this.attach_Transactions), new Action<Transaction>(this.detach_Transactions));
-			this._FilterIndexRestriction_Languages = new EntitySet<FilterIndexRestriction_Language>(new Action<FilterIndexRestriction_Language>(this.attach_FilterIndexRestriction_Languages), new Action<FilterIndexRestriction_Language>(this.detach_FilterIndexRestriction_Languages));
+			this._FilterIndexCombination_Languages = new EntitySet<FilterIndexCombination_Language>(new Action<FilterIndexCombination_Language>(this.attach_FilterIndexCombination_Languages), new Action<FilterIndexCombination_Language>(this.detach_FilterIndexCombination_Languages));
 			this._Country = default(EntityRef<Country>);
 			this._Language = default(EntityRef<Language>);
 			this._Country1 = default(EntityRef<Country>);
@@ -103442,16 +103038,16 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Member_FilterIndexRestriction_Language", Storage="_FilterIndexRestriction_Languages", ThisKey="MemberID", OtherKey="ModifiedMemberID")]
-		public EntitySet<FilterIndexRestriction_Language> FilterIndexRestriction_Languages
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Member_FilterIndexCombination_Language", Storage="_FilterIndexCombination_Languages", ThisKey="MemberID", OtherKey="ModifiedMemberID")]
+		public EntitySet<FilterIndexCombination_Language> FilterIndexCombination_Languages
 		{
 			get
 			{
-				return this._FilterIndexRestriction_Languages;
+				return this._FilterIndexCombination_Languages;
 			}
 			set
 			{
-				this._FilterIndexRestriction_Languages.Assign(value);
+				this._FilterIndexCombination_Languages.Assign(value);
 			}
 		}
 		
@@ -103819,13 +103415,13 @@ namespace Flock.Models
 			entity.Member = null;
 		}
 		
-		private void attach_FilterIndexRestriction_Languages(FilterIndexRestriction_Language entity)
+		private void attach_FilterIndexCombination_Languages(FilterIndexCombination_Language entity)
 		{
 			this.SendPropertyChanging();
 			entity.Member = this;
 		}
 		
-		private void detach_FilterIndexRestriction_Languages(FilterIndexRestriction_Language entity)
+		private void detach_FilterIndexCombination_Languages(FilterIndexCombination_Language entity)
 		{
 			this.SendPropertyChanging();
 			entity.Member = null;
@@ -107017,8 +106613,6 @@ namespace Flock.Models
 		
 		private int _FilterIndexRestrictionID;
 		
-		private EntitySet<FilterIndexRestriction_Language> _FilterIndexRestriction_Languages;
-		
 		private EntityRef<ProductType> _ProductType;
 		
     #region Extensibility Method Definitions
@@ -107045,7 +106639,6 @@ namespace Flock.Models
 		
 		public FilterIndexRestriction()
 		{
-			this._FilterIndexRestriction_Languages = new EntitySet<FilterIndexRestriction_Language>(new Action<FilterIndexRestriction_Language>(this.attach_FilterIndexRestriction_Languages), new Action<FilterIndexRestriction_Language>(this.detach_FilterIndexRestriction_Languages));
 			this._ProductType = default(EntityRef<ProductType>);
 			OnCreated();
 		}
@@ -107214,19 +106807,6 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FilterIndexRestriction_FilterIndexRestriction_Language", Storage="_FilterIndexRestriction_Languages", ThisKey="FilterIndexRestrictionID", OtherKey="FilterIndexRestrictionID")]
-		public EntitySet<FilterIndexRestriction_Language> FilterIndexRestriction_Languages
-		{
-			get
-			{
-				return this._FilterIndexRestriction_Languages;
-			}
-			set
-			{
-				this._FilterIndexRestriction_Languages.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ProductType_FilterIndexRestriction", Storage="_ProductType", ThisKey="ProductTypeID", OtherKey="ProductTypeID", IsForeignKey=true)]
 		public ProductType ProductType
 		{
@@ -107280,27 +106860,626 @@ namespace Flock.Models
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
-		private void attach_FilterIndexRestriction_Languages(FilterIndexRestriction_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.FilterIndexRestriction = this;
-		}
-		
-		private void detach_FilterIndexRestriction_Languages(FilterIndexRestriction_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.FilterIndexRestriction = null;
-		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FilterIndexRestriction_Language")]
-	public partial class FilterIndexRestriction_Language : INotifyPropertyChanging, INotifyPropertyChanged
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MenuItem_Language")]
+	public partial class MenuItem_Language : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
 		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
 		
-		private int _FilterIndexRestrictionID;
+		private short _MenuItemID;
+		
+		private byte _LanguageID;
+		
+		private string _Name;
+		
+		private System.Nullable<bool> _Stage;
+		
+		private System.DateTime _CreatedDT;
+		
+		private System.Nullable<System.DateTime> _ModifiedDT;
+		
+		private string _ExternalURL;
+		
+		private string _QueryStringParameters;
+		
+		private EntityRef<Language> _Language;
+		
+		private EntityRef<MenuItem> _MenuItem;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMenuItemIDChanging(short value);
+    partial void OnMenuItemIDChanged();
+    partial void OnLanguageIDChanging(byte value);
+    partial void OnLanguageIDChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnStageChanging(System.Nullable<bool> value);
+    partial void OnStageChanged();
+    partial void OnCreatedDTChanging(System.DateTime value);
+    partial void OnCreatedDTChanged();
+    partial void OnModifiedDTChanging(System.Nullable<System.DateTime> value);
+    partial void OnModifiedDTChanged();
+    partial void OnExternalURLChanging(string value);
+    partial void OnExternalURLChanged();
+    partial void OnQueryStringParametersChanging(string value);
+    partial void OnQueryStringParametersChanged();
+    #endregion
+		
+		public MenuItem_Language()
+		{
+			this._Language = default(EntityRef<Language>);
+			this._MenuItem = default(EntityRef<MenuItem>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MenuItemID", DbType="SmallInt NOT NULL", IsPrimaryKey=true)]
+		public short MenuItemID
+		{
+			get
+			{
+				return this._MenuItemID;
+			}
+			set
+			{
+				if ((this._MenuItemID != value))
+				{
+					if (this._MenuItem.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnMenuItemIDChanging(value);
+					this.SendPropertyChanging();
+					this._MenuItemID = value;
+					this.SendPropertyChanged("MenuItemID");
+					this.OnMenuItemIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LanguageID", DbType="TinyInt NOT NULL", IsPrimaryKey=true)]
+		public byte LanguageID
+		{
+			get
+			{
+				return this._LanguageID;
+			}
+			set
+			{
+				if ((this._LanguageID != value))
+				{
+					if (this._Language.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnLanguageIDChanging(value);
+					this.SendPropertyChanging();
+					this._LanguageID = value;
+					this.SendPropertyChanged("LanguageID");
+					this.OnLanguageIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(300)")]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Stage", DbType="Bit")]
+		public System.Nullable<bool> Stage
+		{
+			get
+			{
+				return this._Stage;
+			}
+			set
+			{
+				if ((this._Stage != value))
+				{
+					this.OnStageChanging(value);
+					this.SendPropertyChanging();
+					this._Stage = value;
+					this.SendPropertyChanged("Stage");
+					this.OnStageChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedDT", DbType="DateTime2 NOT NULL")]
+		public System.DateTime CreatedDT
+		{
+			get
+			{
+				return this._CreatedDT;
+			}
+			set
+			{
+				if ((this._CreatedDT != value))
+				{
+					this.OnCreatedDTChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedDT = value;
+					this.SendPropertyChanged("CreatedDT");
+					this.OnCreatedDTChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ModifiedDT", DbType="DateTime2")]
+		public System.Nullable<System.DateTime> ModifiedDT
+		{
+			get
+			{
+				return this._ModifiedDT;
+			}
+			set
+			{
+				if ((this._ModifiedDT != value))
+				{
+					this.OnModifiedDTChanging(value);
+					this.SendPropertyChanging();
+					this._ModifiedDT = value;
+					this.SendPropertyChanged("ModifiedDT");
+					this.OnModifiedDTChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ExternalURL", DbType="NVarChar(255)")]
+		public string ExternalURL
+		{
+			get
+			{
+				return this._ExternalURL;
+			}
+			set
+			{
+				if ((this._ExternalURL != value))
+				{
+					this.OnExternalURLChanging(value);
+					this.SendPropertyChanging();
+					this._ExternalURL = value;
+					this.SendPropertyChanged("ExternalURL");
+					this.OnExternalURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(50)")]
+		public string QueryStringParameters
+		{
+			get
+			{
+				return this._QueryStringParameters;
+			}
+			set
+			{
+				if ((this._QueryStringParameters != value))
+				{
+					this.OnQueryStringParametersChanging(value);
+					this.SendPropertyChanging();
+					this._QueryStringParameters = value;
+					this.SendPropertyChanged("QueryStringParameters");
+					this.OnQueryStringParametersChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_MenuItem_Language", Storage="_Language", ThisKey="LanguageID", OtherKey="LanguageID", IsForeignKey=true)]
+		public Language Language
+		{
+			get
+			{
+				return this._Language.Entity;
+			}
+			set
+			{
+				Language previousValue = this._Language.Entity;
+				if (((previousValue != value) 
+							|| (this._Language.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Language.Entity = null;
+						previousValue.MenuItem_Languages.Remove(this);
+					}
+					this._Language.Entity = value;
+					if ((value != null))
+					{
+						value.MenuItem_Languages.Add(this);
+						this._LanguageID = value.LanguageID;
+					}
+					else
+					{
+						this._LanguageID = default(byte);
+					}
+					this.SendPropertyChanged("Language");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MenuItem_MenuItem_Language", Storage="_MenuItem", ThisKey="MenuItemID", OtherKey="MenuItemID", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public MenuItem MenuItem
+		{
+			get
+			{
+				return this._MenuItem.Entity;
+			}
+			set
+			{
+				MenuItem previousValue = this._MenuItem.Entity;
+				if (((previousValue != value) 
+							|| (this._MenuItem.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MenuItem.Entity = null;
+						previousValue.MenuItem_Languages.Remove(this);
+					}
+					this._MenuItem.Entity = value;
+					if ((value != null))
+					{
+						value.MenuItem_Languages.Add(this);
+						this._MenuItemID = value.MenuItemID;
+					}
+					else
+					{
+						this._MenuItemID = default(short);
+					}
+					this.SendPropertyChanged("MenuItem");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FilterIndexCombinations")]
+	public partial class FilterIndexCombination : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private byte _ProductTypeID;
+		
+		private string _AttributeSignature;
+		
+		private string _AttributeDescription;
+		
+		private System.DateTime _CreatedDT;
+		
+		private System.Nullable<System.DateTime> _DeletedDT;
+		
+		private System.Nullable<bool> _Deleted;
+		
+		private bool _Enabled;
+		
+		private int _FilterIndexCombinationID;
+		
+		private EntitySet<FilterIndexCombination_Language> _FilterIndexCombination_Languages;
+		
+		private EntityRef<ProductType> _ProductType;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnProductTypeIDChanging(byte value);
+    partial void OnProductTypeIDChanged();
+    partial void OnAttributeSignatureChanging(string value);
+    partial void OnAttributeSignatureChanged();
+    partial void OnAttributeDescriptionChanging(string value);
+    partial void OnAttributeDescriptionChanged();
+    partial void OnCreatedDTChanging(System.DateTime value);
+    partial void OnCreatedDTChanged();
+    partial void OnDeletedDTChanging(System.Nullable<System.DateTime> value);
+    partial void OnDeletedDTChanged();
+    partial void OnDeletedChanging(System.Nullable<bool> value);
+    partial void OnDeletedChanged();
+    partial void OnEnabledChanging(bool value);
+    partial void OnEnabledChanged();
+    partial void OnFilterIndexCombinationIDChanging(int value);
+    partial void OnFilterIndexCombinationIDChanged();
+    #endregion
+		
+		public FilterIndexCombination()
+		{
+			this._FilterIndexCombination_Languages = new EntitySet<FilterIndexCombination_Language>(new Action<FilterIndexCombination_Language>(this.attach_FilterIndexCombination_Languages), new Action<FilterIndexCombination_Language>(this.detach_FilterIndexCombination_Languages));
+			this._ProductType = default(EntityRef<ProductType>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ProductTypeID", DbType="TinyInt NOT NULL")]
+		public byte ProductTypeID
+		{
+			get
+			{
+				return this._ProductTypeID;
+			}
+			set
+			{
+				if ((this._ProductTypeID != value))
+				{
+					if (this._ProductType.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnProductTypeIDChanging(value);
+					this.SendPropertyChanging();
+					this._ProductTypeID = value;
+					this.SendPropertyChanged("ProductTypeID");
+					this.OnProductTypeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AttributeSignature", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
+		public string AttributeSignature
+		{
+			get
+			{
+				return this._AttributeSignature;
+			}
+			set
+			{
+				if ((this._AttributeSignature != value))
+				{
+					this.OnAttributeSignatureChanging(value);
+					this.SendPropertyChanging();
+					this._AttributeSignature = value;
+					this.SendPropertyChanged("AttributeSignature");
+					this.OnAttributeSignatureChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AttributeDescription", DbType="NVarChar(500) NOT NULL", CanBeNull=false)]
+		public string AttributeDescription
+		{
+			get
+			{
+				return this._AttributeDescription;
+			}
+			set
+			{
+				if ((this._AttributeDescription != value))
+				{
+					this.OnAttributeDescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._AttributeDescription = value;
+					this.SendPropertyChanged("AttributeDescription");
+					this.OnAttributeDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedDT", DbType="DateTime2 NOT NULL")]
+		public System.DateTime CreatedDT
+		{
+			get
+			{
+				return this._CreatedDT;
+			}
+			set
+			{
+				if ((this._CreatedDT != value))
+				{
+					this.OnCreatedDTChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedDT = value;
+					this.SendPropertyChanged("CreatedDT");
+					this.OnCreatedDTChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeletedDT", DbType="DateTime2")]
+		public System.Nullable<System.DateTime> DeletedDT
+		{
+			get
+			{
+				return this._DeletedDT;
+			}
+			set
+			{
+				if ((this._DeletedDT != value))
+				{
+					this.OnDeletedDTChanging(value);
+					this.SendPropertyChanging();
+					this._DeletedDT = value;
+					this.SendPropertyChanged("DeletedDT");
+					this.OnDeletedDTChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Deleted", AutoSync=AutoSync.Always, DbType="Bit", IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
+		public System.Nullable<bool> Deleted
+		{
+			get
+			{
+				return this._Deleted;
+			}
+			set
+			{
+				if ((this._Deleted != value))
+				{
+					this.OnDeletedChanging(value);
+					this.SendPropertyChanging();
+					this._Deleted = value;
+					this.SendPropertyChanged("Deleted");
+					this.OnDeletedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Enabled", DbType="Bit NOT NULL")]
+		public bool Enabled
+		{
+			get
+			{
+				return this._Enabled;
+			}
+			set
+			{
+				if ((this._Enabled != value))
+				{
+					this.OnEnabledChanging(value);
+					this.SendPropertyChanging();
+					this._Enabled = value;
+					this.SendPropertyChanged("Enabled");
+					this.OnEnabledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FilterIndexCombinationID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int FilterIndexCombinationID
+		{
+			get
+			{
+				return this._FilterIndexCombinationID;
+			}
+			set
+			{
+				if ((this._FilterIndexCombinationID != value))
+				{
+					this.OnFilterIndexCombinationIDChanging(value);
+					this.SendPropertyChanging();
+					this._FilterIndexCombinationID = value;
+					this.SendPropertyChanged("FilterIndexCombinationID");
+					this.OnFilterIndexCombinationIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FilterIndexCombination_FilterIndexCombination_Language", Storage="_FilterIndexCombination_Languages", ThisKey="FilterIndexCombinationID", OtherKey="FilterIndexCombinationID")]
+		public EntitySet<FilterIndexCombination_Language> FilterIndexCombination_Languages
+		{
+			get
+			{
+				return this._FilterIndexCombination_Languages;
+			}
+			set
+			{
+				this._FilterIndexCombination_Languages.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ProductType_FilterIndexCombination", Storage="_ProductType", ThisKey="ProductTypeID", OtherKey="ProductTypeID", IsForeignKey=true)]
+		public ProductType ProductType
+		{
+			get
+			{
+				return this._ProductType.Entity;
+			}
+			set
+			{
+				ProductType previousValue = this._ProductType.Entity;
+				if (((previousValue != value) 
+							|| (this._ProductType.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ProductType.Entity = null;
+						previousValue.FilterIndexCombinations.Remove(this);
+					}
+					this._ProductType.Entity = value;
+					if ((value != null))
+					{
+						value.FilterIndexCombinations.Add(this);
+						this._ProductTypeID = value.ProductTypeID;
+					}
+					else
+					{
+						this._ProductTypeID = default(byte);
+					}
+					this.SendPropertyChanged("ProductType");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_FilterIndexCombination_Languages(FilterIndexCombination_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.FilterIndexCombination = this;
+		}
+		
+		private void detach_FilterIndexCombination_Languages(FilterIndexCombination_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.FilterIndexCombination = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FilterIndexCombination_Language")]
+	public partial class FilterIndexCombination_Language : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _FilterIndexCombinationID;
 		
 		private byte _LanguageID;
 		
@@ -107314,7 +107493,7 @@ namespace Flock.Models
 		
 		private System.Nullable<long> _ChatGPTRequestID;
 		
-		private EntityRef<FilterIndexRestriction> _FilterIndexRestriction;
+		private EntityRef<FilterIndexCombination> _FilterIndexCombination;
 		
 		private EntityRef<Language> _Language;
 		
@@ -107324,8 +107503,8 @@ namespace Flock.Models
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
     partial void OnCreated();
-    partial void OnFilterIndexRestrictionIDChanging(int value);
-    partial void OnFilterIndexRestrictionIDChanged();
+    partial void OnFilterIndexCombinationIDChanging(int value);
+    partial void OnFilterIndexCombinationIDChanged();
     partial void OnLanguageIDChanging(byte value);
     partial void OnLanguageIDChanged();
     partial void OnFooterTextChanging(string value);
@@ -107340,34 +107519,34 @@ namespace Flock.Models
     partial void OnChatGPTRequestIDChanged();
     #endregion
 		
-		public FilterIndexRestriction_Language()
+		public FilterIndexCombination_Language()
 		{
-			this._FilterIndexRestriction = default(EntityRef<FilterIndexRestriction>);
+			this._FilterIndexCombination = default(EntityRef<FilterIndexCombination>);
 			this._Language = default(EntityRef<Language>);
 			this._Member = default(EntityRef<Member>);
 			OnCreated();
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FilterIndexRestrictionID", DbType="Int NOT NULL", IsPrimaryKey=true)]
-		public int FilterIndexRestrictionID
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FilterIndexCombinationID", DbType="Int NOT NULL", IsPrimaryKey=true)]
+		public int FilterIndexCombinationID
 		{
 			get
 			{
-				return this._FilterIndexRestrictionID;
+				return this._FilterIndexCombinationID;
 			}
 			set
 			{
-				if ((this._FilterIndexRestrictionID != value))
+				if ((this._FilterIndexCombinationID != value))
 				{
-					if (this._FilterIndexRestriction.HasLoadedOrAssignedValue)
+					if (this._FilterIndexCombination.HasLoadedOrAssignedValue)
 					{
 						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
 					}
-					this.OnFilterIndexRestrictionIDChanging(value);
+					this.OnFilterIndexCombinationIDChanging(value);
 					this.SendPropertyChanging();
-					this._FilterIndexRestrictionID = value;
-					this.SendPropertyChanged("FilterIndexRestrictionID");
-					this.OnFilterIndexRestrictionIDChanged();
+					this._FilterIndexCombinationID = value;
+					this.SendPropertyChanged("FilterIndexCombinationID");
+					this.OnFilterIndexCombinationIDChanged();
 				}
 			}
 		}
@@ -107500,41 +107679,41 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FilterIndexRestriction_FilterIndexRestriction_Language", Storage="_FilterIndexRestriction", ThisKey="FilterIndexRestrictionID", OtherKey="FilterIndexRestrictionID", IsForeignKey=true)]
-		public FilterIndexRestriction FilterIndexRestriction
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FilterIndexCombination_FilterIndexCombination_Language", Storage="_FilterIndexCombination", ThisKey="FilterIndexCombinationID", OtherKey="FilterIndexCombinationID", IsForeignKey=true)]
+		public FilterIndexCombination FilterIndexCombination
 		{
 			get
 			{
-				return this._FilterIndexRestriction.Entity;
+				return this._FilterIndexCombination.Entity;
 			}
 			set
 			{
-				FilterIndexRestriction previousValue = this._FilterIndexRestriction.Entity;
+				FilterIndexCombination previousValue = this._FilterIndexCombination.Entity;
 				if (((previousValue != value) 
-							|| (this._FilterIndexRestriction.HasLoadedOrAssignedValue == false)))
+							|| (this._FilterIndexCombination.HasLoadedOrAssignedValue == false)))
 				{
 					this.SendPropertyChanging();
 					if ((previousValue != null))
 					{
-						this._FilterIndexRestriction.Entity = null;
-						previousValue.FilterIndexRestriction_Languages.Remove(this);
+						this._FilterIndexCombination.Entity = null;
+						previousValue.FilterIndexCombination_Languages.Remove(this);
 					}
-					this._FilterIndexRestriction.Entity = value;
+					this._FilterIndexCombination.Entity = value;
 					if ((value != null))
 					{
-						value.FilterIndexRestriction_Languages.Add(this);
-						this._FilterIndexRestrictionID = value.FilterIndexRestrictionID;
+						value.FilterIndexCombination_Languages.Add(this);
+						this._FilterIndexCombinationID = value.FilterIndexCombinationID;
 					}
 					else
 					{
-						this._FilterIndexRestrictionID = default(int);
+						this._FilterIndexCombinationID = default(int);
 					}
-					this.SendPropertyChanged("FilterIndexRestriction");
+					this.SendPropertyChanged("FilterIndexCombination");
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_FilterIndexRestriction_Language", Storage="_Language", ThisKey="LanguageID", OtherKey="LanguageID", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_FilterIndexCombination_Language", Storage="_Language", ThisKey="LanguageID", OtherKey="LanguageID", IsForeignKey=true)]
 		public Language Language
 		{
 			get
@@ -107551,12 +107730,12 @@ namespace Flock.Models
 					if ((previousValue != null))
 					{
 						this._Language.Entity = null;
-						previousValue.FilterIndexRestriction_Languages.Remove(this);
+						previousValue.FilterIndexCombination_Languages.Remove(this);
 					}
 					this._Language.Entity = value;
 					if ((value != null))
 					{
-						value.FilterIndexRestriction_Languages.Add(this);
+						value.FilterIndexCombination_Languages.Add(this);
 						this._LanguageID = value.LanguageID;
 					}
 					else
@@ -107568,7 +107747,7 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Member_FilterIndexRestriction_Language", Storage="_Member", ThisKey="ModifiedMemberID", OtherKey="MemberID", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Member_FilterIndexCombination_Language", Storage="_Member", ThisKey="ModifiedMemberID", OtherKey="MemberID", IsForeignKey=true)]
 		public Member Member
 		{
 			get
@@ -107585,12 +107764,12 @@ namespace Flock.Models
 					if ((previousValue != null))
 					{
 						this._Member.Entity = null;
-						previousValue.FilterIndexRestriction_Languages.Remove(this);
+						previousValue.FilterIndexCombination_Languages.Remove(this);
 					}
 					this._Member.Entity = value;
 					if ((value != null))
 					{
-						value.FilterIndexRestriction_Languages.Add(this);
+						value.FilterIndexCombination_Languages.Add(this);
 						this._ModifiedMemberID = value.MemberID;
 					}
 					else
@@ -107623,11 +107802,11 @@ namespace Flock.Models
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="adm.vwFilterIndexRestriction_Language")]
-	public partial class vwFilterIndexRestriction_Language
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="adm.vwFilterIndexCombination_Language")]
+	public partial class vwFilterIndexCombination_Language
 	{
 		
-		private int _FilterIndexRestrictionID;
+		private int _FilterIndexCombinationID;
 		
 		private byte _LanguageID;
 		
@@ -107643,26 +107822,26 @@ namespace Flock.Models
 		
 		private string _ProductTypeName;
 		
-		private string _AttributeGroupSignature;
+		private string _AttributeSignature;
 		
-		private string _AttributeGroupDescription;
+		private string _AttributeDescription;
 		
-		public vwFilterIndexRestriction_Language()
+		public vwFilterIndexCombination_Language()
 		{
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FilterIndexRestrictionID", DbType="Int NOT NULL")]
-		public int FilterIndexRestrictionID
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FilterIndexCombinationID", DbType="Int NOT NULL")]
+		public int FilterIndexCombinationID
 		{
 			get
 			{
-				return this._FilterIndexRestrictionID;
+				return this._FilterIndexCombinationID;
 			}
 			set
 			{
-				if ((this._FilterIndexRestrictionID != value))
+				if ((this._FilterIndexCombinationID != value))
 				{
-					this._FilterIndexRestrictionID = value;
+					this._FilterIndexCombinationID = value;
 				}
 			}
 		}
@@ -107779,36 +107958,404 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AttributeGroupSignature", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
-		public string AttributeGroupSignature
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AttributeSignature", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
+		public string AttributeSignature
 		{
 			get
 			{
-				return this._AttributeGroupSignature;
+				return this._AttributeSignature;
 			}
 			set
 			{
-				if ((this._AttributeGroupSignature != value))
+				if ((this._AttributeSignature != value))
 				{
-					this._AttributeGroupSignature = value;
+					this._AttributeSignature = value;
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AttributeGroupDescription", DbType="NVarChar(500) NOT NULL", CanBeNull=false)]
-		public string AttributeGroupDescription
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AttributeDescription", DbType="NVarChar(500) NOT NULL", CanBeNull=false)]
+		public string AttributeDescription
 		{
 			get
 			{
-				return this._AttributeGroupDescription;
+				return this._AttributeDescription;
 			}
 			set
 			{
-				if ((this._AttributeGroupDescription != value))
+				if ((this._AttributeDescription != value))
 				{
-					this._AttributeGroupDescription = value;
+					this._AttributeDescription = value;
 				}
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="art.ArticleSubType")]
+	public partial class ArticleSubType : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private byte _ArticleSubTypeID;
+		
+		private byte _ArticleTypeID;
+		
+		private string _Name;
+		
+		private System.Nullable<int> _PageID;
+		
+		private byte _SortOrder;
+		
+		private System.Nullable<System.DateTime> _DeletedDT;
+		
+		private System.Nullable<bool> _Deleted;
+		
+		private EntitySet<PageSection_ArticleSubType> _PageSection_ArticleSubTypes;
+		
+		private EntitySet<ArticleSubType_Language> _ArticleSubType_Languages;
+		
+		private EntitySet<Article> _Articles;
+		
+		private EntityRef<ArticleType> _ArticleType;
+		
+		private EntityRef<ArticleType> _ArticleType1;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnArticleSubTypeIDChanging(byte value);
+    partial void OnArticleSubTypeIDChanged();
+    partial void OnArticleTypeIDChanging(byte value);
+    partial void OnArticleTypeIDChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnPageIDChanging(System.Nullable<int> value);
+    partial void OnPageIDChanged();
+    partial void OnSortOrderChanging(byte value);
+    partial void OnSortOrderChanged();
+    partial void OnDeletedDTChanging(System.Nullable<System.DateTime> value);
+    partial void OnDeletedDTChanged();
+    partial void OnDeletedChanging(System.Nullable<bool> value);
+    partial void OnDeletedChanged();
+    #endregion
+		
+		public ArticleSubType()
+		{
+			this._PageSection_ArticleSubTypes = new EntitySet<PageSection_ArticleSubType>(new Action<PageSection_ArticleSubType>(this.attach_PageSection_ArticleSubTypes), new Action<PageSection_ArticleSubType>(this.detach_PageSection_ArticleSubTypes));
+			this._ArticleSubType_Languages = new EntitySet<ArticleSubType_Language>(new Action<ArticleSubType_Language>(this.attach_ArticleSubType_Languages), new Action<ArticleSubType_Language>(this.detach_ArticleSubType_Languages));
+			this._Articles = new EntitySet<Article>(new Action<Article>(this.attach_Articles), new Action<Article>(this.detach_Articles));
+			this._ArticleType = default(EntityRef<ArticleType>);
+			this._ArticleType1 = default(EntityRef<ArticleType>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ArticleSubTypeID", AutoSync=AutoSync.OnInsert, DbType="TinyInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public byte ArticleSubTypeID
+		{
+			get
+			{
+				return this._ArticleSubTypeID;
+			}
+			set
+			{
+				if ((this._ArticleSubTypeID != value))
+				{
+					this.OnArticleSubTypeIDChanging(value);
+					this.SendPropertyChanging();
+					this._ArticleSubTypeID = value;
+					this.SendPropertyChanged("ArticleSubTypeID");
+					this.OnArticleSubTypeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ArticleTypeID", DbType="TinyInt NOT NULL")]
+		public byte ArticleTypeID
+		{
+			get
+			{
+				return this._ArticleTypeID;
+			}
+			set
+			{
+				if ((this._ArticleTypeID != value))
+				{
+					if ((this._ArticleType.HasLoadedOrAssignedValue || this._ArticleType1.HasLoadedOrAssignedValue))
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnArticleTypeIDChanging(value);
+					this.SendPropertyChanging();
+					this._ArticleTypeID = value;
+					this.SendPropertyChanged("ArticleTypeID");
+					this.OnArticleTypeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PageID", DbType="Int")]
+		public System.Nullable<int> PageID
+		{
+			get
+			{
+				return this._PageID;
+			}
+			set
+			{
+				if ((this._PageID != value))
+				{
+					this.OnPageIDChanging(value);
+					this.SendPropertyChanging();
+					this._PageID = value;
+					this.SendPropertyChanged("PageID");
+					this.OnPageIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SortOrder", DbType="TinyInt NOT NULL")]
+		public byte SortOrder
+		{
+			get
+			{
+				return this._SortOrder;
+			}
+			set
+			{
+				if ((this._SortOrder != value))
+				{
+					this.OnSortOrderChanging(value);
+					this.SendPropertyChanging();
+					this._SortOrder = value;
+					this.SendPropertyChanged("SortOrder");
+					this.OnSortOrderChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeletedDT", DbType="DateTime2")]
+		public System.Nullable<System.DateTime> DeletedDT
+		{
+			get
+			{
+				return this._DeletedDT;
+			}
+			set
+			{
+				if ((this._DeletedDT != value))
+				{
+					this.OnDeletedDTChanging(value);
+					this.SendPropertyChanging();
+					this._DeletedDT = value;
+					this.SendPropertyChanged("DeletedDT");
+					this.OnDeletedDTChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Deleted", AutoSync=AutoSync.Always, DbType="Bit", IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
+		public System.Nullable<bool> Deleted
+		{
+			get
+			{
+				return this._Deleted;
+			}
+			set
+			{
+				if ((this._Deleted != value))
+				{
+					this.OnDeletedChanging(value);
+					this.SendPropertyChanging();
+					this._Deleted = value;
+					this.SendPropertyChanged("Deleted");
+					this.OnDeletedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_PageSection_ArticleSubType", Storage="_PageSection_ArticleSubTypes", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID")]
+		public EntitySet<PageSection_ArticleSubType> PageSection_ArticleSubTypes
+		{
+			get
+			{
+				return this._PageSection_ArticleSubTypes;
+			}
+			set
+			{
+				this._PageSection_ArticleSubTypes.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_ArticleSubType_Language", Storage="_ArticleSubType_Languages", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID")]
+		public EntitySet<ArticleSubType_Language> ArticleSubType_Languages
+		{
+			get
+			{
+				return this._ArticleSubType_Languages;
+			}
+			set
+			{
+				this._ArticleSubType_Languages.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleSubType_Article", Storage="_Articles", ThisKey="ArticleSubTypeID", OtherKey="ArticleSubTypeID")]
+		public EntitySet<Article> Articles
+		{
+			get
+			{
+				return this._Articles;
+			}
+			set
+			{
+				this._Articles.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleType_ArticleSubType", Storage="_ArticleType", ThisKey="ArticleTypeID", OtherKey="ArticleTypeID", IsForeignKey=true)]
+		public ArticleType ArticleType
+		{
+			get
+			{
+				return this._ArticleType.Entity;
+			}
+			set
+			{
+				ArticleType previousValue = this._ArticleType.Entity;
+				if (((previousValue != value) 
+							|| (this._ArticleType.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ArticleType.Entity = null;
+						previousValue.ArticleSubTypes.Remove(this);
+					}
+					this._ArticleType.Entity = value;
+					if ((value != null))
+					{
+						value.ArticleSubTypes.Add(this);
+						this._ArticleTypeID = value.ArticleTypeID;
+					}
+					else
+					{
+						this._ArticleTypeID = default(byte);
+					}
+					this.SendPropertyChanged("ArticleType");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ArticleType_ArticleSubType1", Storage="_ArticleType1", ThisKey="ArticleTypeID", OtherKey="ArticleTypeID", IsForeignKey=true)]
+		public ArticleType ArticleType1
+		{
+			get
+			{
+				return this._ArticleType1.Entity;
+			}
+			set
+			{
+				ArticleType previousValue = this._ArticleType1.Entity;
+				if (((previousValue != value) 
+							|| (this._ArticleType1.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ArticleType1.Entity = null;
+						previousValue.ArticleSubTypes1.Remove(this);
+					}
+					this._ArticleType1.Entity = value;
+					if ((value != null))
+					{
+						value.ArticleSubTypes1.Add(this);
+						this._ArticleTypeID = value.ArticleTypeID;
+					}
+					else
+					{
+						this._ArticleTypeID = default(byte);
+					}
+					this.SendPropertyChanged("ArticleType1");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_PageSection_ArticleSubTypes(PageSection_ArticleSubType entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleSubType = this;
+		}
+		
+		private void detach_PageSection_ArticleSubTypes(PageSection_ArticleSubType entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleSubType = null;
+		}
+		
+		private void attach_ArticleSubType_Languages(ArticleSubType_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleSubType = this;
+		}
+		
+		private void detach_ArticleSubType_Languages(ArticleSubType_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleSubType = null;
+		}
+		
+		private void attach_Articles(Article entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleSubType = this;
+		}
+		
+		private void detach_Articles(Article entity)
+		{
+			this.SendPropertyChanging();
+			entity.ArticleSubType = null;
 		}
 	}
 	

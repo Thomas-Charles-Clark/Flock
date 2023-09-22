@@ -29,14 +29,14 @@
                 if (s.ImageID == null)
                 {
                     <div class="animation-slide animation-slide-ar@(Model.Animation.AspectRatioID) @(selected)" onclick="LoadSlideDetail(@(s.SlideID))" data-slide-id="@(s.SlideID)" data-image-id="null">
-                        <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveSlide(@(s.SlideID)) }, function () { }, 'Are you sure?')"></span>
+                        <span class="remove-icon bi bi-x-circle-fill" onclick="event.stopPropagation(); window.showConfirm('Are you sure?', 'This will remove this slide.', function () { RemoveSlide(@(s.SlideID)) }, null)"></span>
                         <span>@(s.SortOrder): @(s.SlideType.Name) <em>(Not Assigned)</em></span>
                     </div>
                 }
                 else
                 {
                     <div class="animation-slide animation-slide-ar@(Model.Animation.AspectRatioID) @(selected)" onclick="LoadSlideDetail(@(s.SlideID))" data-slide-id="@(s.SlideID)" data-image-id="@(s.ImageID)" title="Image ID: @(s.ImageID)">
-                        <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveSlide(@(s.SlideID)) }, function () { }, 'Are you sure?')"></span>
+                        <span class="remove-icon bi bi-x-circle-fill" onclick="event.stopPropagation(); window.showConfirm('Are you sure?', 'This will remove this slide.', function () { RemoveSlide(@(s.SlideID)) }, null)"></span>
                         <img src="https://flock.designersguild.com/imagelibrary/195/@(s.ImageID).jpeg" />
                     </div>
                 }
@@ -45,14 +45,14 @@
                 if (s.VideoID == null)
                 {
                     <div class="animation-slide animation-slide-ar@(Model.Animation.AspectRatioID) @(selected)" onclick="LoadSlideDetail(@(s.SlideID))" data-slide-id="@(s.SlideID)" data-video-id="null">
-                        <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveSlide(@(s.SlideID)) }, function () { }, 'Are you sure?')"></span>
+                        <span class="remove-icon bi bi-x-circle-fill" onclick="event.stopPropagation(); window.showConfirm('Are you sure?', 'This will remove this slide.', function () { RemoveSlide(@(s.SlideID)) }, null)"></span>
                         <span>@(s.SortOrder): @(s.SlideType.Name) <em>(Not Assigned)</em></span>
                     </div>
                 }
                 else
                 {
                     <div class="animation-slide animation-slide-ar@(Model.Animation.AspectRatioID) @(selected)" onclick="LoadSlideDetail(@(s.SlideID))" data-slide-id="@(s.SlideID)" data-video-id="@(s.VideoID)" title="Video ID: @(s.VideoID)">
-                        <span class="remove-icon glyphicon glyphicon-remove-circle" onclick="event.stopPropagation(); $.confirm(function () { RemoveSlide(@(s.SlideID)) }, function () { }, 'Are you sure?')"></span>
+                        <span class="remove-icon bi bi-x-circle-fill" onclick="event.stopPropagation(); window.showConfirm('Are you sure?', 'This will remove this slide.', function () { RemoveSlide(@(s.SlideID)) }, null)"></span>
                         <p>@s.Video.Name</p>
                     </div>
                 }

@@ -1,6 +1,7 @@
 ﻿@model Flock.ViewModels.AnimationDetailModel
 
 <script type="text/javascript">
+
     function LoadAnimationDetail(s, e) {
         LoadingPanel.Show();
         $.ajax({
@@ -47,6 +48,7 @@
     }
 
     function RemoveSlide(slideId) {
+        LoadingPanel.Show();
         $.ajax({
             url: '/admin/animations/RemoveSlide',
             type: 'POST',
@@ -56,6 +58,7 @@
             },
             success: function (data) {
                 $("#edit-form-part-one-container").html(data);
+                LoadingPanel.Hide();
             }
         });
     }
@@ -284,7 +287,7 @@
 
     function UpdateSlideSortOrders(slideId) {
         var slides = [];
-        $("#animation-slides-container").children("div").each(function(index) { 
+        $("#animation-slides-container").children("div").each(function(index) {
             slides.push({
                 SlideID: $(this).data("slide-id"),
                 ImageID: $(this).data("image-id"),
@@ -298,10 +301,12 @@
             SlideToLoad: slideId,
             Slides: slides
         };
-        
+
         var data = {
             objUpdate: obj
         };
+
+		LoadingPanel.Show();
 
         $.ajax({
             url: '/admin/animations/UpdateSlideSortOrders',
@@ -311,6 +316,8 @@
             data: JSON.stringify(data),
             success: function (data) {
                 $("#edit-form-part-one-container").html(data);
+
+				LoadingPanel.Hide();
             }
         });
     }

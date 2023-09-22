@@ -15,9 +15,24 @@
     margin-bottom: 16px;
 }
 
+    .result-cell .edit-icon {
+        opacity: 0;
+        z-index: 80;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .result-cell .edit-icon .attribute-holder label {
+        display: flex;
+    }
+
 .result-cell > img {
     border: 1px solid #c0c0c0;
 }
+
+    .result-cell:hover .edit-icon {
+        opacity: 1.0;
+        z-index: 90;
+    }
 
 .edit-icon {
     position: absolute;

@@ -67,7 +67,7 @@
                 settings.Properties.ValueType = typeof(byte);
                 settings.Properties.ValueField = "ArticleSubTypeID";
                 settings.Properties.TextField = "Name";
-            }).BindList(UoW.GetRepository<Flock.Models.ArticleSubType>().GetAll().Where(p => p.ArticleTypeID == Model.ArticleTypeID).ToList()).GetHtml()
+            }).BindList(UoW.GetRepository<Flock.Models.ArticleSubType>().GetAll().Where(p => p.Deleted == false && p.ArticleTypeID == Model.ArticleTypeID).ToList()).GetHtml()
             @Html.ValidationMessageFor(m => Model.Name)
             <div style="clear: both;"></div>
             <label style="float: left; line-height: 30px; margin-right: 1em; width: 100px;">On Date:</label>

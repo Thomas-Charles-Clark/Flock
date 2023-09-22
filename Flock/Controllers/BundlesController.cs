@@ -84,35 +84,53 @@ namespace Flock.Controllers
                 ModelState.Remove(ModelState.Single(m => m.Key == "ProductBundle"));
             }
 
+            var bundleProductId = (int?)null;
+
             if (ModelState.IsValid)
             {
                 var sameCodeCheck = UoW.GetRepository<Product>().GetAll().Where(p => p.Code == item.Code).SingleOrDefault();
 
                 if (sameCodeCheck == null)
                 {
-                    UoW.GetRepository<Product>().Add(new Models.Product()
+                    var p = new Models.Product()
                     {
-                        CreatedDT = DateTime.Now,
-                        ModifiedDT = DateTime.Now,
-                        Code = item.Code,
-                        Status = 'C',
-                        Enabled = true,
-                        BrandID = item.BrandID.Value,
-                        LaunchID = item.LaunchID.Value,
-                        ProductTypeID = item.ProductTypeID.Value,
-                        OrderFormName = item.OrderFormName,
-                        BasketName = item.BasketName,
-                        UKVATCode = 'S'
-                    });
+                      CreatedDT = DateTime.Now,
+                      ModifiedDT = DateTime.Now,
+                      Code = item.Code,
+                      Status = 'C',
+                      Enabled = true,
+                      BrandID = item.BrandID.Value,
+                      LaunchID = item.LaunchID.Value,
+                      ProductTypeID = item.ProductTypeID.Value,
+                      OrderFormName = item.OrderFormName,
+                      BasketName = item.BasketName,
+                      UKVATCode = 'S'
+                    };
+
+                    UoW.GetRepository<Product>().Add(p);
 
                     UoW.Save();
 
                     UoW.Context.Product_Language_Initialise();
+
+                    bundleProductId = p.ProductID;
                 }
                 else
                 {
                     ModelState.AddModelError("Code", "Code already exists!");
                 }
+
+                foreach (var b in item.BundledProducts)
+                {
+                    UoW.GetRepository<ProductBundle>().Add(new ProductBundle()
+                    {
+                        BundleProductID = bundleProductId.Value,
+                        ProductID = b.ProductID,
+                        Quantity = b.Quantity
+                    });
+                }
+
+                UoW.Save();
             }
 
             item.RebuildRequirements(UoW);

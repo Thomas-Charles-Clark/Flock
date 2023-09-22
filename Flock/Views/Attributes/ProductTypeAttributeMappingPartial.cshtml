@@ -2,71 +2,67 @@
 @using Flock.ViewModels
 @model ProductTypeAttributeGroupViewModel
 @{
-    <div id="attribute-groups-assigned" style="float: left; width: 49%;">
+    <div id="attribute-groups-assigned">
     @if(Model.AttributeGroups.Count > 0) {
         foreach (var AttributeGroup in Model.AttributeGroups.OrderBy(p => p.AttributeGroup.SortOrder))
         {
             <div id="attribute-group-@(AttributeGroup.AttributeGroupID)" class="attribute-group" data-attribute-group-id="@(AttributeGroup.AttributeGroupID)">
-                <div style="margin: 0 3px 3px; text-rendering: optimizeLegibility; font-size: 12px; font-weight: 700;" onclick="$('attribute-group-@(AttributeGroup.AttributeGroupID)-inner').slideToggle('fast');"
-                    onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
-                    <span style="float: left; line-height: 23px; margin-right: 12px;">
+                <div class="attribute-group-filters"
+                     onclick="$('attribute-group-@(AttributeGroup.AttributeGroupID)-inner').slideToggle('fast');"
+                     onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
+                    <span>
                         @(AttributeGroup.AttributeGroupID): @(AttributeGroup.AttributeGroup.Name)
                     </span>
-                    <span style="float: left; line-height: 23px;">
-                        Filter
-                    </span>
-                    @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Filter, settings =>
-                    {
-                        settings.Name = "Filter-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
-                        settings.Style.Add("float", "left");
-                        settings.Style.Add("margin-right", "12px");
-                    }).GetHtml()
-
-                    <span style="float: left; line-height: 23px;">
-                        Info
-                    </span>
-                    @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Info, settings =>
-                    {
-                        settings.Name = "Info-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
-                        settings.Style.Add("margin-right", "12px");
-                        settings.Style.Add("float", "left");
-                    }).GetHtml()
-
-
-                    <span style="float: left; line-height: 23px;">
-                        Mandatory
-                    </span>
-                    @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Mandatory, settings =>
-                    {
-                        settings.Name = "Mandatory-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
-                        settings.Style.Add("margin-right", "12px");
-                        settings.Style.Add("float", "left");
-                    }).GetHtml()
-                    
-                    <span style="float: left; line-height: 23px;">
-                        AutoSync
-                    </span>
-                    @Html.DevExpress().CheckBoxFor(m => AttributeGroup.AutoSync, settings =>
-                    {
-                        settings.Name = "AutoSync-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
-                        settings.Style.Add("margin-right", "12px");
-                        settings.Style.Add("float", "left");
-                    }).GetHtml()
-                    <div class="clearfix"></div>
-                    <span style="float: left; line-height: 23px;">
-                        Sort Order
-                    </span>
-                    @Html.DevExpress().TextBoxFor(m => AttributeGroup.SortOrder, settings =>
-                    {
-                        settings.Name = "SortOrder-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
-                        settings.Width = 60;
-                        settings.Style.Add("margin-left", "12px");
-                        settings.Style.Add("float", "left");
-                    }).GetHtml()
-
-                    <img src="/images/systemicons/remove-icon.png" class="remove-icon" style="cursor: pointer; opacity: 0.0; float: right; width: 20px; position: relative; top: 1px;" onclick="RemoveAttributeGroup(@(AttributeGroup.AttributeGroupID))" />
-                    <img id="save-@(AttributeGroup.AttributeGroupID)-@(AttributeGroup.ProductTypeID)" src="/images/icons/24/save.png" style="margin-right: 8px; cursor: pointer; float: right; width: 20px; position: relative; top: 1px;" onclick="SaveAttributeGroupProductTypeFlags(@(AttributeGroup.AttributeGroupID), @(AttributeGroup.ProductTypeID))" />
-                    <div style="clear: both"></div>
+                    <div>
+                        <span>
+                            Filter
+                        </span>
+                        @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Filter, settings =>
+                        {
+                            settings.Name = "Filter-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        }).GetHtml()
+                    </div>
+                    <div>
+                        <span>
+                            Info
+                        </span>
+                        @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Info, settings =>
+                        {
+                            settings.Name = "Info-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        }).GetHtml()
+                    </div>
+                    <div>
+                        <span>
+                            Mandatory
+                        </span>
+                        @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Mandatory, settings =>
+                        {
+                            settings.Name = "Mandatory-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        }).GetHtml()
+                    </div>
+                    <div>
+                        <span>
+                            AutoSync
+                        </span>
+                        @Html.DevExpress().CheckBoxFor(m => AttributeGroup.AutoSync, settings =>
+                        {
+                            settings.Name = "AutoSync-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                        }).GetHtml()
+                    </div>
+                    <div class="gap-2">
+                        <span>
+                            Sort Order
+                        </span>
+                        @Html.DevExpress().TextBoxFor(m => AttributeGroup.SortOrder, settings =>
+                        {
+                            settings.Name = "SortOrder-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+                            settings.Width = 60;
+                        }).GetHtml()
+                    </div>
+                    <div class="ms-auto d-flex gap-3">
+                        <img src="/images/systemicons/remove-icon.png" class="remove-icon" style="cursor: pointer; opacity: 0.0; width: 20px; position: relative;" onclick="RemoveAttributeGroup(@(AttributeGroup.AttributeGroupID))" />
+                        <img id="save-@(AttributeGroup.AttributeGroupID)-@(AttributeGroup.ProductTypeID)" src="/images/icons/24/save.png" style="cursor: pointer; width: 20px; position: relative;" onclick="SaveAttributeGroupProductTypeFlags(@(AttributeGroup.AttributeGroupID), @(AttributeGroup.ProductTypeID))" />
+                    </div>
                 </div>
                 <div id="attribute-group-@(AttributeGroup.AttributeGroupID)-inner" class="attribute-group-inner">
                     <div id="attribute-group-@(AttributeGroup.AttributeGroupID)-droppable" style="width: 49%; float: left; padding: 0.5em;">
@@ -88,7 +84,7 @@
 else
 {
                                 <li class="placeholder">
-                                    <i style="font-size: 10px;">No Attributes Selected</i>
+                                    <i>No Attributes Selected</i>
                                 </li>
                             }
                         </ul>
@@ -111,7 +107,7 @@ else
                             else
                             {
                                 <li>
-                                    <i style="font-size: 10px;">All Attributes Utilised</i>
+                                    <i>All Attributes Utilised</i>
                                 </li>
                             }
                         </ul>
@@ -166,7 +162,7 @@ else
     }
     </div>
     
-    <div id="attribute-groups-list" style="float: right; width: 49%;">
+    <div id="attribute-groups-list">
         @foreach(var AttributeGroup in Model.AvailableGroups)
         {
             <div id="attribute-group-@(AttributeGroup.AttributeGroupID)" class="attribute-group attribute-group-available" data-attribute-group-id="@(AttributeGroup.AttributeGroupID)">

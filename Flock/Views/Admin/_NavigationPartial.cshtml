@@ -105,7 +105,7 @@
                 </label>
                 <div>
                     <div>
-                        <a data-toggle="modal" data-target="#cache-buster-modal" href="#">
+                        <a data-bs-toggle="modal" data-bs-target="#cache-buster-modal" href="#">
                             Cache Buster
                         </a>
                     </div>
@@ -234,7 +234,7 @@
             </div>
         </div>
     </div>
-    <div class="tab-pane fade @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "show active", "")" id="cms-tab-content" role="tabpanel" aria-labelledby="cms-tab">
+    <div class="tab-pane fade @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexcombinations" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "show active", "")" id="cms-tab-content" role="tabpanel" aria-labelledby="cms-tab">
         <div class="menu-tab">
             <div class="sub-menu">
                 <label>
@@ -245,7 +245,7 @@
                         @Html.ActionLink("Compose", "compose", "cms")
                         @Html.ActionLink("Overview", "index", "cms")
                         @Html.ActionLink("Page Sections", "pagesections", "cms")
-                        @Html.ActionLink("Filter Indexing", "index", "filterindexrestrictions")
+                        @Html.ActionLink("Filter Indexing", "index", "filterindexcombinations")
                     </div>
                 </div>
             </div>
@@ -742,7 +742,7 @@
                                 <span>Cache Buster</span>
                                 <ul class="vertical-list" style="float: none">
                                     <li>
-                                        <a data-toggle="modal" data-target="#cache-buster-modal" href="#">Cache Buster</a>
+                                        <a data-bs-toggle="modal" data-bs-target="#cache-buster-modal" href="#">Cache Buster</a>
                                     </li>
                                 </ul>
                             </div>

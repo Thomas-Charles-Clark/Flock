@@ -1,59 +1,65 @@
 ﻿@using Flock.Models
 @using Flock.ViewModels
 @model ProductTypeAttributeGroupViewModel
-<div style="text-rendering: optimizeLegibility; margin: 0 3px 3px; font-size: 12px; font-weight: 700;" onclick="$('attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-inner').slideToggle('fast');"
+@{
+    var AttributeGroup = Model.AttributeGroups[0];
+}
+<div class="attribute-group-filters"
+     onclick="$('attribute-group-@(AttributeGroup.AttributeGroupID)-inner').slideToggle('fast');"
      onmouseover="$(this).find('.remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.remove-icon').stop().animate({opacity: 0.0}, 300)">
-    <span style="float: left; line-height: 20px; margin-right: 12px;">
-        @(Model.AttributeGroups[0].AttributeGroupID): @(Model.AttributeGroups[0].AttributeGroup.Name)
+    <span>
+        @(AttributeGroup.AttributeGroupID): @(AttributeGroup.AttributeGroup.Name)
     </span>
-    <span style="float: left; line-height: 20px;">
-        Filter
-    </span>
-    @Html.DevExpress().CheckBoxFor(m => Model.AttributeGroups[0].Filter, settings =>
-                    {
-                        settings.Name = "Filter-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
-                        settings.Style.Add("float", "left");
-                        settings.Style.Add("margin-right", "12px");
-                    }).GetHtml()
-
-    <span style="float: left; line-height: 20px;">
-        Info
-    </span>
-    @Html.DevExpress().CheckBoxFor(m => Model.AttributeGroups[0].Info, settings =>
-                    {
-                        settings.Name = "Info-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
-                        settings.Style.Add("float", "left");
-                    }).GetHtml()
-    <span style="float: left; line-height: 20px;">
-        Mandatory
-    </span>
-    @Html.DevExpress().CheckBoxFor(m => Model.AttributeGroups[0].Mandatory, settings =>
-                    {
-                        settings.Name = "Mandatory-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
-                        settings.Style.Add("float", "left");
-                    }).GetHtml()
-    <span style="float: left; line-height: 20px;">
-        AutoSync
-    </span>
-    @Html.DevExpress().CheckBoxFor(m => Model.AttributeGroups[0].AutoSync, settings =>
-                    {
-                        settings.Name = "AutoSync-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
-                        settings.Style.Add("float", "left");
-                    }).GetHtml()
-    <span style="float: left; line-height: 20px;">
-        Sort Order
-    </span>
-    @Html.DevExpress().TextBoxFor(m => Model.AttributeGroups[0].SortOrder, settings =>
-                    {
-                        settings.Name = "SortOrder-" + Model.AttributeGroups[0].AttributeGroupID.ToString() + "-" + Model.AttributeGroups[0].ProductTypeID.ToString();
-                        settings.Width = 60;
-                        settings.Style.Add("margin-left", "12px");
-                        settings.Style.Add("float", "left");
-                    }).GetHtml()
-
-    <img src="/images/systemicons/remove-icon.png" class="remove-icon" style="cursor: pointer; opacity: 0.0; float: right; width: 20px; position: relative; top: 1px;" onclick="RemoveAttributeGroup(@(Model.AttributeGroups[0].AttributeGroupID))" />
-    <img id="save-@(Model.AttributeGroups[0].AttributeGroupID)-@(Model.AttributeGroups[0].ProductTypeID)" src="/images/icons/24/save.png" style="margin-right: 8px; cursor: pointer; float: right; width: 20px; position: relative; top: 1px;" onclick="SaveAttributeGroupProductTypeFlags(@(Model.AttributeGroups[0].AttributeGroupID), @(Model.AttributeGroups[0].ProductTypeID))" />
-    <div style="clear: both"></div>
+    <div>
+        <span>
+            Filter
+        </span>
+        @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Filter, settings =>
+        {
+            settings.Name = "Filter-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+        }).GetHtml()
+    </div>
+    <div>
+        <span>
+            Info
+        </span>
+        @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Info, settings =>
+        {
+            settings.Name = "Info-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+        }).GetHtml()
+    </div>
+    <div>
+        <span>
+            Mandatory
+        </span>
+        @Html.DevExpress().CheckBoxFor(m => AttributeGroup.Mandatory, settings =>
+        {
+            settings.Name = "Mandatory-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+        }).GetHtml()
+    </div>
+    <div>
+        <span>
+            AutoSync
+        </span>
+        @Html.DevExpress().CheckBoxFor(m => AttributeGroup.AutoSync, settings =>
+        {
+            settings.Name = "AutoSync-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+        }).GetHtml()
+    </div>
+    <div class="gap-2">
+        <span>
+            Sort Order
+        </span>
+        @Html.DevExpress().TextBoxFor(m => AttributeGroup.SortOrder, settings =>
+        {
+            settings.Name = "SortOrder-" + AttributeGroup.AttributeGroupID.ToString() + "-" + AttributeGroup.ProductTypeID.ToString();
+            settings.Width = 60;
+        }).GetHtml()
+    </div>
+    <div class="ms-auto d-flex gap-3">
+        <img src="/images/systemicons/remove-icon.png" class="remove-icon" style="cursor: pointer; opacity: 0.0; width: 20px; position: relative;" onclick="RemoveAttributeGroup(@(AttributeGroup.AttributeGroupID))" />
+        <img id="save-@(AttributeGroup.AttributeGroupID)-@(AttributeGroup.ProductTypeID)" src="/images/icons/24/save.png" style="cursor: pointer; width: 20px; position: relative;" onclick="SaveAttributeGroupProductTypeFlags(@(AttributeGroup.AttributeGroupID), @(AttributeGroup.ProductTypeID))" />
+    </div>
 </div>
 <div id="attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-inner" class="attribute-group-inner">
     <div id="attribute-group-@(Model.AttributeGroups[0].AttributeGroupID)-droppable" style="width: 49%; float: left; padding: 0.5em;">

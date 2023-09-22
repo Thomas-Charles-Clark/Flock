@@ -427,8 +427,8 @@ span.product-page-cell-info {
 }
 
 .ui-state-highlight-cms-product-page {
-    display: block;
-    min-height: 482px;
+    /*display: block;*/
+    /*min-height: 482px;*/
     opacity: 0.4;
     background-color: #f7dd88;
     border: 1px solid #e96712;
@@ -438,15 +438,16 @@ span.product-page-cell-info {
     display: none;
 }
 
+.collection-grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
 .ui-state-highlight-cms-collection {
-    display: block;
-    float: left;
-    margin-bottom: 1em;
-    margin-right: 1em;
+    /*display: block;*/
     padding: 1em;
     position: relative;
-    width: 305px;
-    height: 185px;
     opacity: 0.4;
     background-color: #f7dd88;
     border: 1px solid #e96712;
@@ -455,14 +456,14 @@ span.product-page-cell-info {
 }
 
 .ui-state-highlight-cms-article {
-    display: block;
-    float: left;
+    /*display: block;*/
+    /*float: left;*/
     margin-bottom: 1em;
     margin-right: 1em;
     padding: 1em;
     position: relative;
-    width: 215px;
-    height: 169px;
+   /* width: 215px;
+    height: 169px;*/
     opacity: 0.4;
     background-color: #f7dd88;
     border: 1px solid #e96712;
@@ -471,14 +472,14 @@ span.product-page-cell-info {
 }
 
 .ui-state-highlight-cms-page {
-    display: block;
-    float: left;
+    /*display: block;*/
+    /*float: left;*/
     margin-bottom: 1em;
     margin-right: 1em;
     padding: 1em;
     position: relative;
-    width: 176px;
-    height: 162px;
+    /*width: 176px;
+    height: 162px;*/
     opacity: 0.4;
     background-color: #f7dd88;
     border: 1px solid #e96712;
@@ -487,13 +488,13 @@ span.product-page-cell-info {
 }
 
 .ui-state-highlight-cms-page-pod-feature {
-    display: inline-block;
+    /*display: inline-block;*/
     margin-bottom: 1em;
     margin-right: 1em;
     padding: 1em;
     position: relative;
-    width: 325px;
-    height: 198px;
+ /*   width: 325px;
+    height: 198px;*/
     opacity: 0.4;
     background-color: #f7dd88;
     border: 1px solid #e96712;

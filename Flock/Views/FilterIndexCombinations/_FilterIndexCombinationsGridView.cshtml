@@ -1,15 +1,15 @@
 ﻿@using Flock.ViewModels;
 @using Flock.Models;
-@model Flock.ViewModels.FilterIndexRestrictionsGridSettings
+@model Flock.ViewModels.FilterIndexCombinationsGridSettings
 @{
     var grid = Html.DevExpress().GridView(settings =>
     {
         var UoW = new Flock.DAL.UnitOfWork<FlockDataContext>();
 
         settings.Name = "TranslateGridView";
-        settings.CallbackRouteValues = new { Controller = "FilterIndexRestrictions", Action = "GridViewPartial" };
+        settings.CallbackRouteValues = new { Controller = "FilterIndexCombinations", Action = "GridViewPartial" };
         //settings.SettingsEditing.AddNewRowRouteValues = new { };// Controller = "Products", Action = "ProductOverviewGridViewPartialAddNew" };
-        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "FilterIndexRestrictions", Action = "GridViewPartialUpdate" };// Controller = "Products", Action = "ProductOverviewGridViewPartialUpdate" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "FilterIndexCombinations", Action = "GridViewPartialUpdate" };// Controller = "Products", Action = "ProductOverviewGridViewPartialUpdate" };
         //settings.SettingsEditing.DeleteRowRouteValues = new { };// Controller = "Products", Action = "ProductOverviewGridViewPartialDelete" };
         settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
         settings.SettingsBehavior.EnableRowHotTrack = true;
@@ -59,7 +59,7 @@
         settings.CommandColumn.Visible = true;
         settings.CommandColumn.ShowClearFilterButton = true;
 
-        settings.KeyFieldName = "FilterIndexRestrictionID;LanguageID";
+        settings.KeyFieldName = "FilterIndexCombinationID;LanguageID";
 
         settings.SettingsPager.Visible = true;
         settings.SettingsPager.PageSize = 20;
@@ -76,8 +76,8 @@
 
         settings.Columns.Add(column =>
         {
-            column.FieldName = "FilterIndexRestrictionID";
-            column.Name = "FilterIndexRestrictionID";
+            column.FieldName = "FilterIndexCombinationID";
+            column.Name = "FilterIndexCombinationID";
             column.Caption = "ID";
             column.Visible = false;
             column.Width = 40;
@@ -124,23 +124,23 @@
         ProductTypeColumn.EditFormSettings.Visible = DefaultBoolean.False;
         settings.Columns.Add(ProductTypeColumn);
 
-        MVCxGridViewColumn AttributeGroupSignature = new MVCxGridViewColumn();
-        AttributeGroupSignature.FieldName = "AttributeGroupSignature";
-        AttributeGroupSignature.Name = "AttributeGroupSignature";
-        AttributeGroupSignature.Caption = "Attribute Group Signature";
-        AttributeGroupSignature.Width = 140;
-        AttributeGroupSignature.Settings.AllowAutoFilter = DefaultBoolean.False;
-        AttributeGroupSignature.Settings.AllowHeaderFilter = DefaultBoolean.False;
-        AttributeGroupSignature.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
-        AttributeGroupSignature.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
-        AttributeGroupSignature.EditFormSettings.Visible = DefaultBoolean.False;
-        settings.Columns.Add(AttributeGroupSignature);
+        MVCxGridViewColumn AttributeSignature = new MVCxGridViewColumn();
+        AttributeSignature.FieldName = "AttributeSignature";
+        AttributeSignature.Name = "AttributeSignature";
+        AttributeSignature.Caption = "Attribute Signature";
+        AttributeSignature.Width = 140;
+        AttributeSignature.Settings.AllowAutoFilter = DefaultBoolean.False;
+        AttributeSignature.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        AttributeSignature.Settings.HeaderFilterMode = HeaderFilterMode.CheckedList;
+        AttributeSignature.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        AttributeSignature.EditFormSettings.Visible = DefaultBoolean.False;
+        settings.Columns.Add(AttributeSignature);
 
         settings.Columns.Add(column =>
         {
-            column.FieldName = "AttributeGroupDescription";
-            column.Name = "AttributeGroupDescription";
-            column.Caption = "Attribute Group Description";
+            column.FieldName = "AttributeDescription";
+            column.Name = "AttributeDescription";
+            column.Caption = "Attribute Description";
             column.Settings.AllowHeaderFilter = DefaultBoolean.False;
             column.Settings.AllowAutoFilter = DefaultBoolean.True;
             column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
@@ -220,11 +220,11 @@
 @grid.BindToLINQ(string.Empty, string.Empty, (s, e) =>
 {
     var dataContext = new Flock.Models.FlockDataContext();
-    var source = dataContext.vwFilterIndexRestriction_Languages.AsQueryable();
+    var source = dataContext.vwFilterIndexCombination_Languages.AsQueryable();
 
     if (Model.LanguageID != null)
         source = source.Where(p => p.LanguageID == Model.LanguageID);
 
-    e.KeyExpression = "FilterIndexRestrictionID;LanguageID";
+    e.KeyExpression = "FilterIndexCombinationID;LanguageID";
     e.QueryableSource = source;
 }).GetHtml()

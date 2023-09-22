@@ -1,4 +1,8 @@
-﻿.container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container { 
+﻿html {
+    padding: 0 !important;
+}
+
+.container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container { 
 animation-name: min-width-2050px;
 width: 2050px !important;
 }

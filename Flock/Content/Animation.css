@@ -64,6 +64,10 @@ html {
     margin-left: 6px;
 }
 
+    .animation-slide .remove-icon {
+        z-index: 1;
+    }
+
 .animation-slide img {
     width: 100%;
 }

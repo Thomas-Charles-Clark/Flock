@@ -193,6 +193,10 @@ namespace Flock
                 "~/Scripts/cms/cms-compose-page.js"
                 ));
 
+            bundles.Add(new ScriptBundle("~/bundles/js/common").Include(
+                "~/js/src/models/common.js"
+                ));
+
 #if !DEBUG
             BundleTable.EnableOptimizations = true;
 #endif
@@ -228,8 +232,8 @@ namespace Flock
                     $"{cssPrefix}/lib/bootstrap-5.3.1/scss/bootstrap-5.3.1.css"
                 ));
 
-            bundles.Add(new StyleBundle("~/bundles/css/filter-index-restrictions").Include(
-                      $"{cssPrefix}/models/filter-index-restrictions{cssSuffix}"
+            bundles.Add(new StyleBundle("~/bundles/css/filter-index-combinations").Include(
+                      $"{cssPrefix}/models/filter-index-combinations{cssSuffix}"
                 ));
 
             //  
@@ -248,8 +252,8 @@ namespace Flock
                       $"{jsPrefix}/lib/codemirror/code-mirror.bundle{jsSuffix}"
                 ));
 
-            bundles.Add(new ScriptBundle("~/bundles/js/filter-index-restrictions").Include(
-                      $"{jsPrefix}/models/filter-index-restrictions{jsSuffix}"
+            bundles.Add(new ScriptBundle("~/bundles/js/filter-index-combinations").Include(
+                      $"{jsPrefix}/models/filter-index-combinations{jsSuffix}"
                 ));
 
             foreach (var b in BundleTable.Bundles)

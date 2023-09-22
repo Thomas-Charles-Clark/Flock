@@ -1,0 +1,9 @@
+#container {
+  width: auto;
+}
+
+.display-footer-text {
+  max-height: 240px;
+  overflow-y: scroll;
+}
+/*# sourceMappingURL=filter-index-combinations.css.map */

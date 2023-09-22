@@ -12,13 +12,13 @@ else
             <span data-bind="text: nameDisplay">
                 @(Model.Page.Name)
             </span>
-            <span class="pull-right small">
-                Don't forget to save using the button below
-            </span>
         </h3>
         <h4>
             URL: <span data-bind="text: urlDisplay"></span>
         </h4>
+        <span class="d-block fs-5">
+            Don't forget to save using the button below
+        </span>
         <div id="attribute-group-availability">
            @foreach(var ag in Model.AttributeGroups.Where(ag => ag.Attributes.Any(a => a.EnableFilterIndexing)).OrderBy(ag => ag.SortOrder))
             { 
@@ -26,27 +26,25 @@ else
                     <h4 class="alert-title">
                         @ag.Name
                     </h4>
-                    <div class="attribute-list">
-                        <ul>
+                    <div>
+                        <ul class="list-group">
                            @foreach (var a in ag.Attributes.Where(at => at.EnableFilterIndexing).OrderBy(at => at.SortOrder))
                             {
                                 var isChecked = Model.AttributeIDs.Any(at => at.id == a.AttributeID);
-                                <li>
+                                <li class="list-group-item p-0">
                                    @if (isChecked)
                                     {
                                         <span style="display: none;" data-bind="init: { convert: parseInt, field: attributeId }, text: attributeId">
                                             @(a.AttributeID)
                                         </span>
                                     }
-                                    <label class="form-control">
+                                    <label class="d-flex align-items-center gap-3 py-2 px-4 pointer">
                                         <input type="radio" name="attribute-group-@(ag.AttributeGroupID)" value="@(a.AttributeID)" @(isChecked ? "checked" : "") data-bind="checkedValue: @(a.AttributeID), checked: attributeId"/>
                                         <span>
                                             @a.Name
                                         </span>
                                         <!-- ko if: attributeId() == @(a.AttributeID) -->
-                                        <span class="pointer close" data-bind="click: () => { attributeId(undefined); }">
-                                            &times;
-                                        </span>
+                                        <span class="pointer close bi bi-x-lg" data-bind="click: () => { attributeId(undefined); }"></span>
                                         <!-- /ko -->
                                     </label>
                                 </li>

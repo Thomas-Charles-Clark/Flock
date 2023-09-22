@@ -23,6 +23,11 @@
 }
 <script type="text/javascript">
 
+
+    function RemoveProductFromCollection(ProductID) {
+        window.showConfirm(`Are you sure?`, `This will remove the product from the collection.`, () => { ConfirmedRemoveProductFromCollection(ProductID) }, null);
+    }
+
     function initDragDrop() {
 
         $(".multisortable-container").multisortable({
@@ -73,19 +78,14 @@
             }
         });
     }
-    function RemoveProductFromCollection(ProductID) {
-        var args = [];
-        args.push(ProductID);
-        $.confirm(ConfirmedRemoveProductFromCollection, function() { }, args);
-    }
 
-    function ConfirmedRemoveProductFromCollection(args) {
+    function ConfirmedRemoveProductFromCollection(productId) {
         LoadingPanel.Show();
         $.ajax({
             url: '@Url.Action("RemoveProductFromCollection", "Collections")',//"/Products/UpdateCollectionAddProduct",
             traditional: true,
             type: "POST",
-            data: { CollectionID: $("#selected-collection-id").val(), ProductID: args[0] },
+            data: { CollectionID: $("#selected-collection-id").val(), ProductID: productId },
             success: function (data) {
                 $('#collection-compose-container').html(data);
                 LoadingPanel.Hide();
@@ -180,7 +180,6 @@
             timeout: 20000
         });
     }
-
 </script>
 
 <input type="hidden" id="selected-collection-id" value="@(Model.CollectionID)" />

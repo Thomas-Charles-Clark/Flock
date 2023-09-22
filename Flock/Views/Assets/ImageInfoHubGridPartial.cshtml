@@ -66,7 +66,7 @@
             {
                 ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' style='margin: 0px 3px 0px 0px; width: 33px;' onclick=\"rowClick(ImageInfoGridView.GetRowKey(" + d.VisibleIndex + "))\">Select</a>");    
             
-                ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' style='margin: 0px 3px 0px 0px; width: 33px;' onclick=\"var args = new Array(); args.push("+d.VisibleIndex+"); args.push(event); $.confirm(ConfirmedDelete, function() { }, args);\">Delete</a>");
+                ViewContext.Writer.Write("<a href='javascript:;' class='dxgvCommandColumnItem_MetropolisBlue dxgv__cci' style='margin: 0px 3px 0px 0px; width: 33px;' onclick=\"var args = new Array(); args.push("+d.VisibleIndex+"); args.push(event); $.confirm(() => { ConfirmedDelete(args) }, null);\">Delete</a>");
             });
         });
         

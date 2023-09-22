@@ -1,0 +1,137 @@
+﻿
+
+<div class="modal fade" tabindex="-1" id="confirm-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-dark" onclick="window.confirmModalInstance.confirmFn()">
+                    Yes
+                </button>
+                <button class="btn btn-light" onclick="window.confirmModalInstance.rejectFn()">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.confirmModal = document.querySelector('#confirm-modal');
+    window.confirmModalInstance = bootstrap.Modal.getOrCreateInstance(window.confirmModal);
+    window.onConfirmModalShow = [];
+    window.confirmModal.addEventListener('show.bs.modal', function (event) {
+        window.onConfirmModalShow.forEach((f) => {
+            if (f instanceof Function)
+                f();
+        });
+    });
+    window.onConfirmModalShown = [];
+    window.confirmModal.addEventListener('shown.bs.modal', function (event) {
+        window.onConfirmModalShown.forEach((f) => {
+            if (f instanceof Function)
+                f();
+        });
+    });
+    window.onConfirmModalHide = [];
+    window.confirmModal.addEventListener('hide.bs.modal', function (event) {
+        window.onConfirmModalHide.forEach((f) => {
+            if (f instanceof Function)
+                f();
+        });
+    });
+    window.onConfirmModalHidden = [];
+    window.confirmModal.addEventListener('hidden.bs.modal', function (event) {
+        window.onConfirmModalHidden.forEach((f) => {
+            if (f instanceof Function)
+                f();
+        });
+    });
+    window.showConfirm = (title, message, confirm, reject) => {
+        document.querySelector('#confirm-modal .modal-title').innerHTML = title;
+        document.querySelector('#confirm-modal .modal-body').innerHTML = message;
+        window.confirmModalInstance.confirmFn = (() => {
+            typeof confirm === 'function' ? confirm() : null;
+            window.confirmModalInstance.hide();
+        });
+        window.confirmModalInstance.rejectFn = (() => {
+            typeof reject === 'function' ? reject() : null;
+            window.confirmModalInstance.hide();
+        });
+        window.confirmModalInstance.show();
+    };
+    window.hideConfirm = () => {
+        window.confirmModalInstance.hide();
+    };
+</script>
+
+
+
+
+<div class="modal fade" tabindex="-1" id="info-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" onclick="window.infoModalInstance.closeFn()">
+                    Ok
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.infoModal = document.querySelector('#info-modal');
+    window.infoModalInstance = bootstrap.Modal.getOrCreateInstance(window.infoModal);
+    window.onInfoModalShow = [];
+    window.infoModal.addEventListener('show.bs.modal', function (event) {
+        window.onInfoModalShow.forEach((f) => {
+            if (f instanceof Function)
+                f();
+        });
+    });
+    window.onInfoModalShown = [];
+    window.infoModal.addEventListener('shown.bs.modal', function (event) {
+        window.onInfoModalShown.forEach((f) => {
+            if (f instanceof Function)
+                f();
+        });
+    });
+    window.onInfoModalHide = [];
+    window.infoModal.addEventListener('hide.bs.modal', function (event) {
+        window.onInfoModalHide.forEach((f) => {
+            if (f instanceof Function)
+                f();
+        });
+    });
+    window.onInfoModalHidden = [];
+    window.infoModal.addEventListener('hidden.bs.modal', function (event) {
+        window.onInfoModalHidden.forEach((f) => {
+            if (f instanceof Function)
+                f();
+        });
+    });
+    window.showInfo = (title, message, close) => {
+        document.querySelector('#info-modal .modal-title').innerHTML = title;
+        document.querySelector('#info-modal .modal-body').innerHTML = message;
+        window.infoModalInstance.closeFn = (() => {
+            typeof close === 'function' ? close() : null;
+            window.infoModalInstance.hide();
+        });
+        window.infoModalInstance.show();
+    };
+    window.hideInfo = () => {
+        window.infoModalInstance.hide();
+    };
+</script>

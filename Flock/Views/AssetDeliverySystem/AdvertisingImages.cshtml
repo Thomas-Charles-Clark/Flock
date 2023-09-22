@@ -224,8 +224,8 @@
         }).Render();
 
         ViewContext.Writer.Write("<div class='popup-button-container'>");
-        ViewContext.Writer.Write("<button class='btn btn-success' onclick='AddNewImage();'><span class='glyphicon glyphicon-check'></span>Ok</button>");
-        ViewContext.Writer.Write("<button class='btn btn-danger' onclick='CancelNewImage();'><span class='glyphicon glyphicon-remove-circle'></span>Cancel</button>");
+        ViewContext.Writer.Write("<button class='btn btn-success d-inline-flex gap-2 align-items-center' onclick='AddNewImage();'><span class='bi bi-check'></span>Ok</button>");
+        ViewContext.Writer.Write("<button class='btn btn-danger d-inline-flex gap-2 align-items-center' onclick='CancelNewImage();'><span class='bi bi-x-circle-fill'></span>Cancel</button>");
         ViewContext.Writer.Write("</div>");
         ViewContext.Writer.Write("<div class='clearfix'></div>");
     });

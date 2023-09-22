@@ -2,6 +2,78 @@ Why did it hold the thing?
 
 base paint orders getting "stuck" in the Portal
 
-because of stock problems
+because of lack of stock and lack of purchase order, it's placing some of the base paint orders on hold for user approval
 
 have removed the Paint virtual UNION bit from portal.Mertex_Stock_Merge
+
+[portal].[Mertex_Stock_Merge]
+
+portal.fnc_OrderImportStockLocation
+WHEN @LineType = 'PRODUCT' AND @ProductTypeID IN (8,79) /* Paint, Paint sample Pots */ AND @ProductFilterFulfilmentGroupID IN (3, 8) /* Paint Sample Pots, Base Paint */THEN 107 -- WH -- Sample pots and base paint are stockedWHEN @LineType = 'PRODUCT' AND @ProductTypeID IN (8,79) /* Paint, Paint sample Pots */ AND @ProductFilterFulfilmentGroupID NOT IN (3, 8) /* Paint Sample Pots, Base Paint */THEN 7 -- BR -- Mixed paint is not stocked
+
+
+Right so
+
+Forget pulling shipping details through Apple
+
+Forget offering shipping methods to Apple 
+
+This is given the kibosh because of the fact that we can have multiple shipping methods because we split orders
+Apple only make provisions for ONE shipping method to be selected. No can do.
+
+So: we regain the benefit of having a tried and tested address gathering method, and we can use our existing shipping method gathering method
+... hmm, it occurs to me that I could with very little trouble permit the use of gift vouchers inside an Apple Pay checkout...
+
+We can even permit address specification as though you were a guest! Click and Collect, Store Delivery, the whole thing.
+
+Everything else happens... then instead of our normal Buy Now button you have a Buy With Apple button right there.
+
+Simple transaction through Apple Pay, they return success we get the nonce to Braintree they confirm the transaction we send the user to the receipt page.
+
+That's it!
+
+
+
+We don't get anything more than partial address information: how much is necessary for a successful call to dispatch_generate? 
+
+Well, there's an INNER JOIN to ecm.CheckoutAddress so that's a good place to start.
+
+As for del.DeliveryZone_Postcode restrictions, we'd have to call to check these again after the Apple Pay sheet had returned us tokenized payment instrumentation and complete user data.
+
+If, at that point, we determined that we could not deliver to that postcode via xyz methods, we'd need to cancel the tokenization if that's even a thing and change the available shipping methods
+
+Which all sounds like a frightful amount of hard work compared to just using what we know is going to work... what we know is already working.
+
+CheckoutID,			[Got one]	
+DeliveryOptionID, 	[0 = Trade Delivery, 1 = Home Delivery, 2 = Deliver to Shop, 3 = UPS Access Point] == 1, Home Delivery
+FullName, 			[Not got one] "Unknown"
+AddressLine1,		[Not got one] "Unknown"
+Town,				[e.shippingContact.locality] 
+CountryID			[have to derive this from countryCode, which we do get]
+
+Shipping Methods
+
+[Everything standard]
+[Everything Express]
+
+
+PART SHIP
+
+FULL DESPATCH
+
+TAX
+
+DO WE NEED THE FULL ADDRESS TO DETERMINE US SALES TAX?
+
+Z-INDEXING ON HOTSPOTS WHEN BROWSER VIEWPORT HEIGHT < N - UNDERNEATH THE MENUS
+
+
+
+Okay so we need to be exactingly precise about the flow of events as they occur
+
+need to test TAX IN THE STATES
+
+
+https://blogs.bing.com/webmaster/2011/03/01/how-to-tell-bing-your-websites-country-and-language/
+
+ 

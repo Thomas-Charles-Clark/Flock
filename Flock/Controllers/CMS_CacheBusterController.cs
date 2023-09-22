@@ -130,6 +130,29 @@ namespace Flock.Controllers
 
             return Json(returnObj);
         }
+
+        [HttpPost]
+        public ActionResult ProductType_Autocomplete(string term)
+        {
+            term = term?.ToLowerInvariant();
+
+            var searchResults = UoW.Context.ProductTypes.Where(pt => pt.DeletedDT == null).ToList();
+
+            searchResults = searchResults.Where(pt => (String.IsNullOrEmpty(pt.Name) || pt.Name.ToLowerInvariant().StartsWith(term)) ||
+                                                      (String.IsNullOrEmpty(pt.Name) || pt.Name.ToLowerInvariant().Contains(term))).ToList();
+
+            var returnObj = new List<IdNameTuple>();
+
+            searchResults.ForEach(p => {
+                returnObj.Add(new IdNameTuple()
+                {
+                    ContentID = p.ProductTypeID,
+                    Name = p.Name
+                });
+            });
+
+            return Json(returnObj);
+        }
     }
 
     public class PassCacheBuster

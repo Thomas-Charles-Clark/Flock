@@ -1,5 +1,5 @@
 ﻿@model Flock.ViewModels.PageComposeViewModel
-    <div id="page-basic-details-container">
+<div id="page-basic-details-container">
     @Html.Partial("PageBasicInfoPartial", Model)
 </div>
 <div id="page-detail-container">
@@ -86,45 +86,42 @@
 </div>
 
 @*
-@if (Model.PageSections.Count > 0)
-{
-    <div class="add-page-section-button" onclick="OpenAddPageSectionDialog();">
+    @if (Model.PageSections.Count > 0)
+    {
+        <div class="add-page-section-button" onclick="OpenAddPageSectionDialog();">
+            <fieldset>
+                <legend>
+                    Add Page Section
+                </legend>
+            </fieldset>
+        </div>
+    }
+    <div id="expand-all-button" style="float: left;" class="expando-all-button" onclick="ExpandLHS();">
         <fieldset>
-            <legend>
-                Add Page Section
+            <legend id="expand-label">
+                Expand All
             </legend>
         </fieldset>
     </div>
-}
-<div id="expand-all-button" style="float: left;" class="expando-all-button" onclick="ExpandLHS();">
-    <fieldset>
-        <legend id="expand-label">
-            Expand All
-        </legend>
-    </fieldset>
-</div>
 
-<div id="collapse-all-button" style="float: right;" class="expando-all-button" onclick="CollapseLHS();">
-    <fieldset>
-        <legend id="collapse-label">
-            Collapse All
-        </legend>
-    </fieldset>
-</div>*@
+    <div id="collapse-all-button" style="float: right;" class="expando-all-button" onclick="CollapseLHS();">
+        <fieldset>
+            <legend id="collapse-label">
+                Collapse All
+            </legend>
+        </fieldset>
+    </div>*@
 
-<div class="modal" tabindex="-1" id="page-pod-advanced-settings-modal">
-    <div class="modal-dialog modal-lg modal-xl">
+<div class="modal fade" tabindex="-1" id="page-pod-advanced-settings-modal">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span>&times;</span>
-                </button>
                 <h5 class="modal-title">
                     Destination Page Attribute Settings
                 </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="page-pod-advanced-settings">
-
             </div>
         </div>
     </div>

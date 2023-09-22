@@ -34,7 +34,7 @@
         settings.SettingsPager.PageSize = 20;
 
         settings.KeyFieldName = "MenuItemID";
-        
+
         settings.Columns.Add(column =>
         {
             column.Name = "MenuID";
@@ -51,7 +51,7 @@
             {
                 var menuID = Convert.ToByte(DataBinder.Eval(c.DataItem, "MenuID"));
                 string menuName = Model.Menus.Where(p => p.MenuID == menuID).Select(p => p.MenuID + " - " + p.Name).Single();
-                
+
                 ViewContext.Writer.Write("<a href='/admin/menubuilder/'>" + menuName + "</a>");
             });
             column.SetEditItemTemplateContent(c =>
@@ -62,7 +62,7 @@
                 ViewContext.Writer.Write("<span style='float: left;'>" + menuName + "</span>");
             });
         });
-        
+
         settings.Columns.Add(column =>
         {
             column.Name = "MenuItemID";
@@ -112,6 +112,58 @@
             tbProp.MaxLength = 50;
         });
 
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ExternalURL";
+            column.FieldName = "ExternalURL";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.Width = 220;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Translated ExternalURL";
+            column.FieldName = "TranslatedExternalURL";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = 220;
+            var tbProp = column.PropertiesEdit as TextBoxProperties;
+            tbProp.MaxLength = 255;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "QueryStringParameters";
+            column.FieldName = "QueryStringParameters";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.Width = 220;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Translated QueryStringParameters";
+            column.FieldName = "TranslatedQueryStringParameters";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = 220;
+            var tbProp = column.PropertiesEdit as TextBoxProperties;
+            tbProp.MaxLength = 50;
+        });
         settings.Columns.Add(column =>
         {
             column.Name = "Stage";
