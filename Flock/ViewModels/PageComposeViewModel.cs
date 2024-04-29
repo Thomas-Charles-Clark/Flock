@@ -128,6 +128,7 @@ namespace Flock.ViewModels
                         hps.TradeSwitch = PageSections[i].TradeSwitch;
                         hps.IsHeader = PageSections[i].IsHeader;
                         hps.HalfWidth = PageSections[i].HalfWidth;
+                        hps.ViewportWidth = PageSections[i].ViewportWidth;
                         hps.PreviewColourways = PageSections[i].PreviewColourways;
                         hps.PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip;
                         hps.CountryLanguageRestrictions = UoW.GetRepository<PageSection_Country_Language>().GetAll().Where(p => p.PageSectionID == HPS.PageSectionID).ToList();
@@ -157,6 +158,7 @@ namespace Flock.ViewModels
                         sps.TradeSwitch = PageSections[i].TradeSwitch;
                         sps.IsHeader = PageSections[i].IsHeader;
                         sps.HalfWidth = PageSections[i].HalfWidth;
+                        sps.ViewportWidth = PageSections[i].ViewportWidth;
                         sps.PreviewColourways = PageSections[i].PreviewColourways;
                         sps.PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip;
                         List<SlideShow_Image> imgs = UoW.GetRepository<SlideShow_Image>().GetAll().Where(p => p.SlideShowID == slideshowsection.SlideShowID).OrderBy(p => p.SortOrder).ToList();
@@ -206,6 +208,7 @@ namespace Flock.ViewModels
                         fps.IsHeader = PageSections[i].IsHeader;
                         fps.StoreEventID = formsection.StoreEventID;
                         fps.HalfWidth = PageSections[i].HalfWidth;
+                        fps.ViewportWidth = PageSections[i].ViewportWidth;
                         fps.PhoneNumberRequired = formsection.PhoneNumberRequired;
                         fps.PreviewColourways = PageSections[i].PreviewColourways;
                         fps.PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip;
@@ -252,6 +255,7 @@ namespace Flock.ViewModels
                             TradeSwitch = PageSections[i].TradeSwitch,
                             IsHeader = PageSections[i].IsHeader,
                             HalfWidth = PageSections[i].HalfWidth,
+                            ViewportWidth = PageSections[i].ViewportWidth,
                             Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(PageSections[i].OnDate, PageSections[i].OffDate)).Select(p => p.Name).Single(),
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
@@ -277,6 +281,7 @@ namespace Flock.ViewModels
                             TradeSwitch = PageSections[i].TradeSwitch,
                             IsHeader = PageSections[i].IsHeader,
                             HalfWidth = PageSections[i].HalfWidth,
+                            ViewportWidth = PageSections[i].ViewportWidth,
                             Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(PageSections[i].OnDate, PageSections[i].OffDate)).Select(p => p.Name).Single(),
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
@@ -302,6 +307,7 @@ namespace Flock.ViewModels
                             TradeSwitch = PageSections[i].TradeSwitch,
                             IsHeader = PageSections[i].IsHeader,
                             HalfWidth = PageSections[i].HalfWidth,
+                            ViewportWidth = PageSections[i].ViewportWidth,
                             Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(PageSections[i].OnDate, PageSections[i].OffDate)).Select(p => p.Name).Single(),
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
@@ -326,6 +332,7 @@ namespace Flock.ViewModels
                             TradeSwitch = PageSections[i].TradeSwitch,
                             IsHeader = PageSections[i].IsHeader,
                             HalfWidth = PageSections[i].HalfWidth,
+                            ViewportWidth = PageSections[i].ViewportWidth,
                             Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(PageSections[i].OnDate, PageSections[i].OffDate)).Select(p => p.Name).Single(),
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
@@ -355,6 +362,7 @@ namespace Flock.ViewModels
                             TradeSwitch = PageSections[i].TradeSwitch,
                             IsHeader = PageSections[i].IsHeader,
                             HalfWidth = PageSections[i].HalfWidth,
+                            ViewportWidth = PageSections[i].ViewportWidth,
                             Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(PageSections[i].OnDate, PageSections[i].OffDate)).Select(p => p.Name).Single(),
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
@@ -382,6 +390,7 @@ namespace Flock.ViewModels
                             TradeSwitch = PageSections[i].TradeSwitch,
                             IsHeader = PageSections[i].IsHeader,
                             HalfWidth = PageSections[i].HalfWidth,
+                            ViewportWidth = PageSections[i].ViewportWidth,
                             Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(PageSections[i].OnDate, PageSections[i].OffDate)).Select(p => p.Name).Single(),
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
@@ -415,6 +424,7 @@ namespace Flock.ViewModels
                             TradeSwitch = PageSections[i].TradeSwitch,
                             IsHeader = PageSections[i].IsHeader,
                             HalfWidth = PageSections[i].HalfWidth,
+                            ViewportWidth = PageSections[i].ViewportWidth,
                             Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(PageSections[i].OnDate, PageSections[i].OffDate)).Select(p => p.Name).Single(),
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
@@ -443,6 +453,7 @@ namespace Flock.ViewModels
                         aps.TradeSwitch = PageSections[i].TradeSwitch;
                         aps.IsHeader = PageSections[i].IsHeader;
                         aps.HalfWidth = PageSections[i].HalfWidth;
+                        aps.ViewportWidth = PageSections[i].ViewportWidth;
                         aps.Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(aps.OnDate, aps.OffDate)).Select(p => p.Name).Single();
                         aps.CountryLanguageRestrictions = UoW.GetRepository<PageSection_Country_Language>().GetAll().Where(p => p.PageSectionID == PageSections[i].PageSectionID).ToList();
                         aps.IsLifestyleGallery = PageSections[i].IsLifestyleGallery;
@@ -469,6 +480,7 @@ namespace Flock.ViewModels
                             TradeSwitch = PageSections[i].TradeSwitch,
                             IsHeader = PageSections[i].IsHeader,
                             HalfWidth = PageSections[i].HalfWidth,
+                            ViewportWidth = PageSections[i].ViewportWidth,
                             Status = UoW.GetRepository<Status>().GetAll().Where(p => p.StatusID == UoW.Context.fnc_Status(PageSections[i].OnDate, PageSections[i].OffDate)).Select(p => p.Name).Single(),
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
@@ -544,6 +556,8 @@ namespace Flock.ViewModels
         public List<PageSection_Country_Language> CountryLanguageRestrictions { get; set; }
 
         public byte TradePartnerAvailability { get; set; }
+
+        public bool ViewportWidth { get; set; }
     }
 
     public class Video_PageSection : BasePageSection

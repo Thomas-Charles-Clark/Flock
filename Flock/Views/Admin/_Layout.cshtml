@@ -99,11 +99,11 @@
                 document.querySelector('#confirm-modal .modal-title').innerHTML = 'Are you sure?';
                 document.querySelector('#confirm-modal .modal-body').innerHTML = message ?? '';
                 window.confirmModalInstance.confirmFn = (() => {
-                    typeof confirm === 'function' ? confirm() : null;
+                    typeof confirm === 'function' ? confirm(args) : null;
                     window.confirmModalInstance.hide();
                 });
                 window.confirmModalInstance.rejectFn = (() => {
-                    typeof reject === 'function' ? reject() : null;
+                    typeof reject === 'function' ? reject(args) : null;
                     window.confirmModalInstance.hide();
                 });
                 window.confirmModalInstance.show();

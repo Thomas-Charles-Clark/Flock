@@ -9,6 +9,7 @@ namespace Flock.ViewModels
     public class approvalRequestShunt
     {
         public int ApprovalRequestID { get; set; }
+
         public string Id { get; set; }
         
         public User User { get; set; }

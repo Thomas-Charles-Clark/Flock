@@ -77,6 +77,8 @@
 
 .attribute-holder {
     margin-bottom: 2px;
+    display: flex;
+    gap: 0.5rem;
 }
 
 .attibute-holder label {

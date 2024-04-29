@@ -228,6 +228,10 @@ namespace Flock
                     $"{cssPrefix}/models/common.css"
                 ));
 
+            bundles.Add(new StyleBundle("~/bundles/css/page-composer").Include(
+                    $"{cssPrefix}/models/page-composer.css"
+                ));
+
             bundles.Add(new StyleBundle("~/bundles/css/bootstrap-5.3.1").Include(
                     $"{cssPrefix}/lib/bootstrap-5.3.1/scss/bootstrap-5.3.1.css"
                 ));

@@ -112,7 +112,7 @@
             cbProp.ValueField = "ArticleSubTypeID";
             cbProp.TextField = "Name";
             cbProp.ValueType = typeof(byte);
-            cbProp.DataSource = UoW.GetRepository<Flock.Models.ArticleSubType>().GetAll();
+            cbProp.DataSource = UoW.GetRepository<Flock.Models.ArticleSubType>().GetAll().Where(p => p.Deleted == false);
             column.EditFormSettings.VisibleIndex = 3;
             column.Settings.AllowAutoFilter = DefaultBoolean.False;
             column.Settings.ShowFilterRowMenu = DefaultBoolean.False;

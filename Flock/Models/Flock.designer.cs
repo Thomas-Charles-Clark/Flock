@@ -104423,6 +104423,8 @@ namespace Flock.Models
 		
 		private byte _TradePartnerAvailability;
 		
+		private bool _ViewportWidth;
+		
 		private EntitySet<PageSection_SlideShow> _PageSection_SlideShows;
 		
 		private EntitySet<PageSection_HTMLSection> _PageSection_HTMLSections;
@@ -104515,6 +104517,8 @@ namespace Flock.Models
     partial void OnPreviewColourwaysCircularClipChanged();
     partial void OnTradePartnerAvailabilityChanging(byte value);
     partial void OnTradePartnerAvailabilityChanged();
+    partial void OnViewportWidthChanging(bool value);
+    partial void OnViewportWidthChanged();
     #endregion
 		
 		public PageSection()
@@ -105064,6 +105068,26 @@ namespace Flock.Models
 					this._TradePartnerAvailability = value;
 					this.SendPropertyChanged("TradePartnerAvailability");
 					this.OnTradePartnerAvailabilityChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ViewportWidth", DbType="BIT NOT NULL")]
+		public bool ViewportWidth
+		{
+			get
+			{
+				return this._ViewportWidth;
+			}
+			set
+			{
+				if ((this._ViewportWidth != value))
+				{
+					this.OnViewportWidthChanging(value);
+					this.SendPropertyChanging();
+					this._ViewportWidth = value;
+					this.SendPropertyChanged("ViewportWidth");
+					this.OnViewportWidthChanged();
 				}
 			}
 		}

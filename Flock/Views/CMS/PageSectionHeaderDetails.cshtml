@@ -1,6 +1,17 @@
 ﻿@model Flock.ViewModels.BasePageSection
 <div class="header-control-wrapper">
     <div>
+        <label>Name</label>
+        @Html.DevExpress().TextBoxFor(m => Model.PageSectionName, settings =>
+        {
+            settings.Name = "PageSection" + Model.PageSectionID + "PageSectionName";
+            settings.Width = 180;
+            if (Model.PageSectionName == null || Model.PageSectionName == "")
+                settings.Text = "Name";
+        }).GetHtml()
+        @Html.ValidationMessageFor(m => Model.PageSectionName)
+    </div>
+    <div>
         <label>Heading</label>
         @Html.DevExpress().TextBoxFor(m => Model.Heading, settings =>
         {
@@ -13,24 +24,6 @@
             {
                 settings.ClientEnabled = false;
             }
-        }).GetHtml()
-    </div>
-    <div class="checkbox-wrapper inline-wrapper">
-        <label>Is Header?</label>
-        @Html.DevExpress().CheckBoxFor(m => Model.IsHeader, settings =>
-        {
-            settings.Name = "PageSection" + Model.PageSectionID + "IsHeader";
-            settings.Properties.ValueChecked = true;
-            settings.Properties.ValueUnchecked = false;
-        }).GetHtml()
-    </div>
-    <div class="checkbox-wrapper inline-wrapper">
-        <label>Is Half-Width?</label>
-        @Html.DevExpress().CheckBoxFor(m => Model.HalfWidth, settings =>
-        {
-            settings.Name = "PageSection" + Model.PageSectionID + "HalfWidth";
-            settings.Properties.ValueChecked = true;
-            settings.Properties.ValueUnchecked = false;
         }).GetHtml()
     </div>
     <div>
@@ -74,70 +67,90 @@
             }).GetHtml()
         </div>
     </div>
-</div>
-<div class="header-control-wrapper">
-    <div>
-        <label>Name</label>
-        @Html.DevExpress().TextBoxFor(m => Model.PageSectionName, settings =>
-        {
-            settings.Name = "PageSection" + Model.PageSectionID + "PageSectionName";
-            settings.Width = 180;
-            if (Model.PageSectionName == null || Model.PageSectionName == "")
-                settings.Text = "Name";
-        }).GetHtml()
-        @Html.ValidationMessageFor(m => Model.PageSectionName)
-    </div>
-    <div class="inline-wrapper">
-        <label>On Date</label>
-        @Html.DevExpress().DateEditFor(m => Model.OnDate, settings =>
-        {
-            settings.Name = "PageSection" + Model.PageSectionID + "OnDate";
-            settings.Width = 90;
-        }).GetHtml()
-        @Html.ValidationMessageFor(m => Model.OnDate)
-    </div>
-    <div class="inline-wrapper">
-        <label>Off Date</label>
-        @Html.DevExpress().DateEditFor(m => Model.OffDate, settings =>
-        {
-            settings.Name = "PageSection" + Model.PageSectionID + "OffDate";
-            settings.Width = 90;
-        }).GetHtml()
-        @Html.ValidationMessageFor(m => Model.OffDate)
-    </div>
-    <div class="inline-wrapper">
-        <label>Status: </label>
-        @{
-            var statusColour = "black";
-            if (Model.Status != null)
-            {
-                switch (Model.Status.Replace('_', ' '))
+    <div class="d-flex justify-content-between w-100">
+        <div class="header-control-wrapper">
+            <div class="checkbox-wrapper inline-wrapper">
+                <label>Is Header?</label>
+                @Html.DevExpress().CheckBoxFor(m => Model.IsHeader, settings =>
                 {
-                    case "On":
-                        statusColour = "green";
-                        break;
-                    case "Pending Off (On)":
-                        statusColour = "#DEC400";
-                        break;
-                    case "Pending On":
-                        statusColour = "#DEC400";
-                        break;
-                    case "Pre-Launch":
-                        statusColour = "orange";
-                        break;
-                    case "Off":
-                    case "Unsaved":
-                        statusColour = "red";
-                        break;
-                    default: break;
+                    settings.Name = "PageSection" + Model.PageSectionID + "IsHeader";
+                    settings.Properties.ValueChecked = true;
+                    settings.Properties.ValueUnchecked = false;
+                }).GetHtml()
+            </div>
+            <div class="checkbox-wrapper inline-wrapper">
+                <label>Is Half-Width?</label>
+                @Html.DevExpress().CheckBoxFor(m => Model.HalfWidth, settings =>
+                {
+                    settings.Name = "PageSection" + Model.PageSectionID + "HalfWidth";
+                    settings.Properties.ValueChecked = true;
+                    settings.Properties.ValueUnchecked = false;
+                }).GetHtml()
+            </div>
+            <div class="checkbox-wrapper inline-wrapper">
+                <label>Is Viewport-Width?</label>
+                @Html.DevExpress().CheckBoxFor(m => Model.ViewportWidth, settings =>
+                {
+                    settings.Name = "PageSection" + Model.PageSectionID + "ViewportWidth";
+                    settings.Properties.ValueChecked = true;
+                    settings.Properties.ValueUnchecked = false;
+                }).GetHtml()
+            </div>
+        </div>
+        <div class="header-control-wrapper">
+            <div>
+                <label>On Date</label>
+                @Html.DevExpress().DateEditFor(m => Model.OnDate, settings =>
+                {
+                    settings.Name = "PageSection" + Model.PageSectionID + "OnDate";
+                    settings.Width = 90;
+                }).GetHtml()
+                @Html.ValidationMessageFor(m => Model.OnDate)
+            </div>
+            <div>
+                <label>Off Date</label>
+                @Html.DevExpress().DateEditFor(m => Model.OffDate, settings =>
+                {
+                    settings.Name = "PageSection" + Model.PageSectionID + "OffDate";
+                    settings.Width = 90;
+                }).GetHtml()
+                @Html.ValidationMessageFor(m => Model.OffDate)
+            </div>
+            <div>
+                <label>Status: </label>
+                @{
+                    var statusColour = "black";
+                    if (Model.Status != null)
+                    {
+                        switch (Model.Status.Replace('_', ' '))
+                        {
+                            case "On":
+                                statusColour = "green";
+                                break;
+                            case "Pending Off (On)":
+                                statusColour = "#DEC400";
+                                break;
+                            case "Pending On":
+                                statusColour = "#DEC400";
+                                break;
+                            case "Pre-Launch":
+                                statusColour = "orange";
+                                break;
+                            case "Off":
+                            case "Unsaved":
+                                statusColour = "red";
+                                break;
+                            default: break;
+                        }
+                        <label class="page-section-web-status" style="color: @(statusColour);">@Model.Status.Replace('_', ' ')</label>
+                    }
+                    else
+                    {
+                        <label class="page-section-web-status" style="color: @(statusColour);">Unknown</label>
+                    }
                 }
-                <label class="page-section-web-status" style="color: @(statusColour);">@Model.Status.Replace('_', ' ')</label>
-            }
-            else
-            {
-                <label class="page-section-web-status" style="color: @(statusColour);">Unknown</label>
-            }
-        }
+            </div>
+        </div>
     </div>
     @if (Model.PageSectionTypeID == 4)
     {
@@ -157,8 +170,7 @@
             settings.Properties.ValueType = typeof(string);
             settings.Width = 140;
             settings.SelectedIndex = 0;
-
-            settings.Style.Add("float", "right");
+            settings.ControlStyle.CssClass = "product-grid-sorter";
 
             settings.Properties.DropDownWidth = 140;
 
@@ -168,7 +180,7 @@
                             SortProductGridByBestSeller(" + Model.PageSectionID.ToString() + @", 1);
                         break;
                         case 'bestseller-us':
-                            SortProductGridByBestSeller("+ Model.PageSectionID.ToString() +@", 2);
+                            SortProductGridByBestSeller(" + Model.PageSectionID.ToString() + @", 2);
                         break;
                         case 'clearance':
                             SortProductGridByClearance(" + Model.PageSectionID.ToString() + @");

@@ -25,7 +25,8 @@
                         <img src="https://flock.designersguild.com/imagelibrary/322/@(pp.ImageID.ToString()).jpeg" style="width: 100%;" title="Product Page ID: @(pp.ProductPageID) - @(pp.Name)" />
                     }
 
-                    @if (Model.IsAttributeGroupMultiSelect)
+                    @* Hardcoded == 1 workaround for Colour 23/01/2024 *@ 
+                    @if (Model.IsAttributeGroupMultiSelect || Model.AttributeGroupID == 1)
                     {
                         <div class="config-wrap edit-icon">
                             <div class="config-part">

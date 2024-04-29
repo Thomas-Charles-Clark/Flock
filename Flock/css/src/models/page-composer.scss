@@ -1,0 +1,32 @@
+﻿@import "common.scss";
+
+.header-control-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+
+    > div {
+        display: flex;
+        flex-direction: row;
+        gap: $l-gutter;
+
+        label {
+            text-align: right;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        input {
+            margin: 0;
+        }
+    }
+
+    + .header-control-wrapper {
+        margin-top: 0;
+    }
+
+    .product-grid-sorter {
+        margin-left: auto;
+    }
+}

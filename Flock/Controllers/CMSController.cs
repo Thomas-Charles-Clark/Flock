@@ -2381,6 +2381,7 @@ namespace Flock.Controllers
                     section.PlatformSwitch = item.PlatformSwitch;
                     section.TradeSwitch = item.TradeSwitch;
                     section.HalfWidth = item.HalfWidth;
+                    section.ViewportWidth = item.ViewportWidth;
                     section.Paging = item.Paging;
                     section.ModifiedDT = DateTime.Now;
 
@@ -2393,6 +2394,7 @@ namespace Flock.Controllers
                     Model.TradeSwitch = item.TradeSwitch;
                     Model.TradePartnerAvailability = item.TradePartnerAvailability;
                     Model.HalfWidth = item.HalfWidth;
+                    Model.ViewportWidth = item.ViewportWidth;
                     Model.OnDate = item.OnDate;
                     Model.OffDate = item.OffDate;
                     Model.Status = UnitOfWork.GetRepository<Status>().GetAll().Where(p => p.StatusID == UnitOfWork.Context.fnc_Status(Model.OnDate, Model.OffDate)).Select(p => p.Name).Single();

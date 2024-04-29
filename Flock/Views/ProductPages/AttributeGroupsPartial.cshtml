@@ -26,7 +26,7 @@ else
                 }
             </h5>
             <div  class="attribute-group-inner">
-                @if (Model.AttributeGroups[i].IsMultipleSelect)
+                @if (Model.AttributeGroups[i].IsMultipleSelect || Model.AttributeGroups[i].AttributeGroupID == 1)
                 {
                     <ul>
                         @foreach (Attribute_SelectResult a in Model.AttributeGroups[i].Options)

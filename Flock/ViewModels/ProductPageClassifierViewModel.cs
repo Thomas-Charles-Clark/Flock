@@ -8,6 +8,7 @@ namespace Flock.ViewModels
 {
     public class ProductPageClassifierViewModel
     {
+        public byte AttributeGroupID { get; set; }
         public bool IsAttributeGroupMultiSelect { get; set; }
         public bool IsFullConfiguration { get; set; }
         public string ToggleButtonText { get; set; }

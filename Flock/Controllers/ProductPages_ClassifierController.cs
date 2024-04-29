@@ -77,7 +77,10 @@ namespace Flock.Controllers
         [HttpPost]
         public ActionResult ClassificationResultsPartial(byte ProductTypeID, byte AttributeGroupID, short? AttributeID, byte? Toggle, string SearchString)
         {
-            var Model = new ProductPageClassifierViewModel();
+            var Model = new ProductPageClassifierViewModel()
+            {
+                AttributeGroupID = AttributeGroupID
+            };
 
             IMultipleResults res = null;
 

@@ -5103,6 +5103,7 @@
       <Column Name="PreviewColourways" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="PreviewColourwaysCircularClip" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="IsPartner" Member="TradePartnerAvailability" Type="System.Byte" DbType="TINYINT" CanBeNull="false" />
+      <Column Name="ViewportWidth" Type="System.Boolean" DbType="BIT NOT NULL" CanBeNull="false" />
       <Association Name="PageSection_PageSection_SlideShow" Member="PageSection_SlideShows" ThisKey="PageSectionID" OtherKey="PageSectionID" Type="PageSection_SlideShow" />
       <Association Name="PageSection_PageSection_HTMLSection" Member="PageSection_HTMLSections" ThisKey="PageSectionID" OtherKey="PageSectionID" Type="PageSection_HTMLSection" />
       <Association Name="PageSection_PageSection_Brochure" Member="PageSection_Brochures" ThisKey="PageSectionID" OtherKey="PageSectionID" Type="PageSection_Brochure" />

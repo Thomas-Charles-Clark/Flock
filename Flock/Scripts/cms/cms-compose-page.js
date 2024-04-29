@@ -1147,6 +1147,7 @@ function SavePageSectionDetails(PageSectionID, PageSectionTypeID) {
         Heading: $("#page-section-" + PageSectionID + "-header-details").find("input[name='PageSection" + PageSectionID + "PageSectionHeading']").val(),
         IsHeader: window["PageSection" + PageSectionID + "IsHeader"].GetValue(),
         HalfWidth: window["PageSection" + PageSectionID + "HalfWidth"].GetValue(),
+        ViewportWidth: window["PageSection" + PageSectionID + "ViewportWidth"].GetValue(),
         PlatformSwitch: window["PageSection" + PageSectionID + "PlatformSwitch"].GetValue(),
         TradeSwitch: window["PageSection" + PageSectionID + "TradeSwitch"].GetValue(),
         TradePartnerAvailability: window["PageSection" + PageSectionID + "TradePartnerAvailability"].GetValue(),
