@@ -66,7 +66,8 @@ namespace Flock.ViewModels
             PPCVM.FurniturePDF = PP.FurniturePDF;
             PPCVM.BrochureID = PP.BrochureID;
             PPCVM.Images = UoW.GetRepository<ProductPage_Image>().GetAll().Where(p => p.ProductPageID == ProductPageID).OrderBy(p => p.SortOrder).ToList();
-
+            PPCVM.VideoURL = PP.VideoURL;
+            PPCVM.VideoThumbnail = PP.VideoThumbnail;
             PPCVM.PrimaryProducts = UoW.GetRepository<vwProductPage_PrimaryProduct>().GetAll().Where(p => p.ProductPageID == (int)ProductPageID).OrderBy(p => p.SortOrder).ToList();
             PPCVM.SecondaryProducts = UoW.GetRepository<vwProductPage_SecondaryProduct>().GetAll().Where(p => p.ProductPageID == (int)ProductPageID).OrderBy(p => p.SortOrder).ToList();
             PPCVM.RelatedProductPages = UoW.GetRepository<vwProductPage_RelatedProductPage>().GetAll().Where(p => p.ProductPageID == (int)ProductPageID).ToList();
@@ -122,6 +123,14 @@ namespace Flock.ViewModels
         public bool? FurnitureLegFinishes { get; set; }
         public bool? FurnitureStitchingOptions { get; set; }
         public string FurniturePDF { get; set; }
+
+        [Display(Name = "Video URL (100)")]
+        [StringLength(100)]
+        public string VideoURL { get; set; }
+
+        [Display(Name = "Video Thumbnail")]
+        [StringLength(100)]
+        public string VideoThumbnail { get; set; }
 
         [Display(Name = "Title (70)")]
         [StringLength(70, MinimumLength = 3)]

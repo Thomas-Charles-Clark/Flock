@@ -6,4 +6,20 @@
   max-height: 240px;
   overflow-y: scroll;
 }
+
+.cm-content, .cm-gutter {
+  min-height: 150px;
+}
+
+.cm-gutters {
+  margin: 1px;
+}
+
+.cm-scroller {
+  overflow: auto;
+}
+
+.cm-wrap {
+  border: 1px solid silver;
+}
 /*# sourceMappingURL=filter-index-combinations.css.map */

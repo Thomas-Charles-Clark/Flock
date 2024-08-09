@@ -13,6 +13,7 @@ using System.Web.Script.Serialization;
 using System.Data.Linq;
 using System.IO;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace Flock.Controllers
 {
@@ -167,19 +168,21 @@ namespace Flock.Controllers
             }
             else
             {
+                var fileName = System.Text.RegularExpressions.Regex.Replace(file.FileName, @"[^\w\.@-]", "_", RegexOptions.None, TimeSpan.FromSeconds(1.5));
+
                 var guid = Guid.NewGuid().ToString();
 
                 if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\FurniturePDFs\\"))
                     Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "\\FurniturePDFs\\");
 
-                using (var fileStream = System.IO.File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\FurniturePDFs\\" + file.FileName))
+                using (var fileStream = System.IO.File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\FurniturePDFs\\" + fileName))
                 {
                     file.InputStream.CopyTo(fileStream);
                 }
 
                 ProductPage ppi = UnitOfWork.GetRepository<ProductPage>().GetAll().Where(p => p.ProductPageID == ProductPageID).Single();
 
-                ppi.FurniturePDF = file.FileName;
+                ppi.FurniturePDF = fileName;
 
                 UnitOfWork.Save();
 
@@ -189,7 +192,7 @@ namespace Flock.Controllers
 
                 if (file != null)
                 {
-                    jsresult.files[0].name = file.FileName;
+                    jsresult.files[0].name = fileName;
                     jsresult.files[0].size = file.InputStream.Length;
                 }
                 else
@@ -198,7 +201,7 @@ namespace Flock.Controllers
                     jsresult.files[0].size = 0;
                 }
 
-                jsresult.files[0].url = "/FurniturePDFs/" + file.FileName;
+                jsresult.files[0].url = "/FurniturePDFs/" + fileName;
                 jsresult.files[0].thumbnailUrl = "";
                 jsresult.files[0].deleteUrl = "";
                 jsresult.files[0].deleteType = "";
@@ -1053,6 +1056,8 @@ namespace Flock.Controllers
                         return PartialView("FurnitureCutOutImagePartial", Model);
                     else
                         return Content("");
+                case 5:
+                    return PartialView("ProductPageSlideshowPartial", new ProductPageComposeViewModelBuilder(UnitOfWork).Build(ProductPageID));
                 default:
                     return Content("");
             }
@@ -1093,6 +1098,8 @@ namespace Flock.Controllers
                 case 3:
                 case 4:
                     return PartialView("FurnitureCutOutImagePartial", Model);
+                case 5:
+                    return PartialView("ProductPageSlideshowPartial", new ProductPageComposeViewModelBuilder(UnitOfWork).Build(ProductPageID));
                 default:
                     return Content("");
             }
@@ -1637,7 +1644,25 @@ namespace Flock.Controllers
                 pp.FurnitureLegFinishes = model.FurnitureLegFinishes.HasValue ? model.FurnitureLegFinishes.Value : false;
                 pp.FurnitureStitchingOptions = model.FurnitureStitchingOptions.HasValue ? model.FurnitureStitchingOptions.Value : false;
                 pp.FurniturePDF = model.FurniturePDF;
+                pp.VideoURL = model.VideoURL;
+
+                if (pp.ProductPage_Images.FirstOrDefault(i => i.TemplateImageID == 5) == null)
+                {
+                    var img = pp.ProductPage_Images.Where(i => i.TemplateImageID == 2).OrderBy(i => i.SortOrder).FirstOrDefault();
+
+                    if (img != null)
+                    {
+                        pp.ProductPage_Images.Add(new ProductPage_Image()
+                        {
+                            ImageID = img.ImageID,
+                            TemplateImageID = 5,
+                            ProductPageID = model.ProductPageID.Value
+                        });
+                    }
+                }
+
                 pp.ModifiedDT = DateTime.Now;
+
                 UnitOfWork.Save();
 
                 UnitOfWork.Context.ReplaceLocalURLPlaceholders_ProductPage(model.ProductPageID, null, null, null, null, null, false, false);

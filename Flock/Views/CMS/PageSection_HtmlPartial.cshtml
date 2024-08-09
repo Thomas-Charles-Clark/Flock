@@ -15,7 +15,7 @@
         <div id="page-section-@(Model.PageSectionID)-header-details" class="pagesection-header">
             @Html.Partial("PageSectionHeaderDetails", Model)
         </div>
-        <div data-page-section-id="@(Model.PageSectionID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
+        <div data-page-section-id="@(Model.PageSectionID)" data-page-section-type="@(Model.PageSectionTypeID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
             @Html.Partial("CountryLanguageRestrictionPartial", Model.CountryLanguageRestrictions)
         </div>
         <div id="page-section-@(Model.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none;" : "")" class="fieldset-inner page-section-hideable">

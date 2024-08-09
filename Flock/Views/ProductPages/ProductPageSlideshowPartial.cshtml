@@ -36,8 +36,39 @@
                         settings.Style.Add("margin-top", "1em");
                         settings.Style.Add("margin-bottom", "2px");
                     }).GetHtml()
-                    <div id="product-page-html-editor-container">                        
+                    <div id="product-page-html-editor-container">
                         @Html.Partial("ProductPageHTMLEditorPartial", Model.Description, new ViewDataDictionary())
+                    </div>
+
+                    @Html.DevExpress().LabelFor(m => Model.VideoURL, settings =>
+                    {
+                        settings.Style.Add("margin-top", "1em");
+                        settings.Style.Add("margin-bottom", "2px");
+                    }).GetHtml()
+                    @Html.DevExpress().TextBoxFor(m => Model.VideoURL, settings =>
+                    {
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Name = "ProductPageVideoURL";
+                        settings.Properties.MaxLength = 100;
+                    }).GetHtml()
+
+                    @Html.DevExpress().LabelFor(m => Model.VideoThumbnail, settings =>
+                    {
+                        settings.Style.Add("margin-top", "1em");
+                        settings.Style.Add("margin-bottom", "2px");
+                    }).GetHtml()
+                    <div id="product-page-video-thumbnail-container" class="droppable" data-product-page-id="@(Model.ProductPageID)">
+                        <div id="video-thumbnail" class="sortable-list ui-sortable">
+                            @{ 
+                                var img = Model.Images.FirstOrDefault(i => i.TemplateImageID == 5);
+
+                                if (img != null)
+                                {
+                                    <img src="/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromProductPageArea(5, @(img.ImageID))" />
+                                    <img title="Image ID: @(img.ImageID)" src="https://flock.designersguild.com/ImageLibrary/322/@(img.ImageID).jpeg" />
+                                }
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -53,12 +84,16 @@
             <div style="clear: both;"></div>
 
             <img id="product-page-text-save" class="pagesection-save-icon" src="/images/icons/32/save.png" style="margin-right: 0; position: absolute; bottom: 10px; right: 10px;" onclick="SaveProductPageText();" />
-            
+
             @*<div id="slideshow-buttons">
-                <img id="slideshow-play-icon" class="slideshow-button" src="/Images/SystemIcons/slideshow-play-icon.png" />
-                <img id="slideshow-grid-icon" class="slideshow-button" src="/Images/SystemIcons/slideshow-grid-icon.png" />
-                <div style="clear: both;"></div>
-            </div>*@
+                    <img id="slideshow-play-icon" class="slideshow-button" src="/Images/SystemIcons/slideshow-play-icon.png" />
+                    <img id="slideshow-grid-icon" class="slideshow-button" src="/Images/SystemIcons/slideshow-grid-icon.png" />
+                    <div style="clear: both;"></div>
+                </div>*@
         </div>
     </fieldset>
 </div>
+<script type="text/javascript">
+    if (typeof (InitVideoThumbnailDragDrop) == 'function')
+        InitVideoThumbnailDragDrop();
+</script>

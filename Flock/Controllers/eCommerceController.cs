@@ -926,6 +926,7 @@ namespace Flock.Controllers
 
                 db.Name = item.Name;
                 db.DisplayName = item.DisplayName;
+                db.ConsolidatedDisplayName = item.ConsolidatedDisplayName;
                 db.DeliveryOptionID = item.DeliveryOptionID;
                 db.PriceListID = item.PriceListID;
                 db.CourierID = item.CourierID;
@@ -965,6 +966,7 @@ namespace Flock.Controllers
 
                 db.Name = item.Name;
                 db.DisplayName = item.DisplayName;
+                db.ConsolidatedDisplayName = item.ConsolidatedDisplayName;
                 db.CARRCODE = item.CARRCODE;
                 db.SortOrder = item.SortOrder;
                 db.DaysToDeliverMin = item.DaysToDeliverMin;

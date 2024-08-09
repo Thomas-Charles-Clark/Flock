@@ -85,7 +85,7 @@
             }
         }
 
-        
+
         productPages = productPages.concat(bulkPagesToAdd);
 
         window.RelatedProductPages = productPages;
@@ -144,6 +144,20 @@
                     window.slideshowImages.push({ ID: $(this).data("image-id"), SortOrder: index });
                 });
                 UpdateProductPageImageArea(2);
+                //}
+            }
+        });
+    }
+
+    function InitVideoThumbnailDragDrop() {
+        $("#video-thumbnail").sortable({
+            helper: 'clone',
+            placeholder: "ui-state-highlight-slideshow",
+            connectWith: '.ar1',
+            update: function (ev, ui) {
+                //if ($(ui.item).hasClass("draggable")) {
+                $(".product-page-video-thumbnail-placeholder").remove();
+                UpdateProductPageImageArea(5, ui);
                 //}
             }
         });
@@ -271,7 +285,28 @@
                     timeout: 20000
                 });
                 break;
-
+            case 5:
+                $.ajax({
+                    url: '@Url.Action("UpdateProductPageImageArea", "ProductPages")',
+                    traditional: true,
+                    type: 'post',
+                    data: {
+                        ProductPageID: Number($("#selected-product-page-id").val()),
+                        Images: JSON.stringify([{
+                            ID: $(ui.item).data("image-id"),
+                            SortOrder: 0
+                        }]),
+                        TemplateImageID: 5
+                    },
+                    success: function (data) {
+                        $("#slideshow-and-html-editor-container").html(data);
+                    },
+                    error: function (e, s, a) {
+                        alert(e.responseText);
+                    },
+                    timeout: 20000
+                });
+                break;
             default: break;
         }
     }
@@ -281,6 +316,7 @@
             case 1: $("#product-page-pod-busy").fadeIn("fast"); break;
             case 2: $("#product-page-slideshow-busy").fadeIn("fast"); break;
             case 3: $("#product-page-cutout-busy").fadeIn("fast"); break;
+            case 5: $("#product-page-slideshow-busy").fadeIn("fast"); break;
             default: return;
         }
         $.confirm(function () {
@@ -329,12 +365,31 @@
                         error: function (e, s, a) {
                             $.showError(e, s, a, function () {
                                 $("#product-page-cutout-busy").fadeOut("fast");
-                            });      
+                            });
                             return false;
                         },
                         timeout: 20000
                     });
                     break;
+                case 5:
+                    $.ajax({
+                        url: '@Url.Action("RemoveImageFromProductPageArea", "ProductPages")',
+                        traditional: true,
+                        type: 'post',
+                        data: {
+                            ProductPageID: Number($("#selected-product-page-id").val()),
+                            ImageID: ImageID,
+                            TemplateImageID: 5
+                        },
+                        success: function (data) {
+                            $("#slideshow-and-html-editor-container").html(data);
+                        },
+                        error: function (e, s, a) {
+                            alert(e.responseText);
+                        },
+                        timeout: 20000
+                    });
+                break;
                 default: return;
             }
             @*else
@@ -366,7 +421,7 @@
                     timeout: 20000
                 });
             }*@
-        }, function () { 
+        }, function () {
             switch (TemplateImageID) {
                 case 1: $("#product-page-pod-busy").fadeOut("fast"); break;
                 case 2: $("#product-page-slideshow-busy").fadeOut("fast"); break;
@@ -442,7 +497,7 @@
     }
 
     function InitPrimaryProductDragDrop() {
-        
+
         var fixHelper = function (e, ui) {
             ui.children().each(function () {
                 $(this).width($(this).width());
@@ -719,7 +774,7 @@
     }
 
     //$(document).ready(function () {
-        
+
 
         //$("#resource-panels").sortable({
         //    helper: 'clone',
@@ -811,7 +866,8 @@
                 FurnitureLeatherOptions: flo,
                 FurnitureLegStyles: fls,
                 FurnitureLegFinishes: flf,
-                FurnitureStitchingOptions: fso
+                FurnitureStitchingOptions: fso,
+                VideoURL: ProductPageVideoURL.GetValue()
             },
             success: function (data) {
                 if ($("#text-and-cutout-image-container").length > 0) {

@@ -1,4 +1,6 @@
 ﻿using DevExpress.Web.Mvc;
+using DocumentFormat.OpenXml.EMMA;
+
 using Flock.Models;
 using Flock.ViewModels;
 using Google.Apis.Translate.v2;
@@ -118,20 +120,105 @@ namespace Flock.Controllers
             }
         }
         
+        //[ValidateInput(false)]
+        //public ActionResult TranslateResourceGridViewUpdate(Resource_Language_SelectList_ResourceResult item, byte countryLanguageId, bool acrossCountries = false)
+        //{
+        //    try
+        //    {
+        //        if(ModelState.IsValid)
+        //        {
+        //            List<short> countryIds = new List<short>();
+        //            byte? languageId = null;
+
+        //            TranslateResourceGridViewModel saveModel = new TranslateResourceGridViewModel();
+        //            saveModel.Resources.Add(item);
+
+        //            if (acrossCountries)
+        //            {
+        //                var cl = UnitOfWork.GetRepository<Models.Country_Language>().GetAll().Where(p => p.Country_Language_ID == countryLanguageId).Single();
+
+        //                languageId = cl.LanguageID;
+
+        //                // careful to never update English translation for the UK!
+        //                var resources = UnitOfWork.GetRepository<Models.Resource_Language>().GetAll().Where(p => p.ResourceID == item.ResourceID && p.LanguageID == cl.LanguageID && p.CountryID != 81).ToList();
+
+        //                var items = new List<Resource_Language_SelectList_ResourceResult>();
+
+        //                resources.ForEach(resource => {
+        //                    if (resource.CountryID != item.CountryID)
+        //                    {
+        //                        countryIds.Add(resource.CountryID);
+
+        //                        items.Add(new Resource_Language_SelectList_ResourceResult()
+        //                        {
+        //                            ResourceID = resource.ResourceID,
+        //                            CountryID = resource.CountryID,
+        //                            LanguageID = cl.LanguageID,
+        //                            Key = item.Key,
+        //                            Value = item.Value,
+        //                            TranslatedValue = item.TranslatedValue,
+        //                            Stage = item.Stage,
+        //                            FieldsToReview = item.FieldsToReview
+        //                        });
+        //                    }
+        //                });
+
+        //                saveModel.Resources.AddRange(items);
+        //            }
+
+        //            UnitOfWork.Context.Resource_Language_Save(countryIds, languageId.Value, countryLanguageId, saveModel);
+
+        //            List<Resource_Language_SelectList_ResourceResult> Resources = new List<Resource_Language_SelectList_ResourceResult>();
+
+                    
+        //            IMultipleResults Results = UnitOfWork.Context.Resource_Language_SelectList(countryLanguageId);
+
+        //            Resources = Results.GetResult<Resource_Language_SelectList_ResourceResult>().ToList();
+                    
+        //            TranslateResourceGridViewModel Model = new TranslateResourceGridViewModel(Resources, countryLanguageId);
+
+        //            return PartialView("Resources/_TranslateResourceGridView", Model);
+        //        }
+        //        else
+        //        {
+        //            List<Resource_Language_SelectList_ResourceResult> Resources = new List<Resource_Language_SelectList_ResourceResult>();
+
+        //            IMultipleResults Results = UnitOfWork.Context.Resource_Language_SelectList(countryLanguageId);
+
+        //            Resources = Results.GetResult<Resource_Language_SelectList_ResourceResult>().ToList();
+
+        //            TranslateResourceGridViewModel Model = new TranslateResourceGridViewModel(Resources, countryLanguageId);
+
+        //            return PartialView("Resources/_TranslateResourceGridView", Model);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+        //        Response.StatusCode = 400;
+        //        return Content(ex.Message);
+        //    }    
+        //}
+
+
         [ValidateInput(false)]
-        public ActionResult TranslateResourceGridViewUpdate(Resource_Language_SelectList_ResourceResult item, byte countryLanguageId, bool acrossCountries = false)
+        public ActionResult TranslateResourceGridViewBatchUpdate(MVCxGridViewBatchUpdateValues<Resource_Language_SelectList_ResourceResult, int> updateValues, byte countryLanguageId, bool acrossCountries = false)
         {
-            try
+            foreach(var item in updateValues.Update)
             {
-                if(ModelState.IsValid)
+                try
                 {
+                    List<short> countryIds = new List<short>();
+                    byte? languageId = null;
+
                     TranslateResourceGridViewModel saveModel = new TranslateResourceGridViewModel();
-                    saveModel.Resources.Add(item);
+
+                    var cl = UnitOfWork.GetRepository<Models.Country_Language>().GetAll().Where(p => p.Country_Language_ID == countryLanguageId).Single();
+
+                    languageId = cl.LanguageID;
 
                     if (acrossCountries)
                     {
-                        var cl = UnitOfWork.GetRepository<Models.Country_Language>().GetAll().Where(p => p.Country_Language_ID == countryLanguageId).Single();
-
                         // careful to never update English translation for the UK!
                         var resources = UnitOfWork.GetRepository<Models.Resource_Language>().GetAll().Where(p => p.ResourceID == item.ResourceID && p.LanguageID == cl.LanguageID && p.CountryID != 81).ToList();
 
@@ -140,6 +227,8 @@ namespace Flock.Controllers
                         resources.ForEach(resource => {
                             if (resource.CountryID != item.CountryID)
                             {
+                                countryIds.Add(resource.CountryID);
+
                                 items.Add(new Resource_Language_SelectList_ResourceResult()
                                 {
                                     ResourceID = resource.ResourceID,
@@ -156,39 +245,27 @@ namespace Flock.Controllers
 
                         saveModel.Resources.AddRange(items);
                     }
+                    else
+                    {
+                        item.LanguageID = cl.LanguageID;
+                        item.CountryID = cl.CountryID;
 
-                    UnitOfWork.Context.Resource_Language_Save(countryLanguageId, saveModel);
+                        saveModel.Resources.Add(item);
+                    }
 
-                    List<Resource_Language_SelectList_ResourceResult> Resources = new List<Resource_Language_SelectList_ResourceResult>();
-
-                    
-                    IMultipleResults Results = UnitOfWork.Context.Resource_Language_SelectList(countryLanguageId);
-
-                    Resources = Results.GetResult<Resource_Language_SelectList_ResourceResult>().ToList();
-                    
-                    TranslateResourceGridViewModel Model = new TranslateResourceGridViewModel(Resources, countryLanguageId);
-
-                    return PartialView("Resources/_TranslateResourceGridView", Model);
+                    UnitOfWork.Context.Resource_Language_Save(countryIds, languageId.Value, countryLanguageId, saveModel);
                 }
-                else
+                catch (Exception ex)
                 {
-                    List<Resource_Language_SelectList_ResourceResult> Resources = new List<Resource_Language_SelectList_ResourceResult>();
-
-                    IMultipleResults Results = UnitOfWork.Context.Resource_Language_SelectList(countryLanguageId);
-
-                    Resources = Results.GetResult<Resource_Language_SelectList_ResourceResult>().ToList();
-
-                    TranslateResourceGridViewModel Model = new TranslateResourceGridViewModel(Resources, countryLanguageId);
-
-                    return PartialView("Resources/_TranslateResourceGridView", Model);
+                    updateValues.SetErrorText(item, $"{ex}");
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                Response.StatusCode = 400;
-                return Content(ex.Message);
-            }    
+
+            IMultipleResults Results = UnitOfWork.Context.Resource_Language_SelectList(countryLanguageId);
+
+            var Model = new TranslateResourceGridViewModel(Results.GetResult<Resource_Language_SelectList_ResourceResult>().ToList(), countryLanguageId);
+
+            return PartialView("Resources/_TranslateResourceGridView", Model);
         }
     }
 }

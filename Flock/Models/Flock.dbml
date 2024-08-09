@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Flock" Class="FlockDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="ConnectionString" ConnectionString="Data Source=VM-SQL1;Initial Catalog=Flock;Persist Security Info=True;User ID=dg;Password=mattm00" Provider="System.Data.SqlClient" />
+  <Connection Mode="ConnectionString" ConnectionString="Data Source=vm-sql;Initial Catalog=Flock;Integrated Security=False;Persist Security Info=True;User ID=App_Flock-Backend;Password=98FB269A-064A-4E4D-9A1A-39B9BBEA88EF;TrustServerCertificate=True" Provider="System.Data.SqlClient" />
   <Table Name="dbo.Admin" Member="Admins">
     <Type Name="Admin">
       <Column Name="AdminID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -2020,6 +2020,7 @@
       <Column Name="DaysToDeliverMin" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
       <Column Name="DaysToDeliverMax" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
       <Column Name="CutOff" Type="System.TimeSpan" DbType="Time" CanBeNull="true" />
+      <Column Name="ConsolidatedDisplayName" Type="System.String" DbType="NVARCHAR(50) NOT NULL" CanBeNull="false" />
       <Association Name="DeliveryBand_DeliveryBand_DeliveryZone" Member="DeliveryBand_DeliveryZones" ThisKey="DeliveryBandID" OtherKey="DeliveryBandID" Type="DeliveryBand_DeliveryZone" />
       <Association Name="DeliveryBand_DeliveryPrice" Member="DeliveryPrices" ThisKey="DeliveryBandID" OtherKey="DeliveryBandID" Type="DeliveryPrice" />
       <Association Name="PriceList_DeliveryBand" Member="PriceList" ThisKey="PriceListID" OtherKey="PriceListID" Type="PriceList" IsForeignKey="true" />
@@ -4645,6 +4646,8 @@
       <Column Name="TradeDiscountPercentage" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
       <Column Name="TradeDiscountOperator" Type="System.Char" DbType="NChar(1)" CanBeNull="true" />
       <Column Name="TradeSwitch" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="VideoURL" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="VideoThumbnail" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
       <Association Name="ProductPage_ProductPage_RelatedProductPage" Member="ProductPage_RelatedProductPages" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="ProductPage_RelatedProductPage" />
       <Association Name="ProductPage_ProductPage_Attribute" Member="ProductPage_Attributes" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="ProductPage_Attribute" />
       <Association Name="ProductPage_Product_ProductPage" Member="Product_ProductPages" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="Product_ProductPage" />
@@ -5215,6 +5218,7 @@
       <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="Enabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="FilterIndexCombinationID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="SEMRushSearchVolume" Type="System.Int32" DbType="INT" CanBeNull="true" />
       <Association Name="FilterIndexCombination_FilterIndexCombination_Language" Member="FilterIndexCombination_Languages" ThisKey="FilterIndexCombinationID" OtherKey="FilterIndexCombinationID" Type="FilterIndexCombination_Language" />
       <Association Name="ProductType_FilterIndexCombination" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
@@ -5245,6 +5249,7 @@
       <Column Name="ProductTypeName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="AttributeSignature" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
       <Column Name="AttributeDescription" Type="System.String" DbType="NVarChar(500) NOT NULL" CanBeNull="false" />
+      <Column Name="SEMRushSearchVolume" Type="System.Int32" DbType="INT" CanBeNull="true" />
     </Type>
   </Table>
   <Table Name="art.ArticleSubType" Member="ArticleSubTypes">
@@ -6593,5 +6598,25 @@
       <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
     </ElementType>
+  </Function>
+  <Function Name="adm.HTMLSection_Country_Language_Initialise" Method="HTMLSection_Country_Language_Initialise">
+    <Parameter Name="HTMLSectionID" Parameter="hTMLSectionID" Type="System.Int64" DbType="BigInt" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="adm.Article_Country_Language_Initialise" Method="Article_Country_Language_Initialise">
+    <Parameter Name="ArticleID" Parameter="articleID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="adm.Page_Country_Language_Initialise" Method="Page_Country_Language_Initialise">
+    <Parameter Name="PageID" Parameter="pageID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="adm.ProductPage_Country_Language_Initialise" Method="ProductPage_Country_Language_Initialise">
+    <Parameter Name="ProductPageID" Parameter="productPageID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="adm.Collection_Country_Language_Initialise" Method="Collection_Country_Language_Initialise">
+    <Parameter Name="CollectionID" Parameter="collectionID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
   </Function>
 </Database>

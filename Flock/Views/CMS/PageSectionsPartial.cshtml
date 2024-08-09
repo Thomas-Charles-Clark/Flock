@@ -39,7 +39,7 @@
                     <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
                         @Html.Partial("PageSectionHeaderDetails", sect)
                     </div>
-                    <div data-page-section-id="@(sect.PageSectionID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
+                    <div data-page-section-id="@(sect.PageSectionID)" data-page-section-type="@(sect.PageSectionTypeID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
                         @Html.Partial("CountryLanguageRestrictionPartial", sect.CountryLanguageRestrictions)
                     </div>
                     <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
@@ -73,7 +73,7 @@
             break;
         case 5:
             @*Collection Grid*@
-            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)" data-page-section-type="@(sect.PageSectionTypeID)">
                 <fieldset>
                     <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
                         Collection Grid @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
@@ -87,6 +87,9 @@
                     </legend>
                     <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
                         @Html.Partial("PageSectionHeaderDetails", sect)
+                    </div>
+                    <div data-page-section-id="@(sect.PageSectionID)" data-page-section-type="@(sect.PageSectionTypeID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
+                        @Html.Partial("CountryLanguageRestrictionPartial", sect.CountryLanguageRestrictions)
                     </div>
                     <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
                         <div id="page-section-@(sect.PageSectionID)-grid" data-page-section-name="@(sect.PageSectionName)" data-page-section-id="@(sect.PageSectionID)" class="collection-grid-container">
@@ -119,7 +122,7 @@
                     <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
                         @Html.Partial("PageSectionHeaderDetails", sect)
                     </div>
-                    <div data-page-section-id="@(sect.PageSectionID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
+                    <div data-page-section-id="@(sect.PageSectionID)" data-page-section-type="@(sect.PageSectionTypeID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
                         @Html.Partial("CountryLanguageRestrictionPartial", sect.CountryLanguageRestrictions)
                     </div>
                     <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
@@ -137,7 +140,7 @@
             </div>
             break;
             case 7:
-            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+            <div class="content-panel-container" data-page-section-type="@(sect.PageSectionTypeID)" data-page-section-id="@(sect.PageSectionID)">
                 <fieldset>
                     <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
                         Brochure @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
@@ -161,7 +164,7 @@
             </div>
             break;
             case 8:
-            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+            <div class="content-panel-container" data-page-section-type="@(sect.PageSectionTypeID)" data-page-section-id="@(sect.PageSectionID)">
                 <fieldset>
                     <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
                         Banner Location Group @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
@@ -201,7 +204,7 @@
                     <div id="page-section-@(sect.PageSectionID)-header-details" class="pagesection-header">
                         @Html.Partial("PageSectionHeaderDetails", sect)
                     </div>
-                    <div data-page-section-id="@(sect.PageSectionID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
+                    <div data-page-section-id="@(sect.PageSectionID)" data-page-section-type="@(sect.PageSectionTypeID)" style="padding: 1em; padding-bottom: 0; background-color: white;">
                         @Html.Partial("CountryLanguageRestrictionPartial", sect.CountryLanguageRestrictions)
                     </div>
                     <div id="page-section-@(sect.PageSectionID)" style="@(ViewBag.IsUserShuffling ? "display: none" : "")" class="fieldset-inner page-section-hideable">
@@ -222,7 +225,7 @@
             </div>
             break;
         case 10:
-        <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+        <div class="content-panel-container" data-page-section-type="@(sect.PageSectionTypeID)" data-page-section-id="@(sect.PageSectionID)">
             <fieldset>
                 <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
                     Video @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")
@@ -257,7 +260,7 @@
             </div>
             break;
         case 13:
-            <div class="content-panel-container" data-page-section-id="@(sect.PageSectionID)">
+            <div class="content-panel-container" data-page-section-type="@(sect.PageSectionTypeID)" data-page-section-id="@(sect.PageSectionID)">
                 <fieldset>
                     <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + sect.PageSectionID + "').slideToggle('fast');")">
                         Bespoke Content @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")

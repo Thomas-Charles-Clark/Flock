@@ -14,6 +14,7 @@ using System.Web.Script.Serialization;
 using DevExpress.Web;
 using Flock.Models;
 using Flock.ViewModels;
+using OpenXmlPowerTools;
 
 namespace Flock.Models
 {
@@ -2949,6 +2950,8 @@ namespace Flock.Models
         }
 
         public string Resource_Language_Save(
+            IEnumerable<short> countryIds,
+            byte languageId,
             short countryLanguageId,
             Flock.ViewModels.TranslateResourceGridViewModel model)
         {
@@ -2964,11 +2967,23 @@ namespace Flock.Models
             TranslatedText.Columns.Add("CountryID", typeof(short));
             TranslatedText.Columns.Add("Value", typeof(string));
 
-            foreach (var r in model.Resources)
+            if (countryIds.Any())
             {
-                OriginalText.Rows.Add(new object[] { r.ResourceID, r.CountryID, r.Value });
+                foreach (var r in model.Resources)
+                {
+                    OriginalText.Rows.Add(new object[] { r.ResourceID, r.CountryID, r.Value });
 
-                TranslatedText.Rows.Add(new object[] { r.ResourceID, r.CountryID, r.TranslatedValue });
+                    TranslatedText.Rows.Add(new object[] { r.ResourceID, r.CountryID, r.TranslatedValue });
+                }
+            }
+            else
+            {
+                foreach (var r in model.Resources)
+                {
+                    OriginalText.Rows.Add(new object[] { r.ResourceID, r.CountryID, r.Value });
+
+                    TranslatedText.Rows.Add(new object[] { r.ResourceID, r.CountryID, r.TranslatedValue });
+                }
             }
 
             SqlConnection con = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString);
@@ -6352,12 +6367,12 @@ namespace Flock.ViewModels
             public string Name { get; set; }
         }
 
-        public static IEnumerable<Source> GetSources(ListEditItemsRequestedByFilterConditionEventArgs args)
+        public static IEnumerable<Flock.Models.Source> GetSources(ListEditItemsRequestedByFilterConditionEventArgs args)
         {
             return DB.Sources.Where(p => p.Deleted == false).OrderBy(p => p.SourceID).ToList();
         }
 
-        public static IEnumerable<Source> GetSourceByID(ListEditItemRequestedByValueEventArgs args)
+        public static IEnumerable<Flock.Models.Source> GetSourceByID(ListEditItemRequestedByValueEventArgs args)
         {
             if (args.Value != null)
                 return DB.Sources.Where(p => p.SourceID == (byte)args.Value).ToList();

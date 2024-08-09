@@ -1416,7 +1416,11 @@ function InitCountryLanguageDragDrop() {
                     url: '/admin/cms/UpdatePageSectionCountryRestrictions',
                     type: "POST",
                     traditional: true,
-                    data: { pageSectionID: $(this).parent().data("page-section-id"), countryLanguageRestrictions: JSON.stringify(countryLanguageRestrictions) },
+                    data: {
+                        pageSectionID: $(this).parent().data("page-section-id"),
+                        pageSectionTypeId: $(this).closest('.content-panel-container').data("page-section-type"),
+                        countryLanguageRestrictions: JSON.stringify(countryLanguageRestrictions)
+                    },
                     success: function (data) {
                         $(targ).html(data);
                     },
@@ -1452,7 +1456,11 @@ function UpdatePageSectionCountryRestrictions(container) {
         url: '/admin/cms/UpdatePageSectionCountryRestrictions',
         type: "POST",
         traditional: true,
-        data: { pageSectionID: targ.data("page-section-id"), countryLanguageRestrictions: JSON.stringify(countryLanguageRestrictions) },
+        data: {
+            pageSectionID: targ.data("page-section-id"),
+            pageSectionTypeId: targ.data("page-section-type"),
+            countryLanguageRestrictions: JSON.stringify(countryLanguageRestrictions)
+        },
         success: function (data) {
             $(targ).html(data);
         },
@@ -1780,24 +1788,24 @@ function RefreshPageOptions()
     $("#add-all-country-language-dialog").html("");
 
     $('.content-panel-container[data-page-section-type="1"]').each(function () {
-        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>HTML Section - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + ", 1); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>HTML Section - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
     });
 
     $('.content-panel-container[data-page-section-type="2"]').each(function () {
-        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Slideshow - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + ", 2); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Slideshow - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
     });
 
     $('.content-panel-container[data-page-section-type="3"]').each(function () {
-        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Form - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + ", 3); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Form - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
     });
 
     $('.content-panel-container[data-page-section-type="4"]').each(function () {
-        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>ProductPage Grid - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + ", 4); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>ProductPage Grid - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
         $("#pagesection-productpage-merge-dialog-buttons").append("<input type='button' data-page-section-id=" + $(this).data('page-section-id') + " style='display: block; margin-top: 8px;' onclick='$.confirm(function() { PageSectionProductPageMerge(" + $(this).data('page-section-id') + ") }, function() { });'  value='ProductPage Grid - " + (window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() == null ? "Unnamed" : window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue()) + " - (PageSectionID: " + $(this).data("page-section-id") + ")'/>");
     });
 
     $('.content-panel-container[data-page-section-type="6"]').each(function () {
-        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + "); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Page Grid - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
+        $("#add-all-country-language-dialog").append("<button style='display: block; margin-top: 8px;' type='button' onclick='AddAllCountryLanguagesToPageSection(" + $(this).data('page-section-id') + ", 6); $(\"#add-all-country-language-dialog\").dialog(\"close\");'>Page Grid - " + window["PageSection" + $(this).data("page-section-id") + "PageSectionName"].GetValue() + " - (PageSectionID: " + $(this).data("page-section-id") + ")</button>");
     });
 
 }
@@ -2057,7 +2065,7 @@ function AddAllCountriesToSlideshow(SlideshowID, PageSectionID) {
     });
 }
 
-function AddAllCountryLanguagesToPageSection(PageSectionID) {
+function AddAllCountryLanguagesToPageSection(PageSectionID, pageSectionTypeId) {
     $("div [data-page-section-id='" + PageSectionID + "']").find(".country-restriction-section").sortable("refresh");
     var restrictions = new Array();
 
@@ -2085,7 +2093,7 @@ function AddAllCountryLanguagesToPageSection(PageSectionID) {
         url: '/admin/cms/updatepagesectioncountryrestrictions',//'@Url.Action("UpdatePageSectionCountryRestrictions", "CMS")',
         type: "POST",
         traditional: true,
-        data: { pageSectionID: PageSectionID, countryLanguageRestrictions: JSON.stringify(restrictions) },
+        data: { pageSectionID: PageSectionID, pageSectionTypeId: pageSectionTypeId, countryLanguageRestrictions: JSON.stringify(restrictions) },
         success: function (data) {
             $("#page-section-" + PageSectionID + "-country-restriction-container").html(data);
             LoadingPanel.Hide();

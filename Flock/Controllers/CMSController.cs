@@ -16,6 +16,7 @@ using System.Data.Linq;
 using Newtonsoft.Json;
 using System.Net;
 using NLog.Internal;
+using DevExpress.XtraPrinting.Native;
 
 namespace Flock.Controllers
 {
@@ -2078,7 +2079,7 @@ namespace Flock.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdatePageSectionCountryRestrictions(long pageSectionID, string countryLanguageRestrictions)
+        public ActionResult UpdatePageSectionCountryRestrictions(long pageSectionID, string countryLanguageRestrictions, byte pageSectionTypeId)
         {
             var incomingRestrictions = JsonConvert.DeserializeObject<List<CountryLanguageSortDatum>>(countryLanguageRestrictions ?? "[]");
 
@@ -2116,6 +2117,23 @@ namespace Flock.Controllers
             UnitOfWork.Save();
 
             var model = UnitOfWork.GetRepository<PageSection_Country_Language>().GetAll().Where(p => p.PageSectionID == pageSectionID).ToList();
+
+            switch (pageSectionTypeId)
+            {
+                case 1:
+                    var htmlSectionId = UnitOfWork.GetRepository<PageSection_HTMLSection>().GetAll().Single(p => p.PageSectionID == pageSectionID).HtmlSectionID;
+                    UnitOfWork.Context.HTMLSection_Country_Language_Initialise(htmlSectionId);
+                    break;
+                // Do we actually want to do this... 
+                //case 9:
+                //    var articleIds = UnitOfWork.GetRepository<PageSection_Article>().GetAll().Where(p => p.PageSectionID == pageSectionID).Select(a => a.ArticleID);
+                //    articleIds.ForEach(aid =>
+                //    {
+                //        UnitOfWork.Context.Article_Country_Language_Initialise(aid);
+                //    });
+                //    break;
+                default: break;
+            }
             
             return PartialView("CountryLanguageRestrictionPartial", model);
         }

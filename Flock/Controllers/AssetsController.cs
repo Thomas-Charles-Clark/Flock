@@ -871,6 +871,7 @@ namespace Flock.Controllers
             return PartialView("MessageComposePartial", Model);
         }
 
+        [ValidateInput(false)]
         public ActionResult MessagesGridViewPartialAddNew(MessageViewModel item)
         {
             item.CreatedDT = DateTime.Now;
@@ -915,6 +916,7 @@ namespace Flock.Controllers
             return PartialView("MessagesGridViewPartial");
         }
 
+        [ValidateInput(false)]
         public ActionResult MessagesGridViewPartialUpdate(MessageViewModel item)
         {
             return PartialView("MessagesGridViewPartial");
@@ -1068,6 +1070,7 @@ namespace Flock.Controllers
             return PartialView("MessageCountryRestrictionsPartial", Model);
         }
 
+        [ValidateInput(false)]
         [HttpPost]
         public ActionResult SaveMessageDetails(MessageViewModel item)
         {

@@ -260,6 +260,7 @@ namespace Flock.ViewModels
                             PreviewColourways = PageSections[i].PreviewColourways,
                             PreviewColourwaysCircularClip = PageSections[i].PreviewColourwaysCircularClip
                         };
+                        cbps.CountryLanguageRestrictions = UoW.GetRepository<PageSection_Country_Language>().GetAll().Where(p => p.PageSectionID == PageSections[i].PageSectionID).ToList();
                         cbps.IsLifestyleGallery = PageSections[i].IsLifestyleGallery;
                         cbps.TradePartnerAvailability = PageSections[i].TradePartnerAvailability;
                         PVM.PageSections.Add(cbps);

@@ -54,13 +54,13 @@
         settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Count, "DeliveryBandID").DisplayFormat = "Total: {0:n0}";
         settings.Settings.ShowFooter = true;
 
-        
+
         settings.SettingsBehavior.EnableRowHotTrack = true;
         settings.Styles.Row.Cursor = "pointer";
         settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
         settings.CommandColumn.Visible = false;
-        
-        
+
+
         MVCxGridViewColumn CustomColumn = new MVCxGridViewColumn();
         CustomColumn.Name = "CustomCommandColumn";
         CustomColumn.FieldName = "CustomCommandColumn";
@@ -97,6 +97,7 @@
         MVCxGridViewColumn DisplayNameColumn = new MVCxGridViewColumn();
         MVCxGridViewColumn CourierIDColumn = new MVCxGridViewColumn();
         MVCxGridViewColumn PriceListIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn ConsolidatedDisplayNameColumn = new MVCxGridViewColumn();
         MVCxGridViewColumn CarrCodeColumn = new MVCxGridViewColumn();
         MVCxGridViewColumn SortOrderColumn = new MVCxGridViewColumn();
         MVCxGridViewColumn CreatedDTColumn = new MVCxGridViewColumn();
@@ -159,7 +160,7 @@
         doProp.ValueType = typeof(byte);
         doProp.DataSource = UoW.GetRepository<DeliveryOption>().GetAll().OrderBy(p => p.Name).ToList();
         settings.Columns.Add(DeliveryOptionIDColumn);
-        
+
         NameColumn.Name = "Name";
         NameColumn.FieldName = "Name";
         NameColumn.Caption = "Name";
@@ -195,6 +196,18 @@
         CarrCodeColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
         CarrCodeColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
         settings.Columns.Add(CarrCodeColumn);
+
+        ConsolidatedDisplayNameColumn.Name = "ConsolidatedDisplayName";
+        ConsolidatedDisplayNameColumn.FieldName = "ConsolidatedDisplayName";
+        ConsolidatedDisplayNameColumn.Caption = "Consolidated Display Name";
+        ConsolidatedDisplayNameColumn.Width = 65;
+        var ccdnProp = CarrCodeColumn.PropertiesEdit as TextBoxProperties;
+        ccdnProp.MaxLength = 50;
+        ConsolidatedDisplayNameColumn.EditFormSettings.Visible = DefaultBoolean.True;
+        ConsolidatedDisplayNameColumn.Settings.AllowAutoFilter = DefaultBoolean.True;
+        ConsolidatedDisplayNameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        ConsolidatedDisplayNameColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        settings.Columns.Add(ConsolidatedDisplayNameColumn);
 
 
         SortOrderColumn.Name = "SortOrderID";
@@ -245,193 +258,193 @@
                 default: break;
             }
         };
-        
-//        settings.SetEditFormTemplateContent(c =>
-//        {
-//            ViewContext.Writer.Write("<div id='country-pricelist-linker'>");
-//            //foreach (var country in (IEnumerable<Country>)Flock.ViewModels.LargeDatabaseDataProvider.GetCountryWithPriceList(new ListEditItemsRequestedByFilterConditionEventArgs(0, 1000, null)))
-//            foreach(var country in UoW.GetRepository<Country>().GetAll().ToList())
-//            {
-//                ViewContext.Writer.Write("<div data-pricelist-id='" + country.PriceListID + "' data-country-id='" + country.CountryID + "' ></div>");
-//            }
-//            ViewContext.Writer.Write("</div>");
-            
-//            var DeliveryZones = UoW.GetRepository<DeliveryZone>().GetAll().OrderBy(p => p.Name).ToList();
-//            var StockLocations = UoW.GetRepository<StockLocation>().GetAll().OrderBy(p => p.Name).ToList();
 
-//            var DZLinker = new List<short>();
-//            var AssignedDeliveryZones = new List<DeliveryZone>();
-//            var SLLinker = new List<byte>();
-//            var AssignedStockLocations = new List<StockLocation>();
-            
-//            if (c.KeyValue != null)
-//            {
-//                DZLinker = UoW.GetRepository<DeliveryBand_DeliveryZone>().GetAll().Where(p => p.DeliveryBandID == (short)c.KeyValue).Select(p => p.DeliveryZoneID).ToList();
-//                AssignedDeliveryZones = UoW.GetRepository<DeliveryZone>().GetAll().Where(p => DZLinker.Contains(p.DeliveryZoneID)).ToList();
+        //        settings.SetEditFormTemplateContent(c =>
+        //        {
+        //            ViewContext.Writer.Write("<div id='country-pricelist-linker'>");
+        //            //foreach (var country in (IEnumerable<Country>)Flock.ViewModels.LargeDatabaseDataProvider.GetCountryWithPriceList(new ListEditItemsRequestedByFilterConditionEventArgs(0, 1000, null)))
+        //            foreach(var country in UoW.GetRepository<Country>().GetAll().ToList())
+        //            {
+        //                ViewContext.Writer.Write("<div data-pricelist-id='" + country.PriceListID + "' data-country-id='" + country.CountryID + "' ></div>");
+        //            }
+        //            ViewContext.Writer.Write("</div>");
 
-//                SLLinker = UoW.GetRepository<DeliveryBand_StockLocation>().GetAll().Where(p => p.DeliveryBandID == (short)c.KeyValue).Select(p => p.StockLocationID).ToList();
-//                AssignedStockLocations = UoW.GetRepository<StockLocation>().GetAll().Where(p => SLLinker.Contains(p.StockLocationID)).ToList();
-//            }
-//            ViewContext.Writer.Write("<table id='DeliveryBandGridView_DXEFT' class='dxgvEditFormTable_MetropolisBlue' style='width:100%;'>");
-//            ViewContext.Writer.Write("<tbody>");
-            
-//            ViewContext.Writer.Write("<tr>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
-//            Html.DevExpress().Label(lblSettings =>
-//            {
-//                lblSettings.Name = "NameLbl";
-//                lblSettings.Text = "Name";
-//            }).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
-//            Html.DevExpress().TextBox(tbSettings =>
-//            {
-//                tbSettings.Name = "Name";
-//                tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
-//                tbSettings.Properties.MaxLength = 50;
-//                tbSettings.ShowModelErrors = true;
-//                tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
-//            }).Bind(DataBinder.Eval(c.DataItem, "Name")).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
-//            Html.DevExpress().Label(lblSettings =>
-//            {
-//                lblSettings.Name = "DisplayNameLbl";
-//                lblSettings.Text = "Display Name";
-//            }).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
-//            Html.DevExpress().TextBox(tbSettings =>
-//            {
-//                tbSettings.Name = "DisplayName";
-//                tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
-//                tbSettings.Properties.MaxLength = 50;
-//                tbSettings.ShowModelErrors = true;
-//                tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
-//            }).Bind(DataBinder.Eval(c.DataItem, "DisplayName")).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("</tr>");
+        //            var DeliveryZones = UoW.GetRepository<DeliveryZone>().GetAll().OrderBy(p => p.Name).ToList();
+        //            var StockLocations = UoW.GetRepository<StockLocation>().GetAll().OrderBy(p => p.Name).ToList();
 
-//            ViewContext.Writer.Write("<tr>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
-//            Html.DevExpress().Label(lblSettings =>
-//            {
-//                lblSettings.Name = "PriceListLbl";
-//                lblSettings.Text = "Price List";
-//            }).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
-//            Html.DevExpress().ComboBox(cbSettings => {
-//                cbSettings.Name = "PriceListID";
-//                cbSettings.Properties.TextField = "Name";
-//                cbSettings.Properties.ValueField = "PriceListID";
-//                cbSettings.Properties.ValueType = typeof(byte);
-//                cbSettings.ShowModelErrors = true;
-//                cbSettings.Properties.NullDisplayText = "Price List";
-//                cbSettings.Properties.NullText = "Price List";
-//                cbSettings.SelectedIndex = -1;
-//                cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
-//                cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
-//                    FilterDeliveryZonesList();
-//                }";
-//            }).BindList(args => {
-//                return Flock.ViewModels.LargeDatabaseDataProvider.GetPriceLists(args);
-//            }, Flock.ViewModels.LargeDatabaseDataProvider.GetPriceListByID).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
-//            Html.DevExpress().Label(lblSettings =>
-//            {
-//                lblSettings.Name = "CourierLbl";
-//                lblSettings.Text = "Courier";
-//            }).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
-//            Html.DevExpress().ComboBox(cbSettings =>
-//            {
-//                cbSettings.Name = "CourierID";
-//                var cbProp = cbSettings.Properties as ComboBoxProperties;
-//                cbProp.TextField = "Name";
-//                cbProp.ValueField = "CourierID";
-//                cbProp.ValueType = typeof(byte);
-//                cbSettings.Properties.NullDisplayText = "Courier";
-//                cbSettings.Properties.NullText = "Courier";
-//                cbSettings.SelectedIndex = -1;
-//                cbSettings.ShowModelErrors = true;
-//                cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
-//                cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
-//                    FilterDeliveryZonesList();
-//                }";
-//            }).BindList(args =>{
-//                return Flock.ViewModels.LargeDatabaseDataProvider.GetCouriers(args);
-//            }, Flock.ViewModels.LargeDatabaseDataProvider.GetCourierByID).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("</tr>");
+        //            var DZLinker = new List<short>();
+        //            var AssignedDeliveryZones = new List<DeliveryZone>();
+        //            var SLLinker = new List<byte>();
+        //            var AssignedStockLocations = new List<StockLocation>();
 
-//            ViewContext.Writer.Write("<tr>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
-//            Html.DevExpress().Label(lblSettings =>
-//            {
-//                lblSettings.Name = "CarrCodeLbl";
-//                lblSettings.Text = "CARRCODE";
-//            }).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
-//            Html.DevExpress().TextBox(tbSettings =>
-//            {
-//                tbSettings.Name = "CARRCODE";
-//                tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
-//                tbSettings.Properties.MaxLength = 10;
-//                tbSettings.ShowModelErrors = true;
-//                tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
-//            }).Bind(DataBinder.Eval(c.DataItem, "CARRCODE")).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
-//            Html.DevExpress().Label(lblSettings =>
-//            {
-//                lblSettings.Name = "SortOrderLbl";
-//                lblSettings.Text = "Sort Order";
-//            }).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
-//            Html.DevExpress().TextBox(tbSettings =>
-//            {
-//                tbSettings.Name = "SortOrder";
-//                tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
-//                tbSettings.Properties.MaxLength = 3;
-//                tbSettings.ShowModelErrors = true;
-//                tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
-//            }).Bind(DataBinder.Eval(c.DataItem, "SortOrder")).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("</tr>");
+        //            if (c.KeyValue != null)
+        //            {
+        //                DZLinker = UoW.GetRepository<DeliveryBand_DeliveryZone>().GetAll().Where(p => p.DeliveryBandID == (short)c.KeyValue).Select(p => p.DeliveryZoneID).ToList();
+        //                AssignedDeliveryZones = UoW.GetRepository<DeliveryZone>().GetAll().Where(p => DZLinker.Contains(p.DeliveryZoneID)).ToList();
 
-            
-//            ViewContext.Writer.Write("<tr>");
-//            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='8' rowspan='1' width='100%;' style='text-align: right;'>");
-//            Html.DevExpress().Button(
-//                btnSettings =>
-//                {
-//                    btnSettings.Name = "btnUpdate";
-//                    btnSettings.ControlStyle.CssClass = "button";
-//                    btnSettings.Text = "Update";
-//                    btnSettings.Style.Add("margin-right", "20px");
-//                    btnSettings.ClientSideEvents.Click = "function(s, e){ DeliveryBandGridView.UpdateEdit(); }";
-//                }
-//            ).Render();
-//            Html.DevExpress().Button(
-//                btnSettings =>
-//                {
-//                    btnSettings.Name = "btnCancel";
-//                    btnSettings.ControlStyle.CssClass = "button";
-//                    btnSettings.Text = "Cancel";
-//                    btnSettings.ClientSideEvents.Click = "function(s, e){ DeliveryBandGridView.CancelEdit(); }";
-//                }
-//            ).Render();
-//            ViewContext.Writer.Write("</td>");
-//            ViewContext.Writer.Write("</tr>");
-            
-//            ViewContext.Writer.Write("</tbody>");
-//            ViewContext.Writer.Write("</table>");
-//        });
+        //                SLLinker = UoW.GetRepository<DeliveryBand_StockLocation>().GetAll().Where(p => p.DeliveryBandID == (short)c.KeyValue).Select(p => p.StockLocationID).ToList();
+        //                AssignedStockLocations = UoW.GetRepository<StockLocation>().GetAll().Where(p => SLLinker.Contains(p.StockLocationID)).ToList();
+        //            }
+        //            ViewContext.Writer.Write("<table id='DeliveryBandGridView_DXEFT' class='dxgvEditFormTable_MetropolisBlue' style='width:100%;'>");
+        //            ViewContext.Writer.Write("<tbody>");
+
+        //            ViewContext.Writer.Write("<tr>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
+        //            Html.DevExpress().Label(lblSettings =>
+        //            {
+        //                lblSettings.Name = "NameLbl";
+        //                lblSettings.Text = "Name";
+        //            }).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
+        //            Html.DevExpress().TextBox(tbSettings =>
+        //            {
+        //                tbSettings.Name = "Name";
+        //                tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        //                tbSettings.Properties.MaxLength = 50;
+        //                tbSettings.ShowModelErrors = true;
+        //                tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        //            }).Bind(DataBinder.Eval(c.DataItem, "Name")).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
+        //            Html.DevExpress().Label(lblSettings =>
+        //            {
+        //                lblSettings.Name = "DisplayNameLbl";
+        //                lblSettings.Text = "Display Name";
+        //            }).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
+        //            Html.DevExpress().TextBox(tbSettings =>
+        //            {
+        //                tbSettings.Name = "DisplayName";
+        //                tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        //                tbSettings.Properties.MaxLength = 50;
+        //                tbSettings.ShowModelErrors = true;
+        //                tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        //            }).Bind(DataBinder.Eval(c.DataItem, "DisplayName")).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("</tr>");
+
+        //            ViewContext.Writer.Write("<tr>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
+        //            Html.DevExpress().Label(lblSettings =>
+        //            {
+        //                lblSettings.Name = "PriceListLbl";
+        //                lblSettings.Text = "Price List";
+        //            }).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
+        //            Html.DevExpress().ComboBox(cbSettings => {
+        //                cbSettings.Name = "PriceListID";
+        //                cbSettings.Properties.TextField = "Name";
+        //                cbSettings.Properties.ValueField = "PriceListID";
+        //                cbSettings.Properties.ValueType = typeof(byte);
+        //                cbSettings.ShowModelErrors = true;
+        //                cbSettings.Properties.NullDisplayText = "Price List";
+        //                cbSettings.Properties.NullText = "Price List";
+        //                cbSettings.SelectedIndex = -1;
+        //                cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        //                cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+        //                    FilterDeliveryZonesList();
+        //                }";
+        //            }).BindList(args => {
+        //                return Flock.ViewModels.LargeDatabaseDataProvider.GetPriceLists(args);
+        //            }, Flock.ViewModels.LargeDatabaseDataProvider.GetPriceListByID).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
+        //            Html.DevExpress().Label(lblSettings =>
+        //            {
+        //                lblSettings.Name = "CourierLbl";
+        //                lblSettings.Text = "Courier";
+        //            }).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
+        //            Html.DevExpress().ComboBox(cbSettings =>
+        //            {
+        //                cbSettings.Name = "CourierID";
+        //                var cbProp = cbSettings.Properties as ComboBoxProperties;
+        //                cbProp.TextField = "Name";
+        //                cbProp.ValueField = "CourierID";
+        //                cbProp.ValueType = typeof(byte);
+        //                cbSettings.Properties.NullDisplayText = "Courier";
+        //                cbSettings.Properties.NullText = "Courier";
+        //                cbSettings.SelectedIndex = -1;
+        //                cbSettings.ShowModelErrors = true;
+        //                cbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        //                cbSettings.Properties.ClientSideEvents.SelectedIndexChanged = @"function(s, e) { 
+        //                    FilterDeliveryZonesList();
+        //                }";
+        //            }).BindList(args =>{
+        //                return Flock.ViewModels.LargeDatabaseDataProvider.GetCouriers(args);
+        //            }, Flock.ViewModels.LargeDatabaseDataProvider.GetCourierByID).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("</tr>");
+
+        //            ViewContext.Writer.Write("<tr>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
+        //            Html.DevExpress().Label(lblSettings =>
+        //            {
+        //                lblSettings.Name = "CarrCodeLbl";
+        //                lblSettings.Text = "CARRCODE";
+        //            }).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
+        //            Html.DevExpress().TextBox(tbSettings =>
+        //            {
+        //                tbSettings.Name = "CARRCODE";
+        //                tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        //                tbSettings.Properties.MaxLength = 10;
+        //                tbSettings.ShowModelErrors = true;
+        //                tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        //            }).Bind(DataBinder.Eval(c.DataItem, "CARRCODE")).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue'>");
+        //            Html.DevExpress().Label(lblSettings =>
+        //            {
+        //                lblSettings.Name = "SortOrderLbl";
+        //                lblSettings.Text = "Sort Order";
+        //            }).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='1' rowspan='1' width='50%;'>");
+        //            Html.DevExpress().TextBox(tbSettings =>
+        //            {
+        //                tbSettings.Name = "SortOrder";
+        //                tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        //                tbSettings.Properties.MaxLength = 3;
+        //                tbSettings.ShowModelErrors = true;
+        //                tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+        //            }).Bind(DataBinder.Eval(c.DataItem, "SortOrder")).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("</tr>");
+
+
+        //            ViewContext.Writer.Write("<tr>");
+        //            ViewContext.Writer.Write("<td class='dxgvEditFormCaption_MetropolisBlue' colspan='8' rowspan='1' width='100%;' style='text-align: right;'>");
+        //            Html.DevExpress().Button(
+        //                btnSettings =>
+        //                {
+        //                    btnSettings.Name = "btnUpdate";
+        //                    btnSettings.ControlStyle.CssClass = "button";
+        //                    btnSettings.Text = "Update";
+        //                    btnSettings.Style.Add("margin-right", "20px");
+        //                    btnSettings.ClientSideEvents.Click = "function(s, e){ DeliveryBandGridView.UpdateEdit(); }";
+        //                }
+        //            ).Render();
+        //            Html.DevExpress().Button(
+        //                btnSettings =>
+        //                {
+        //                    btnSettings.Name = "btnCancel";
+        //                    btnSettings.ControlStyle.CssClass = "button";
+        //                    btnSettings.Text = "Cancel";
+        //                    btnSettings.ClientSideEvents.Click = "function(s, e){ DeliveryBandGridView.CancelEdit(); }";
+        //                }
+        //            ).Render();
+        //            ViewContext.Writer.Write("</td>");
+        //            ViewContext.Writer.Write("</tr>");
+
+        //            ViewContext.Writer.Write("</tbody>");
+        //            ViewContext.Writer.Write("</table>");
+        //        });
     });
 }
 

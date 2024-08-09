@@ -966,8 +966,9 @@ namespace Flock.Models
     #endregion
 		
 		public FlockDataContext() : 
-				base("Data Source=VM-SQL1;Initial Catalog=Flock;Persist Security Info=True;User ID=dg;P" +
-						"assword=mattm00", mappingSource)
+				base("Data Source=vm-sql;Initial Catalog=Flock;Integrated Security=False;Persist Securi" +
+						"ty Info=True;User ID=App_Flock-Backend;Password=98FB269A-064A-4E4D-9A1A-39B9BBEA" +
+						"88EF;TrustServerCertificate=True", mappingSource)
 		{
 			OnCreated();
 		}
@@ -5117,6 +5118,41 @@ namespace Flock.Models
 		{
 			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), marketID, continentID, regionID, languageID, countryName);
 			return ((ISingleResult<Country_Language_SearchResult>)(result.ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="adm.HTMLSection_Country_Language_Initialise")]
+		public int HTMLSection_Country_Language_Initialise([global::System.Data.Linq.Mapping.ParameterAttribute(Name="HTMLSectionID", DbType="BigInt")] System.Nullable<long> hTMLSectionID)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), hTMLSectionID);
+			return ((int)(result.ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="adm.Article_Country_Language_Initialise")]
+		public int Article_Country_Language_Initialise([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ArticleID", DbType="Int")] System.Nullable<int> articleID)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), articleID);
+			return ((int)(result.ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="adm.Page_Country_Language_Initialise")]
+		public int Page_Country_Language_Initialise([global::System.Data.Linq.Mapping.ParameterAttribute(Name="PageID", DbType="Int")] System.Nullable<int> pageID)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), pageID);
+			return ((int)(result.ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="adm.ProductPage_Country_Language_Initialise")]
+		public int ProductPage_Country_Language_Initialise([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ProductPageID", DbType="Int")] System.Nullable<int> productPageID)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), productPageID);
+			return ((int)(result.ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="adm.Collection_Country_Language_Initialise")]
+		public int Collection_Country_Language_Initialise([global::System.Data.Linq.Mapping.ParameterAttribute(Name="CollectionID", DbType="Int")] System.Nullable<int> collectionID)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), collectionID);
+			return ((int)(result.ReturnValue));
 		}
 	}
 	
@@ -40287,6 +40323,8 @@ namespace Flock.Models
 		
 		private System.Nullable<System.TimeSpan> _CutOff;
 		
+		private string _ConsolidatedDisplayName;
+		
 		private EntitySet<DeliveryBand_DeliveryZone> _DeliveryBand_DeliveryZones;
 		
 		private EntitySet<DeliveryPrice> _DeliveryPrices;
@@ -40329,6 +40367,8 @@ namespace Flock.Models
     partial void OnDaysToDeliverMaxChanged();
     partial void OnCutOffChanging(System.Nullable<System.TimeSpan> value);
     partial void OnCutOffChanged();
+    partial void OnConsolidatedDisplayNameChanging(string value);
+    partial void OnConsolidatedDisplayNameChanged();
     #endregion
 		
 		public DeliveryBand()
@@ -40644,6 +40684,26 @@ namespace Flock.Models
 					this._CutOff = value;
 					this.SendPropertyChanged("CutOff");
 					this.OnCutOffChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ConsolidatedDisplayName", DbType="NVARCHAR(50) NOT NULL", CanBeNull=false)]
+		public string ConsolidatedDisplayName
+		{
+			get
+			{
+				return this._ConsolidatedDisplayName;
+			}
+			set
+			{
+				if ((this._ConsolidatedDisplayName != value))
+				{
+					this.OnConsolidatedDisplayNameChanging(value);
+					this.SendPropertyChanging();
+					this._ConsolidatedDisplayName = value;
+					this.SendPropertyChanged("ConsolidatedDisplayName");
+					this.OnConsolidatedDisplayNameChanged();
 				}
 			}
 		}
@@ -94155,6 +94215,10 @@ namespace Flock.Models
 		
 		private System.Nullable<bool> _TradeSwitch;
 		
+		private string _VideoURL;
+		
+		private string _VideoThumbnail;
+		
 		private EntitySet<ProductPage_RelatedProductPage> _ProductPage_RelatedProductPages;
 		
 		private EntitySet<ProductPage_Attribute> _ProductPage_Attributes;
@@ -94277,6 +94341,10 @@ namespace Flock.Models
     partial void OnTradeDiscountOperatorChanged();
     partial void OnTradeSwitchChanging(System.Nullable<bool> value);
     partial void OnTradeSwitchChanged();
+    partial void OnVideoURLChanging(string value);
+    partial void OnVideoURLChanged();
+    partial void OnVideoThumbnailChanging(string value);
+    partial void OnVideoThumbnailChanged();
     #endregion
 		
 		public ProductPage()
@@ -95165,6 +95233,46 @@ namespace Flock.Models
 					this._TradeSwitch = value;
 					this.SendPropertyChanged("TradeSwitch");
 					this.OnTradeSwitchChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_VideoURL", DbType="NVarChar(100)")]
+		public string VideoURL
+		{
+			get
+			{
+				return this._VideoURL;
+			}
+			set
+			{
+				if ((this._VideoURL != value))
+				{
+					this.OnVideoURLChanging(value);
+					this.SendPropertyChanging();
+					this._VideoURL = value;
+					this.SendPropertyChanged("VideoURL");
+					this.OnVideoURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_VideoThumbnail", DbType="NVarChar(500)")]
+		public string VideoThumbnail
+		{
+			get
+			{
+				return this._VideoThumbnail;
+			}
+			set
+			{
+				if ((this._VideoThumbnail != value))
+				{
+					this.OnVideoThumbnailChanging(value);
+					this.SendPropertyChanging();
+					this._VideoThumbnail = value;
+					this.SendPropertyChanged("VideoThumbnail");
+					this.OnVideoThumbnailChanged();
 				}
 			}
 		}
@@ -107220,6 +107328,8 @@ namespace Flock.Models
 		
 		private int _FilterIndexCombinationID;
 		
+		private System.Nullable<int> _SEMRushSearchVolume;
+		
 		private EntitySet<FilterIndexCombination_Language> _FilterIndexCombination_Languages;
 		
 		private EntityRef<ProductType> _ProductType;
@@ -107244,6 +107354,8 @@ namespace Flock.Models
     partial void OnEnabledChanged();
     partial void OnFilterIndexCombinationIDChanging(int value);
     partial void OnFilterIndexCombinationIDChanged();
+    partial void OnSEMRushSearchVolumeChanging(System.Nullable<int> value);
+    partial void OnSEMRushSearchVolumeChanged();
     #endregion
 		
 		public FilterIndexCombination()
@@ -107413,6 +107525,26 @@ namespace Flock.Models
 					this._FilterIndexCombinationID = value;
 					this.SendPropertyChanged("FilterIndexCombinationID");
 					this.OnFilterIndexCombinationIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SEMRushSearchVolume", DbType="INT")]
+		public System.Nullable<int> SEMRushSearchVolume
+		{
+			get
+			{
+				return this._SEMRushSearchVolume;
+			}
+			set
+			{
+				if ((this._SEMRushSearchVolume != value))
+				{
+					this.OnSEMRushSearchVolumeChanging(value);
+					this.SendPropertyChanging();
+					this._SEMRushSearchVolume = value;
+					this.SendPropertyChanged("SEMRushSearchVolume");
+					this.OnSEMRushSearchVolumeChanged();
 				}
 			}
 		}
@@ -107850,6 +107982,8 @@ namespace Flock.Models
 		
 		private string _AttributeDescription;
 		
+		private System.Nullable<int> _SEMRushSearchVolume;
+		
 		public vwFilterIndexCombination_Language()
 		{
 		}
@@ -108010,6 +108144,22 @@ namespace Flock.Models
 				if ((this._AttributeDescription != value))
 				{
 					this._AttributeDescription = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SEMRushSearchVolume", DbType="INT")]
+		public System.Nullable<int> SEMRushSearchVolume
+		{
+			get
+			{
+				return this._SEMRushSearchVolume;
+			}
+			set
+			{
+				if ((this._SEMRushSearchVolume != value))
+				{
+					this._SEMRushSearchVolume = value;
 				}
 			}
 		}

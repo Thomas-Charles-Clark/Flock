@@ -147,12 +147,24 @@
             column.EditFormSettings.Visible = DefaultBoolean.False;
             column.Width = 100;
         });
+        
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "SEMRushSearchVolume";
+            column.Name = "SEMRushSearchVolume";
+            column.Caption = "Search Volume";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.Width = 100;
+        });
 
         settings.Columns.Add(column =>
         {
             column.FieldName = "FooterText";
             column.Name = "FooterText";
-            column.Caption = "Footer Text";
+            column.Caption = "Text";
             column.Settings.AllowHeaderFilter = DefaultBoolean.False;
             column.EditFormSettings.Visible = DefaultBoolean.True;
             column.EditFormSettings.RowSpan = 5;
@@ -160,8 +172,7 @@
             column.SetEditItemTemplateContent(c =>
             {
                 ViewContext.Writer.Write($@"<input id=""footer-text-value"" type=""hidden"" value=""{Html.Encode(DataBinder.Eval(c.DataItem, "FooterText"))}""/>");
-                ViewContext.Writer.Write($@"<div id=""footer-text-preview"">{Html.Raw(DataBinder.Eval(c.DataItem, "FooterText"))}</div>");
-                ViewContext.Writer.Write($@"<hr class=""separator""/>");
+                ViewContext.Writer.Write($@"<div id=""footer-text-preview"" style=""display: none"">{Html.Raw(DataBinder.Eval(c.DataItem, "FooterText"))}</div>");
                 ViewContext.Writer.Write($@"<div id=""footer-text-editor""></div>");
             });
             column.EditCellStyle.CssClass = "edit-footer-text";

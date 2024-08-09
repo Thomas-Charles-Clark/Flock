@@ -4,6 +4,7 @@
     {
         settings.Name = "TranslateGridView";
         settings.CallbackRouteValues = new { Controller = "Translations", Action = "TranslateResourceGridView" };
+        settings.SettingsEditing.BatchUpdateRouteValues = new { Controller = "Translations", Action = "TranslateResourceGridViewBatchUpdate" };
         settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Translations", Action = "TranslateResourceGridViewUpdate" };
 
         settings.ClientSideEvents.BeginCallback = @"function(s, e) {
@@ -21,23 +22,35 @@
             }, function() { }, [], 'This will set this record\'s translation fields for ' + TranslationTargetLanguageDD.GetText() + ' to NULL.');
         }";
 
-        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
-        settings.CommandColumn.Width = 100;
-        settings.CommandColumn.Visible = true;
-        settings.CommandColumn.VisibleIndex = 10;
-        settings.CommandColumn.ShowEditButton = true;
-        settings.CommandColumn.ShowCancelButton = true;
-        settings.CommandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton()
-        {
-            ID = "Clear",
-            Index = 0,
-            Text = "Clear",
-            Visibility = GridViewCustomButtonVisibility.AllDataRows
-        });
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+
+        //settings.CommandColumn.Width = 100;
+        //settings.CommandColumn.Visible = true;
+        //settings.CommandColumn.VisibleIndex = 10;
+        //settings.CommandColumn.ShowEditButton = true;
+        //settings.CommandColumn.ShowCancelButton = true;
+        //settings.CommandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton()
+        //{
+        //    ID = "Clear",
+        //    Index = 0,
+        //    Text = "Clear",
+        //    Visibility = GridViewCustomButtonVisibility.AllDataRows
+        //});
 
         settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
 
-        settings.SettingsPager.PageSize = 20;
+        settings.SettingsPager.PageSize = 500;
+
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+
+        settings.SettingsPager.PageSizeItemSettings.Items = new[] {
+            "10",
+            "20",
+            "50",
+            "100",
+            "200",
+            "500"
+        };
 
         settings.Settings.ShowFilterRow = true;
 
@@ -53,16 +66,8 @@
             column.Settings.AllowHeaderFilter = DefaultBoolean.False;
             column.Width = 50;
             column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
-            column.EditFormSettings.Visible = DefaultBoolean.False;
             column.ReadOnly = true;
-            column.SetDataItemTemplateContent(c =>
-            {
-                ViewContext.Writer.Write("<a href='/admin/Resources/compose/" + c.KeyValue.ToString() + "'>" + c.KeyValue.ToString() + "</a>");
-            });
-            column.SetEditItemTemplateContent(c =>
-            {
-                ViewContext.Writer.Write("<span style='float: left;'>" + c.KeyValue.ToString() + "</span>");
-            });
+            column.EditFormSettings.Visible = DefaultBoolean.False;
         });
 
         settings.Columns.Add(column =>
@@ -70,7 +75,7 @@
             column.Name = "CountryID";
             column.FieldName = "CountryID";
             column.Caption = " ";
-            column.Visible = true;
+            column.Visible = false;
             column.EditFormSettings.Visible = DefaultBoolean.False;
         });
 
@@ -79,7 +84,7 @@
             column.Name = "LanguageID";
             column.FieldName = "LanguageID";
             column.Caption = " ";
-            column.Visible = true;
+            column.Visible = false;
             column.EditFormSettings.Visible = DefaultBoolean.False;
         });
         //settings.Columns.Add(column =>
@@ -104,8 +109,10 @@
             column.Settings.AllowAutoFilter = DefaultBoolean.True;
             column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
             column.Settings.AllowHeaderFilter = DefaultBoolean.False;
-            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
             column.ColumnType = MVCxGridViewColumnType.Memo;
+            column.ReadOnly = true;
+
             var mProp = column.PropertiesEdit as MemoProperties;
             mProp.Rows = 3;
             column.ReadOnly = true;
@@ -120,8 +127,10 @@
             column.Settings.AllowAutoFilter = DefaultBoolean.True;
             column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
             column.Settings.AllowHeaderFilter = DefaultBoolean.False;
-            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
             column.ColumnType = MVCxGridViewColumnType.Memo;
+            column.CellStyle.CssClass = "translated-resource-cell";
+            column.EditCellStyle.CssClass = "translated-resource-cell-editing";
             var mProp = column.PropertiesEdit as MemoProperties;
             mProp.Rows = 3;
             column.Width = 320;
@@ -234,7 +243,6 @@
                 ViewContext.Writer.Write("<span style='float: left;'>" + TranslationStatus + "</span>");
             });
         });
-
 
         settings.HeaderFilterFillItems = (sender, e) =>
         {

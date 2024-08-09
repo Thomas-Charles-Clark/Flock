@@ -27,6 +27,7 @@ namespace Flock.ViewModels
             Model.PriceListID = d.PriceListID;
             Model.Name = d.Name;
             Model.DisplayName = d.DisplayName;
+            Model.ConsolidatedDisplayName = d.ConsolidatedDisplayName;
             Model.CARRCODE = d.CARRCODE;
             Model.SortOrder = d.SortOrder;
             Model.CreatedDT = d.CreatedDT;
@@ -81,6 +82,10 @@ namespace Flock.ViewModels
         [Required]
         [StringLength(50, MinimumLength=3)]
         public string DisplayName { get; set; }
+
+        [Required]
+        [StringLength(50, MinimumLength = 3)]
+        public string ConsolidatedDisplayName { get; set; }
 
         [Required]
         [StringLength(10)]

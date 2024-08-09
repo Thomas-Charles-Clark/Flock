@@ -4,7 +4,7 @@
     {
         <div class="product-page-slideshow-item" data-image-id="@(Model[i].ImageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)">
             <img src="~/Images/SystemIcons/remove-icon.png" class="image-remove-icon" onclick="RemoveImageFromProductPageArea(2, @(Model[i].ImageID))" />
-            <img style="width: 200px; height: 200px;" src="https://flock.designersguild.com/ImageLibrary/322/@(Model[i].ImageID).jpeg" />
+            <img style="width: 200px; height: 200px;" title="Image ID: @(Model[i].ImageID)" src="https://flock.designersguild.com/ImageLibrary/322/@(Model[i].ImageID).jpeg" />
             @if (Model[i].Image.DeletedDT != null)
             {
                 <span class="pod-image-deleted-strip"></span>

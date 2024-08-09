@@ -21,7 +21,7 @@
             @*@(ViewBag.IsUserShuffling ? MvcHtmlString.Empty : Html.Partial("PageSectionSlideshow", Model))*@
         </div>
         <div class="fieldset-inner">
-            <div id="page-section-@(Model.PageSectionID)-slideshow-images" data-slideshow-accepts="@(Model.ARID)" data-images-count="@(Model.Images.Count)" data-slideshow-id="@(Model.SlideshowID)" data-pagesection-id="@(Model.PageSectionID)" class="slideshow-list-@(Model.ARID) horizontal-slideshow-images-container">
+            <div id="page-section-@(Model.PageSectionID)-slideshow-images" data-slideshow-accepts="@(Model.ARID)" data-images-count="@(Model.Images.Count)" data-slideshow-id="@(Model.SlideshowID)" data-pagesection-id="@(Model.PageSectionID)" data-page-section-type="@(Model.PageSectionTypeID)" class="slideshow-list-@(Model.ARID) horizontal-slideshow-images-container">
                 @for (int i = 0; i < Model.Images.Count; i++)
                 {
                     <div class="horizontal-slideshow-images-sortable" style="position: relative; cursor: pointer"
@@ -37,7 +37,7 @@
                 }
             </div>
         </div>
-        <div data-slideshow-id="@(Model.SlideshowID)" data-page-section-id="@(Model.PageSectionID)" style="padding: 1em; padding-top: 0;">
+        <div data-slideshow-id="@(Model.SlideshowID)" data-page-section-id="@(Model.PageSectionID)" data-page-section-type="@(Model.PageSectionTypeID)" style="padding: 1em; padding-top: 0;">
             @Html.Partial("CountryLanguageRestrictionPartial", Model.CountryLanguageRestrictions)
         </div>
     </div>

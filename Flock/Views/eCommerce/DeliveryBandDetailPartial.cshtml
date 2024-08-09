@@ -94,6 +94,25 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td colspan="3" style="text-align: right">
+                                                @Html.DevExpress().Label(lblSettings =>
+                                                {
+                                                    lblSettings.Name = "ConsolidatedDisplayNameLabel";
+                                                    lblSettings.Text = "Consolidated Display Name";
+                                                }).GetHtml()
+                                            </td>
+                                            <td class='dxgvEditFormCaption_MetropolisBlue' style="padding-right: 6px;">
+                                                @Html.DevExpress().TextBox(tbSettings =>
+                                                {
+                                                    tbSettings.Name = "ConsolidatedDisplayName";
+                                                    tbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    tbSettings.Properties.MaxLength = 50;
+                                                    tbSettings.ShowModelErrors = true;
+                                                    tbSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                                                }).Bind(Model.ConsolidatedDisplayName).GetHtml()
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td colspan="4">
                                                 <table style="width: 100%;">
                                                     <tr>
@@ -301,7 +320,8 @@
                                                                 DaysToDeliverMax: DaysToDeliverMax.GetValue(),
                                                                 DeliveryZones: deliveryZones,
                                                                 StockLocations: stockLocations,
-                                                                CutOff: cutOff
+                                                                CutOff: cutOff,
+                                                                ConsolidatedDisplayName: ConsolidatedDisplayName.GetValue()
                                                             },
                                                             success: function(data) {
                                                                 $('#delivery-band-compose-container').html(data);
