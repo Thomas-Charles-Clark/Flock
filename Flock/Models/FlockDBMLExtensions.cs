@@ -1089,6 +1089,10 @@ namespace Flock.Models
         public string TranslatedURLKeywords { get; set; }
         public string NamePlural { get; set; }
         public string TranslatedNamePlural { get; set; }
+        public string SearchKeywords { get; set; }
+        public string TranslatedSearchKeywords { get; set; }
+        public string HTMLSection { get; set; }
+        public string TranslatedHTMLSection { get; set; }
         public bool? Stage { get; set; }
         public byte FieldsToReview { get; set; }
     }
@@ -2840,40 +2844,24 @@ namespace Flock.Models
             DataTable OriginalText = new DataTable();
             OriginalText.Columns.Add("ProductTypeID", typeof(byte));
             OriginalText.Columns.Add("Name", typeof(string));
+            OriginalText.Columns.Add("NamePlural", typeof(string));
+            OriginalText.Columns.Add("URLKeywords", typeof(string));
+            OriginalText.Columns.Add("SearchKeywords", typeof(string));
+            OriginalText.Columns.Add("HTMLSection", typeof(string));
 
             DataTable TranslatedText = new DataTable();
             TranslatedText.Columns.Add("ProductTypeID", typeof(byte));
             TranslatedText.Columns.Add("Name", typeof(string));
-
-            DataTable OriginalNamePlural = new DataTable();
-            OriginalNamePlural.Columns.Add("ProductTypeID", typeof(byte));
-            OriginalNamePlural.Columns.Add("Name", typeof(string));
-
-            DataTable TranslatedNamePlural = new DataTable();
-            TranslatedNamePlural.Columns.Add("ProductTypeID", typeof(byte));
-            TranslatedNamePlural.Columns.Add("Name", typeof(string));
-
-            DataTable OriginalURLKeywords = new DataTable();
-            OriginalURLKeywords.Columns.Add("ProductTypeID", typeof(byte));
-            OriginalURLKeywords.Columns.Add("Name", typeof(string));
-
-            DataTable TranslatedURLKeywords = new DataTable();
-            TranslatedURLKeywords.Columns.Add("ProductTypeID", typeof(byte));
-            TranslatedURLKeywords.Columns.Add("Name", typeof(string));
+            TranslatedText.Columns.Add("NamePlural", typeof(string));
+            TranslatedText.Columns.Add("URLKeywords", typeof(string));
+            TranslatedText.Columns.Add("SearchKeywords", typeof(string));
+            TranslatedText.Columns.Add("HTMLSection", typeof(string));
 
             foreach (var pt in model.ProductTypes)
             {
-                OriginalText.Rows.Add(new object[] { pt.ProductTypeID, pt.Name });
+                OriginalText.Rows.Add(new object[] { pt.ProductTypeID, pt.Name, pt.NamePlural, pt.URLKeywords, pt.SearchKeywords, pt.HTMLSection });
 
-                TranslatedText.Rows.Add(new object[] { pt.ProductTypeID, pt.TranslatedName });
-
-                OriginalNamePlural.Rows.Add(new object[] { pt.ProductTypeID, pt.NamePlural });
-
-                TranslatedNamePlural.Rows.Add(new object[] { pt.ProductTypeID, pt.TranslatedNamePlural });
-
-                OriginalURLKeywords.Rows.Add(new object[] { pt.ProductTypeID, pt.URLKeywords });
-
-                TranslatedURLKeywords.Rows.Add(new object[] { pt.ProductTypeID, pt.TranslatedURLKeywords });
+                TranslatedText.Rows.Add(new object[] { pt.ProductTypeID, pt.TranslatedName, pt.TranslatedNamePlural, pt.TranslatedURLKeywords, pt.TranslatedSearchKeywords, pt.TranslatedHTMLSection });
             }
 
             SqlConnection con = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString);
@@ -2886,21 +2874,11 @@ namespace Flock.Models
             SqlParameter oT = cmd.Parameters.AddWithValue("@OriginalText", OriginalText);
             oT.SqlDbType = SqlDbType.Structured;
             oT.TypeName = "ProductTypeTextTableType";
+
             SqlParameter tT = cmd.Parameters.AddWithValue("@TranslatedText", TranslatedText);
             tT.SqlDbType = SqlDbType.Structured;
             tT.TypeName = "ProductTypeTextTableType";
-            SqlParameter oP = cmd.Parameters.AddWithValue("@OriginalPluralText", OriginalNamePlural);
-            oP.SqlDbType = SqlDbType.Structured;
-            oP.TypeName = "ProductTypeTextTableType";
-            SqlParameter tP = cmd.Parameters.AddWithValue("@TranslatedPluralText", TranslatedNamePlural);
-            tP.SqlDbType = SqlDbType.Structured;
-            tP.TypeName = "ProductTypeTextTableType";
-            SqlParameter oU = cmd.Parameters.AddWithValue("@OriginalURLKeywordsText", OriginalURLKeywords);
-            oP.SqlDbType = SqlDbType.Structured;
-            oP.TypeName = "ProductTypeTextTableType";
-            SqlParameter tU = cmd.Parameters.AddWithValue("@TranslatedURLKeywordsText", TranslatedURLKeywords);
-            tP.SqlDbType = SqlDbType.Structured;
-            tP.TypeName = "ProductTypeTextTableType";
+
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             da.Fill(ds);
             con.Close();

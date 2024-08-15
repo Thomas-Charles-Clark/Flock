@@ -19,7 +19,7 @@
 
         settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
         settings.CommandColumn.Visible = true;
-        settings.CommandColumn.VisibleIndex = 10;
+        settings.CommandColumn.VisibleIndex = 15;
         settings.CommandColumn.ShowEditButton = true;
         settings.CommandColumn.ShowCancelButton = true;
         settings.CommandColumn.CustomButtons.Add(new GridViewCommandColumnCustomButton()
@@ -31,6 +31,8 @@
         });
 
         settings.SettingsPager.PageSize = 20;
+
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
 
         settings.KeyFieldName = "ProductTypeID";
 
@@ -82,7 +84,7 @@
             var tbProp = column.PropertiesEdit as TextBoxProperties;
             tbProp.MaxLength = 50;
         });
-        
+
 
         settings.Columns.Add(column =>
         {
@@ -109,7 +111,7 @@
             var tbProp = column.PropertiesEdit as TextBoxProperties;
             tbProp.MaxLength = 50;
         });
-        
+
         settings.Columns.Add(column =>
         {
             column.Name = "URL Keywords";
@@ -137,6 +139,62 @@
             tbProp.ClientSideEvents.ValueChanged = $@"(s, e) => {{
                 s.SetValue(s.GetValue().replace(/ /g, '-').toLowerCase());
             }}";
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Search Keywords";
+            column.FieldName = "SearchKeywords";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.Width = 220;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Translated Search Keywords";
+            column.FieldName = "TranslatedSearchKeywords";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = 220;
+            var tbProp = column.PropertiesEdit as TextBoxProperties;
+            tbProp.MaxLength = 50;
+        });
+
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "HTML Section";
+            column.FieldName = "HTMLSection";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+            var tbProp = column.PropertiesEdit as MemoProperties;
+            tbProp.Rows = 10;
+            column.ReadOnly = true;
+            column.Width = 540;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Translated HTML Section";
+            column.FieldName = "TranslatedHTMLSection";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+            column.Width = 540;
+            var tbProp = column.PropertiesEdit as MemoProperties;
+            tbProp.Rows = 10;
         });
 
         settings.Columns.Add(column =>

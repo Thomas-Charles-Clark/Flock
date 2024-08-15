@@ -63,6 +63,9 @@ namespace Flock.Controllers
                         var item = UnitOfWork.GetRepository<Models.ProductType_Language>().GetAll().Where(p => p.ProductTypeID == productTypeId && p.LanguageID == languageId).Single();
                         item.Name = null;
                         item.SearchKeywords = null;
+                        item.NamePlural = null;
+                        item.URLKeywords = null;
+                        item.HTMLSection = null;
                         item.Stage = null;
                         item.ModifiedDT = DateTime.Now;
                         UnitOfWork.Save();

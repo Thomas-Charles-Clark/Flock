@@ -564,6 +564,7 @@
     <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Controllers\Translations\TranslationsController.cs" />
     <Compile Include="Controllers\Translations\Translations_CallsToActionController.cs" />
+    <Compile Include="Controllers\Translations\Translations_ModularProducts.cs" />
     <Compile Include="Controllers\Translations\Translations_SnippetsController.cs" />
     <Compile Include="Controllers\Translations\Translations_ModuleOptionGroups.cs" />
     <Compile Include="Controllers\Translations\Translations_ModuleOptions.cs" />

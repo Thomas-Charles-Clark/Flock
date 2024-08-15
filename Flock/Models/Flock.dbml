@@ -272,7 +272,6 @@
       <Association Name="Language_PageSection_Language" Member="PageSection_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="PageSection_Language" />
       <Association Name="Language_ProductPage_Language" Member="ProductPage_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ProductPage_Language" />
       <Association Name="Language_Product_Language" Member="Product_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="Product_Language" />
-      <Association Name="Language_ProductType_Language" Member="ProductType_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ProductType_Language" />
       <Association Name="Language_Resource_Language" Member="Resource_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="Resource_Language" />
       <Association Name="Language_ReturnReason_Language" Member="ReturnReason_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ReturnReason_Language" />
       <Association Name="Language_StockStatus_Language" Member="StockStatus_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="StockStatus_Language" />
@@ -293,6 +292,9 @@
       <Association Name="Language_PageSection_Country_Language" Member="PageSection_Country_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="PageSection_Country_Language" />
       <Association Name="Language_MenuItem_Language" Member="MenuItem_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="MenuItem_Language" />
       <Association Name="Language_FilterIndexCombination_Language" Member="FilterIndexCombination_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="FilterIndexCombination_Language" />
+      <Association Name="Language_ProductType_Language" Member="ProductType_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ProductType_Language" />
+      <Association Name="Language_ModularProduct_Language_Snapshot" Member="ModularProduct_Language_Snapshots" ThisKey="LanguageID" OtherKey="LanguageID" Type="ModularProduct_Language_Snapshot" />
+      <Association Name="Language_ModularProduct_Language" Member="ModularProduct_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ModularProduct_Language" />
     </Type>
   </Table>
   <Table Name="dbo.Region" Member="Regions">
@@ -776,6 +778,7 @@
     <Type Name="Brochure_ProductType">
       <Column Name="BrochureID" Type="System.Int16" DbType="SmallInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="ProductType_Brochure_ProductType" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Member_Competition" Member="Member_Competitions">
@@ -1367,6 +1370,7 @@
       <Column Name="PODueDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
       <Association Name="Checkout_Checkout_Basket" Member="Checkout" ThisKey="CheckoutID" OtherKey="CheckoutID" Type="Checkout" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
       <Association Name="Product_Checkout_Basket" Member="Product" ThisKey="ProductID" OtherKey="ProductID" Type="Product" IsForeignKey="true" />
+      <Association Name="ProductType_Checkout_Basket" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="del.CourierService" Member="CourierServices">
@@ -1383,7 +1387,6 @@
       <Column Name="StockLocationID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Association Name="StockLocation_DeliveryBand_StockLocation" Member="DeliveryBand_StockLocations" ThisKey="StockLocationID" OtherKey="StockLocationID" Type="DeliveryBand_StockLocation" />
-      <Association Name="StockLocation_ProductType" Member="ProductTypes" ThisKey="StockLocationID" OtherKey="StockLocationID" Type="ProductType" />
     </Type>
   </Table>
   <Table Name="del.DeliveryBand_DeliveryZone" Member="DeliveryBand_DeliveryZones">
@@ -1401,9 +1404,9 @@
       <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="CourierID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
       <Association Name="DeliveryOption_DeliveryMatrix" Member="DeliveryOption" ThisKey="DeliveryOptionID" OtherKey="DeliveryOptionID" Type="DeliveryOption" IsForeignKey="true" />
-      <Association Name="ProductType_DeliveryMatrix" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
       <Association Name="Country_DeliveryMatrix" Member="Country" ThisKey="CountryID" OtherKey="CountryID" Type="Country" IsForeignKey="true" />
       <Association Name="Courier_DeliveryMatrix" Member="Courier" ThisKey="CourierID" OtherKey="CourierID" Type="Courier" IsForeignKey="true" />
+      <Association Name="ProductType_DeliveryMatrix" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="del.DeliveryOption" Member="DeliveryOptions">
@@ -1646,6 +1649,7 @@
     <Type Name="PromotionCode_ProductType">
       <Column Name="PromotionCodeID" Type="System.Int16" DbType="SmallInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="ProductType_PromotionCode_ProductType" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="ecm.PromotionGroup" Member="PromotionGroups">
@@ -1808,33 +1812,6 @@
       <Column Name="ProductPageMetaDescription" Type="System.String" DbType="NVarChar(155)" CanBeNull="true" />
       <Column Name="ProductPageSubHeading" Type="System.String" DbType="NVarChar(70)" CanBeNull="true" />
       <Column Name="ProductPageDescription" Type="System.String" DbType="NVarChar(2000)" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.ProductType" Member="ProductTypes">
-    <Type Name="ProductType">
-      <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="SortOrder" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
-      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
-      <Column Name="DeletedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
-      <Column Name="AlternateColourways" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="GiftWrappable" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="StockLocationID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
-      <Column Name="AllowReturns" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="URLKeywords" Storage="_Plural" Type="System.String" DbType="NVarChar(50) NULL" CanBeNull="false" />
-      <Column Name="NamePlural" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Association Name="ProductType_Attribute_ProductType" Member="Attribute_ProductTypes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Attribute_ProductType" />
-      <Association Name="ProductType_DeliveryMatrix" Member="DeliveryMatrixes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="DeliveryMatrix" />
-      <Association Name="ProductType_Product" Member="Products" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Product" />
-      <Association Name="ProductType_ProductType_Language" Member="ProductType_Languages" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType_Language" />
-      <Association Name="ProductType_Page" Member="Pages" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Page" />
-      <Association Name="ProductType_ProductPage" Member="ProductPages" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductPage" />
-      <Association Name="ProductType_AttributeGroup_ProductType" Member="AttributeGroup_ProductTypes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="AttributeGroup_ProductType" />
-      <Association Name="ProductType_Article" Member="Articles" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Article" />
-      <Association Name="ProductType_Collection" Member="Collections" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Collection" />
-      <Association Name="ProductType_FilterIndexRestriction" Member="FilterIndexRestrictions" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexRestriction" />
-      <Association Name="ProductType_FilterIndexCombination" Member="FilterIndexCombinations" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexCombination" />
-      <Association Name="StockLocation_ProductType" Member="StockLocation" ThisKey="StockLocationID" OtherKey="StockLocationID" Type="StockLocation" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Redirect" Member="Redirects">
@@ -2593,6 +2570,8 @@
       <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Association Name="ModularProduct_ModularProduct_ModuleOption" Member="ModularProduct_ModuleOptions" ThisKey="ModularProductID" OtherKey="ModularProductID" Type="ModularProduct_ModuleOption" />
       <Association Name="ModularProduct_ProductPage" Member="ProductPages" ThisKey="ModularProductID" OtherKey="ModularProductID" Type="ProductPage" />
+      <Association Name="ModularProduct_ModularProduct_Language_Snapshot" Member="ModularProduct_Language_Snapshots" ThisKey="ModularProductID" OtherKey="ModularProductID" Type="ModularProduct_Language_Snapshot" />
+      <Association Name="ModularProduct_ModularProduct_Language" Member="ModularProduct_Languages" ThisKey="ModularProductID" OtherKey="ModularProductID" Type="ModularProduct_Language" />
     </Type>
   </Table>
   <Table Name="mod.ModularProduct_ModuleOption" Member="ModularProduct_ModuleOptions">
@@ -2851,6 +2830,7 @@
       <Column Name="TemplateID" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
       <Column Name="Exclude" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Association Name="NamingConvention_Mertex_ProductCategory" Member="NamingConvention" ThisKey="NamingConventionID" OtherKey="NamingConventionID" Type="NamingConvention" IsForeignKey="true" DeleteRule="SET NULL" />
+      <Association Name="ProductType_Mertex_ProductCategory" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" DeleteRule="SET NULL" />
     </Type>
   </Table>
   <Table Name="adm.NamingConvention" Member="NamingConventions">
@@ -3458,9 +3438,9 @@
       <Association Name="Product_Product_Language" Member="Product_Languages" ThisKey="ProductID" OtherKey="ProductID" Type="Product_Language" />
       <Association Name="Design_Product" Member="Design" ThisKey="DesignID" OtherKey="DesignID" Type="Design" IsForeignKey="true" DeleteRule="SET NULL" />
       <Association Name="Launch_Product" Member="Launch" ThisKey="LaunchID" OtherKey="LaunchID" Type="Launch" IsForeignKey="true" />
-      <Association Name="ProductType_Product" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
       <Association Name="Quality_Product" Member="Quality" ThisKey="QualityID" OtherKey="QualityID" Type="Quality" IsForeignKey="true" />
       <Association Name="ProductPage_Product" Member="ProductPage" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="ProductPage" IsForeignKey="true" DeleteRule="SET NULL" />
+      <Association Name="ProductType_Product" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="adm.vwProductReviewOverview" Member="vwProductReviewOverviews">
@@ -3976,21 +3956,6 @@
       <Association Name="Product_Product_Language" Member="Product" ThisKey="ProductID" OtherKey="ProductID" Type="Product" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
-  <Table Name="dbo.ProductType_Language" Member="ProductType_Languages">
-    <Type Name="ProductType_Language">
-      <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="SearchKeywords" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="Stage" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
-      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
-      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
-      <Column Name="URLKeywords" Storage="_Plural" Type="System.String" DbType="NVarChar(50) NULL" CanBeNull="true" />
-      <Column Name="NamePlural" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Association Name="Language_ProductType_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
-      <Association Name="ProductType_ProductType_Language" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Resource_Language" Member="Resource_Languages">
     <Type Name="Resource_Language">
       <Column Name="ResourceID" Type="System.Int16" DbType="SmallInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -4405,8 +4370,9 @@
       <Association Name="Page_Banner" Member="Banners" ThisKey="PageID" OtherKey="PageID" Type="Banner" />
       <Association Name="Page_Menu" Member="Menus" ThisKey="PageID" OtherKey="PageID" Type="Menu" />
       <Association Name="Page_PageSection" Member="PageSections" ThisKey="PageID" OtherKey="PageID" Type="PageSection" />
-      <Association Name="ProductType_Page" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
+      <Association Name="Page_ProductType" Member="ProductTypes" ThisKey="PageID" OtherKey="CategoryPageID" Type="ProductType" />
       <Association Name="SiteSection_Page" Member="SiteSection" ThisKey="SiteSectionID" OtherKey="SiteSectionID" Type="SiteSection" IsForeignKey="true" />
+      <Association Name="ProductType_Page" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="del.Courier" Member="Couriers">
@@ -4663,8 +4629,8 @@
       <Association Name="Launch_ProductPage" Member="Launch" ThisKey="LaunchID" OtherKey="LaunchID" Type="Launch" IsForeignKey="true" />
       <Association Name="ModularProduct_ProductPage" Member="ModularProduct" ThisKey="ModularProductID" OtherKey="ModularProductID" Type="ModularProduct" IsForeignKey="true" />
       <Association Name="Pattern_ProductPage" Member="Pattern" ThisKey="PatternID" OtherKey="PatternID" Type="Pattern" IsForeignKey="true" />
-      <Association Name="ProductType_ProductPage" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
       <Association Name="Template_ProductPage" Member="Template" ThisKey="TemplateID" OtherKey="TemplateID" Type="Template" IsForeignKey="true" />
+      <Association Name="ProductType_ProductPage" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.BundlePriceImport" Member="BundlePriceImports">
@@ -4871,8 +4837,8 @@
       <Association Name="Article_Article_Language" Member="Article_Languages" ThisKey="ArticleID" OtherKey="ArticleID" Type="Article_Language" />
       <Association Name="ArticleTemplate_Article" Member="ArticleTemplate" ThisKey="ArticleTemplateID" OtherKey="ArticleTemplateID" Type="ArticleTemplate" IsForeignKey="true" />
       <Association Name="ArticleType_Article" Member="ArticleType" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleType" IsForeignKey="true" />
-      <Association Name="ProductType_Article" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
       <Association Name="ArticleSubType_Article" Member="ArticleSubType" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="ArticleSubType" IsForeignKey="true" />
+      <Association Name="ProductType_Article" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="adm.vwCollection" Member="vwCollections">
@@ -5266,6 +5232,112 @@
       <Association Name="ArticleSubType_Article" Member="Articles" ThisKey="ArticleSubTypeID" OtherKey="ArticleSubTypeID" Type="Article" />
       <Association Name="ArticleType_ArticleSubType" Member="ArticleType" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleType" IsForeignKey="true" />
       <Association Name="ArticleType_ArticleSubType1" Member="ArticleType1" ThisKey="ArticleTypeID" OtherKey="ArticleTypeID" Type="ArticleType" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ProductType" Member="ProductTypes">
+    <Type Name="ProductType">
+      <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="SortOrder" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="DeletedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Column Name="AlternateColourways" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="GiftWrappable" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="StockLocationID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="AllowReturns" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="NonStockedItem" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="MaxSkuOrderQuantity" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="MaxTotalOrderQuantity" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="TargetGM" Type="System.Decimal" DbType="Decimal(3,2) NOT NULL" CanBeNull="false" />
+      <Column Name="TranslationLogic" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="SampleCodeFormat" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="AlternateColourwayIncludeSize" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ShowInSearchDropDown" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TradeMaxSkuOrderQuantity" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="TradeMaxTotalOrderQuantity" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="ProductTypeGroupID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="SearchKeywords" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="DispatchGroup" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="DisplaySize" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="MinimumOrderQuantity" Type="System.Decimal" DbType="Decimal(6,1) NOT NULL" CanBeNull="false" />
+      <Column Name="DeliveryGroupID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="AllowZeroRetailPrice" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="AllowZeroTradePrice" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="GrossMarginTarget" Type="System.Decimal" DbType="Decimal(3,2)" CanBeNull="true" />
+      <Column Name="SaleGrossMarginTarget" Type="System.Decimal" DbType="Decimal(3,2)" CanBeNull="true" />
+      <Column Name="StockUnitID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="AllowReserves" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="RetailQuantityMinimum" Type="System.Decimal" DbType="Decimal(7,2) NOT NULL" CanBeNull="false" />
+      <Column Name="RetailQuantityMaximum" Type="System.Decimal" DbType="Decimal(7,2) NOT NULL" CanBeNull="false" />
+      <Column Name="RetailQuantityIncrement" Type="System.Decimal" DbType="Decimal(7,2) NOT NULL" CanBeNull="false" />
+      <Column Name="TradeQuantityMinimum" Type="System.Decimal" DbType="Decimal(7,2) NOT NULL" CanBeNull="false" />
+      <Column Name="TradeQuantityMaximum" Type="System.Decimal" DbType="Decimal(7,2) NOT NULL" CanBeNull="false" />
+      <Column Name="TradeQuantityIncrement" Type="System.Decimal" DbType="Decimal(7,2) NOT NULL" CanBeNull="false" />
+      <Column Name="CategoryPageID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="TemplateID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="IsDeliveryProductType" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="URLKeywords" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="NamePlural" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="IsActualProductType" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="HTMLSection" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Association Name="ProductType_Brochure_ProductType" Member="Brochure_ProductTypes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Brochure_ProductType" />
+      <Association Name="ProductType_Attribute_ProductType" Member="Attribute_ProductTypes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Attribute_ProductType" />
+      <Association Name="ProductType_Checkout_Basket" Member="Checkout_Baskets" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Checkout_Basket" />
+      <Association Name="ProductType_DeliveryMatrix" Member="DeliveryMatrixes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="DeliveryMatrix" />
+      <Association Name="ProductType_PromotionCode_ProductType" Member="PromotionCode_ProductTypes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="PromotionCode_ProductType" />
+      <Association Name="ProductType_Mertex_ProductCategory" Member="Mertex_ProductCategories" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Mertex_ProductCategory" />
+      <Association Name="ProductType_Product" Member="Products" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Product" />
+      <Association Name="ProductType_Page" Member="Pages" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Page" />
+      <Association Name="ProductType_ProductPage" Member="ProductPages" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductPage" />
+      <Association Name="ProductType_AttributeGroup_ProductType" Member="AttributeGroup_ProductTypes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="AttributeGroup_ProductType" />
+      <Association Name="ProductType_Article" Member="Articles" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Article" />
+      <Association Name="ProductType_Collection" Member="Collections" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Collection" />
+      <Association Name="ProductType_FilterIndexRestriction" Member="FilterIndexRestrictions" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexRestriction" />
+      <Association Name="ProductType_FilterIndexCombination" Member="FilterIndexCombinations" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexCombination" />
+      <Association Name="ProductType_ProductType_Language" Member="ProductType_Languages" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType_Language" />
+      <Association Name="Page_ProductType" Member="Page" ThisKey="CategoryPageID" OtherKey="PageID" Type="Page" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ProductType_Language" Member="ProductType_Languages">
+    <Type Name="ProductType_Language">
+      <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="SearchKeywords" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Stage" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Column Name="URLKeywords" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="NamePlural" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="HTMLSection" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Association Name="Language_ProductType_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+      <Association Name="ProductType_ProductType_Language" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="mod.ModularProduct_Language_Snapshot" Member="ModularProduct_Language_Snapshots">
+    <Type Name="ModularProduct_Language_Snapshot">
+      <Column Name="ModularProductID" Type="System.Int16" DbType="SmallInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Association Name="Language_ModularProduct_Language_Snapshot" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+      <Association Name="ModularProduct_ModularProduct_Language_Snapshot" Member="ModularProduct" ThisKey="ModularProductID" OtherKey="ModularProductID" Type="ModularProduct" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="mod.ModularProduct_Language" Member="ModularProduct_Languages">
+    <Type Name="ModularProduct_Language">
+      <Column Name="ModularProductID" Type="System.Int16" DbType="SmallInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="Stage" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Association Name="Language_ModularProduct_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+      <Association Name="ModularProduct_ModularProduct_Language" Member="ModularProduct" ThisKey="ModularProductID" OtherKey="ModularProductID" Type="ModularProduct" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.PageSection_ClearPage" Method="PageSection_ClearPage">
@@ -6617,6 +6689,9 @@
   </Function>
   <Function Name="adm.Collection_Country_Language_Initialise" Method="Collection_Country_Language_Initialise">
     <Parameter Name="CollectionID" Parameter="collectionID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="adm.ModularProduct_Language_Initialise" Method="ModularProduct_Language_Initialise">
     <Return Type="System.Int32" />
   </Function>
 </Database>
