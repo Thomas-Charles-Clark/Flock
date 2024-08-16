@@ -16,7 +16,7 @@ namespace Flock.Controllers
     {
         public ActionResult ModularProducts(string targetLanguage)
         {
-            var Model = new TranslateModularProductsViewModel();
+            var Model = new TranslateModularProductViewModel();
 
             if (targetLanguage != null)
             {
@@ -39,10 +39,10 @@ namespace Flock.Controllers
                 }
             }
 
-            return View("ModuleOptions/TranslateModuleOption", Model);
+            return View("ModularProducts/TranslateModularProduct", Model);
         }
 
-        public ActionResult TranslateModuleOptionTargetLanguageDropDown(byte? targetLanguageId)
+        public ActionResult TranslateModularProductsTargetLanguageDropDown(byte? targetLanguageId)
         {
             var PreModel = UnitOfWork.GetRepository<Country_Language>().GetAll().Where(p => (p.OffDate == null) || (p.OffDate > DateTime.Now)).OrderBy(p => p.CountryID).ToList();
 
@@ -53,14 +53,14 @@ namespace Flock.Controllers
             return PartialView("Shared/_TargetLanguageDropDown", Model);
         }
 
-        public ActionResult TranslateModuleOptionGridView(byte? languageId, string commandType, int? moduleOptionId)
+        public ActionResult TranslateModularProductsGridView(byte? languageId, string commandType, short? modularProductId)
         {
             try
             {
                 switch (commandType)
                 {
                     case "Clear":
-                        var item = UnitOfWork.GetRepository<Models.ModuleOption_Language>().GetAll().Where(p => p.ModuleOptionID == moduleOptionId && p.LanguageID == languageId).Single();
+                        var item = UnitOfWork.GetRepository<Models.ModularProduct_Language>().GetAll().Where(p => p.ModularProductID == modularProductId && p.LanguageID == languageId).Single();
                         item.Name = null;
                         item.Stage = null;
                         item.ModifiedDT = DateTime.Now;
@@ -68,18 +68,18 @@ namespace Flock.Controllers
                         break;
                 }
 
-                List<ModuleOption_Language_SelectList_ModuleOptionResult> ModuleOptions = new List<ModuleOption_Language_SelectList_ModuleOptionResult>();
+                List<ModularProduct_Language_SelectList_ModularProductResult> ModularProducts = new List<ModularProduct_Language_SelectList_ModularProductResult>();
 
                 if (languageId != null)
                 {
-                    IMultipleResults Results = UnitOfWork.Context.ModuleOption_Language_SelectList(languageId.Value);
+                    IMultipleResults Results = UnitOfWork.Context.ModularProduct_Language_SelectList(languageId.Value);
 
-                    ModuleOptions = Results.GetResult<ModuleOption_Language_SelectList_ModuleOptionResult>().ToList();
+                    ModularProducts = Results.GetResult<ModularProduct_Language_SelectList_ModularProductResult>().ToList();
                 }
 
-                TranslateModuleOptionGridViewModel Model = new TranslateModuleOptionGridViewModel(ModuleOptions, languageId);
+                TranslateModularProductGridViewModel Model = new TranslateModularProductGridViewModel(ModularProducts, languageId);
 
-                return PartialView("ModuleOptions/_TranslateModuleOptionGridView", Model);
+                return PartialView("ModularProducts/_TranslateModularProductGridView", Model);
             }
             catch (Exception ex)
             {
@@ -90,31 +90,31 @@ namespace Flock.Controllers
         }
 
         [ValidateInput(false)]
-        public ActionResult TranslateModuleOptionGridViewUpdate(ModuleOption_Language_SelectList_ModuleOptionResult item, byte languageId)
+        public ActionResult TranslateModularProductGridViewUpdate(ModularProduct_Language_SelectList_ModularProductResult item, byte languageId)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    var saveModel = new TranslateModuleOptionGridViewModel();
-                    saveModel.ModuleOptions.Add(item);
-                    UnitOfWork.Context.ModuleOption_Language_Save(languageId, saveModel);
+                    var saveModel = new TranslateModularProductGridViewModel();
+                    saveModel.ModularProducts.Add(item);
+                    UnitOfWork.Context.ModularProduct_Language_Save(languageId, saveModel);
 
-                    List<ModuleOption_Language_SelectList_ModuleOptionResult> ModuleOptions = new List<ModuleOption_Language_SelectList_ModuleOptionResult>();
-                    IMultipleResults Results = UnitOfWork.Context.ModuleOption_Language_SelectList(languageId);
-                    ModuleOptions = Results.GetResult<ModuleOption_Language_SelectList_ModuleOptionResult>().ToList();
-                    var Model = new TranslateModuleOptionGridViewModel(ModuleOptions, languageId);
+                    List<ModularProduct_Language_SelectList_ModularProductResult> ModularProducts = new List<ModularProduct_Language_SelectList_ModularProductResult>();
+                    IMultipleResults Results = UnitOfWork.Context.ModularProduct_Language_SelectList(languageId);
+                    ModularProducts = Results.GetResult<ModularProduct_Language_SelectList_ModularProductResult>().ToList();
+                    var Model = new TranslateModularProductGridViewModel(ModularProducts, languageId);
 
-                    return PartialView("ModuleOptions/_TranslateModuleOptionGridView", Model);
+                    return PartialView("ModularProducts/_TranslateModularProductGridView", Model);
                 }
                 else
                 {
-                    List<ModuleOption_Language_SelectList_ModuleOptionResult> ModuleOptions = new List<ModuleOption_Language_SelectList_ModuleOptionResult>();
-                    IMultipleResults Results = UnitOfWork.Context.ModuleOption_Language_SelectList(languageId);
-                    ModuleOptions = Results.GetResult<ModuleOption_Language_SelectList_ModuleOptionResult>().ToList();
-                    var Model = new TranslateModuleOptionGridViewModel(ModuleOptions, languageId);
+                    List<ModularProduct_Language_SelectList_ModularProductResult> ModularProducts = new List<ModularProduct_Language_SelectList_ModularProductResult>();
+                    IMultipleResults Results = UnitOfWork.Context.ModularProduct_Language_SelectList(languageId);
+                    ModularProducts = Results.GetResult<ModularProduct_Language_SelectList_ModularProductResult>().ToList();
+                    var Model = new TranslateModularProductGridViewModel(ModularProducts, languageId);
 
-                    return PartialView("ModuleOptions/_TranslateModuleOptionGridView", Model);
+                    return PartialView("ModularProducts/_TranslateModularProductGridView", Model);
                 }
             }
             catch (Exception ex)

@@ -52,7 +52,7 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link @isActiveController(new string[] { "translations" }, new string[] { "index", "overview", "htmlsections", "slideshowimages", "productpages", "pagesections", "uploadspreadsheet", "images", "products", "ProductTypes", "sitesections", "products", "collections", "forms", "finishes", "producttypes", "colours", "pages", "patterns", "usages", "articlesubtypes", "articletypes", "articles", "emailtexts", "attributegroups", "attributes", "deliveryoptions", "menuitems", "menus", "giftvouchervalidations", "technicaldescriptions", "orderformgroups", "orderstatuses", "returnreasons", "stockstatuses", "techinfo_additionalinfo", "techinfo_aftercare", "techinfo_composition", "techinfo_contractfr", "techinfo_domesticfr", "techinfo_flamcode", "techinfo_patternmatch", "techinfo_test", "techinfo_type", "techinfo_usage", "resources", "modules", "moduleoptions", "moduleoptiongroups", "slideshowimages", "callstoaction", "announcements", "rooms", "snippets" }, "active", "")" id="translations-tab" data-bs-toggle="tab" data-bs-target="#translations-tab-content" type="button" role="tab" aria-controls="translations-tab-content">
+        <button class="nav-link @isActiveController(new string[] { "translations" }, new string[] { "index", "overview", "htmlsections", "slideshowimages", "productpages", "pagesections", "uploadspreadsheet", "images", "products", "ProductTypes", "sitesections", "products", "collections", "forms", "finishes", "producttypes", "colours", "pages", "patterns", "usages", "articlesubtypes", "articletypes", "articles", "emailtexts", "attributegroups", "attributes", "deliveryoptions", "menuitems", "menus", "giftvouchervalidations", "technicaldescriptions", "orderformgroups", "orderstatuses", "returnreasons", "stockstatuses", "techinfo_additionalinfo", "techinfo_aftercare", "techinfo_composition", "techinfo_contractfr", "techinfo_domesticfr", "techinfo_flamcode", "techinfo_patternmatch", "techinfo_test", "techinfo_type", "techinfo_usage", "resources", "modules", "moduleoptions", "moduleoptiongroups", "modularproducts", "slideshowimages", "callstoaction", "announcements", "rooms", "snippets" }, "active", "")" id="translations-tab" data-bs-toggle="tab" data-bs-target="#translations-tab-content" type="button" role="tab" aria-controls="translations-tab-content">
             Translations
         </button>
     </li>
@@ -506,7 +506,7 @@
             </div>
         </div>
     </div>
-    <div class="tab-pane fade @isActiveController(new string[] { "translations" }, new string[] { "index", "overview", "htmlsections", "slideshowimages", "productpages", "pagesections", "uploadspreadsheet", "images", "products", "ProductTypes", "sitesections", "products", "collections", "forms", "finishes", "producttypes", "colours", "pages", "patterns", "usages", "articlesubtypes", "articletypes", "articles", "emailtexts", "attributegroups", "attributes", "deliveryoptions", "menuitems", "menus", "giftvouchervalidations", "technicaldescriptions", "orderformgroups", "orderstatuses", "returnreasons", "stockstatuses", "techinfo_additionalinfo", "techinfo_aftercare", "techinfo_composition", "techinfo_contractfr", "techinfo_domesticfr", "techinfo_flamcode", "techinfo_patternmatch", "techinfo_test", "techinfo_type", "techinfo_usage", "resources", "modules", "moduleoptions", "moduleoptiongroups", "slideshowimages", "callstoaction", "announcements", "rooms", "snippets" }, "show active", "")" id="translations-tab-content" role="tabpanel" aria-labelledby="translations-tab">
+    <div class="tab-pane fade @isActiveController(new string[] { "translations" }, new string[] { "index", "overview", "htmlsections", "slideshowimages", "productpages", "pagesections", "uploadspreadsheet", "images", "products", "ProductTypes", "sitesections", "products", "collections", "forms", "finishes", "producttypes", "colours", "pages", "patterns", "usages", "articlesubtypes", "articletypes", "articles", "emailtexts", "attributegroups", "attributes", "deliveryoptions", "menuitems", "menus", "giftvouchervalidations", "technicaldescriptions", "orderformgroups", "orderstatuses", "returnreasons", "stockstatuses", "techinfo_additionalinfo", "techinfo_aftercare", "techinfo_composition", "techinfo_contractfr", "techinfo_domesticfr", "techinfo_flamcode", "techinfo_patternmatch", "techinfo_test", "techinfo_type", "techinfo_usage", "resources", "modules", "moduleoptions", "moduleoptiongroups", "modularproducts", "slideshowimages", "callstoaction", "announcements", "rooms", "snippets" }, "show active", "")" id="translations-tab-content" role="tabpanel" aria-labelledby="translations-tab">
         <div class="menu-tab">
             <div class="sub-menu">
                 <label>
@@ -561,36 +561,37 @@
                         @Html.ActionLink("Menus", "menus", "translations")
                     </div>
                     <div>
-                        @Html.ActionLink("ModuleOptionGroups", "moduleoptiongroups", "translations")
-                        @Html.ActionLink("ModuleOptions", "moduleoptions", "translations")
+                        @Html.ActionLink("Module Option Groups", "moduleoptiongroups", "translations")
+                        @Html.ActionLink("Module Options", "moduleoptions", "translations")
                         @Html.ActionLink("Modules", "modules", "translations")
-                        @Html.ActionLink("Order Form Groups", "orderformgroups", "translations")
+                        @Html.ActionLink("Modular Products", "modularproducts", "translations")
                     </div>
                     <div>
+                        @Html.ActionLink("Order Form Groups", "orderformgroups", "translations")
                         @Html.ActionLink("Order Statuses", "orderstatuses", "translations")
                         @Html.ActionLink("Page Sections", "pagesections", "translations")
                         @Html.ActionLink("Pages", "pages", "translations")
-                        @Html.ActionLink("Pattern Matches", "techinfo_patternmatch", "translations")
                     </div>
                     <div>
+                        @Html.ActionLink("Pattern Matches", "techinfo_patternmatch", "translations")
                         @Html.ActionLink("Patterns", "patterns", "translations")
                         @Html.ActionLink("Product Pages", "productpages", "translations")
                         @Html.ActionLink("Product Types", "producttypes", "translations")
-                        @Html.ActionLink("Products", "products", "translations")
                     </div>
                     <div>
+                        @Html.ActionLink("Products", "products", "translations")
                         @Html.ActionLink("Resources", "resources", "translations")
                         @Html.ActionLink("Return Reasons", "returnreasons", "translations")
                         @Html.ActionLink("Rooms", "rooms", "translations")
-                        @Html.ActionLink("Site Sections", "sitesections", "translations")
                     </div>
                     <div>
+                        @Html.ActionLink("Site Sections", "sitesections", "translations")
                         @Html.ActionLink("Slideshow Images", "slideshowimages", "translations")
                         @Html.ActionLink("Snippets", "snippets", "translations")
                         @Html.ActionLink("Stock Statuses", "stockstatuses", "translations")
-                        @Html.ActionLink("Technical Descriptions", "technicaldescriptions", "translations")
                     </div>
                     <div>
+                        @Html.ActionLink("Technical Descriptions", "technicaldescriptions", "translations")
                         @Html.ActionLink("Tests", "techinfo_test", "translations")
                         @Html.ActionLink("Types", "techinfo_type", "translations")
                         @Html.ActionLink("Usages", "techinfo_usage", "translations")

@@ -79,7 +79,64 @@
             column.ColumnType = MVCxGridViewColumnType.TextBox;
             column.Width = 220;
             var tbProp = column.PropertiesEdit as TextBoxProperties;
-            tbProp.MaxLength = 50;
+            tbProp.MaxLength = 100;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "ConfirmText";
+            column.FieldName = "ConfirmText";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ReadOnly = true;
+            column.Width = 220;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "TranslatedConfirmText";
+            column.FieldName = "TranslatedConfirmText";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.TextBox;
+            column.Width = 220;
+            var tbProp = column.PropertiesEdit as TextBoxProperties;
+            tbProp.MaxLength = 100;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "Description";
+            column.FieldName = "Description";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+            column.ReadOnly = true;
+            column.Width = 220;
+            var tbProp = column.PropertiesEdit as MemoProperties;
+            tbProp.MaxLength = 500;
+            tbProp.Rows = 10;
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.Name = "TranslatedDescription";
+            column.FieldName = "TranslatedDescription";
+            column.Settings.AllowAutoFilter = DefaultBoolean.True;
+            column.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.False;
+            column.ColumnType = MVCxGridViewColumnType.Memo;
+            column.Width = 220;
+            var tbProp = column.PropertiesEdit as MemoProperties;
+            tbProp.MaxLength = 500;
+            tbProp.Rows = 10;
         });
 
         settings.Columns.Add(column =>

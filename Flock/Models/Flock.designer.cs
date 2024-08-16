@@ -51641,6 +51641,8 @@ namespace Flock.Models
 		
 		private string _Description;
 		
+		private string _ConfirmText;
+		
 		private EntitySet<ProductPage_ModuleOption> _ProductPage_ModuleOptions;
 		
 		private EntitySet<ModuleOption> _ModuleOptions;
@@ -51657,6 +51659,8 @@ namespace Flock.Models
     partial void OnNameChanged();
     partial void OnDescriptionChanging(string value);
     partial void OnDescriptionChanged();
+    partial void OnConfirmTextChanging(string value);
+    partial void OnConfirmTextChanged();
     #endregion
 		
 		public Module()
@@ -51723,6 +51727,26 @@ namespace Flock.Models
 					this._Description = value;
 					this.SendPropertyChanged("Description");
 					this.OnDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ConfirmText", DbType="NVarChar(100)")]
+		public string ConfirmText
+		{
+			get
+			{
+				return this._ConfirmText;
+			}
+			set
+			{
+				if ((this._ConfirmText != value))
+				{
+					this.OnConfirmTextChanging(value);
+					this.SendPropertyChanging();
+					this._ConfirmText = value;
+					this.SendPropertyChanged("ConfirmText");
+					this.OnConfirmTextChanged();
 				}
 			}
 		}
@@ -77277,6 +77301,8 @@ namespace Flock.Models
 		
 		private System.Nullable<bool> _Deleted;
 		
+		private string _ConfirmText;
+		
 		private EntityRef<Module> _Module;
 		
     #region Extensibility Method Definitions
@@ -77301,6 +77327,8 @@ namespace Flock.Models
     partial void OnDeletedDTChanged();
     partial void OnDeletedChanging(System.Nullable<bool> value);
     partial void OnDeletedChanged();
+    partial void OnConfirmTextChanging(string value);
+    partial void OnConfirmTextChanged();
     #endregion
 		
 		public Module_Language()
@@ -77489,6 +77517,26 @@ namespace Flock.Models
 					this._Deleted = value;
 					this.SendPropertyChanged("Deleted");
 					this.OnDeletedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ConfirmText", DbType="NVarChar(100)")]
+		public string ConfirmText
+		{
+			get
+			{
+				return this._ConfirmText;
+			}
+			set
+			{
+				if ((this._ConfirmText != value))
+				{
+					this.OnConfirmTextChanging(value);
+					this.SendPropertyChanging();
+					this._ConfirmText = value;
+					this.SendPropertyChanged("ConfirmText");
+					this.OnConfirmTextChanged();
 				}
 			}
 		}

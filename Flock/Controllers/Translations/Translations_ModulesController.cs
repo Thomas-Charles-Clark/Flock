@@ -62,6 +62,8 @@ namespace Flock.Controllers
                     case "Clear":
                         var item = UnitOfWork.GetRepository<Models.Module_Language>().GetAll().Where(p => p.ModuleID == moduleId && p.LanguageID == languageId).Single();
                         item.Name = null;
+                        item.Description = null;
+                        item.ConfirmText = null;
                         item.Stage = null;
                         item.ModifiedDT = DateTime.Now;
                         UnitOfWork.Save();

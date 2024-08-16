@@ -780,6 +780,8 @@
     <Compile Include="ViewModels\TaskSearchViewModel.cs" />
     <Compile Include="ViewModels\Translations\TranslateCallToActionViewModel.cs" />
     <Compile Include="ViewModels\Translations\TranslateCallToActionGridViewModel.cs" />
+    <Compile Include="ViewModels\Translations\TranslateModularProductViewModel.cs" />
+    <Compile Include="ViewModels\Translations\TranslateModularProductGridViewModel.cs" />
     <Compile Include="ViewModels\Translations\TranslateSnippetDetailViewModel.cs" />
     <Compile Include="ViewModels\Translations\TranslateSnippetGridViewModel.cs" />
     <Compile Include="ViewModels\Translations\TranslateSnippetViewModel.cs" />
@@ -6384,6 +6386,8 @@
     <Content Include="Views\FilterIndexCombinations\FilterIndexCombinations.cshtml" />
     <Content Include="Views\FilterIndexCombinations\_FilterIndexCombinationsGridView.cshtml" />
     <Content Include="Views\Shared\_CommonModals.cshtml" />
+    <Content Include="Views\Translations\ModularProducts\_TranslateModularProductGridView.cshtml" />
+    <Content Include="Views\Translations\ModularProducts\TranslateModularProduct.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

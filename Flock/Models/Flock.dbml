@@ -2599,6 +2599,7 @@
       <Column Name="ModuleID" Type="System.Int16" DbType="SmallInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="Name" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
       <Column Name="Description" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="ConfirmText" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
       <Association Name="Module_ProductPage_ModuleOption" Member="ProductPage_ModuleOptions" ThisKey="ModuleID" OtherKey="ModuleID" Type="ProductPage_ModuleOption" />
       <Association Name="Module_ModuleOption" Member="ModuleOptions" ThisKey="ModuleID" OtherKey="ModuleID" Type="ModuleOption" />
       <Association Name="Module_Module_Language" Member="Module_Languages" ThisKey="ModuleID" OtherKey="ModuleID" Type="Module_Language" />
@@ -3823,6 +3824,7 @@
       <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
       <Column Name="DeletedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
       <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="ConfirmText" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
       <Association Name="Module_Module_Language" Member="Module" ThisKey="ModuleID" OtherKey="ModuleID" Type="Module" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>

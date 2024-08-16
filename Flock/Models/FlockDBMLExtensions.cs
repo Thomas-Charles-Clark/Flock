@@ -904,6 +904,22 @@ namespace Flock.Models
         public byte LanguageID { get; set; }
         public string Name { get; set; }
         public string TranslatedName { get; set; }
+        public string Description { get; set; }
+        public string TranslatedDescription { get; set; }
+        public string ConfirmText { get; set; }
+        public string TranslatedConfirmText { get; set; }
+        public bool? Stage { get; set; }
+        public byte FieldsToReview { get; set; }
+    }
+
+    public class ModularProduct_Language_SelectList_ModularProductResult
+    {
+        public short ModularProductID { get; set; }
+        public byte LanguageID { get; set; }
+        public string Name { get; set; }
+        public string TranslatedName { get; set; }
+        public string Description { get; set; }
+        public string TranslatedDescription { get; set; }
         public bool? Stage { get; set; }
         public byte FieldsToReview { get; set; }
     }
@@ -2224,6 +2240,13 @@ namespace Flock.Models
             return (IMultipleResults)result.ReturnValue;
         }
 
+        [global::System.Data.Linq.Mapping.FunctionAttribute(Name = "adm.ModularProduct_Language_SelectList")]
+        [ResultType(typeof(ModularProduct_Language_SelectList_ModularProductResult))]
+        public IMultipleResults ModularProduct_Language_SelectList(byte languageId)
+        {
+            IExecuteResult result = this.ExecuteMethodCall(this, (MethodInfo)MethodInfo.GetCurrentMethod(), languageId);
+            return (IMultipleResults)result.ReturnValue;
+        }
 
         [global::System.Data.Linq.Mapping.FunctionAttribute(Name = "adm.Room_Language_SelectList")]
         [ResultType(typeof(Room_Language_SelectList_RoomResult))]
@@ -3500,16 +3523,20 @@ namespace Flock.Models
             DataTable OriginalText = new DataTable();
             OriginalText.Columns.Add("ModuleID", typeof(Int16));
             OriginalText.Columns.Add("Name", typeof(string));
+            OriginalText.Columns.Add("Description", typeof(string));
+            OriginalText.Columns.Add("ConfirmText", typeof(string));
 
             DataTable TranslatedText = new DataTable();
             TranslatedText.Columns.Add("ModuleID", typeof(Int16));
             TranslatedText.Columns.Add("Name", typeof(string));
+            TranslatedText.Columns.Add("Description", typeof(string));
+            TranslatedText.Columns.Add("ConfirmText", typeof(string));
 
             foreach (var ast in model.Modules)
             {
-                OriginalText.Rows.Add(new object[] { ast.ModuleID, ast.Name });
+                OriginalText.Rows.Add(new object[] { ast.ModuleID, ast.Name, ast.Description, ast.ConfirmText });
 
-                TranslatedText.Rows.Add(new object[] { ast.ModuleID, ast.TranslatedName });
+                TranslatedText.Rows.Add(new object[] { ast.ModuleID, ast.TranslatedName, ast.TranslatedDescription, ast.TranslatedConfirmText });
             }
 
             SqlConnection con = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString);
@@ -3532,6 +3559,49 @@ namespace Flock.Models
             return "ok";
         }
 
+        public string ModularProduct_Language_Save(
+            byte languageId,
+            Flock.ViewModels.TranslateModularProductGridViewModel model)
+        {
+            DataSet ds = new DataSet();
+
+            DataTable OriginalText = new DataTable();
+            OriginalText.Columns.Add("ModularProductID", typeof(short));
+            OriginalText.Columns.Add("Name", typeof(string));
+            OriginalText.Columns.Add("Description", typeof(string));
+
+            DataTable TranslatedText = new DataTable();
+            TranslatedText.Columns.Add("ModularProductID", typeof(short));
+            TranslatedText.Columns.Add("Name", typeof(string));
+            TranslatedText.Columns.Add("Description", typeof(string));
+
+            foreach (var mp in model.ModularProducts)
+            {
+                OriginalText.Rows.Add(new object[] { mp.ModularProductID, mp.Name, mp.Description });
+
+                TranslatedText.Rows.Add(new object[] { mp.ModularProductID, mp.TranslatedName, mp.TranslatedDescription });
+            }
+
+            SqlConnection con = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd = new SqlCommand("adm.ModularProduct_Language_Save", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@LanguageID", languageId);
+            SqlParameter oT = cmd.Parameters.AddWithValue("@OriginalText", OriginalText);
+            oT.SqlDbType = SqlDbType.Structured;
+            oT.TypeName = "mod.ModularProductTextTableType";
+            SqlParameter tT = cmd.Parameters.AddWithValue("@TranslatedText", TranslatedText);
+            tT.SqlDbType = SqlDbType.Structured;
+            tT.TypeName = "mod.ModularProductTextTableType";
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+            con.Close();
+
+            return "ok";
+        }
+
         public string ModuleOption_Language_Save(
             byte languageId,
             Flock.ViewModels.TranslateModuleOptionGridViewModel model)
@@ -3539,11 +3609,11 @@ namespace Flock.Models
             DataSet ds = new DataSet();
 
             DataTable OriginalText = new DataTable();
-            OriginalText.Columns.Add("ModuleOptionID", typeof(Int32));
+            OriginalText.Columns.Add("ModuleOptionID", typeof(int));
             OriginalText.Columns.Add("Name", typeof(string));
 
             DataTable TranslatedText = new DataTable();
-            TranslatedText.Columns.Add("ModuleOptionID", typeof(Int16));
+            TranslatedText.Columns.Add("ModuleOptionID", typeof(int));
             TranslatedText.Columns.Add("Name", typeof(string));
 
             foreach (var ast in model.ModuleOptions)
