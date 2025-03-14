@@ -3032,7 +3032,7 @@ namespace Flock.Controllers
         //@Html.Action("PageComposePageSectionPlatformDropDown", "CMS")
         //@Html.Action("PageComposePageSectionWebStatusDropDown", "CMS")
 
-        public ActionResult PageSectionsPartial(int pageId, short? countryId, byte? pageSectionTypeId, bool? tradeSwitch, byte? platformSwitch, byte? webStatus)
+        public ActionResult PageSectionsPartial(int pageId, byte? countryLanguageId, byte? pageSectionTypeId, bool? tradeSwitch, byte? platformSwitch, byte? webStatus)
         {
             ViewBag.IsUserShuffling = false;
 
@@ -3068,9 +3068,12 @@ namespace Flock.Controllers
                 ViewData["InvalidPageIDError"] = "Invalid Page ID, or the page is marked as deleted. Deleted pages can be retrieved.";
             }
 
-            if (countryId != null)
+            if (countryLanguageId != null && countryLanguageId != 0)
             {
-                PVM.PageSections = PVM.PageSections.Where(p => p.CountryLanguageRestrictions == null || p.CountryLanguageRestrictions.Select(q => q.CountryID).ToList().Contains(countryId.Value)).ToList();
+                var countryLanguage = UnitOfWork.GetRepository<Country_Language>().GetAll().Where(cl => cl.Country_Language_ID == countryLanguageId).Single();
+
+                PVM.PageSections = PVM.PageSections.Where(p => p.CountryLanguageRestrictions == null ||
+                    (p.CountryLanguageRestrictions.Any(q => q.CountryID == countryLanguage.CountryID && q.LanguageID == countryLanguage.LanguageID))).ToList();
             }
 
             if (pageSectionTypeId != null)

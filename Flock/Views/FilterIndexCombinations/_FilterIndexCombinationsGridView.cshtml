@@ -188,7 +188,7 @@
             {
                 case "ProductTypeName":
                     e.Values.Clear();
-                    foreach (var pt in UoW.GetRepository<Flock.Models.ProductType>().GetAll().OrderBy(p => p.Name))
+                    foreach (var pt in UoW.GetRepository<Flock.Models.ProductType>().GetAll().Where(p => p.Deleted == false).OrderBy(p => p.Name))
                     {
                         e.AddValue(pt.Name, pt.Name.ToString());
                     }

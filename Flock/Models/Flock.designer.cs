@@ -912,9 +912,6 @@ namespace Flock.Models
     partial void InsertBundlePriceImport(BundlePriceImport instance);
     partial void UpdateBundlePriceImport(BundlePriceImport instance);
     partial void DeleteBundlePriceImport(BundlePriceImport instance);
-    partial void InsertCountry_Language(Country_Language instance);
-    partial void UpdateCountry_Language(Country_Language instance);
-    partial void DeleteCountry_Language(Country_Language instance);
     partial void InsertAttributeGroup_ProductType(AttributeGroup_ProductType instance);
     partial void UpdateAttributeGroup_ProductType(AttributeGroup_ProductType instance);
     partial void DeleteAttributeGroup_ProductType(AttributeGroup_ProductType instance);
@@ -969,12 +966,18 @@ namespace Flock.Models
     partial void InsertModularProduct_Language(ModularProduct_Language instance);
     partial void UpdateModularProduct_Language(ModularProduct_Language instance);
     partial void DeleteModularProduct_Language(ModularProduct_Language instance);
+    partial void InsertCountry_Language(Country_Language instance);
+    partial void UpdateCountry_Language(Country_Language instance);
+    partial void DeleteCountry_Language(Country_Language instance);
+    partial void InsertBanner_ProductType(Banner_ProductType instance);
+    partial void UpdateBanner_ProductType(Banner_ProductType instance);
+    partial void DeleteBanner_ProductType(Banner_ProductType instance);
     #endregion
 		
 		public FlockDataContext() : 
 				base("Data Source=vm-sql;Initial Catalog=Flock;Integrated Security=False;Persist Securi" +
 						"ty Info=True;User ID=App_Flock-Backend;Password=98FB269A-064A-4E4D-9A1A-39B9BBEA" +
-						"88EF;TrustServerCertificate=True", mappingSource)
+						"88EF", mappingSource)
 		{
 			OnCreated();
 		}
@@ -3819,14 +3822,6 @@ namespace Flock.Models
 			}
 		}
 		
-		public System.Data.Linq.Table<Country_Language> Country_Languages
-		{
-			get
-			{
-				return this.GetTable<Country_Language>();
-			}
-		}
-		
 		public System.Data.Linq.Table<AttributeGroup_ProductType> AttributeGroup_ProductTypes
 		{
 			get
@@ -4008,6 +4003,22 @@ namespace Flock.Models
 			get
 			{
 				return this.GetTable<ModularProduct_Language>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Country_Language> Country_Languages
+		{
+			get
+			{
+				return this.GetTable<Country_Language>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Banner_ProductType> Banner_ProductTypes
+		{
+			get
+			{
+				return this.GetTable<Banner_ProductType>();
 			}
 		}
 		
@@ -9484,8 +9495,6 @@ namespace Flock.Models
 		
 		private EntitySet<TechInfo_Ref_Test_Language> _TechInfo_Ref_Test_Languages;
 		
-		private EntitySet<Country_Language> _Country_Languages;
-		
 		private EntitySet<Member> _Members;
 		
 		private EntitySet<Member> _Members1;
@@ -9501,6 +9510,8 @@ namespace Flock.Models
 		private EntitySet<ModularProduct_Language_Snapshot> _ModularProduct_Language_Snapshots;
 		
 		private EntitySet<ModularProduct_Language> _ModularProduct_Languages;
+		
+		private EntitySet<Country_Language> _Country_Languages;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -9554,7 +9565,6 @@ namespace Flock.Models
 			this._TechInfo_Ref_Usage_Languages = new EntitySet<TechInfo_Ref_Usage_Language>(new Action<TechInfo_Ref_Usage_Language>(this.attach_TechInfo_Ref_Usage_Languages), new Action<TechInfo_Ref_Usage_Language>(this.detach_TechInfo_Ref_Usage_Languages));
 			this._TechnicalDescription_Languages = new EntitySet<TechnicalDescription_Language>(new Action<TechnicalDescription_Language>(this.attach_TechnicalDescription_Languages), new Action<TechnicalDescription_Language>(this.detach_TechnicalDescription_Languages));
 			this._TechInfo_Ref_Test_Languages = new EntitySet<TechInfo_Ref_Test_Language>(new Action<TechInfo_Ref_Test_Language>(this.attach_TechInfo_Ref_Test_Languages), new Action<TechInfo_Ref_Test_Language>(this.detach_TechInfo_Ref_Test_Languages));
-			this._Country_Languages = new EntitySet<Country_Language>(new Action<Country_Language>(this.attach_Country_Languages), new Action<Country_Language>(this.detach_Country_Languages));
 			this._Members = new EntitySet<Member>(new Action<Member>(this.attach_Members), new Action<Member>(this.detach_Members));
 			this._Members1 = new EntitySet<Member>(new Action<Member>(this.attach_Members1), new Action<Member>(this.detach_Members1));
 			this._PageSection_Country_Languages = new EntitySet<PageSection_Country_Language>(new Action<PageSection_Country_Language>(this.attach_PageSection_Country_Languages), new Action<PageSection_Country_Language>(this.detach_PageSection_Country_Languages));
@@ -9563,6 +9573,7 @@ namespace Flock.Models
 			this._ProductType_Languages = new EntitySet<ProductType_Language>(new Action<ProductType_Language>(this.attach_ProductType_Languages), new Action<ProductType_Language>(this.detach_ProductType_Languages));
 			this._ModularProduct_Language_Snapshots = new EntitySet<ModularProduct_Language_Snapshot>(new Action<ModularProduct_Language_Snapshot>(this.attach_ModularProduct_Language_Snapshots), new Action<ModularProduct_Language_Snapshot>(this.detach_ModularProduct_Language_Snapshots));
 			this._ModularProduct_Languages = new EntitySet<ModularProduct_Language>(new Action<ModularProduct_Language>(this.attach_ModularProduct_Languages), new Action<ModularProduct_Language>(this.detach_ModularProduct_Languages));
+			this._Country_Languages = new EntitySet<Country_Language>(new Action<Country_Language>(this.attach_Country_Languages), new Action<Country_Language>(this.detach_Country_Languages));
 			OnCreated();
 		}
 		
@@ -10102,19 +10113,6 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_Country_Language", Storage="_Country_Languages", ThisKey="LanguageID", OtherKey="LanguageID")]
-		public EntitySet<Country_Language> Country_Languages
-		{
-			get
-			{
-				return this._Country_Languages;
-			}
-			set
-			{
-				this._Country_Languages.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_Member", Storage="_Members", ThisKey="LanguageID", OtherKey="LanguageID")]
 		public EntitySet<Member> Members
 		{
@@ -10216,6 +10214,19 @@ namespace Flock.Models
 			set
 			{
 				this._ModularProduct_Languages.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_Country_Language", Storage="_Country_Languages", ThisKey="LanguageID", OtherKey="LanguageID")]
+		public EntitySet<Country_Language> Country_Languages
+		{
+			get
+			{
+				return this._Country_Languages;
+			}
+			set
+			{
+				this._Country_Languages.Assign(value);
 			}
 		}
 		
@@ -10623,18 +10634,6 @@ namespace Flock.Models
 			entity.Language = null;
 		}
 		
-		private void attach_Country_Languages(Country_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.Language = this;
-		}
-		
-		private void detach_Country_Languages(Country_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.Language = null;
-		}
-		
 		private void attach_Members(Member entity)
 		{
 			this.SendPropertyChanging();
@@ -10726,6 +10725,18 @@ namespace Flock.Models
 		}
 		
 		private void detach_ModularProduct_Languages(ModularProduct_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.Language = null;
+		}
+		
+		private void attach_Country_Languages(Country_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.Language = this;
+		}
+		
+		private void detach_Country_Languages(Country_Language entity)
 		{
 			this.SendPropertyChanging();
 			entity.Language = null;
@@ -63401,13 +63412,13 @@ namespace Flock.Models
 		
 		private EntitySet<Resource_Language> _Resource_Languages;
 		
-		private EntitySet<Country_Language> _Country_Languages;
-		
 		private EntitySet<Member> _Members;
 		
 		private EntitySet<Member> _Members1;
 		
 		private EntitySet<PageSection_Country_Language> _PageSection_Country_Languages;
+		
+		private EntitySet<Country_Language> _Country_Languages;
 		
 		private EntityRef<Continent> _Continent;
 		
@@ -63480,10 +63491,10 @@ namespace Flock.Models
 			this._Collection_Countries = new EntitySet<Collection_Country>(new Action<Collection_Country>(this.attach_Collection_Countries), new Action<Collection_Country>(this.detach_Collection_Countries));
 			this._DeliveryExceptions = new EntitySet<DeliveryException>(new Action<DeliveryException>(this.attach_DeliveryExceptions), new Action<DeliveryException>(this.detach_DeliveryExceptions));
 			this._Resource_Languages = new EntitySet<Resource_Language>(new Action<Resource_Language>(this.attach_Resource_Languages), new Action<Resource_Language>(this.detach_Resource_Languages));
-			this._Country_Languages = new EntitySet<Country_Language>(new Action<Country_Language>(this.attach_Country_Languages), new Action<Country_Language>(this.detach_Country_Languages));
 			this._Members = new EntitySet<Member>(new Action<Member>(this.attach_Members), new Action<Member>(this.detach_Members));
 			this._Members1 = new EntitySet<Member>(new Action<Member>(this.attach_Members1), new Action<Member>(this.detach_Members1));
 			this._PageSection_Country_Languages = new EntitySet<PageSection_Country_Language>(new Action<PageSection_Country_Language>(this.attach_PageSection_Country_Languages), new Action<PageSection_Country_Language>(this.detach_PageSection_Country_Languages));
+			this._Country_Languages = new EntitySet<Country_Language>(new Action<Country_Language>(this.attach_Country_Languages), new Action<Country_Language>(this.detach_Country_Languages));
 			this._Continent = default(EntityRef<Continent>);
 			this._Market = default(EntityRef<Market>);
 			this._PriceList = default(EntityRef<PriceList>);
@@ -64084,19 +64095,6 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Country_Country_Language", Storage="_Country_Languages", ThisKey="CountryID", OtherKey="CountryID")]
-		public EntitySet<Country_Language> Country_Languages
-		{
-			get
-			{
-				return this._Country_Languages;
-			}
-			set
-			{
-				this._Country_Languages.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Country_Member", Storage="_Members", ThisKey="CountryID", OtherKey="CountryID")]
 		public EntitySet<Member> Members
 		{
@@ -64133,6 +64131,19 @@ namespace Flock.Models
 			set
 			{
 				this._PageSection_Country_Languages.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Country_Country_Language", Storage="_Country_Languages", ThisKey="CountryID", OtherKey="CountryID")]
+		public EntitySet<Country_Language> Country_Languages
+		{
+			get
+			{
+				return this._Country_Languages;
+			}
+			set
+			{
+				this._Country_Languages.Assign(value);
 			}
 		}
 		
@@ -64400,18 +64411,6 @@ namespace Flock.Models
 			entity.Country = null;
 		}
 		
-		private void attach_Country_Languages(Country_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.Country = this;
-		}
-		
-		private void detach_Country_Languages(Country_Language entity)
-		{
-			this.SendPropertyChanging();
-			entity.Country = null;
-		}
-		
 		private void attach_Members(Member entity)
 		{
 			this.SendPropertyChanging();
@@ -64443,6 +64442,18 @@ namespace Flock.Models
 		}
 		
 		private void detach_PageSection_Country_Languages(PageSection_Country_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.Country = null;
+		}
+		
+		private void attach_Country_Languages(Country_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.Country = this;
+		}
+		
+		private void detach_Country_Languages(Country_Language entity)
 		{
 			this.SendPropertyChanging();
 			entity.Country = null;
@@ -90090,7 +90101,7 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(200)")]
 		public string QueryStringParameters
 		{
 			get
@@ -90432,6 +90443,8 @@ namespace Flock.Models
 		
 		private EntitySet<Banner_FontClass> _Banner_FontClasses;
 		
+		private EntitySet<Banner_ProductType> _Banner_ProductTypes;
+		
 		private EntityRef<BannerLinkType> _BannerLinkType;
 		
 		private EntityRef<Page> _Page;
@@ -90507,6 +90520,7 @@ namespace Flock.Models
 			this._Banner_Pages = new EntitySet<Banner_Page>(new Action<Banner_Page>(this.attach_Banner_Pages), new Action<Banner_Page>(this.detach_Banner_Pages));
 			this._Banner_SiteSections = new EntitySet<Banner_SiteSection>(new Action<Banner_SiteSection>(this.attach_Banner_SiteSections), new Action<Banner_SiteSection>(this.detach_Banner_SiteSections));
 			this._Banner_FontClasses = new EntitySet<Banner_FontClass>(new Action<Banner_FontClass>(this.attach_Banner_FontClasses), new Action<Banner_FontClass>(this.detach_Banner_FontClasses));
+			this._Banner_ProductTypes = new EntitySet<Banner_ProductType>(new Action<Banner_ProductType>(this.attach_Banner_ProductTypes), new Action<Banner_ProductType>(this.detach_Banner_ProductTypes));
 			this._BannerLinkType = default(EntityRef<BannerLinkType>);
 			this._Page = default(EntityRef<Page>);
 			OnCreated();
@@ -91165,6 +91179,19 @@ namespace Flock.Models
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Banner_Banner_ProductType", Storage="_Banner_ProductTypes", ThisKey="BannerID", OtherKey="BannerID")]
+		public EntitySet<Banner_ProductType> Banner_ProductTypes
+		{
+			get
+			{
+				return this._Banner_ProductTypes;
+			}
+			set
+			{
+				this._Banner_ProductTypes.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="BannerLinkType_Banner", Storage="_BannerLinkType", ThisKey="BannerLinkTypeID", OtherKey="BannerLinkTypeID", IsForeignKey=true)]
 		public BannerLinkType BannerLinkType
 		{
@@ -91308,6 +91335,18 @@ namespace Flock.Models
 		}
 		
 		private void detach_Banner_FontClasses(Banner_FontClass entity)
+		{
+			this.SendPropertyChanging();
+			entity.Banner = null;
+		}
+		
+		private void attach_Banner_ProductTypes(Banner_ProductType entity)
+		{
+			this.SendPropertyChanging();
+			entity.Banner = this;
+		}
+		
+		private void detach_Banner_ProductTypes(Banner_ProductType entity)
 		{
 			this.SendPropertyChanging();
 			entity.Banner = null;
@@ -92797,7 +92836,7 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(200)")]
 		public string QueryStringParameters
 		{
 			get
@@ -93585,6 +93624,8 @@ namespace Flock.Models
 		
 		private string _VideoThumbnail;
 		
+		private System.Nullable<long> _AlternateColourwayImageID;
+		
 		private EntitySet<ProductPage_RelatedProductPage> _ProductPage_RelatedProductPages;
 		
 		private EntitySet<ProductPage_Attribute> _ProductPage_Attributes;
@@ -93711,6 +93752,8 @@ namespace Flock.Models
     partial void OnVideoURLChanged();
     partial void OnVideoThumbnailChanging(string value);
     partial void OnVideoThumbnailChanged();
+    partial void OnAlternateColourwayImageIDChanging(System.Nullable<long> value);
+    partial void OnAlternateColourwayImageIDChanged();
     #endregion
 		
 		public ProductPage()
@@ -94639,6 +94682,26 @@ namespace Flock.Models
 					this._VideoThumbnail = value;
 					this.SendPropertyChanged("VideoThumbnail");
 					this.OnVideoThumbnailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AlternateColourwayImageID", DbType="BigInt")]
+		public System.Nullable<long> AlternateColourwayImageID
+		{
+			get
+			{
+				return this._AlternateColourwayImageID;
+			}
+			set
+			{
+				if ((this._AlternateColourwayImageID != value))
+				{
+					this.OnAlternateColourwayImageIDChanging(value);
+					this.SendPropertyChanging();
+					this._AlternateColourwayImageID = value;
+					this.SendPropertyChanged("AlternateColourwayImageID");
+					this.OnAlternateColourwayImageIDChanged();
 				}
 			}
 		}
@@ -96380,558 +96443,6 @@ namespace Flock.Models
 				{
 					this._SalePriceStatus = value;
 				}
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Country_Language")]
-	public partial class Country_Language : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private byte _Country_Language_ID;
-		
-		private short _CountryID;
-		
-		private byte _LanguageID;
-		
-		private short _SortOrder;
-		
-		private string _URL;
-		
-		private string _Name;
-		
-		private string _hreflang;
-		
-		private System.DateTime _CreatedDT;
-		
-		private System.Nullable<System.DateTime> _ModifiedDT;
-		
-		private System.Nullable<System.DateTime> _OnDate;
-		
-		private System.Nullable<System.DateTime> _OffDate;
-		
-		private string _DotNetCulture;
-		
-		private string _CustomerServiceEmail;
-		
-		private string _CustomerServicePhone;
-		
-		private string _MarketManagerEmail;
-		
-		private byte _BrontoSubAccountID;
-		
-		private System.Nullable<System.DateTime> _DeletedDT;
-		
-		private System.Nullable<bool> _Deleted;
-		
-		private EntityRef<Country> _Country;
-		
-		private EntityRef<Language> _Language;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnCountry_Language_IDChanging(byte value);
-    partial void OnCountry_Language_IDChanged();
-    partial void OnCountryIDChanging(short value);
-    partial void OnCountryIDChanged();
-    partial void OnLanguageIDChanging(byte value);
-    partial void OnLanguageIDChanged();
-    partial void OnSortOrderChanging(short value);
-    partial void OnSortOrderChanged();
-    partial void OnURLChanging(string value);
-    partial void OnURLChanged();
-    partial void OnNameChanging(string value);
-    partial void OnNameChanged();
-    partial void OnhreflangChanging(string value);
-    partial void OnhreflangChanged();
-    partial void OnCreatedDTChanging(System.DateTime value);
-    partial void OnCreatedDTChanged();
-    partial void OnModifiedDTChanging(System.Nullable<System.DateTime> value);
-    partial void OnModifiedDTChanged();
-    partial void OnOnDateChanging(System.Nullable<System.DateTime> value);
-    partial void OnOnDateChanged();
-    partial void OnOffDateChanging(System.Nullable<System.DateTime> value);
-    partial void OnOffDateChanged();
-    partial void OnDotNetCultureChanging(string value);
-    partial void OnDotNetCultureChanged();
-    partial void OnCustomerServiceEmailChanging(string value);
-    partial void OnCustomerServiceEmailChanged();
-    partial void OnCustomerServicePhoneChanging(string value);
-    partial void OnCustomerServicePhoneChanged();
-    partial void OnMarketManagerEmailChanging(string value);
-    partial void OnMarketManagerEmailChanged();
-    partial void OnBrontoSubAccountIDChanging(byte value);
-    partial void OnBrontoSubAccountIDChanged();
-    partial void OnDeletedDTChanging(System.Nullable<System.DateTime> value);
-    partial void OnDeletedDTChanged();
-    partial void OnDeletedChanging(System.Nullable<bool> value);
-    partial void OnDeletedChanged();
-    #endregion
-		
-		public Country_Language()
-		{
-			this._Country = default(EntityRef<Country>);
-			this._Language = default(EntityRef<Language>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Country_Language_ID", AutoSync=AutoSync.OnInsert, DbType="TinyInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public byte Country_Language_ID
-		{
-			get
-			{
-				return this._Country_Language_ID;
-			}
-			set
-			{
-				if ((this._Country_Language_ID != value))
-				{
-					this.OnCountry_Language_IDChanging(value);
-					this.SendPropertyChanging();
-					this._Country_Language_ID = value;
-					this.SendPropertyChanged("Country_Language_ID");
-					this.OnCountry_Language_IDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CountryID", DbType="SmallInt NOT NULL")]
-		public short CountryID
-		{
-			get
-			{
-				return this._CountryID;
-			}
-			set
-			{
-				if ((this._CountryID != value))
-				{
-					if (this._Country.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnCountryIDChanging(value);
-					this.SendPropertyChanging();
-					this._CountryID = value;
-					this.SendPropertyChanged("CountryID");
-					this.OnCountryIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LanguageID", DbType="TinyInt NOT NULL")]
-		public byte LanguageID
-		{
-			get
-			{
-				return this._LanguageID;
-			}
-			set
-			{
-				if ((this._LanguageID != value))
-				{
-					if (this._Language.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnLanguageIDChanging(value);
-					this.SendPropertyChanging();
-					this._LanguageID = value;
-					this.SendPropertyChanged("LanguageID");
-					this.OnLanguageIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SortOrder", DbType="SmallInt NOT NULL")]
-		public short SortOrder
-		{
-			get
-			{
-				return this._SortOrder;
-			}
-			set
-			{
-				if ((this._SortOrder != value))
-				{
-					this.OnSortOrderChanging(value);
-					this.SendPropertyChanging();
-					this._SortOrder = value;
-					this.SendPropertyChanged("SortOrder");
-					this.OnSortOrderChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_URL", DbType="NVarChar(5) NOT NULL", CanBeNull=false)]
-		public string URL
-		{
-			get
-			{
-				return this._URL;
-			}
-			set
-			{
-				if ((this._URL != value))
-				{
-					this.OnURLChanging(value);
-					this.SendPropertyChanging();
-					this._URL = value;
-					this.SendPropertyChanged("URL");
-					this.OnURLChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(50)")]
-		public string Name
-		{
-			get
-			{
-				return this._Name;
-			}
-			set
-			{
-				if ((this._Name != value))
-				{
-					this.OnNameChanging(value);
-					this.SendPropertyChanging();
-					this._Name = value;
-					this.SendPropertyChanged("Name");
-					this.OnNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hreflang", DbType="NVarChar(5) NOT NULL", CanBeNull=false)]
-		public string hreflang
-		{
-			get
-			{
-				return this._hreflang;
-			}
-			set
-			{
-				if ((this._hreflang != value))
-				{
-					this.OnhreflangChanging(value);
-					this.SendPropertyChanging();
-					this._hreflang = value;
-					this.SendPropertyChanged("hreflang");
-					this.OnhreflangChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedDT", DbType="DateTime2 NOT NULL")]
-		public System.DateTime CreatedDT
-		{
-			get
-			{
-				return this._CreatedDT;
-			}
-			set
-			{
-				if ((this._CreatedDT != value))
-				{
-					this.OnCreatedDTChanging(value);
-					this.SendPropertyChanging();
-					this._CreatedDT = value;
-					this.SendPropertyChanged("CreatedDT");
-					this.OnCreatedDTChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ModifiedDT", DbType="DateTime2")]
-		public System.Nullable<System.DateTime> ModifiedDT
-		{
-			get
-			{
-				return this._ModifiedDT;
-			}
-			set
-			{
-				if ((this._ModifiedDT != value))
-				{
-					this.OnModifiedDTChanging(value);
-					this.SendPropertyChanging();
-					this._ModifiedDT = value;
-					this.SendPropertyChanged("ModifiedDT");
-					this.OnModifiedDTChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OnDate", DbType="Date")]
-		public System.Nullable<System.DateTime> OnDate
-		{
-			get
-			{
-				return this._OnDate;
-			}
-			set
-			{
-				if ((this._OnDate != value))
-				{
-					this.OnOnDateChanging(value);
-					this.SendPropertyChanging();
-					this._OnDate = value;
-					this.SendPropertyChanged("OnDate");
-					this.OnOnDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OffDate", DbType="Date")]
-		public System.Nullable<System.DateTime> OffDate
-		{
-			get
-			{
-				return this._OffDate;
-			}
-			set
-			{
-				if ((this._OffDate != value))
-				{
-					this.OnOffDateChanging(value);
-					this.SendPropertyChanging();
-					this._OffDate = value;
-					this.SendPropertyChanged("OffDate");
-					this.OnOffDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DotNetCulture", DbType="NVarChar(10) NOT NULL", CanBeNull=false)]
-		public string DotNetCulture
-		{
-			get
-			{
-				return this._DotNetCulture;
-			}
-			set
-			{
-				if ((this._DotNetCulture != value))
-				{
-					this.OnDotNetCultureChanging(value);
-					this.SendPropertyChanging();
-					this._DotNetCulture = value;
-					this.SendPropertyChanged("DotNetCulture");
-					this.OnDotNetCultureChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CustomerServiceEmail", DbType="NVarChar(256) NOT NULL", CanBeNull=false)]
-		public string CustomerServiceEmail
-		{
-			get
-			{
-				return this._CustomerServiceEmail;
-			}
-			set
-			{
-				if ((this._CustomerServiceEmail != value))
-				{
-					this.OnCustomerServiceEmailChanging(value);
-					this.SendPropertyChanging();
-					this._CustomerServiceEmail = value;
-					this.SendPropertyChanged("CustomerServiceEmail");
-					this.OnCustomerServiceEmailChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CustomerServicePhone", DbType="NVarChar(50)")]
-		public string CustomerServicePhone
-		{
-			get
-			{
-				return this._CustomerServicePhone;
-			}
-			set
-			{
-				if ((this._CustomerServicePhone != value))
-				{
-					this.OnCustomerServicePhoneChanging(value);
-					this.SendPropertyChanging();
-					this._CustomerServicePhone = value;
-					this.SendPropertyChanged("CustomerServicePhone");
-					this.OnCustomerServicePhoneChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MarketManagerEmail", DbType="NVarChar(255)")]
-		public string MarketManagerEmail
-		{
-			get
-			{
-				return this._MarketManagerEmail;
-			}
-			set
-			{
-				if ((this._MarketManagerEmail != value))
-				{
-					this.OnMarketManagerEmailChanging(value);
-					this.SendPropertyChanging();
-					this._MarketManagerEmail = value;
-					this.SendPropertyChanged("MarketManagerEmail");
-					this.OnMarketManagerEmailChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BrontoSubAccountID", DbType="TinyInt NOT NULL")]
-		public byte BrontoSubAccountID
-		{
-			get
-			{
-				return this._BrontoSubAccountID;
-			}
-			set
-			{
-				if ((this._BrontoSubAccountID != value))
-				{
-					this.OnBrontoSubAccountIDChanging(value);
-					this.SendPropertyChanging();
-					this._BrontoSubAccountID = value;
-					this.SendPropertyChanged("BrontoSubAccountID");
-					this.OnBrontoSubAccountIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeletedDT", DbType="DateTime2")]
-		public System.Nullable<System.DateTime> DeletedDT
-		{
-			get
-			{
-				return this._DeletedDT;
-			}
-			set
-			{
-				if ((this._DeletedDT != value))
-				{
-					this.OnDeletedDTChanging(value);
-					this.SendPropertyChanging();
-					this._DeletedDT = value;
-					this.SendPropertyChanged("DeletedDT");
-					this.OnDeletedDTChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Deleted", AutoSync=AutoSync.Always, DbType="Bit", IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
-		public System.Nullable<bool> Deleted
-		{
-			get
-			{
-				return this._Deleted;
-			}
-			set
-			{
-				if ((this._Deleted != value))
-				{
-					this.OnDeletedChanging(value);
-					this.SendPropertyChanging();
-					this._Deleted = value;
-					this.SendPropertyChanged("Deleted");
-					this.OnDeletedChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Country_Country_Language", Storage="_Country", ThisKey="CountryID", OtherKey="CountryID", IsForeignKey=true)]
-		public Country Country
-		{
-			get
-			{
-				return this._Country.Entity;
-			}
-			set
-			{
-				Country previousValue = this._Country.Entity;
-				if (((previousValue != value) 
-							|| (this._Country.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Country.Entity = null;
-						previousValue.Country_Languages.Remove(this);
-					}
-					this._Country.Entity = value;
-					if ((value != null))
-					{
-						value.Country_Languages.Add(this);
-						this._CountryID = value.CountryID;
-					}
-					else
-					{
-						this._CountryID = default(short);
-					}
-					this.SendPropertyChanged("Country");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_Country_Language", Storage="_Language", ThisKey="LanguageID", OtherKey="LanguageID", IsForeignKey=true)]
-		public Language Language
-		{
-			get
-			{
-				return this._Language.Entity;
-			}
-			set
-			{
-				Language previousValue = this._Language.Entity;
-				if (((previousValue != value) 
-							|| (this._Language.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Language.Entity = null;
-						previousValue.Country_Languages.Remove(this);
-					}
-					this._Language.Entity = value;
-					if ((value != null))
-					{
-						value.Country_Languages.Add(this);
-						this._LanguageID = value.LanguageID;
-					}
-					else
-					{
-						this._LanguageID = default(byte);
-					}
-					this.SendPropertyChanged("Language");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
 	}
@@ -105095,6 +104606,8 @@ namespace Flock.Models
 		
 		private EntitySet<Member> _Members;
 		
+		private EntitySet<Country_Language> _Country_Languages;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -105136,6 +104649,7 @@ namespace Flock.Models
 		public Account()
 		{
 			this._Members = new EntitySet<Member>(new Action<Member>(this.attach_Members), new Action<Member>(this.detach_Members));
+			this._Country_Languages = new EntitySet<Country_Language>(new Action<Country_Language>(this.attach_Country_Languages), new Action<Country_Language>(this.detach_Country_Languages));
 			OnCreated();
 		}
 		
@@ -105472,6 +104986,19 @@ namespace Flock.Models
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Country_Language", Storage="_Country_Languages", ThisKey="AccountID", OtherKey="DotDigitalAccountID")]
+		public EntitySet<Country_Language> Country_Languages
+		{
+			get
+			{
+				return this._Country_Languages;
+			}
+			set
+			{
+				this._Country_Languages.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -105499,6 +105026,18 @@ namespace Flock.Models
 		}
 		
 		private void detach_Members(Member entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_Country_Languages(Country_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_Country_Languages(Country_Language entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -106563,7 +106102,7 @@ namespace Flock.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(200)")]
 		public string QueryStringParameters
 		{
 			get
@@ -108025,6 +107564,8 @@ namespace Flock.Models
 		
 		private EntitySet<ProductType_Language> _ProductType_Languages;
 		
+		private EntitySet<Banner_ProductType> _Banner_ProductTypes;
+		
 		private EntityRef<Page> _Page;
 		
     #region Extensibility Method Definitions
@@ -108140,6 +107681,7 @@ namespace Flock.Models
 			this._FilterIndexRestrictions = new EntitySet<FilterIndexRestriction>(new Action<FilterIndexRestriction>(this.attach_FilterIndexRestrictions), new Action<FilterIndexRestriction>(this.detach_FilterIndexRestrictions));
 			this._FilterIndexCombinations = new EntitySet<FilterIndexCombination>(new Action<FilterIndexCombination>(this.attach_FilterIndexCombinations), new Action<FilterIndexCombination>(this.detach_FilterIndexCombinations));
 			this._ProductType_Languages = new EntitySet<ProductType_Language>(new Action<ProductType_Language>(this.attach_ProductType_Languages), new Action<ProductType_Language>(this.detach_ProductType_Languages));
+			this._Banner_ProductTypes = new EntitySet<Banner_ProductType>(new Action<Banner_ProductType>(this.attach_Banner_ProductTypes), new Action<Banner_ProductType>(this.detach_Banner_ProductTypes));
 			this._Page = default(EntityRef<Page>);
 			OnCreated();
 		}
@@ -109243,6 +108785,19 @@ namespace Flock.Models
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ProductType_Banner_ProductType", Storage="_Banner_ProductTypes", ThisKey="ProductTypeID", OtherKey="ProductTypeID")]
+		public EntitySet<Banner_ProductType> Banner_ProductTypes
+		{
+			get
+			{
+				return this._Banner_ProductTypes;
+			}
+			set
+			{
+				this._Banner_ProductTypes.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Page_ProductType", Storage="_Page", ThisKey="CategoryPageID", OtherKey="PageID", IsForeignKey=true)]
 		public Page Page
 		{
@@ -109472,6 +109027,18 @@ namespace Flock.Models
 		}
 		
 		private void detach_ProductType_Languages(ProductType_Language entity)
+		{
+			this.SendPropertyChanging();
+			entity.ProductType = null;
+		}
+		
+		private void attach_Banner_ProductTypes(Banner_ProductType entity)
+		{
+			this.SendPropertyChanging();
+			entity.ProductType = this;
+		}
+		
+		private void detach_Banner_ProductTypes(Banner_ProductType entity)
 		{
 			this.SendPropertyChanging();
 			entity.ProductType = null;
@@ -110365,6 +109932,959 @@ namespace Flock.Models
 						this._ModularProductID = default(short);
 					}
 					this.SendPropertyChanged("ModularProduct");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Country_Language")]
+	public partial class Country_Language : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private byte _Country_Language_ID;
+		
+		private short _CountryID;
+		
+		private byte _LanguageID;
+		
+		private short _SortOrder;
+		
+		private string _URL;
+		
+		private string _Name;
+		
+		private string _hreflang;
+		
+		private System.DateTime _CreatedDT;
+		
+		private System.Nullable<System.DateTime> _ModifiedDT;
+		
+		private System.Nullable<System.DateTime> _OnDate;
+		
+		private System.Nullable<System.DateTime> _OffDate;
+		
+		private string _DotNetCulture;
+		
+		private string _CustomerServiceEmail;
+		
+		private string _CustomerServicePhone;
+		
+		private string _MarketManagerEmail;
+		
+		private byte _BrontoSubAccountID;
+		
+		private System.Nullable<System.DateTime> _DeletedDT;
+		
+		private System.Nullable<bool> _Deleted;
+		
+		private bool _EcommerceEnabled;
+		
+		private bool _SamplesEnabled;
+		
+		private string _TradeCustomerServiceEmail;
+		
+		private byte _DotDigitalAccountID;
+		
+		private bool _EnableFilterIndexing;
+		
+		private bool _NoIndex;
+		
+		private System.Nullable<bool> _NoFollow;
+		
+		private string _Label;
+		
+		private EntityRef<Country> _Country;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<Language> _Language;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnCountry_Language_IDChanging(byte value);
+    partial void OnCountry_Language_IDChanged();
+    partial void OnCountryIDChanging(short value);
+    partial void OnCountryIDChanged();
+    partial void OnLanguageIDChanging(byte value);
+    partial void OnLanguageIDChanged();
+    partial void OnSortOrderChanging(short value);
+    partial void OnSortOrderChanged();
+    partial void OnURLChanging(string value);
+    partial void OnURLChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnhreflangChanging(string value);
+    partial void OnhreflangChanged();
+    partial void OnCreatedDTChanging(System.DateTime value);
+    partial void OnCreatedDTChanged();
+    partial void OnModifiedDTChanging(System.Nullable<System.DateTime> value);
+    partial void OnModifiedDTChanged();
+    partial void OnOnDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnOnDateChanged();
+    partial void OnOffDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnOffDateChanged();
+    partial void OnDotNetCultureChanging(string value);
+    partial void OnDotNetCultureChanged();
+    partial void OnCustomerServiceEmailChanging(string value);
+    partial void OnCustomerServiceEmailChanged();
+    partial void OnCustomerServicePhoneChanging(string value);
+    partial void OnCustomerServicePhoneChanged();
+    partial void OnMarketManagerEmailChanging(string value);
+    partial void OnMarketManagerEmailChanged();
+    partial void OnBrontoSubAccountIDChanging(byte value);
+    partial void OnBrontoSubAccountIDChanged();
+    partial void OnDeletedDTChanging(System.Nullable<System.DateTime> value);
+    partial void OnDeletedDTChanged();
+    partial void OnDeletedChanging(System.Nullable<bool> value);
+    partial void OnDeletedChanged();
+    partial void OnEcommerceEnabledChanging(bool value);
+    partial void OnEcommerceEnabledChanged();
+    partial void OnSamplesEnabledChanging(bool value);
+    partial void OnSamplesEnabledChanged();
+    partial void OnTradeCustomerServiceEmailChanging(string value);
+    partial void OnTradeCustomerServiceEmailChanged();
+    partial void OnDotDigitalAccountIDChanging(byte value);
+    partial void OnDotDigitalAccountIDChanged();
+    partial void OnEnableFilterIndexingChanging(bool value);
+    partial void OnEnableFilterIndexingChanged();
+    partial void OnNoIndexChanging(bool value);
+    partial void OnNoIndexChanged();
+    partial void OnNoFollowChanging(System.Nullable<bool> value);
+    partial void OnNoFollowChanged();
+    partial void OnLabelChanging(string value);
+    partial void OnLabelChanged();
+    #endregion
+		
+		public Country_Language()
+		{
+			this._Country = default(EntityRef<Country>);
+			this._Account = default(EntityRef<Account>);
+			this._Language = default(EntityRef<Language>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Country_Language_ID", AutoSync=AutoSync.OnInsert, DbType="TinyInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public byte Country_Language_ID
+		{
+			get
+			{
+				return this._Country_Language_ID;
+			}
+			set
+			{
+				if ((this._Country_Language_ID != value))
+				{
+					this.OnCountry_Language_IDChanging(value);
+					this.SendPropertyChanging();
+					this._Country_Language_ID = value;
+					this.SendPropertyChanged("Country_Language_ID");
+					this.OnCountry_Language_IDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CountryID", DbType="SmallInt NOT NULL")]
+		public short CountryID
+		{
+			get
+			{
+				return this._CountryID;
+			}
+			set
+			{
+				if ((this._CountryID != value))
+				{
+					if (this._Country.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCountryIDChanging(value);
+					this.SendPropertyChanging();
+					this._CountryID = value;
+					this.SendPropertyChanged("CountryID");
+					this.OnCountryIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LanguageID", DbType="TinyInt NOT NULL")]
+		public byte LanguageID
+		{
+			get
+			{
+				return this._LanguageID;
+			}
+			set
+			{
+				if ((this._LanguageID != value))
+				{
+					if (this._Language.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnLanguageIDChanging(value);
+					this.SendPropertyChanging();
+					this._LanguageID = value;
+					this.SendPropertyChanged("LanguageID");
+					this.OnLanguageIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SortOrder", DbType="SmallInt NOT NULL")]
+		public short SortOrder
+		{
+			get
+			{
+				return this._SortOrder;
+			}
+			set
+			{
+				if ((this._SortOrder != value))
+				{
+					this.OnSortOrderChanging(value);
+					this.SendPropertyChanging();
+					this._SortOrder = value;
+					this.SendPropertyChanged("SortOrder");
+					this.OnSortOrderChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_URL", DbType="NVarChar(5) NOT NULL", CanBeNull=false)]
+		public string URL
+		{
+			get
+			{
+				return this._URL;
+			}
+			set
+			{
+				if ((this._URL != value))
+				{
+					this.OnURLChanging(value);
+					this.SendPropertyChanging();
+					this._URL = value;
+					this.SendPropertyChanged("URL");
+					this.OnURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(50)")]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hreflang", DbType="NVarChar(5) NOT NULL", CanBeNull=false)]
+		public string hreflang
+		{
+			get
+			{
+				return this._hreflang;
+			}
+			set
+			{
+				if ((this._hreflang != value))
+				{
+					this.OnhreflangChanging(value);
+					this.SendPropertyChanging();
+					this._hreflang = value;
+					this.SendPropertyChanged("hreflang");
+					this.OnhreflangChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedDT", DbType="DateTime2 NOT NULL")]
+		public System.DateTime CreatedDT
+		{
+			get
+			{
+				return this._CreatedDT;
+			}
+			set
+			{
+				if ((this._CreatedDT != value))
+				{
+					this.OnCreatedDTChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedDT = value;
+					this.SendPropertyChanged("CreatedDT");
+					this.OnCreatedDTChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ModifiedDT", DbType="DateTime2")]
+		public System.Nullable<System.DateTime> ModifiedDT
+		{
+			get
+			{
+				return this._ModifiedDT;
+			}
+			set
+			{
+				if ((this._ModifiedDT != value))
+				{
+					this.OnModifiedDTChanging(value);
+					this.SendPropertyChanging();
+					this._ModifiedDT = value;
+					this.SendPropertyChanged("ModifiedDT");
+					this.OnModifiedDTChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OnDate", DbType="Date")]
+		public System.Nullable<System.DateTime> OnDate
+		{
+			get
+			{
+				return this._OnDate;
+			}
+			set
+			{
+				if ((this._OnDate != value))
+				{
+					this.OnOnDateChanging(value);
+					this.SendPropertyChanging();
+					this._OnDate = value;
+					this.SendPropertyChanged("OnDate");
+					this.OnOnDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OffDate", DbType="Date")]
+		public System.Nullable<System.DateTime> OffDate
+		{
+			get
+			{
+				return this._OffDate;
+			}
+			set
+			{
+				if ((this._OffDate != value))
+				{
+					this.OnOffDateChanging(value);
+					this.SendPropertyChanging();
+					this._OffDate = value;
+					this.SendPropertyChanged("OffDate");
+					this.OnOffDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DotNetCulture", DbType="NVarChar(10) NOT NULL", CanBeNull=false)]
+		public string DotNetCulture
+		{
+			get
+			{
+				return this._DotNetCulture;
+			}
+			set
+			{
+				if ((this._DotNetCulture != value))
+				{
+					this.OnDotNetCultureChanging(value);
+					this.SendPropertyChanging();
+					this._DotNetCulture = value;
+					this.SendPropertyChanged("DotNetCulture");
+					this.OnDotNetCultureChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CustomerServiceEmail", DbType="NVarChar(256) NOT NULL", CanBeNull=false)]
+		public string CustomerServiceEmail
+		{
+			get
+			{
+				return this._CustomerServiceEmail;
+			}
+			set
+			{
+				if ((this._CustomerServiceEmail != value))
+				{
+					this.OnCustomerServiceEmailChanging(value);
+					this.SendPropertyChanging();
+					this._CustomerServiceEmail = value;
+					this.SendPropertyChanged("CustomerServiceEmail");
+					this.OnCustomerServiceEmailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CustomerServicePhone", DbType="NVarChar(50)")]
+		public string CustomerServicePhone
+		{
+			get
+			{
+				return this._CustomerServicePhone;
+			}
+			set
+			{
+				if ((this._CustomerServicePhone != value))
+				{
+					this.OnCustomerServicePhoneChanging(value);
+					this.SendPropertyChanging();
+					this._CustomerServicePhone = value;
+					this.SendPropertyChanged("CustomerServicePhone");
+					this.OnCustomerServicePhoneChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MarketManagerEmail", DbType="NVarChar(255)")]
+		public string MarketManagerEmail
+		{
+			get
+			{
+				return this._MarketManagerEmail;
+			}
+			set
+			{
+				if ((this._MarketManagerEmail != value))
+				{
+					this.OnMarketManagerEmailChanging(value);
+					this.SendPropertyChanging();
+					this._MarketManagerEmail = value;
+					this.SendPropertyChanged("MarketManagerEmail");
+					this.OnMarketManagerEmailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BrontoSubAccountID", DbType="TinyInt NOT NULL")]
+		public byte BrontoSubAccountID
+		{
+			get
+			{
+				return this._BrontoSubAccountID;
+			}
+			set
+			{
+				if ((this._BrontoSubAccountID != value))
+				{
+					this.OnBrontoSubAccountIDChanging(value);
+					this.SendPropertyChanging();
+					this._BrontoSubAccountID = value;
+					this.SendPropertyChanged("BrontoSubAccountID");
+					this.OnBrontoSubAccountIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeletedDT", DbType="DateTime2")]
+		public System.Nullable<System.DateTime> DeletedDT
+		{
+			get
+			{
+				return this._DeletedDT;
+			}
+			set
+			{
+				if ((this._DeletedDT != value))
+				{
+					this.OnDeletedDTChanging(value);
+					this.SendPropertyChanging();
+					this._DeletedDT = value;
+					this.SendPropertyChanged("DeletedDT");
+					this.OnDeletedDTChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Deleted", AutoSync=AutoSync.Always, DbType="Bit", IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
+		public System.Nullable<bool> Deleted
+		{
+			get
+			{
+				return this._Deleted;
+			}
+			set
+			{
+				if ((this._Deleted != value))
+				{
+					this.OnDeletedChanging(value);
+					this.SendPropertyChanging();
+					this._Deleted = value;
+					this.SendPropertyChanged("Deleted");
+					this.OnDeletedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EcommerceEnabled", DbType="Bit NOT NULL")]
+		public bool EcommerceEnabled
+		{
+			get
+			{
+				return this._EcommerceEnabled;
+			}
+			set
+			{
+				if ((this._EcommerceEnabled != value))
+				{
+					this.OnEcommerceEnabledChanging(value);
+					this.SendPropertyChanging();
+					this._EcommerceEnabled = value;
+					this.SendPropertyChanged("EcommerceEnabled");
+					this.OnEcommerceEnabledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SamplesEnabled", DbType="Bit NOT NULL")]
+		public bool SamplesEnabled
+		{
+			get
+			{
+				return this._SamplesEnabled;
+			}
+			set
+			{
+				if ((this._SamplesEnabled != value))
+				{
+					this.OnSamplesEnabledChanging(value);
+					this.SendPropertyChanging();
+					this._SamplesEnabled = value;
+					this.SendPropertyChanged("SamplesEnabled");
+					this.OnSamplesEnabledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TradeCustomerServiceEmail", DbType="NVarChar(256)")]
+		public string TradeCustomerServiceEmail
+		{
+			get
+			{
+				return this._TradeCustomerServiceEmail;
+			}
+			set
+			{
+				if ((this._TradeCustomerServiceEmail != value))
+				{
+					this.OnTradeCustomerServiceEmailChanging(value);
+					this.SendPropertyChanging();
+					this._TradeCustomerServiceEmail = value;
+					this.SendPropertyChanged("TradeCustomerServiceEmail");
+					this.OnTradeCustomerServiceEmailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DotDigitalAccountID", DbType="TinyInt NOT NULL")]
+		public byte DotDigitalAccountID
+		{
+			get
+			{
+				return this._DotDigitalAccountID;
+			}
+			set
+			{
+				if ((this._DotDigitalAccountID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnDotDigitalAccountIDChanging(value);
+					this.SendPropertyChanging();
+					this._DotDigitalAccountID = value;
+					this.SendPropertyChanged("DotDigitalAccountID");
+					this.OnDotDigitalAccountIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EnableFilterIndexing", DbType="Bit NOT NULL")]
+		public bool EnableFilterIndexing
+		{
+			get
+			{
+				return this._EnableFilterIndexing;
+			}
+			set
+			{
+				if ((this._EnableFilterIndexing != value))
+				{
+					this.OnEnableFilterIndexingChanging(value);
+					this.SendPropertyChanging();
+					this._EnableFilterIndexing = value;
+					this.SendPropertyChanged("EnableFilterIndexing");
+					this.OnEnableFilterIndexingChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NoIndex", DbType="Bit NOT NULL")]
+		public bool NoIndex
+		{
+			get
+			{
+				return this._NoIndex;
+			}
+			set
+			{
+				if ((this._NoIndex != value))
+				{
+					this.OnNoIndexChanging(value);
+					this.SendPropertyChanging();
+					this._NoIndex = value;
+					this.SendPropertyChanged("NoIndex");
+					this.OnNoIndexChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NoFollow", DbType="Bit")]
+		public System.Nullable<bool> NoFollow
+		{
+			get
+			{
+				return this._NoFollow;
+			}
+			set
+			{
+				if ((this._NoFollow != value))
+				{
+					this.OnNoFollowChanging(value);
+					this.SendPropertyChanging();
+					this._NoFollow = value;
+					this.SendPropertyChanged("NoFollow");
+					this.OnNoFollowChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Label", AutoSync=AutoSync.Always, DbType="NVarChar(50)", IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
+		public string Label
+		{
+			get
+			{
+				return this._Label;
+			}
+			set
+			{
+				if ((this._Label != value))
+				{
+					this.OnLabelChanging(value);
+					this.SendPropertyChanging();
+					this._Label = value;
+					this.SendPropertyChanged("Label");
+					this.OnLabelChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Country_Country_Language", Storage="_Country", ThisKey="CountryID", OtherKey="CountryID", IsForeignKey=true)]
+		public Country Country
+		{
+			get
+			{
+				return this._Country.Entity;
+			}
+			set
+			{
+				Country previousValue = this._Country.Entity;
+				if (((previousValue != value) 
+							|| (this._Country.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Country.Entity = null;
+						previousValue.Country_Languages.Remove(this);
+					}
+					this._Country.Entity = value;
+					if ((value != null))
+					{
+						value.Country_Languages.Add(this);
+						this._CountryID = value.CountryID;
+					}
+					else
+					{
+						this._CountryID = default(short);
+					}
+					this.SendPropertyChanged("Country");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Country_Language", Storage="_Account", ThisKey="DotDigitalAccountID", OtherKey="AccountID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.Country_Languages.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.Country_Languages.Add(this);
+						this._DotDigitalAccountID = value.AccountID;
+					}
+					else
+					{
+						this._DotDigitalAccountID = default(byte);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Language_Country_Language", Storage="_Language", ThisKey="LanguageID", OtherKey="LanguageID", IsForeignKey=true)]
+		public Language Language
+		{
+			get
+			{
+				return this._Language.Entity;
+			}
+			set
+			{
+				Language previousValue = this._Language.Entity;
+				if (((previousValue != value) 
+							|| (this._Language.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Language.Entity = null;
+						previousValue.Country_Languages.Remove(this);
+					}
+					this._Language.Entity = value;
+					if ((value != null))
+					{
+						value.Country_Languages.Add(this);
+						this._LanguageID = value.LanguageID;
+					}
+					else
+					{
+						this._LanguageID = default(byte);
+					}
+					this.SendPropertyChanged("Language");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Banner_ProductType")]
+	public partial class Banner_ProductType : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _BannerID;
+		
+		private byte _ProductTypeID;
+		
+		private EntityRef<Banner> _Banner;
+		
+		private EntityRef<ProductType> _ProductType;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnBannerIDChanging(int value);
+    partial void OnBannerIDChanged();
+    partial void OnProductTypeIDChanging(byte value);
+    partial void OnProductTypeIDChanged();
+    #endregion
+		
+		public Banner_ProductType()
+		{
+			this._Banner = default(EntityRef<Banner>);
+			this._ProductType = default(EntityRef<ProductType>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BannerID", DbType="Int NOT NULL", IsPrimaryKey=true)]
+		public int BannerID
+		{
+			get
+			{
+				return this._BannerID;
+			}
+			set
+			{
+				if ((this._BannerID != value))
+				{
+					if (this._Banner.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnBannerIDChanging(value);
+					this.SendPropertyChanging();
+					this._BannerID = value;
+					this.SendPropertyChanged("BannerID");
+					this.OnBannerIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ProductTypeID", DbType="TinyInt NOT NULL", IsPrimaryKey=true)]
+		public byte ProductTypeID
+		{
+			get
+			{
+				return this._ProductTypeID;
+			}
+			set
+			{
+				if ((this._ProductTypeID != value))
+				{
+					if (this._ProductType.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnProductTypeIDChanging(value);
+					this.SendPropertyChanging();
+					this._ProductTypeID = value;
+					this.SendPropertyChanged("ProductTypeID");
+					this.OnProductTypeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Banner_Banner_ProductType", Storage="_Banner", ThisKey="BannerID", OtherKey="BannerID", IsForeignKey=true)]
+		public Banner Banner
+		{
+			get
+			{
+				return this._Banner.Entity;
+			}
+			set
+			{
+				Banner previousValue = this._Banner.Entity;
+				if (((previousValue != value) 
+							|| (this._Banner.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Banner.Entity = null;
+						previousValue.Banner_ProductTypes.Remove(this);
+					}
+					this._Banner.Entity = value;
+					if ((value != null))
+					{
+						value.Banner_ProductTypes.Add(this);
+						this._BannerID = value.BannerID;
+					}
+					else
+					{
+						this._BannerID = default(int);
+					}
+					this.SendPropertyChanged("Banner");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ProductType_Banner_ProductType", Storage="_ProductType", ThisKey="ProductTypeID", OtherKey="ProductTypeID", IsForeignKey=true)]
+		public ProductType ProductType
+		{
+			get
+			{
+				return this._ProductType.Entity;
+			}
+			set
+			{
+				ProductType previousValue = this._ProductType.Entity;
+				if (((previousValue != value) 
+							|| (this._ProductType.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ProductType.Entity = null;
+						previousValue.Banner_ProductTypes.Remove(this);
+					}
+					this._ProductType.Entity = value;
+					if ((value != null))
+					{
+						value.Banner_ProductTypes.Add(this);
+						this._ProductTypeID = value.ProductTypeID;
+					}
+					else
+					{
+						this._ProductTypeID = default(byte);
+					}
+					this.SendPropertyChanged("ProductType");
 				}
 			}
 		}

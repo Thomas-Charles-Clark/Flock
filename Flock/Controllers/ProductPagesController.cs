@@ -14,6 +14,8 @@ using System.Data.Linq;
 using System.IO;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using DevExpress.CodeParser;
 
 namespace Flock.Controllers
 {
@@ -1028,9 +1030,19 @@ namespace Flock.Controllers
 
             try
             {
-                TemplateID = UnitOfWork.GetRepository<ProductPage>().GetAll().Where(p => p.ProductPageID == ProductPageID).Single().TemplateID;
+                if (TemplateImageID != 6)
+                {
+                    TemplateID = UnitOfWork.GetRepository<ProductPage>().GetAll().Where(p => p.ProductPageID == ProductPageID).Single().TemplateID;
 
-                UnitOfWork.Context.ProductPage_Image_Merge(ProductPageID, Images, TemplateImageID);
+                    UnitOfWork.Context.ProductPage_Image_Merge(ProductPageID, Images, TemplateImageID);
+                }
+                else
+                {
+                    var pp = UnitOfWork.GetRepository<ProductPage>().GetAll().Single(p => p.ProductPageID == ProductPageID);
+                    var imagesList = JsonConvert.DeserializeObject<List<SortDatum>>(Images).ToList();
+                    pp.AlternateColourwayImageID = imagesList?.Any() == true ? imagesList[0].ID : (long?)null;
+                    UnitOfWork.Save();
+                }
             }
             catch (Exception e)
             {
@@ -1058,6 +1070,8 @@ namespace Flock.Controllers
                         return Content("");
                 case 5:
                     return PartialView("ProductPageSlideshowPartial", new ProductPageComposeViewModelBuilder(UnitOfWork).Build(ProductPageID));
+                case 6:
+                    return PartialView("ProductPageInfoPartial", new ProductPageComposeViewModelBuilder(UnitOfWork).Build(ProductPageID));
                 default:
                     return Content("");
             }
@@ -1072,9 +1086,19 @@ namespace Flock.Controllers
             {
                 templateID = UnitOfWork.GetRepository<ProductPage>().GetAll().Where(p => p.ProductPageID == ProductPageID).Single().TemplateID;
 
-                ProductPage_Image CI = UnitOfWork.GetRepository<ProductPage_Image>().GetAll().Where(p => p.ProductPageID == ProductPageID && p.ImageID == ImageID && p.TemplateImageID == TemplateImageID).Single();
-                UnitOfWork.GetRepository<ProductPage_Image>().Delete(CI);
-                UnitOfWork.Save();
+                if (TemplateImageID != 6)
+                {
+                    ProductPage_Image CI = UnitOfWork.GetRepository<ProductPage_Image>().GetAll().Where(p => p.ProductPageID == ProductPageID && p.ImageID == ImageID && p.TemplateImageID == TemplateImageID).Single();
+                    UnitOfWork.GetRepository<ProductPage_Image>().Delete(CI);
+                    UnitOfWork.Save();
+                }
+                else
+                {
+                    var pp = UnitOfWork.GetRepository<ProductPage>().GetAll().Single(p => p.ProductPageID == ProductPageID);
+                    pp.AlternateColourwayImageID = null;
+                    UnitOfWork.Save();
+                }
+
             }
             catch (Exception e)
             {
@@ -1100,6 +1124,8 @@ namespace Flock.Controllers
                     return PartialView("FurnitureCutOutImagePartial", Model);
                 case 5:
                     return PartialView("ProductPageSlideshowPartial", new ProductPageComposeViewModelBuilder(UnitOfWork).Build(ProductPageID));
+                case 6:
+                    return PartialView("ProductPageInfoPartial", new ProductPageComposeViewModelBuilder(UnitOfWork).Build(ProductPageID));
                 default:
                     return Content("");
             }
@@ -1827,7 +1853,7 @@ namespace Flock.Controllers
     
         public ActionResult AttributeProductTypeDropDownPartial(byte? SelectedProductTypeID)
         {
-            var Model = UnitOfWork.GetRepository<ProductType>().GetAll().OrderBy(p => p.Name).ToList();
+            var Model = UnitOfWork.GetRepository<ProductType>().GetAll().Where(p => p.Deleted == false).OrderBy(p => p.Name).ToList();
             return PartialView("~/Views/Shared/SearchFilters/ProductTypeDropDownPartial.cshtml", Model);
         }
 

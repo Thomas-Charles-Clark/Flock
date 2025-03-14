@@ -746,3 +746,9 @@ input[disabled] {
         margin-left: 0.5rem;
         line-height: 22px;
     }
+
+#animation-modal {
+    width: auto;
+    height: auto;
+    left: calc(50% - 480px);
+}

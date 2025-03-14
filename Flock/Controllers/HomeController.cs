@@ -24,14 +24,6 @@ namespace Flock.Controllers
         {
             var Model = UnitOfWork.GetRepository<Country_Language>().GetAll().OrderBy(p => p.SortOrder).ToList();
 
-            Model.Insert(0, new Country_Language()
-            {
-                Country_Language_ID = 0,
-                CountryID = 0,
-                LanguageID = 0,
-                Name = "All Countries"
-            });
-
             return PartialView("GlobalCountryLanguageDropDownPartial", Model);
         }
         
@@ -56,7 +48,7 @@ namespace Flock.Controllers
         }
 
         [HttpPost]
-        public ActionResult SetGlobalCountryLanguageID(byte CountryLanguageID)
+        public ActionResult SetGlobalCountryLanguageID(byte? CountryLanguageID)
         {
             Session["GlobalCountryLanguageID"] = CountryLanguageID;
 

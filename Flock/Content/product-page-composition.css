@@ -438,3 +438,32 @@ fieldset {
     #video-thumbnail:hover img.image-remove-icon {
         opacity: 1.0;
     }
+
+
+#product-page-info-inner {
+    display: flex;
+    gap: 1rem;
+}
+
+#product-page-clearance-label {
+    border: 1px solid #808080;
+    padding: 0.5rem 1rem;
+    background-color: orange;
+    font-size: 1.5em;
+    color: black;
+}
+
+#alternate-colourway-image-target {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #6d6d6d;
+    background-color: #cdcdcd;
+    overflow: hidden;
+    position: relative;
+}
+
+
+
+#alternate-colourway-image-target img.image-remove-icon:hover {
+    cursor: pointer;
+}

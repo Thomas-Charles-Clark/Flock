@@ -72,6 +72,13 @@ namespace Flock.ViewModels
             PPCVM.SecondaryProducts = UoW.GetRepository<vwProductPage_SecondaryProduct>().GetAll().Where(p => p.ProductPageID == (int)ProductPageID).OrderBy(p => p.SortOrder).ToList();
             PPCVM.RelatedProductPages = UoW.GetRepository<vwProductPage_RelatedProductPage>().GetAll().Where(p => p.ProductPageID == (int)ProductPageID).ToList();
 
+            PPCVM.AlternateColourwayImageID = PP.AlternateColourwayImageID;
+
+            if (PPCVM.AlternateColourwayImageID.HasValue) 
+            {
+                PPCVM.AlternateColourwayImage = UoW.GetRepository<Image>().GetAll().SingleOrDefault(p => p.ImageID == PP.AlternateColourwayImageID);
+            }
+
             return PPCVM;
         }
     }
@@ -80,7 +87,6 @@ namespace Flock.ViewModels
     {
         public int? ProductPageID { get; set; }
         public byte? TemplateID { get; set; }
-
         public string TemplateName { get; set; }
 
         [Required]
@@ -149,6 +155,8 @@ namespace Flock.ViewModels
         [StringLength(155)]
         public string MetaDescription { get; set; }
 
+        public long? AlternateColourwayImageID { get; set; }
+
         public DateTime? OnDate { get; set; }
         public DateTime? OffDate { get; set; }
         public bool Clearance { get; set; }
@@ -162,6 +170,8 @@ namespace Flock.ViewModels
         public List<vwProductPage_PrimaryProduct> PrimaryProducts { get; set; }
         public List<vwProductPage_SecondaryProduct> SecondaryProducts { get; set; }
         public List<vwProductPage_RelatedProductPage> RelatedProductPages { get; set; }
+
+        public Image AlternateColourwayImage { get; set; }
     }
 
     public class ProductSearchHeader

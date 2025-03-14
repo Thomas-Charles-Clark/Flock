@@ -137,6 +137,28 @@
         });
     }
 
+    function SaveBannerProductTypes() {
+
+        $.ajax({
+            url: '@Url.Action("SaveBannerProductTypes", "Banners")',
+            type: 'POST',
+            traditional: true,
+            data: {
+                ID: $("#selected-banner-id").val(),
+                ProductTypeIDs: ComposeBannerProductTypeListBox.GetSelectedValues().toString()
+            },
+            success: function (data) {
+                SuccessFade($("#banner-producttype-save"));
+            },
+            error: function (e, s, a) {
+                $.showError(e, s, a, function () {
+                    FailureFade($("#banner-producttype-save"));
+                });
+            },
+            timeout: 20000
+        });
+    }
+
     function SaveBannerLocations() {
 
         var SelectedBannerLocations = new Array();

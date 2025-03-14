@@ -529,7 +529,7 @@
     <button type="button" onclick="AddAllCountriesToPage();">To Page</button>
 </div>
 
-<div id="animation-modal" class="modal" data-bs-backdrop="false">
+<div id="animation-modal" class="modal" data-bs-backdrop="false" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header pointer">
@@ -543,7 +543,10 @@
 
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer justify-content-between d-flex">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                    Close
+                </button>
                 <button class="btn btn-default" data-bs-dismiss="modal">
                     Done
                 </button>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Flock" Class="FlockDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="ConnectionString" ConnectionString="Data Source=vm-sql;Initial Catalog=Flock;Integrated Security=False;Persist Security Info=True;User ID=App_Flock-Backend;Password=98FB269A-064A-4E4D-9A1A-39B9BBEA88EF;TrustServerCertificate=True" Provider="System.Data.SqlClient" />
+  <Connection Mode="ConnectionString" ConnectionString="Data Source=vm-sql;Initial Catalog=Flock;Integrated Security=False;Persist Security Info=True;User ID=App_Flock-Backend;Password=98FB269A-064A-4E4D-9A1A-39B9BBEA88EF" Provider="System.Data.SqlClient" />
   <Table Name="dbo.Admin" Member="Admins">
     <Type Name="Admin">
       <Column Name="AdminID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -286,7 +286,6 @@
       <Association Name="Language_TechInfo_Ref_Usage_Language" Member="TechInfo_Ref_Usage_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="TechInfo_Ref_Usage_Language" />
       <Association Name="Language_TechnicalDescription_Language" Member="TechnicalDescription_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="TechnicalDescription_Language" />
       <Association Name="Language_TechInfo_Ref_Test_Language" Member="TechInfo_Ref_Test_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="TechInfo_Ref_Test_Language" />
-      <Association Name="Language_Country_Language" Member="Country_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="Country_Language" />
       <Association Name="Language_Member" Member="Members" ThisKey="LanguageID" OtherKey="LanguageID" Type="Member" />
       <Association Name="Language_Member1" Member="Members1" ThisKey="LanguageID" OtherKey="MarketingLanguageID" Type="Member" />
       <Association Name="Language_PageSection_Country_Language" Member="PageSection_Country_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="PageSection_Country_Language" />
@@ -295,6 +294,7 @@
       <Association Name="Language_ProductType_Language" Member="ProductType_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ProductType_Language" />
       <Association Name="Language_ModularProduct_Language_Snapshot" Member="ModularProduct_Language_Snapshots" ThisKey="LanguageID" OtherKey="LanguageID" Type="ModularProduct_Language_Snapshot" />
       <Association Name="Language_ModularProduct_Language" Member="ModularProduct_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ModularProduct_Language" />
+      <Association Name="Language_Country_Language" Member="Country_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="Country_Language" />
     </Type>
   </Table>
   <Table Name="dbo.Region" Member="Regions">
@@ -3187,10 +3187,10 @@
       <Association Name="Country_Collection_Country" Member="Collection_Countries" ThisKey="CountryID" OtherKey="CountryID" Type="Collection_Country" />
       <Association Name="Country_DeliveryException" Member="DeliveryExceptions" ThisKey="CountryID" OtherKey="CountryID" Type="DeliveryException" />
       <Association Name="Country_Resource_Language" Member="Resource_Languages" ThisKey="CountryID" OtherKey="CountryID" Type="Resource_Language" />
-      <Association Name="Country_Country_Language" Member="Country_Languages" ThisKey="CountryID" OtherKey="CountryID" Type="Country_Language" />
       <Association Name="Country_Member" Member="Members" ThisKey="CountryID" OtherKey="CountryID" Type="Member" />
       <Association Name="Country_Member1" Member="Members1" ThisKey="CountryID" OtherKey="MarketingCountryID" Type="Member" />
       <Association Name="Country_PageSection_Country_Language" Member="PageSection_Country_Languages" ThisKey="CountryID" OtherKey="CountryID" Type="PageSection_Country_Language" />
+      <Association Name="Country_Country_Language" Member="Country_Languages" ThisKey="CountryID" OtherKey="CountryID" Type="Country_Language" />
       <Association Name="Continent_Country" Member="Continent" ThisKey="ContinentID" OtherKey="ContinentID" Type="Continent" IsForeignKey="true" />
       <Association Name="Market_Country" Member="Market" ThisKey="MarketID" OtherKey="MarketID" Type="Market" IsForeignKey="true" />
       <Association Name="PriceList_Country" Member="PriceList" ThisKey="PriceListID" OtherKey="PriceListID" Type="PriceList" IsForeignKey="true" />
@@ -4458,6 +4458,7 @@
       <Association Name="Banner_Banner_Page" Member="Banner_Pages" ThisKey="BannerID" OtherKey="BannerID" Type="Banner_Page" />
       <Association Name="Banner_Banner_SiteSection" Member="Banner_SiteSections" ThisKey="BannerID" OtherKey="BannerID" Type="Banner_SiteSection" />
       <Association Name="Banner_Banner_FontClass" Member="Banner_FontClasses" ThisKey="BannerID" OtherKey="BannerID" Type="Banner_FontClass" />
+      <Association Name="Banner_Banner_ProductType" Member="Banner_ProductTypes" ThisKey="BannerID" OtherKey="BannerID" Type="Banner_ProductType" />
       <Association Name="BannerLinkType_Banner" Member="BannerLinkType" ThisKey="BannerLinkTypeID" OtherKey="BannerLinkTypeID" Type="BannerLinkType" IsForeignKey="true" />
       <Association Name="Page_Banner" Member="Page" ThisKey="PageID" OtherKey="PageID" Type="Page" IsForeignKey="true" />
     </Type>
@@ -4616,6 +4617,7 @@
       <Column Name="TradeSwitch" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
       <Column Name="VideoURL" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
       <Column Name="VideoThumbnail" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="AlternateColourwayImageID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
       <Association Name="ProductPage_ProductPage_RelatedProductPage" Member="ProductPage_RelatedProductPages" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="ProductPage_RelatedProductPage" />
       <Association Name="ProductPage_ProductPage_Attribute" Member="ProductPage_Attributes" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="ProductPage_Attribute" />
       <Association Name="ProductPage_Product_ProductPage" Member="Product_ProductPages" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="Product_ProductPage" />
@@ -4706,30 +4708,6 @@
       <Column Name="DesignName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="ExtantOnDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
       <Column Name="SalePriceStatus" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Country_Language" Member="Country_Languages">
-    <Type Name="Country_Language">
-      <Column Name="Country_Language_ID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="CountryID" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
-      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
-      <Column Name="SortOrder" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
-      <Column Name="URL" Type="System.String" DbType="NVarChar(5) NOT NULL" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="hreflang" Type="System.String" DbType="NVarChar(5) NOT NULL" CanBeNull="false" />
-      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
-      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
-      <Column Name="OnDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
-      <Column Name="OffDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
-      <Column Name="DotNetCulture" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
-      <Column Name="CustomerServiceEmail" Type="System.String" DbType="NVarChar(256) NOT NULL" CanBeNull="false" />
-      <Column Name="CustomerServicePhone" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="MarketManagerEmail" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
-      <Column Name="BrontoSubAccountID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
-      <Column Name="DeletedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
-      <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
-      <Association Name="Country_Country_Language" Member="Country" ThisKey="CountryID" OtherKey="CountryID" Type="Country" IsForeignKey="true" />
-      <Association Name="Language_Country_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.AttributeGroup_ProductType" Member="AttributeGroup_ProductTypes">
@@ -5114,6 +5092,7 @@
       <Column Name="WebBehaviourTrackingProfileID" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
       <Column Name="SignUpAddressBookID" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Association Name="Account_Member" Member="Members" ThisKey="AccountID" OtherKey="DotDigitalAccountID" Type="Member" />
+      <Association Name="Account_Country_Language" Member="Country_Languages" ThisKey="AccountID" OtherKey="DotDigitalAccountID" Type="Country_Language" />
     </Type>
   </Table>
   <Table Name="adm.vwPromoCodeProductImage" Member="vwPromoCodeProductImages">
@@ -5298,6 +5277,7 @@
       <Association Name="ProductType_FilterIndexRestriction" Member="FilterIndexRestrictions" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexRestriction" />
       <Association Name="ProductType_FilterIndexCombination" Member="FilterIndexCombinations" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="FilterIndexCombination" />
       <Association Name="ProductType_ProductType_Language" Member="ProductType_Languages" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType_Language" />
+      <Association Name="ProductType_Banner_ProductType" Member="Banner_ProductTypes" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="Banner_ProductType" />
       <Association Name="Page_ProductType" Member="Page" ThisKey="CategoryPageID" OtherKey="PageID" Type="Page" IsForeignKey="true" />
     </Type>
   </Table>
@@ -5340,6 +5320,47 @@
       <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
       <Association Name="Language_ModularProduct_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
       <Association Name="ModularProduct_ModularProduct_Language" Member="ModularProduct" ThisKey="ModularProductID" OtherKey="ModularProductID" Type="ModularProduct" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Country_Language" Member="Country_Languages">
+    <Type Name="Country_Language">
+      <Column Name="Country_Language_ID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="CountryID" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="SortOrder" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="URL" Type="System.String" DbType="NVarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="hreflang" Type="System.String" DbType="NVarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Column Name="OnDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
+      <Column Name="OffDate" Type="System.DateTime" DbType="Date" CanBeNull="true" />
+      <Column Name="DotNetCulture" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="CustomerServiceEmail" Type="System.String" DbType="NVarChar(256) NOT NULL" CanBeNull="false" />
+      <Column Name="CustomerServicePhone" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="MarketManagerEmail" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="BrontoSubAccountID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="DeletedDT" Type="System.DateTime" DbType="DateTime2" CanBeNull="true" />
+      <Column Name="Deleted" Type="System.Boolean" DbType="Bit" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="EcommerceEnabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="SamplesEnabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TradeCustomerServiceEmail" Type="System.String" DbType="NVarChar(256)" CanBeNull="true" />
+      <Column Name="DotDigitalAccountID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="EnableFilterIndexing" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="NoIndex" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="NoFollow" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Label" Type="System.String" DbType="NVarChar(50)" IsDbGenerated="true" CanBeNull="true" UpdateCheck="Never" />
+      <Association Name="Country_Country_Language" Member="Country" ThisKey="CountryID" OtherKey="CountryID" Type="Country" IsForeignKey="true" />
+      <Association Name="Account_Country_Language" Member="Account" ThisKey="DotDigitalAccountID" OtherKey="AccountID" Type="Account" IsForeignKey="true" />
+      <Association Name="Language_Country_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Banner_ProductType" Member="Banner_ProductTypes">
+    <Type Name="Banner_ProductType">
+      <Column Name="BannerID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="Banner_Banner_ProductType" Member="Banner" ThisKey="BannerID" OtherKey="BannerID" Type="Banner" IsForeignKey="true" />
+      <Association Name="ProductType_Banner_ProductType" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.PageSection_ClearPage" Method="PageSection_ClearPage">

@@ -17,7 +17,7 @@
         LoadingPanel.Show();
         var data = {
             pageId: $('#page-compose-section').data('page-id'),
-            countryId: PageSectionCountryListBox.GetValue(),
+            countryLanguageId: GlobalCountryLanguageListBox.GetValue(),
             pageSectionTypeId: PageSectionTypeListBox.GetValue(),
             tradeSwitch: PageSectionAudienceListBox.GetValue(),
             platformSwitch: PageSectionPlatformListBox.GetValue(),
@@ -53,17 +53,17 @@
 
 <div style="clear: both;"></div>
 
+<div class="well" style="padding: 10px 5px 5px 5px;">
+    @Html.Action("GlobalCountryLanguageSelector", "Home")
+    @Html.Action("PageComposePageSectionTypeDropDown", "CMS")
+    @Html.Action("PageComposePageSectionAudienceDropDown", "CMS")
+    @Html.Action("PageComposePageSectionPlatformDropDown", "CMS")
+    @Html.Action("PageComposePageSectionWebStatusDropDown", "CMS")
+    <div class="clearfix"></div>
+</div>
+
 @if (Model.PageSections.Count > 0)
 {
-    <div class="well" style="padding: 10px 5px 5px 5px;">
-        @Html.Action("GlobalCountryLanguageSelector", "Home")
-        @Html.Action("PageComposePageSectionTypeDropDown", "CMS")
-        @Html.Action("PageComposePageSectionAudienceDropDown", "CMS")
-        @Html.Action("PageComposePageSectionPlatformDropDown", "CMS")
-        @Html.Action("PageComposePageSectionWebStatusDropDown", "CMS")
-        <div class="clearfix"></div>
-    </div>
-
     <div id="expand-all-button" style="float: left; margin-bottom: 2em;" class="expando-all-button" onclick="ExpandLHS();">
         <fieldset>
             <legend id="expand-label">

@@ -9,6 +9,8 @@
         settings.Style.Add("float", "left");
         settings.Style.Add("margin", "0 7px 7px 0");
 
+        settings.Text = "Country Language";
+
         settings.Width = System.Web.UI.WebControls.Unit.Pixel(200);
         settings.Height = System.Web.UI.WebControls.Unit.Pixel(35);
 
@@ -21,6 +23,35 @@
             ViewContext.Writer.Write(@Html.Partial("GlobalCountryLanguageListBoxPartial", Model));
             ViewContext.Writer.Write("</div>");
             ViewContext.Writer.Write("<div style=\"padding: 6px;\">");
+            @Html.DevExpress().Button(buttonSettings =>
+            {
+                buttonSettings.Name = "GlobalCountryLanguageButtonClear";
+                buttonSettings.ClientSideEvents.Click = @"function(s, e){ 
+                     GlobalCountryLanguageListBox.UnselectAll();
+                    $.ajax({
+                        url: '" + Url.Action("SetGlobalCountryLanguageID", "Home") + @"',
+                        type: 'POST',
+                        traditional: true,
+                        data: {
+                            CountryLanguageID: GlobalCountryLanguageListBox.GetValue() 
+                        },
+                        success: function(data) {
+                            GlobalCountryLanguageDD.HideDropDown(); 
+                            GlobalCountryLanguageDD.SetText('Country Language');
+                            if (typeof ReloadSectionsForEdit === 'function') {
+                                LoadingPanel.Show();
+                                ReloadSectionsForEdit();
+                            }
+                            else
+                                window.location.reload(true);
+                        },
+                        timeout: 20000
+                    });
+                }";
+                buttonSettings.Text = "Clear";
+                buttonSettings.Style.Add("float", "left");
+            }).Render();
+
             @Html.DevExpress().Button(
                 buttonSettings =>
                 {

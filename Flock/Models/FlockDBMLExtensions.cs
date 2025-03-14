@@ -6243,7 +6243,7 @@ namespace Flock.ViewModels
             var take = args.EndIndex - args.BeginIndex + 1;
 
             var preModel = DB.ProductTypes
-                .Where(p => p.ProductTypeID.ToString().StartsWith(args.Filter) || p.Name.StartsWith(args.Filter))
+                .Where(p => p.Deleted == false && (p.ProductTypeID.ToString().StartsWith(args.Filter) || p.Name.StartsWith(args.Filter)))
                 .OrderBy(p => p.Name)
                 .Skip(skip).Take(take).ToList();
 

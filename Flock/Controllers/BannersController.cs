@@ -567,7 +567,14 @@ namespace Flock.Controllers
                         //auBmp = new Aurigma.GraphicsMill.Bitmap(file.InputStream);
                         break;
                     case 1:
-                        img = System.Drawing.Image.FromFile("D://wwwroot//flock//imagelibrary//1024//" + ImageLibraryID.ToString() + ".jpeg");
+                        try
+                        {
+                            img = System.Drawing.Image.FromFile("D://wwwroot//flock//imagelibrary//1546//" + ImageLibraryID.ToString() + ".jpeg");
+                        }
+                        catch (FileNotFoundException)
+                        {
+                            img = System.Drawing.Image.FromFile("D://wwwroot//flock//imagelibrary//1024//" + ImageLibraryID.ToString() + ".jpeg");
+                        }
                         //auBmp = new Aurigma.GraphicsMill.Bitmap("C://wwwroot//flock//imagelibrary//1024//" + ImageLibraryID.ToString() + ".jpeg");
                         break;
                     default: break;
@@ -606,12 +613,22 @@ namespace Flock.Controllers
                     newHeight = Convert.ToInt16(img.Height * d);
                     targetDimensions.Add(new short[2] { 1024, newHeight });
                 }
+                if (img.Width >= 1546)
+                {
+                    decimal d = 1546.0M / (decimal)img.Width;
+                    newHeight = Convert.ToInt16(img.Height * d);
+                    targetDimensions.Add(new short[2] { 1546, newHeight });
+                }
 
                 // based on the width of the original image, we are able to process - maintaining the same aspect ratio - into:
                 // 156 - 256 - 342 - 512 - 1024
 
                 // we want an array of the widths and heights we must process the image to...
-
+                
+                foreach (FileInfo f in new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "//BannerImages//1546//").GetFiles(BannerID.ToString() + (isImageB ? "-B" : "") + ".*"))
+                {
+                    f.Delete();
+                }
                 foreach (FileInfo f in new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "//BannerImages//1024//").GetFiles(BannerID.ToString() + (isImageB ? "-B" : "") + ".*"))
                 {
                     f.Delete();
@@ -914,6 +931,13 @@ namespace Flock.Controllers
             return PartialView("MenuListBoxPartial", Model);
         }
 
+        public ActionResult ComposeBannerProductTypeListBoxPartial(string ProductTypeAssignmentSelectedProductTypeDs)
+        {
+            List<ProductType> Model = UnitOfWork.GetRepository<ProductType>().GetAll().Where(p => p.IsActualProductType == true).OrderBy(p => p.Name).ToList();
+            ViewBag.ProductTypeAssignmentSelectedProductTypeIDs = ProductTypeAssignmentSelectedProductTypeDs;
+            return PartialView("~/Views/Shared/SearchFilters/ProductTypeListBoxPartial.cshtml", Model);
+        }
+
         public ActionResult ComposeBannerLanguageDropDownPartial(byte? SelectedLanguageID)
         {
             List<Language> Model = UnitOfWork.GetRepository<Language>().GetAll().OrderBy(p => p.Name).ToList();
@@ -947,6 +971,44 @@ namespace Flock.Controllers
                     foreach (var i in Current)
                     {
                         UnitOfWork.GetRepository<Banner_SiteSection>().Delete(i);
+                    }
+                    UnitOfWork.Save();
+                }
+            }
+            catch (SqlException e)
+            {
+                Response.StatusCode = 400;
+                return Content(e.Message);
+            }
+            return Content("");
+        }
+
+        [HttpPost]
+        public ActionResult SaveBannerProductTypes(int ID, string ProductTypeIDs)
+        {
+            try
+            {
+                if (ProductTypeIDs != null && ProductTypeIDs != "")
+                {
+                    byte[] Sections = ProductTypeIDs.Split(',').ToList().ConvertAll(p => Convert.ToByte(p)).ToArray();
+                    List<Banner_ProductType> Current = UnitOfWork.GetRepository<Banner_ProductType>().GetAll().Where(p => p.BannerID == ID).ToList();
+                    foreach (var i in Current)
+                    {
+                        UnitOfWork.GetRepository<Banner_ProductType>().Delete(i);
+                    }
+                    UnitOfWork.Save();
+                    foreach (byte i in Sections)
+                    {
+                        UnitOfWork.GetRepository<Banner_ProductType>().Add(new Banner_ProductType() { BannerID = ID, ProductTypeID = i });
+                    }
+                    UnitOfWork.Save();
+                }
+                else
+                {
+                    List<Banner_ProductType> Current = UnitOfWork.GetRepository<Banner_ProductType>().GetAll().Where(p => p.BannerID == ID).ToList();
+                    foreach (var i in Current)
+                    {
+                        UnitOfWork.GetRepository<Banner_ProductType>().Delete(i);
                     }
                     UnitOfWork.Save();
                 }
@@ -1043,7 +1105,11 @@ namespace Flock.Controllers
 
                         // If we're nullifying VersionB we should delete the files, force the user to upload a new image.
                         // If you have got BannerLocationID 55 selected and VersionB is null, we will not serve the banner.
-                        
+
+                        foreach (FileInfo f in new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "//BannerImages//1546//").GetFiles(objSave.ID.ToString() + "-B" + ".*"))
+                        {
+                            f.Delete();
+                        }
                         foreach (FileInfo f in new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "//BannerImages//1024//").GetFiles(objSave.ID.ToString() + "-B" + ".*"))
                         {
                             f.Delete();
@@ -1089,6 +1155,10 @@ namespace Flock.Controllers
                     // If we're nullifying VersionB we should delete the files, force the user to upload a new image.
                     // If you have got BannerLocationID 55 selected and VersionB is null, we will not serve the banner.
 
+                    foreach (FileInfo f in new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "//BannerImages//1546//").GetFiles(objSave.ID.ToString() + "-B" + ".*"))
+                    {
+                        f.Delete();
+                    }
                     foreach (FileInfo f in new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "//BannerImages//1024//").GetFiles(objSave.ID.ToString() + "-B" + ".*"))
                     {
                         f.Delete();

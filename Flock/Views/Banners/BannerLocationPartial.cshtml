@@ -2,13 +2,12 @@
 @using Flock.DAL;
 @using Flock.Models;
 @{
-    if(Model.ImageWidth != null)
-    {
+
         using(var UoW = new UnitOfWork<FlockDataContext>())
         {
             var BannerLocations = UoW.GetRepository<vwBannerLocation>().GetAll().ToList();
 
-            var TemplateLocations = BannerLocations.Where(p => p.BannerLocationTypeID == 1).OrderBy(p => p.BannerLocationID).OrderBy(p => p.BannerLocationGroupSortOrder).ToList();
+            var TemplateLocations = BannerLocations.Where(p => p.BannerLocationTypeID == 1 || p.BannerLocationTypeID == 3).OrderBy(p => p.BannerLocationID).OrderBy(p => p.BannerLocationGroupSortOrder).ToList();
 
             var TemplateGroups = TemplateLocations.GroupBy(p => p.BannerLocationGroupID).ToList();
 
@@ -31,9 +30,9 @@
                 //AllowedLocations = new List<byte>() { 12, 13, 14, 15, 16, 17, 8, 9, 10, 11, 50, 51, 52, 53, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 30, 31, 32, 33, 54, 55, 60, 61, 62, 63, 64, 65, 66, 67 };
                 AllowedLocations = new List<byte>() { 12, 13, 14, 15, 16, 17, 8, 9, 10, 11, 50, 51, 52, 53, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 54, 55, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70 }; // removed 512 wide locations; Tom 14/04/2020
             }
-            else if (Model.ImageWidth == 1024)
+            else if (Model.ImageWidth == 1024 || Model.ImageWidth == 1546 || Model.ImageWidth == null)
             {
-                AllowedLocations = new List<byte>() { 12, 13, 14, 15, 16, 17, 8, 9, 10, 11, 50, 51, 52, 53, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 30, 31, 32, 33, 20, 21, 54, 55, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70 };
+                AllowedLocations = new List<byte>() { 12, 13, 14, 15, 16, 17, 8, 9, 10, 11, 50, 51, 52, 53, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 30, 31, 32, 33, 20, 21, 54, 55, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71 };
             }
 
             if (Model.BannerLocations.Count() == 1)
@@ -146,9 +145,7 @@
             </div>
         }
     }
-    else
-    {
-         <div class="content-panel-container">
+         @*<div class="content-panel-container">
             <fieldset id="banner-location-sitesection-fieldset">
                 <legend style="color: black; border-bottom-color: #929292;" onclick="$('#template-location-section').slideToggle('fast');">
                     Banner Location Details (click to expand / contract)
@@ -158,15 +155,7 @@
                     <div style="float: left; width: 40%; height: 100%;">
                         <label style="display: block; text-decoration: underline;"><span style="font-weight: 700;">You must specify an image before electing banner locations.</span></label>
                         </div>
-                    @*<div style="position: absolute; right: 4em; top: 60px; width: 20%; height: auto;">
-                        <div style="height: 100%;">
-                            <img id="banner-location-schematic" src="/images/admin/schematic-sml.png" style="width: 100%;" onclick="$('#schematic-dialog').dialog('open')" />
-                            <a href="javascript:;" style="display: block; margin-top: 0.5em; text-align: center;" onclick="$('#schematic-dialog').dialog('open');">Banner Location Schematic<br />(click to expand)</a>
-                        </div>
-                    </div>*@
                     <div style="clear: both;"></div>
                 </div>
             </fieldset>
-        </div>
-    }
-}
+        </div>*@

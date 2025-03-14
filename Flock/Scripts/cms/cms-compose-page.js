@@ -379,11 +379,7 @@ function LoadAnimationEditor(AnimationID) {
     LoadingPanel.Show();
     $.get('/admin/animations/edit', { AnimationID: AnimationID }, function (data, status, jqxhr) {
         $("#animation-edit-container").html(data);
-        let m = bootstrap.Modal.getOrCreateInstance(document.querySelector("#animation-modal"), {
-            backdrop: false
-        });
-        m._element.style.width = 'auto';
-        m._element.style.height = 'auto';
+        let m = bootstrap.Modal.getOrCreateInstance(document.querySelector("#animation-modal"));
         LoadingPanel.Hide();
         m.show();
         $("#animation-modal").draggable({

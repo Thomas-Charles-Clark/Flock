@@ -62,6 +62,8 @@
         CollectionIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
         CollectionIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
         CollectionIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.True;
+        CollectionIDColumn.SortIndex = 0;
+        CollectionIDColumn.SortOrder = DevExpress.Data.ColumnSortOrder.Descending;
         settings.Columns.Add(CollectionIDColumn);
         
 
@@ -422,7 +424,7 @@
 @grid.BindToLINQ("", "", (s, e) => {
     var UoW = new UnitOfWork<FlockDataContext>();
     var source = UoW.GetRepository<vwCollectionOverview>().GetAll();
-
+    e.DefaultSorting = "CollectionID";
     e.KeyExpression = "CollectionID";
     e.QueryableSource = source;
 }).GetHtml()

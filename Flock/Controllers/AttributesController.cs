@@ -205,7 +205,7 @@ namespace Flock.Controllers
 
         public ActionResult MapAttributesProductTypeDropDown()
         {
-            var Model = UnitOfWork.GetRepository<ProductType>().GetAll().ToList();
+            var Model = UnitOfWork.GetRepository<ProductType>().GetAll().Where(p => p.Deleted == false).ToList();
             return PartialView("~/Views/Shared/SearchFilters/ProductTypeDropDownPartial.cshtml", Model);
         }
 

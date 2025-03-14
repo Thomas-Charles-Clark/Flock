@@ -41,9 +41,14 @@ namespace Flock.ViewModels
             List<string> MenuLinkerStrings = MenuLinker.ConvertAll(Convert.ToString);
             BCVM.MenuIDs = string.Join(",", MenuLinkerStrings.ToArray());
 
+            List<byte> ProductTypeLinker = UoW.GetRepository<Banner_ProductType>().GetAll().Where(p => p.BannerID == BannerID).Select(p => p.ProductTypeID).ToList();
+            List<string> ProductTypeLinkerStrings = ProductTypeLinker.ConvertAll(Convert.ToString);
+            BCVM.ProductTypeIDs = string.Join(",", ProductTypeLinkerStrings.ToArray());
+
             BCVM.CssClasses = UoW.GetRepository<Banner_FontClass>().GetAll().Where(p => p.BannerID == BannerID).ToList();
 
             BCVM.SiteSections = UoW.GetRepository<SiteSection>().GetAll().Where(p => SiteSectionLinker.Contains(p.SiteSectionID)).ToList();
+            BCVM.ProductTypes = UoW.GetRepository<ProductType>().GetAll().Where(p => ProductTypeLinker.Contains(p.ProductTypeID)).ToList();
             BCVM.LanguageID = b.LanguageID;
             BCVM.Name = b.Name;
             BCVM.LinkTypeID = b.BannerLinkTypeID;
@@ -67,11 +72,14 @@ namespace Flock.ViewModels
             BCVM.BackgroundColour = b.BackgroundColour;
             BCVM.ForegroundColour = b.ForegroundColour;
 
-            // 156 - 256 - 342 - 512 - 1024
+            // 156 - 256 - 342 - 512 - 1024 - 1546
             BCVM.ImageWidth = b.Width;
+
             if (BCVM.ImageWidth != null)
             {
-                if (BCVM.ImageWidth >= 1024)
+                if (BCVM.ImageWidth >= 1546)
+                    BCVM.WidestAvailableGeneratedImage = 1546;
+                else if (BCVM.ImageWidth >= 1024)
                     BCVM.WidestAvailableGeneratedImage = 1024;
                 else if (BCVM.ImageWidth >= 512)
                     BCVM.WidestAvailableGeneratedImage = 512;
@@ -95,6 +103,7 @@ namespace Flock.ViewModels
         public int? BannerID { get; set; }
         public string BannerLocationIDs { get; set; }
         public string SiteSectionIDs { get; set; }
+        public string ProductTypeIDs { get; set; }
         public string MenuIDs { get; set; }
 
         [Required]
@@ -148,6 +157,7 @@ namespace Flock.ViewModels
         public List<Page> PageRestrictions { get; set; }
         public List<Banner_BannerLocation> BannerLocations { get; set; }
         public List<SiteSection> SiteSections { get; set; }
+        public List<ProductType> ProductTypes { get; set; }
 
         public List<short> CssClassesToSave { get; set; }
     }

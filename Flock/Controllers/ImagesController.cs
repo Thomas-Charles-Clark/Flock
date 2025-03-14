@@ -12,6 +12,7 @@ using Flock.ViewModels;
 using System.Data.Linq;
 using System.IO;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace Flock.Controllers
 {
@@ -50,7 +51,7 @@ namespace Flock.Controllers
             System.Data.Linq.ISingleResult<Image_SearchResult> Results = null;
 
             List<Image_SearchResult> Model = new List<Image_SearchResult>();
-            using (FlockDataContext fdc = new FlockDataContext())
+            using (FlockDataContext fdc = new FlockDataContext(ConfigurationManager.ConnectionStrings["FlockConnectionString"].ConnectionString.ToString()))
             {
                 Results = fdc.Image_Search(AspectRatio, ImageType, Perspective, HotspotStatus, Style, Room, ProductType, Collection, Brand, Launch, Colour, NameOrID, Resolution, SearchWithinHotspots);
 

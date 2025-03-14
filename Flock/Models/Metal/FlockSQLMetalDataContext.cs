@@ -115750,7 +115750,7 @@ namespace Flock.Models.Metal
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(200)")]
 		public string QueryStringParameters
 		{
 			get
@@ -117381,7 +117381,7 @@ namespace Flock.Models.Metal
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(200)")]
 		public string QueryStringParameters
 		{
 			get
@@ -183101,7 +183101,7 @@ namespace Flock.Models.Metal
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QueryStringParameters", DbType="NVarChar(200)")]
 		public string QueryStringParameters
 		{
 			get

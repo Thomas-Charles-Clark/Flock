@@ -287,7 +287,8 @@
         PhoneColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
         PhoneColumn.SetDataItemTemplateContent(c => {
             var mID = (int?)DataBinder.Eval(c.DataItem, "MemberID");
-            if(mID != null)
+            var checkoutType = (string)DataBinder.Eval(c.DataItem, "CheckoutType");
+            if (checkoutType != "Trade" && mID != null)
             {
                 var phoneNumbers = UoW.GetRepository<Flock.Models.MemberAddress>().GetAll().Where(p => p.MemberID == mID.Value).Select(p => p.PhoneNumber).Distinct().ToList();
                 foreach (var pn in phoneNumbers)

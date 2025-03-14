@@ -1,6 +1,6 @@
 ﻿ @using Flock.ViewModels
 @model HTML_PageSection
-<div class="content-panel-container" data-page-section-type="@(Model.PageSectionTypeID)" data-page-section-id="@(Model.PageSectionID)">
+<div class="content-panel-container" data-page-section-type="@(Model.PageSectionTypeID)" data-page-section-type-id="@(Model.PageSectionTypeID)" data-page-section-id="@(Model.PageSectionID)">
     <fieldset>
         <legend onclick="@(ViewBag.IsUserShuffling ? "" : "$('#page-section-" + Model.PageSectionID + "').slideToggle('fast');")">
             HTML @(ViewBag.IsUserShuffling ? "(click and drag to reorder)" : "(click to expand / contract)")

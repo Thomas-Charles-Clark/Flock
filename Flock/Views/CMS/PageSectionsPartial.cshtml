@@ -255,7 +255,7 @@
 
         case 12:
             Animation_PageSection aps = sect as Animation_PageSection;
-            <div id="page-section-@(aps.PageSectionID)" class="content-panel-container" data-animation-id="@(aps.Animation == null ? "" : aps.Animation.AnimationID.ToString())" data-page-section-type="@(aps.PageSectionTypeID)" style="width: 986px;" data-page-section-id="@(aps.PageSectionID)">
+            <div id="page-section-@(aps.PageSectionID)" class="content-panel-container" data-animation-id="@(aps.Animation == null ? "" : aps.Animation.AnimationID.ToString())" data-page-section-type="@(aps.PageSectionTypeID)" data-page-section-type-id="@(aps.PageSectionTypeID)" style="width: 986px;" data-page-section-id="@(aps.PageSectionID)">
                 @Html.Partial("PageSection_Animation", aps)
             </div>
             break;
