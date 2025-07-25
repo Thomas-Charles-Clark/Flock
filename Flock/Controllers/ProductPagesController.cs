@@ -1669,7 +1669,7 @@ namespace Flock.Controllers
                 pp.FurnitureLegStyles = model.FurnitureLegStyles.HasValue ? model.FurnitureLegStyles.Value : false; ;
                 pp.FurnitureLegFinishes = model.FurnitureLegFinishes.HasValue ? model.FurnitureLegFinishes.Value : false;
                 pp.FurnitureStitchingOptions = model.FurnitureStitchingOptions.HasValue ? model.FurnitureStitchingOptions.Value : false;
-                pp.FurniturePDF = model.FurniturePDF;
+                pp.FurniturePDF = String.IsNullOrEmpty(model.FurniturePDF) ? pp.FurniturePDF : model.FurniturePDF;
                 pp.VideoURL = model.VideoURL;
 
                 if (pp.ProductPage_Images.FirstOrDefault(i => i.TemplateImageID == 5) == null)
