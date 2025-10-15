@@ -22,6 +22,9 @@
             if (document.querySelector('#footer-text-value')) {
                 e.customArgs['key'] = s.GetRowKey(s.editingItemVisibleIndex);
                 e.customArgs['footerText'] = document.querySelector('#footer-text-preview').innerHTML;
+                e.customArgs['titleTag'] = document.querySelector('#title-tag-value').value;
+                e.customArgs['metaDescription'] = document.querySelector('#meta-description-value').value;
+
             }
         }";
 
@@ -147,7 +150,7 @@
             column.EditFormSettings.Visible = DefaultBoolean.False;
             column.Width = 100;
         });
-        
+
         settings.Columns.Add(column =>
         {
             column.FieldName = "SEMRushSearchVolume";
@@ -176,8 +179,50 @@
                 ViewContext.Writer.Write($@"<div id=""footer-text-editor""></div>");
             });
             column.EditCellStyle.CssClass = "edit-footer-text";
+            column.EditFormSettings.ColumnSpan = 2; // need to display the title tag and meta descriotion side-by-side ontop of the... big text box thign.... (Y).,.
             column.SetDataItemTemplateContent(c => {
                 ViewContext.Writer.Write($@"<div class=""display-footer-text"">{Html.Raw(DataBinder.Eval(c.DataItem, "FooterText"))}</div>");
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "TitleTag";
+            column.Name = "TitleTag";
+            column.Caption = "Title Tag";
+            column.Width = 200;
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.EditFormSettings.RowSpan = 5;
+            column.ColumnType = MVCxGridViewColumnType.Default;
+            column.SetEditItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write($@"<input id=""title-tag-value"" type=""text"" class=""form-control"" value=""{Html.Encode(DataBinder.Eval(c.DataItem, "TitleTag"))}"" maxlength=""100"" />");
+            });
+            column.EditCellStyle.CssClass = "edit-footer-text";
+            column.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(Html.Raw(DataBinder.Eval(c.DataItem, "TitleTag")));
+            });
+        });
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "MetaDescription";
+            column.Name = "MetaDescription";
+            column.Caption = "Meta Description";
+            column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            column.EditFormSettings.Visible = DefaultBoolean.True;
+            column.EditFormSettings.RowSpan = 5;
+            column.ColumnType = MVCxGridViewColumnType.Default;
+            column.SetEditItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write($@"<input id=""meta-description-value"" class=""form-control"" type=""text"" value=""{Html.Encode(DataBinder.Eval(c.DataItem, "MetaDescription"))}"" maxlength=""155"" />");
+            });
+            column.EditCellStyle.CssClass = "edit-footer-text";
+            column.SetDataItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(Html.Raw(DataBinder.Eval(c.DataItem, "MetaDescription")));
             });
         });
 

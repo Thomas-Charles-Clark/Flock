@@ -47,8 +47,15 @@ namespace Flock.ViewModels
             get 
             {
                 return Convert.ToInt32(Key?.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries)[0]);
-            } 
+            }
         }
+
+        [StringLength(100, ErrorMessage = "Cannot exceed 100 characters")]
+        public string TitleTag { get; set; }
+
+
+        [StringLength(155, ErrorMessage = "Cannot exceed 155 characters")]
+        public string MetaDescription { get; set; }
 
         public byte LanguageID
         {

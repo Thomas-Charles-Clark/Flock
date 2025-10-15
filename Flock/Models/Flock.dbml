@@ -290,11 +290,11 @@
       <Association Name="Language_Member1" Member="Members1" ThisKey="LanguageID" OtherKey="MarketingLanguageID" Type="Member" />
       <Association Name="Language_PageSection_Country_Language" Member="PageSection_Country_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="PageSection_Country_Language" />
       <Association Name="Language_MenuItem_Language" Member="MenuItem_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="MenuItem_Language" />
-      <Association Name="Language_FilterIndexCombination_Language" Member="FilterIndexCombination_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="FilterIndexCombination_Language" />
       <Association Name="Language_ProductType_Language" Member="ProductType_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ProductType_Language" />
       <Association Name="Language_ModularProduct_Language_Snapshot" Member="ModularProduct_Language_Snapshots" ThisKey="LanguageID" OtherKey="LanguageID" Type="ModularProduct_Language_Snapshot" />
       <Association Name="Language_ModularProduct_Language" Member="ModularProduct_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="ModularProduct_Language" />
       <Association Name="Language_Country_Language" Member="Country_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="Country_Language" />
+      <Association Name="Language_FilterIndexCombination_Language" Member="FilterIndexCombination_Languages" ThisKey="LanguageID" OtherKey="LanguageID" Type="FilterIndexCombination_Language" />
     </Type>
   </Table>
   <Table Name="dbo.Region" Member="Regions">
@@ -5170,35 +5170,6 @@
       <Association Name="ProductType_FilterIndexCombination" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.FilterIndexCombination_Language" Member="FilterIndexCombination_Languages">
-    <Type Name="FilterIndexCombination_Language">
-      <Column Name="FilterIndexCombinationID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="FooterText" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
-      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
-      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
-      <Column Name="ModifiedMemberID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ChatGPTRequestID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
-      <Association Name="FilterIndexCombination_FilterIndexCombination_Language" Member="FilterIndexCombination" ThisKey="FilterIndexCombinationID" OtherKey="FilterIndexCombinationID" Type="FilterIndexCombination" IsForeignKey="true" />
-      <Association Name="Language_FilterIndexCombination_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
-      <Association Name="Member_FilterIndexCombination_Language" Member="Member" ThisKey="ModifiedMemberID" OtherKey="MemberID" Type="Member" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="adm.vwFilterIndexCombination_Language" Member="vwFilterIndexCombination_Languages">
-    <Type Name="vwFilterIndexCombination_Language">
-      <Column Name="FilterIndexCombinationID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
-      <Column Name="FooterText" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
-      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
-      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
-      <Column Name="ModifiedMemberID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ChatGPTRequestID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
-      <Column Name="ProductTypeName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="AttributeSignature" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="AttributeDescription" Type="System.String" DbType="NVarChar(500) NOT NULL" CanBeNull="false" />
-      <Column Name="SEMRushSearchVolume" Type="System.Int32" DbType="INT" CanBeNull="true" />
-    </Type>
-  </Table>
   <Table Name="art.ArticleSubType" Member="ArticleSubTypes">
     <Type Name="ArticleSubType">
       <Column Name="ArticleSubTypeID" Type="System.Byte" DbType="TinyInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -5361,6 +5332,39 @@
       <Column Name="ProductTypeID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Association Name="Banner_Banner_ProductType" Member="Banner" ThisKey="BannerID" OtherKey="BannerID" Type="Banner" IsForeignKey="true" />
       <Association Name="ProductType_Banner_ProductType" Member="ProductType" ThisKey="ProductTypeID" OtherKey="ProductTypeID" Type="ProductType" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FilterIndexCombination_Language" Member="FilterIndexCombination_Languages">
+    <Type Name="FilterIndexCombination_Language">
+      <Column Name="FilterIndexCombinationID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="FooterText" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedMemberID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ChatGPTRequestID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Column Name="MetaDescription" Type="System.String" DbType="NVarChar(155)" CanBeNull="true" />
+      <Column Name="TitleTag" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Association Name="FilterIndexCombination_FilterIndexCombination_Language" Member="FilterIndexCombination" ThisKey="FilterIndexCombinationID" OtherKey="FilterIndexCombinationID" Type="FilterIndexCombination" IsForeignKey="true" />
+      <Association Name="Language_FilterIndexCombination_Language" Member="Language" ThisKey="LanguageID" OtherKey="LanguageID" Type="Language" IsForeignKey="true" />
+      <Association Name="Member_FilterIndexCombination_Language" Member="Member" ThisKey="ModifiedMemberID" OtherKey="MemberID" Type="Member" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="adm.vwFilterIndexCombination_Language" Member="vwFilterIndexCombination_Languages">
+    <Type Name="vwFilterIndexCombination_Language">
+      <Column Name="FilterIndexCombinationID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="FooterText" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="MetaDescription" Type="System.String" DbType="NVarChar(155)" CanBeNull="true" />
+      <Column Name="TitleTag" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="CreatedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedDT" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedMemberID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ChatGPTRequestID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Column Name="ProductTypeName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeSignature" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="AttributeDescription" Type="System.String" DbType="NVarChar(500) NOT NULL" CanBeNull="false" />
+      <Column Name="SEMRushSearchVolume" Type="System.Int32" DbType="Int" CanBeNull="true" />
     </Type>
   </Table>
   <Function Name="dbo.PageSection_ClearPage" Method="PageSection_ClearPage">
