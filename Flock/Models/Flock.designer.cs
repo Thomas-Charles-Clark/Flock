@@ -109479,6 +109479,8 @@ namespace Flock.Models
 		
 		private string _Label;
 		
+		private string _TitleTagSuffix;
+		
 		private EntityRef<Country> _Country;
 		
 		private EntityRef<Account> _Account;
@@ -109541,6 +109543,8 @@ namespace Flock.Models
     partial void OnNoFollowChanged();
     partial void OnLabelChanging(string value);
     partial void OnLabelChanged();
+    partial void OnTitleTagSuffixChanging(string value);
+    partial void OnTitleTagSuffixChanged();
     #endregion
 		
 		public Country_Language()
@@ -110079,6 +110083,26 @@ namespace Flock.Models
 					this._Label = value;
 					this.SendPropertyChanged("Label");
 					this.OnLabelChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TitleTagSuffix", DbType="NVarChar(50) NULL")]
+		public string TitleTagSuffix
+		{
+			get
+			{
+				return this._TitleTagSuffix;
+			}
+			set
+			{
+				if ((this._TitleTagSuffix != value))
+				{
+					this.OnTitleTagSuffixChanging(value);
+					this.SendPropertyChanging();
+					this._TitleTagSuffix = value;
+					this.SendPropertyChanged("TitleTagSuffix");
+					this.OnTitleTagSuffixChanged();
 				}
 			}
 		}

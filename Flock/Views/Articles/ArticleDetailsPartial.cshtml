@@ -18,12 +18,16 @@
             </div>
             <div style="width: 33.2%; float: left;">
                 <span style="display: block;">Article Title (70)</span>
-                @Html.DevExpress().TextBoxFor(m => Model.TitleTag, settings =>
-                {
-                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(304);
-                    settings.ShowModelErrors = true;
-                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
-                }).GetHtml()
+                <div class="title-tag-wrapper">
+                    @Html.DevExpress().TextBoxFor(m => Model.TitleTag, settings =>
+                    {
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Properties.MaxLength = 70;
+                    }).GetHtml()
+                    <span class="title-tag-suffix">
+                        @Model.TitleTagSuffix
+                    </span>
+                </div>
                 <span style="margin-top: 1em; display: block">URL Keywords (100)</span>
                 @Html.DevExpress().TextBoxFor(m => Model.URLKeywords, settings =>
                 {

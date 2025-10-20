@@ -716,5 +716,13 @@ namespace Flock.ViewModels
         public Page CanonicalPage { get; set; }
         public List<AttributeStub> AttributeList { get; set; }
         public List<Flock.Models.Attribute> Attributes { get; set; }
+        public string TitleTagSuffix { get; set; }
+
+        public PageComposeViewModel()
+        {
+            var uow = new UnitOfWork<FlockDataContext>();
+
+            TitleTagSuffix = uow.GetRepository<Country_Language>().GetAll().Single(c => c.Country_Language_ID == 3).TitleTagSuffix;
+        }
     }
 }

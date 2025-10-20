@@ -27,7 +27,7 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "")" id="cms-tab" data-bs-toggle="tab" data-bs-target="#cms-tab-content" type="button" role="tab" aria-controls="cms-tab-content">
+        <button class="nav-link @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexrestrictions" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "titletagsuffixes", "imageexporter", "storeevents", "styles", "cachebuster" }, "active", "")" id="cms-tab" data-bs-toggle="tab" data-bs-target="#cms-tab-content" type="button" role="tab" aria-controls="cms-tab-content">
             CMS
         </button>
     </li>
@@ -234,7 +234,7 @@
             </div>
         </div>
     </div>
-    <div class="tab-pane fade @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexcombinations" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "imageexporter", "storeevents", "styles", "cachebuster" }, "show active", "")" id="cms-tab-content" role="tabpanel" aria-labelledby="cms-tab">
+    <div class="tab-pane fade @isActiveController(new string[] { "cms", "forms", "images", "banners", "assets", "careers", "storeevents", "animations", "callstoaction", "filterindexcombinations" }, new string[] { "index", "snippets", "messages", "menubuilder", "menuitemsbuilder", "imageinfo", "pagesections", "brochures", "images", "videos", "banners", "cms", "compose", "videos", "brochures", "overview", "versionchecker", "titletagsuffixes", "imageexporter", "storeevents", "styles", "cachebuster" }, "show active", "")" id="cms-tab-content" role="tabpanel" aria-labelledby="cms-tab">
         <div class="menu-tab">
             <div class="sub-menu">
                 <label>
@@ -264,6 +264,7 @@
                         @Html.ActionLink("Videos", "videos", "assets")
                         @Html.ActionLink("Image Export", "imageexporter", "images")
                         @Html.ActionLink("Image Version Checker", "versionchecker", "images")
+                        @Html.ActionLink("Title Tag Suffixes", "titletagsuffixes", "assets")
                     </div>
                 </div>
             </div>

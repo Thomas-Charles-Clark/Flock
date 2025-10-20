@@ -1,0 +1,32 @@
+﻿@{
+    ViewBag.Title = "Title Tag Suffixes";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+}
+@section styles {
+    @Styles.Render("~/bundles/composer")
+    <style type="text/css">
+    #container {
+        width: 1275px;
+        margin: 0 auto;
+    }
+    #TitleTagSuffixesGridView_tcFC1 {
+        text-align: center;
+    }
+        #TitleTagSuffixes_DXFooterRow .dxgv {
+            border-top: 1px solid #C0C0C0;
+        }
+
+        #TitleTagSuffixesGridView_DXEditingRow span.dxgv {
+            padding: 0 5px;
+        }
+
+    </style >
+}
+
+<h4 class="page-heading">
+    Title Tag Suffixes
+</h4>
+
+<div>
+    @Html.Partial("TitleTagSuffixesGridViewPartial")
+</div>

@@ -1,0 +1,131 @@
+﻿@using Flock.DAL
+@using Flock.Models
+@{
+    var UoW = new UnitOfWork<FlockDataContext>();
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "TitleTagSuffixesGridView";
+
+        settings.PreRender = (sender, e) =>
+        {
+            MVCxGridView gv = (MVCxGridView)sender;
+            gv.FocusedRowIndex = -1;
+        };
+
+        settings.CallbackRouteValues = new { Controller = "Assets", Action = "TitleTagSuffixesGridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = null;
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Assets", Action = "TitleTagSuffixesGridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = null;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+        settings.SettingsBehavior.ConfirmDelete = false;
+        settings.Settings.ShowFilterRow = false;
+        settings.Settings.ShowFilterRowMenu = false;
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.VisibleIndex = 5;
+        settings.CommandColumn.ShowUpdateButton = true;
+        settings.CommandColumn.Caption = "&nbsp";
+        settings.CommandColumn.Width = 60;
+
+        settings.ClientSideEvents.RowClick += @"(s, e) => {
+            s.StartEditRow(e.visibleIndex);
+        }";
+
+        settings.ClientSideEvents.BatchEditEndEditing += @"(s, e) => {
+            s.UpdateEdit();
+        }";
+
+        settings.SettingsEditing.ShowModelErrorsForEditors = true;
+
+        settings.KeyFieldName = "Country_Language_ID";
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+        settings.Settings.ShowFooter = false;
+
+        settings.SettingsBehavior.EnableRowHotTrack = true;
+
+        settings.Styles.Row.Cursor = "pointer";
+
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        
+        settings.Settings.ShowFilterRow = false;
+
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Hidden;
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+        settings.SettingsBehavior.AllowFocusedRow = true;
+
+        MVCxGridViewColumn CountryLanguageIDColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn NameColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn URLColumn = new MVCxGridViewColumn();
+        MVCxGridViewColumn TitleTagSuffixColumn = new MVCxGridViewColumn();
+
+        CountryLanguageIDColumn.Name = "CountryLanguageID";
+        CountryLanguageIDColumn.FieldName = "Country_Language_ID";
+        CountryLanguageIDColumn.Caption = "Country Language ID";
+        CountryLanguageIDColumn.ReadOnly = true;
+        CountryLanguageIDColumn.Visible = false;
+        CountryLanguageIDColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        CountryLanguageIDColumn.Width = 125;
+        CountryLanguageIDColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        CountryLanguageIDColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        CountryLanguageIDColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        CountryLanguageIDColumn.SetEditItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write($"<span class='dxgv'>{DataBinder.Eval(c.DataItem, "Country_Language_ID")}</span>");
+        });
+        settings.Columns.Add(CountryLanguageIDColumn);
+
+        NameColumn.Name = "Name";
+        NameColumn.FieldName = "Name";
+        NameColumn.Caption = "Site Name";
+        NameColumn.Width = 200;
+        NameColumn.ReadOnly = true;
+        NameColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        NameColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        NameColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        NameColumn.SetEditItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write($"<span class='dxgv'>{DataBinder.Eval(c.DataItem, "Name")}</span>");
+        });
+        settings.Columns.Add(NameColumn);
+
+        URLColumn.Name = "URL";
+        URLColumn.FieldName = "URL";
+        URLColumn.Caption = "URL";
+        URLColumn.Width = 155;
+        URLColumn.ReadOnly = true;
+        URLColumn.EditFormSettings.Visible = DefaultBoolean.False;
+        URLColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        URLColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        URLColumn.SetEditItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write($"<span class='dxgv'>{DataBinder.Eval(c.DataItem, "URL")}</span>");
+        });
+        settings.Columns.Add(URLColumn);
+
+        TitleTagSuffixColumn.Name = "TitleTagSuffix";
+        TitleTagSuffixColumn.FieldName = "TitleTagSuffix";
+        TitleTagSuffixColumn.Caption = "Title Tag Suffix";
+        TitleTagSuffixColumn.Width = 255;
+        TitleTagSuffixColumn.ColumnType = MVCxGridViewColumnType.TextBox;
+        var ttProp = TitleTagSuffixColumn.PropertiesEdit as TextBoxProperties;
+        ttProp.MaxLength = 50;
+        TitleTagSuffixColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        TitleTagSuffixColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        settings.Columns.Add(TitleTagSuffixColumn);
+
+    });
+}
+@grid.BindToLINQ("", "", (s, e) => { 
+
+    var source = UoW.GetRepository<Country_Language>().GetAll();
+
+    e.KeyExpression = "Country_Language_ID";
+
+    e.QueryableSource = source;
+
+}).GetHtml()

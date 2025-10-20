@@ -202,6 +202,15 @@ namespace Flock.ViewModels
         public CollectionHeaderFilters HeaderFilters { get; set; }
 
         public List<Country> CountryRestrictions { get; set; }
+
+        public string TitleTagSuffix { get; set; }
+
+        public CollectionViewModel()
+        {
+            var uow = new UnitOfWork<FlockDataContext>();
+
+            TitleTagSuffix = uow.GetRepository<Country_Language>().GetAll().Single(c => c.Country_Language_ID == 3).TitleTagSuffix;
+        }
     }
 
     public class CollectionHeaderFilters

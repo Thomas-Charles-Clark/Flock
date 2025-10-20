@@ -110,6 +110,15 @@ namespace Flock.ViewModels
         public List<Country> Countries { get; set; }
 
         public DateTime? EventDT { get; set; }
+
+        public string TitleTagSuffix { get; set; }
+
+        public ArticleComposeViewModel()
+        {
+            var uow = new UnitOfWork<FlockDataContext>();
+
+            TitleTagSuffix = uow.GetRepository<Country_Language>().GetAll().Single(c => c.Country_Language_ID == 3).TitleTagSuffix;
+        }
     }
 
     public class ArticleCreationModel

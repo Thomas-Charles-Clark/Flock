@@ -20,12 +20,16 @@
         <div style="width: 33.2%; float: left;">
             @Html.DevExpress().LabelFor(m => Model.TitleTag).GetHtml()
             <img id="product-page-titletag-busy" class="busy" style="float: right; width: 20px;" src="/Images/SystemIcons/busy-icon.gif" alt="busy icon" title="Working..." />
-            @Html.DevExpress().TextBoxFor(m => Model.TitleTag, settings =>
-        {
-            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
-            settings.ShowModelErrors = true;
-            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
-        }).GetHtml()
+            <div class="title-tag-wrapper">
+                @Html.DevExpress().TextBoxFor(m => Model.TitleTag, settings =>
+                {
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    settings.Properties.MaxLength = 70;
+                }).GetHtml()
+                <span class="title-tag-suffix">
+                    @Model.TitleTagSuffix
+                </span>
+            </div>
             @Html.DevExpress().LabelFor(m => Model.URLKeywords, settings =>
         {
             settings.Style.Add("margin-top", "1em");

@@ -659,6 +659,7 @@
     <Compile Include="ViewModels\BadEmailsViewModel.cs" />
     <Compile Include="ViewModels\BannerComposeViewModel.cs" />
     <Compile Include="ViewModels\BannerOverviewViewModel.cs" />
+    <Compile Include="ViewModels\TitleTagSuffixesViewModel.cs" />
     <Compile Include="ViewModels\BrochureDetailsViewModel.cs" />
     <Compile Include="ViewModels\BrochureViewModel.cs" />
     <Compile Include="ViewModels\Bronto\BrontoListGridViewModel.cs" />
@@ -6342,6 +6343,8 @@
     <Content Include="Views\CMS\CanonicalPageAttributeSettingsPartial.cshtml" />
     <Content Include="Views\CMS\CountryLanguageRestrictionPartial.cshtml" />
     <Content Include="Views\Banners\BannerProductTypeRestrictionsPartial.cshtml" />
+    <Content Include="Views\Assets\TitleTagSuffixes.cshtml" />
+    <Content Include="Views\Assets\TitleTagSuffixesGridViewPartial.cshtml" />
     <None Include="Views\CMS\SlideshowImageOverlayPartial.cshtml.backup" />
     <Content Include="Views\Translations\CallsToAction\TranslateCallToAction.cshtml" />
     <Content Include="Views\Translations\CallsToAction\_TranslateCallToActionGridView.cshtml" />

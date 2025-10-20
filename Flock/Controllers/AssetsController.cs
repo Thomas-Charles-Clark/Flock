@@ -829,6 +829,37 @@ namespace Flock.Controllers
         }
 
 
+
+        /// <summary>
+        /// Messages section
+        /// </summary>
+        /// <returns></returns>
+
+        public ActionResult TitleTagSuffixes()
+        {
+            return View();
+        }
+
+        public ActionResult TitleTagSuffixesGridViewPartial()
+        {
+            return PartialView();
+        }
+
+        [ValidateInput(false)]
+        public ActionResult TitleTagSuffixesGridViewPartialUpdate(TitleTagSuffixViewModel item)
+        {
+            if (ModelState.IsValid)
+            {
+                Country_Language CountryLanguage = UnitOfWork.GetRepository<Country_Language>().GetAll().Single(s => s.Country_Language_ID == item.Country_Language_ID);
+
+                CountryLanguage.TitleTagSuffix = item.TitleTagSuffix;
+
+                UnitOfWork.Save();
+            }
+
+            return PartialView("TitleTagSuffixesGridViewPartial");
+        }
+
         /// <summary>
         /// Messages section
         /// </summary>

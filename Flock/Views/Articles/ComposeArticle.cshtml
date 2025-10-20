@@ -6,6 +6,21 @@
 @section styles {
     @Styles.Render("~/content/articles.css")
     @Styles.Render("~/content/composition-base.css")
+
+    <style type="text/css">
+        .title-tag-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .title-tag-suffix {
+            font-size: 13px;
+            flex: 0 0 140px;
+            position: relative;
+            top: -1px;
+        }
+    </style>
 }
 @section scripts {
     <script type="text/javascript">
