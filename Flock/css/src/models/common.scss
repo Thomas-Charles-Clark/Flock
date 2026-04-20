@@ -176,3 +176,20 @@ $menu-background-color: #8bbfe5;
 #main-loading-blocker {
     z-index: 40000;
 }
+
+.title-tag-suffix-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    > input.form-control {
+        flex: 0 1 300px;
+    }
+}
+
+.title-tag-suffix {
+    font-size: 13px;
+    flex: 0 0 140px;
+    position: relative;
+    top: -1px;
+}

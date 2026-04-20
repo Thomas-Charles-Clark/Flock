@@ -161,8 +161,15 @@
                 </div>
             </div>
             <div>
+				<div>
+					<label style="width: 170px; display: block; margin-bottom: 8px;">
+						Alternate Colourway Group
+					</label>
+                    <input type="text" style="margin: 0 auto; width: 42px; text-align: center; text-transform: uppercase" id="alternative-colourway-group" class="form-control" value="@(Model.AlternativeColourwayGroup)" maxlength="1" />
+				</div>
                 @if (Model.Clearance)
                 {
+                    <hr/>
                     <div id="product-page-clearance-label">
                         CLEARANCE
                     </div>

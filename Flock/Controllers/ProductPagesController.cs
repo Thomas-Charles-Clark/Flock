@@ -1593,6 +1593,7 @@ namespace Flock.Controllers
                     pp.OffDate = model.OffDate;
                     pp.New = model.New;
                     pp.TradeSwitch = model.TradeSwitch;
+                    pp.AlternativeColourwayGroup = String.IsNullOrEmpty(model.AlternativeColourwayGroup) ? null : model.AlternativeColourwayGroup;
                     UnitOfWork.Save();
 
                     ProductPageComposeViewModelBuilder Builder = new ProductPageComposeViewModelBuilder(UnitOfWork);

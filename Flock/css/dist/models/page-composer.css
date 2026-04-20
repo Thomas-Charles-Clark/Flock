@@ -7971,6 +7971,19 @@
   z-index: 40000;
 }
 
+.title-tag-suffix-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.title-tag-suffix {
+  font-size: 13px;
+  flex: 0 0 140px;
+  position: relative;
+  top: -1px;
+}
+
 .header-control-wrapper {
   display: flex;
   flex-wrap: wrap;

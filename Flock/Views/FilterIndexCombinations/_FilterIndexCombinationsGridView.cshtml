@@ -195,15 +195,20 @@
             column.EditFormSettings.Visible = DefaultBoolean.True;
             column.EditFormSettings.RowSpan = 5;
             column.ColumnType = MVCxGridViewColumnType.Default;
-            column.SetEditItemTemplateContent(c =>
-            {
-                ViewContext.Writer.Write($@"<input id=""title-tag-value"" type=""text"" class=""form-control"" value=""{Html.Encode(DataBinder.Eval(c.DataItem, "TitleTag"))}"" maxlength=""100"" />");
-            });
-            column.EditCellStyle.CssClass = "edit-footer-text";
             column.SetDataItemTemplateContent(c =>
             {
-                ViewContext.Writer.Write(Html.Raw(DataBinder.Eval(c.DataItem, "TitleTag")));
+                var titleTag = DataBinder.Eval(c.DataItem, "TitleTag")?.ToString();
+
+                if (!String.IsNullOrEmpty(titleTag))
+                {
+                    ViewContext.Writer.Write($@"{titleTag} {Model.TitleTagSuffix}");
+                }
             });
+            column.SetEditItemTemplateContent(c =>
+            {
+                ViewContext.Writer.Write($@"<div class=""title-tag-suffix-wrapper""><input id=""title-tag-value"" type=""text"" class=""form-control"" value=""{Html.Encode(DataBinder.Eval(c.DataItem, "TitleTag"))}"" maxlength=""100"" /><span class=""title-tag-suffix"">{Model.TitleTagSuffix}</span></div>");
+            });
+            column.EditCellStyle.CssClass = "edit-footer-text";
         });
 
         settings.Columns.Add(column =>

@@ -1,0 +1,62 @@
+﻿@model Flock.ViewModels.ArticleComposeViewModel
+<script>
+    function SaveArticleHtml(articleId) {
+        LoadingPanel.Show();
+
+		$.ajax({
+			url: '@Url.Action("SaveHtmlArticle", "Articles")',
+			type: 'POST',
+			traditional: true,
+			data: {
+				ArticleID: articleId,
+				Contents: window.articleHtmlEditor.state.doc.toString()
+			},
+			success: function (data) {
+				LoadingPanel.Hide();
+				SuccessFade($("#article-html-save"));
+			},
+			error: function (e, s, a) {
+				FailureFade($("#article-html-save"));
+				$.showError(e, s, a);
+			},
+			timeout: 120000
+		});
+    }
+</script>
+<div class="content-panel-container">
+	<fieldset id="article-fieldset">
+		<legend>
+			HTML Article
+		</legend>
+		<div class="fieldset-inner">
+
+			<div id="html-article-preview">
+				@Html.Raw(Model.Contents))
+			</div>
+
+			<div id="article-htmleditor"></div>
+
+			<script type="text/javascript">
+				window.articleHtmlEditor = window.createJSCodeMirrorEditor(document.querySelector('#article-htmleditor'), {
+					theme: 'basicDark',
+					json: false,
+					updateListener: (event) => {
+						//console.log('updateListener', event, view);
+						let value = event.view.state.doc.toString();
+						document.querySelector('#html-article-preview').innerHTML = value;
+					},
+					dropListener: (event, view) => {
+						//console.log('dropListener', event, view);
+					}
+				});
+				window.setTimeout(() => {
+					let value = '@(HttpUtility.JavaScriptStringEncode(Model.Contents))';
+					window.articleHtmlEditor.clearTo(value);
+				}, 0);
+			</script>
+			<div class="buttons-container">
+				<img id="article-html-save" class="pagesection-save-icon" src="/images/icons/32/save.png" onclick="SaveArticleHtml(@(Model.ArticleID));">
+			</div>
+		</div>
+	</fieldset>
+</div>

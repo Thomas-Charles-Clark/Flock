@@ -74,6 +74,8 @@ namespace Flock.ViewModels
 
             PPCVM.AlternateColourwayImageID = PP.AlternateColourwayImageID;
 
+            PPCVM.AlternativeColourwayGroup = PP.AlternativeColourwayGroup;
+
             if (PPCVM.AlternateColourwayImageID.HasValue) 
             {
                 PPCVM.AlternateColourwayImage = UoW.GetRepository<Image>().GetAll().SingleOrDefault(p => p.ImageID == PP.AlternateColourwayImageID);
@@ -173,7 +175,9 @@ namespace Flock.ViewModels
 
         public Image AlternateColourwayImage { get; set; }
 
-        public string TitleTagSuffix { get; set; }
+        public string AlternativeColourwayGroup { get; set; }
+
+		public string TitleTagSuffix { get; set; }
 
         public ProductPageComposeViewModel()
         {

@@ -93626,6 +93626,8 @@ namespace Flock.Models
 		
 		private System.Nullable<long> _AlternateColourwayImageID;
 		
+		private string _AlternativeColourwayGroup;
+		
 		private EntitySet<ProductPage_RelatedProductPage> _ProductPage_RelatedProductPages;
 		
 		private EntitySet<ProductPage_Attribute> _ProductPage_Attributes;
@@ -93754,6 +93756,8 @@ namespace Flock.Models
     partial void OnVideoThumbnailChanged();
     partial void OnAlternateColourwayImageIDChanging(System.Nullable<long> value);
     partial void OnAlternateColourwayImageIDChanged();
+    partial void OnAlternativeColourwayGroupChanging(string value);
+    partial void OnAlternativeColourwayGroupChanged();
     #endregion
 		
 		public ProductPage()
@@ -94702,6 +94706,26 @@ namespace Flock.Models
 					this._AlternateColourwayImageID = value;
 					this.SendPropertyChanged("AlternateColourwayImageID");
 					this.OnAlternateColourwayImageIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AlternativeColourwayGroup", AutoSync=AutoSync.Always, DbType="NVARCHAR(1)")]
+		public string AlternativeColourwayGroup
+		{
+			get
+			{
+				return this._AlternativeColourwayGroup;
+			}
+			set
+			{
+				if ((this._AlternativeColourwayGroup != value))
+				{
+					this.OnAlternativeColourwayGroupChanging(value);
+					this.SendPropertyChanging();
+					this._AlternativeColourwayGroup = value;
+					this.SendPropertyChanged("AlternativeColourwayGroup");
+					this.OnAlternativeColourwayGroupChanged();
 				}
 			}
 		}

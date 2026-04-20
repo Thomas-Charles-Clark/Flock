@@ -29,9 +29,15 @@ namespace Flock.ViewModels
     {
         public byte? LanguageID { get; set; }
 
+        public string TitleTagSuffix { get; set; }
+
         public FilterIndexCombinationsGridSettings(byte? languageId)
         {
             LanguageID = languageId;
+
+            var db = new FlockDataContext();
+
+            TitleTagSuffix = db.Country_Languages.Single(cl => cl.Country_Language_ID == 3).TitleTagSuffix;
         }
     }
 

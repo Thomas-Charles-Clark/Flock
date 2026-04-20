@@ -1,29 +1,29 @@
 ﻿@model Flock.ViewModels.ArticleComposeViewModel
 @{
-    ViewBag.Title = "Compose Article";
-    Layout = "~/Views/Admin/_Layout.cshtml";
+	ViewBag.Title = "Compose Article";
+	Layout = "~/Views/Admin/_Layout.cshtml";
 }
 @section styles {
-    @Styles.Render("~/content/articles.css")
-    @Styles.Render("~/content/composition-base.css")
+	@Styles.Render("~/content/articles.css")
+	@Styles.Render("~/content/composition-base.css")
 
-    <style type="text/css">
-        .title-tag-wrapper {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+	<style type="text/css">
+		.title-tag-wrapper {
+			display: flex;
+			gap: 8px;
+			align-items: center;
+		}
 
-        .title-tag-suffix {
-            font-size: 13px;
-            flex: 0 0 140px;
-            position: relative;
-            top: -1px;
-        }
-    </style>
+		.title-tag-suffix {
+			font-size: 13px;
+			flex: 0 0 140px;
+			position: relative;
+			top: -1px;
+		}
+	</style>
 }
 @section scripts {
-    <script type="text/javascript">
+	<script type="text/javascript">
 
 
         function InitRelatedArticleDragDrop() {
@@ -65,7 +65,7 @@
             });
         }
     function InitPodDragDrop() {
-        
+
         //$('.draggable').draggable({
         //    helper: 'clone',
         //    start: function (e, ui) {
@@ -94,7 +94,7 @@
                         $(ui.helper).css("z-index", "300000");
                     }
                 });
-                
+
                 InitSingleImageDragDrop();
             }
             else if ($("#selected-template-id").val() == '4')
@@ -579,49 +579,51 @@
         InitRelatedArticlesDragDrop();
         InitCountryDragDrop();
     });
-    </script>
+	</script>
+
+	@Scripts.Render("~/bundles/js/code-mirror")
 }
 
 <h4 class="page-heading">Compose Article</h4>
 
 <div id="resource-panels" style="float: right; width: 986px;">
-    @Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
-    @Html.Partial("ArticleSearchPartial")
-    @Html.Partial("~/Views/Shared/CountrySearch.cshtml")
+	@Html.Partial("~/Views/Images/ImageSearchPartial.cshtml")
+	@Html.Partial("ArticleSearchPartial")
+	@Html.Partial("~/Views/Shared/CountrySearch.cshtml")
 </div>
 
 <div id="article-compose-section" data-article-id="@Model.ArticleID" style="float: left; width: 986px;">
-    <div id="article-select-header-container">
-        <div class="content-panel-container">
-            <fieldset id="article-select-header">
-                <legend onclick="$('#select-header-inner').slideToggle('fast');">
-                    Compose Article - Article Selector (click to expand / contract)
-                    <img id="article-select-header-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
-                </legend>
-                <div id="select-header-inner">
-                    <div id="article-header-page-drop-down-container">
-                        @Html.Action("ArticleComposeGridViewPartial", "Articles")
-                    </div>
-                    <div style="clear: both"></div>
-                </div>
-            </fieldset>
-        </div>
-    </div>
-    <div id="article-compose-container">
-        @if (ViewData["InvalidArticleIDError"] != null)
-        {
-            <h5>@(ViewData["InvalidArticleIDError"])</h5>
-        }
-        @if (Model.ArticleID != null)
-        {
-            @Html.Partial("ArticleComposePartial", Model)
-        }
-    </div>
+	<div id="article-select-header-container">
+		<div class="content-panel-container">
+			<fieldset id="article-select-header">
+				<legend onclick="$('#select-header-inner').slideToggle('fast');">
+					Compose Article - Article Selector (click to expand / contract)
+					<img id="article-select-header-busy" class="fieldset-busy" src="/images/systemicons/busy-icon.gif" />
+				</legend>
+				<div id="select-header-inner">
+					<div id="article-header-page-drop-down-container">
+						@Html.Action("ArticleComposeGridViewPartial", "Articles")
+					</div>
+					<div style="clear: both"></div>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+	<div id="article-compose-container">
+		@if (ViewData["InvalidArticleIDError"] != null)
+		{
+			<h5>@(ViewData["InvalidArticleIDError"])</h5>
+		}
+		@if (Model.ArticleID != null)
+		{
+			@Html.Partial("ArticleComposePartial", Model)
+		}
+	</div>
 </div>
 <div style="clear: both;"></div>
 
 <div id="slideshow-advanced-settings-dialog">
-    <div id="slideshow-advanced-settings">
+	<div id="slideshow-advanced-settings">
 
-    </div>
+	</div>
 </div>

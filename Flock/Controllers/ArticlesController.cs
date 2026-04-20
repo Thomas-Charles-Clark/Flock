@@ -9,6 +9,7 @@ using Flock.ViewModels;
 using DevExpress.Web.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Script.Serialization;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace Flock.Controllers
 {
@@ -916,5 +917,32 @@ namespace Flock.Controllers
             }
             return PartialView("_ArticleGridViewPartial", model);
         }
-    }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult SaveHtmlArticle(int ArticleID, string Contents)
+		{
+			try
+			{
+				if (ModelState.IsValid)
+				{
+					var modelItem = UnitOfWork.GetRepository<Article>().GetAll().Where(p => p.ArticleID == ArticleID).SingleOrDefault();
+					if (modelItem != null)
+					{
+						modelItem.Contents = Contents;
+						UnitOfWork.Save();
+						UnitOfWork.Context.ReplaceLocalURLPlaceholders_Article(ArticleID, null, null, null, null, null, false, false);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Response.StatusDescription = e.Message;
+			}
+
+			var Model = new ArticleViewModelBuilder(UnitOfWork).Build(ArticleID);
+
+			return PartialView("ArticleHTMLPartial", Model);
+		}
+	}
 }

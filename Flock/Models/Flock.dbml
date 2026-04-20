@@ -4618,6 +4618,7 @@
       <Column Name="VideoURL" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
       <Column Name="VideoThumbnail" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
       <Column Name="AlternateColourwayImageID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Column Name="AlternativeColourwayGroup" AutoSync="Always" Type="System.String" DbType="NVARCHAR(1)" CanBeNull="true" />
       <Association Name="ProductPage_ProductPage_RelatedProductPage" Member="ProductPage_RelatedProductPages" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="ProductPage_RelatedProductPage" />
       <Association Name="ProductPage_ProductPage_Attribute" Member="ProductPage_Attributes" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="ProductPage_Attribute" />
       <Association Name="ProductPage_Product_ProductPage" Member="Product_ProductPages" ThisKey="ProductPageID" OtherKey="ProductPageID" Type="Product_ProductPage" />

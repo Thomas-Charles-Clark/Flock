@@ -859,7 +859,8 @@
                 OffDate: $("input[name='OffDate']").val(),
                 New: New.GetValue(),
                 BrochureID: BrochureID.GetSelectedItem().value,
-                TradeSwitch: TradeSwitch.GetValue()
+                TradeSwitch: TradeSwitch.GetValue(),
+                AlternativeColourwayGroup: $("#alternative-colourway-group").val() ? $("#alternative-colourway-group").val().toUpperCase() : null
             },
             success: function (data) {
                 $("#product-page-info-container").html(data);

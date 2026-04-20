@@ -80,3 +80,33 @@
     margin-bottom: 1em;
     width: 239px;
 }
+
+#article-contents-container {
+    border-radius: 5px;
+}
+
+    #article-contents-container fieldset {
+        border-top: 0;
+    }
+
+    #article-contents-container fieldset .fieldset-inner {
+        border-bottom: 1px solid #ddd;
+    }
+
+        #article-contents-container fieldset .buttons-container {
+            width: 100%;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        #html-article-preview {
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+#article-html-save {
+    float: none;
+    margin-right: 0;
+}

@@ -6345,6 +6345,7 @@
     <Content Include="Views\Banners\BannerProductTypeRestrictionsPartial.cshtml" />
     <Content Include="Views\Assets\TitleTagSuffixes.cshtml" />
     <Content Include="Views\Assets\TitleTagSuffixesGridViewPartial.cshtml" />
+    <Content Include="Views\Articles\ArticleHTMLPartial.cshtml" />
     <None Include="Views\CMS\SlideshowImageOverlayPartial.cshtml.backup" />
     <Content Include="Views\Translations\CallsToAction\TranslateCallToAction.cshtml" />
     <Content Include="Views\Translations\CallsToAction\_TranslateCallToActionGridView.cshtml" />
