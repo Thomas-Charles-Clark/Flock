@@ -314,9 +314,22 @@
         discTradeProp.Items.Add("No", false);
         DiscountTradePriceColumn.EditFormSettings.VisibleIndex = 100;
 
-
-
-
+        MVCxGridViewColumn DiscountSamplesColumn = new MVCxGridViewColumn();
+        DiscountSamplesColumn.Name = "DiscountSamples";
+        DiscountSamplesColumn.FieldName = "DiscountSamples";
+        DiscountSamplesColumn.Caption = "Discount Sample Cuttings";
+        DiscountSamplesColumn.Width = 60;
+        DiscountSamplesColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        DiscountSamplesColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+        DiscountSamplesColumn.Settings.ShowFilterRowMenu = DefaultBoolean.False;
+        DiscountSamplesColumn.Settings.AllowHeaderFilter = DefaultBoolean.True;
+        DiscountSamplesColumn.Settings.HeaderFilterMode = HeaderFilterMode.List;
+        DiscountSamplesColumn.ColumnType = MVCxGridViewColumnType.ComboBox;
+        var discSamplesProp = DiscountSamplesColumn.PropertiesEdit as ComboBoxProperties;
+        discSamplesProp.ValueType = typeof(bool);
+        discSamplesProp.Items.Add("Yes", true);
+        discSamplesProp.Items.Add("No", false);
+        DiscountSamplesColumn.EditFormSettings.VisibleIndex = 100;
 
         MVCxGridViewColumn DiscountBundlesColumn = new MVCxGridViewColumn();
         DiscountBundlesColumn.Name = "DiscountBundles";
@@ -394,6 +407,7 @@
         settings.Columns.Add(DiscountSalePriceColumn);
         settings.Columns.Add(DiscountTradePriceColumn);
         settings.Columns.Add(DiscountBundlesColumn);
+        settings.Columns.Add(DiscountSamplesColumn);
         settings.Columns.Add(GiftBoxPriceIncColumn);
         settings.Columns.Add(GiftBoxPriceExColumn);
         //settings.Columns.Add(CreatedDTColumn);
@@ -473,6 +487,10 @@
                 if (e.Column.FieldName == "DiscountBundles")
                 {
                     (e.Editor as ASPxCheckBox).Checked = true;
+                }
+                if (e.Column.FieldName == "DiscountSamples")
+                {
+                    (e.Editor as ASPxCheckBox).Checked = false;
                 }
             }
         };

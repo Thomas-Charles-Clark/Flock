@@ -338,6 +338,20 @@
                             </td>
                         </tr>
                         <tr>
+                            <td>
+                                @Html.DevExpress().Label(settings => { settings.Name = "DiscountSamplesLbl"; settings.Style.Add("margin-right", "8px"); settings.Style.Add("margin-bottom", "4px"); settings.Text = "Apply Discount to Sample Cuttings"; settings.Style.Add("line-height", "32px!important"); settings.ControlStyle.CssClass = "detail-label"; }).GetHtml()
+                                @Html.DevExpress().CheckBoxFor(m => Model.DiscountSamples, settings =>
+                                {
+                                    settings.Properties.ValueChecked = true;
+                                    settings.Properties.ValueUnchecked = false;
+                                    settings.ShowModelErrors = true;
+                                    settings.Style.Add("line-height", "29px!important");
+                                    settings.Style.Add("margin-left", "8px");
+                                    settings.Style.Add("margin-bottom", "4px");
+                                }).GetHtml()
+                            </td>
+                        </tr>
+                        <tr>
                             <td class="percentage-related" style="vertical-align: top;">
                                 <div style="width: 545px; margin-bottom: 0;" class="resource-panel-container">
                                     <fieldset id="product-type-fieldset">

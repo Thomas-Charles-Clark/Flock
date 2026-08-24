@@ -1554,9 +1554,12 @@ function InitSlideshowDragDrop() {
 
 function InitProductPagesDragDrop(pageSectionId) {
     if (typeof pageSectionId === 'undefined') {
-        $(".multisortable-container").multisortable();
+        $(".multisortable-container").multisortable({
+            cancel: '.not-sortable'
+        });
 
         $(".product-page-grid-container").sortable({
+            cancel: '.not-sortable',
             scroll: false
         });
     }

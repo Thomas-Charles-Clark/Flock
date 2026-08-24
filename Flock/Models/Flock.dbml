@@ -4303,6 +4303,7 @@
       <Column Name="ApplyDiscountToSalePrice" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="ApplyDiscountToFullPrice" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="ApplyDiscountToTradePrice" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DiscountSamples" Type="System.Boolean" DbType="BIT" CanBeNull="false" />
     </Type>
   </Table>
   <Table Name="adm.vwProductPage" Member="vwProductPages">
@@ -4885,6 +4886,7 @@
       <Column Name="MaxUsesPerTradeAccount" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
       <Column Name="ApplyDiscountToClearancePrice" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="CreatedByUserID" Type="System.String" DbType="NVarChar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="DiscountSamples" Type="System.Boolean" DbType="BIT" CanBeNull="false" />
       <Association Name="PromotionCode_Transaction" Member="Transactions" ThisKey="PromotionCodeID" OtherKey="PromotionCodeID" Type="Transaction" />
       <Association Name="PromotionGroup_PromotionCode" Member="PromotionGroup" ThisKey="PromotionGroupID" OtherKey="PromotionGroupID" Type="PromotionGroup" IsForeignKey="true" />
     </Type>

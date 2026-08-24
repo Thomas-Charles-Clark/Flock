@@ -1,407 +1,422 @@
 ﻿@model Flock.ViewModels.PageSection_ProductPageViewModel
 
 @{
-    bool fiveAcross = false;
+	bool fiveAcross = false;
 
-    var productTypes = Model.CoreResults.Select(p => p.ProductTypeID).Distinct().ToList();
+	var productTypes = Model.CoreResults.Select(p => p.ProductTypeID).Distinct().ToList();
 
-    if (productTypes.Count() == 1)
-    {
-        if (Model.CoreResults.Select(p => p.ProductTypeID).First() == 8)
-        {
-            fiveAcross = true;
-        }
-    }
-    
-    
-    System.Globalization.NumberFormatInfo nfi = new System.Globalization.CultureInfo("en-GB").NumberFormat;
+	if (productTypes.Count() == 1)
+	{
+		if (Model.CoreResults.Select(p => p.ProductTypeID).First() == 8)
+		{
+			fiveAcross = true;
+		}
+	}
 
-    nfi.CurrencySymbol = Model.CurrencySymbol;
+
+	System.Globalization.NumberFormatInfo nfi = new System.Globalization.CultureInfo("en-GB").NumberFormat;
+
+	nfi.CurrencySymbol = Model.CurrencySymbol;
 }
 
-@if (fiveAcross)
+@if (Model.CoreResults.Count() < 500)
 {
-    for (int i = 0; i < Model.CoreResults.Count; i++)
-    {
-        var PP = Model.CoreResults[i];
+	if (fiveAcross)
+	{
+		for (int i = 0; i < Model.CoreResults.Count; i++)
+		{
+			var PP = Model.CoreResults[i];
 
-        if (PP.ImageID != null)
-        {
-
-
-            <div class="product-page-cell product-page-cell-five-across" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
-                <img src="https://flock.designersguild.com/imagelibrary/156/@(PP.ImageID).jpeg" />
-                <span>Product Page: @(PP.Name)</span>
-                <br />
-                <span><a href="/admin/productpages/compose/@(PP.ProductPageID)">Product Page ID: @(PP.ProductPageID)</a></span>
-                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon image-remove-icon-five-across" style="right: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
-            </div>
-        }
-        else
-        {
-            <div class="product-page-cell product-page-cell-five-across" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
-                <img src="/images/admin/image-not-set.png" style="width: 156px;" />
-                <span>Product Page: @(PP.Name)</span>
-                <br />
-                <span><a href="/admin/productpages/compose/@(PP.ProductPageID)">Product Page ID: @(PP.ProductPageID)</a></span>
-                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon image-remove-icon-five-across" style="right: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
-            </div>
-        }
-    }
-}
-else
-{
-    var notOffProductPages = Model.CoreResults.Where(p => p.WebStatusID < 4).ToList();
-    for (int i = 0; i < notOffProductPages.Count(); i++)
-    {
-        var PP = notOffProductPages[i];
-        var Related = Model.RelatedProductPages.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
-        var SecondaryProducts = Model.SecondaryProducts.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
-        var PriceStock = Model.PriceAndStock.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
-        var Launch = Model.Launches.Where(p => p.LaunchID == PP.LaunchID).Select(p => p.LaunchDate).ToList();
-        var Status = Model.Statuses.Where(p => p.WebStatusID == PP.WebStatusID).Select(p => p.Name).ToList();
-
-        if (PP.ImageID != null)
-        {
-            <div class="product-page-cell" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
-                <div>
-                    <img src="https://flock.designersguild.com/imagelibrary/239/@(PP.ImageID).jpeg" />
-                    <span class="product-page-cell-info" style="text-align: center; letter-spacing: 0; font-size: 105%;"><a target="_blank" href="/admin/productpages/compose/@(PP.ProductPageID)">ID: @(PP.ProductPageID) EDIT</a></span>
-                    <span class="product-page-cell-info">Sales Rank: <span style="float: right;">@(PP.SalesRank.HasValue ? PP.SalesRank.Value : 0)</span></span>
-                    <span class="product-page-cell-info">
-                        Total Stock: <span style="float: right;">
-                            @if (PriceStock != null)
-                            { @(PriceStock.TotalStock) }
-                            else { <text>0</text> }
-                        </span>
-                    </span>
-                    <span class="product-page-cell-info">
-                        Primary Prods: <span style="float: right;">
-                            @if (PriceStock != null)
-                            { @(PriceStock.PrimaryProductCount) }
-                            else { <text>0</text> }
-                        </span>
-                    </span>
-                    <span class="product-page-cell-info">
-                        Secondary Prods: <span style="float: right;">
-                            @if (SecondaryProducts != null)
-                            { @(SecondaryProducts.SecondaryProductCount) }
-                            else { <text>0</text> }
-                        </span>
-                    </span>
-                    <span class="product-page-cell-info">
-                        Rel. Prod. Pages: <span style="float: right;">
-                            @if (Related != null)
-                            { @(Related.RelatedProductPageCount) }
-                            else { <text>0</text> }
-                        </span>
-                    </span>
-                    <span class="product-page-cell-info">Launch: <span style="float: right;">@(Launch.Select(p => p.ToString("dd/MM/yyyy")).FirstOrDefault())</span></span>
-
-                    @{
-                        var j = PP.WebStatusID;
-                        string colour = "black";
-                        string statusText = "unknown";
-                        switch (j)
-                        {
-                            case 0:
-                                colour = "green";
-                                break;
-                            case 1:
-                                colour = "orange";
-                                break;
-                            case 2:
-                                colour = "orange";
-                                break;
-                            case 3:
-                                colour = "green";
-                                break;
-                            case 4:
-                                colour = "red";
-                                break;
-                            default: break;
-                        }
-                    }
-
-                    <span class="product-page-cell-info">Status: <span style="color: @(colour); float: right;">@(Status.Select(p => p).FirstOrDefault())</span></span>
-                    @if (PP.Clearance)
-                    {
-                        <span class="product-page-cell-info" style="color: red; font-weight: bold; letter-spacing: 0; float: right;">Clearance</span>
-                    }
-                    else
-                    {
-                        <br />
-                    }
-
-                    <div class="clearfix"></div>
-                </div>
-                <p style="height: 40px; margin: 5px 0;">@(PP.Name)</p>
-                
-                <div style="float: right; width: 50%;">
-                    @{
-                        decimal? avg = PP.ProductRating;
-                        decimal pixelShift = 0;
-                        if (avg.HasValue)
-                        {
-                            //that ^ is out of 4, need out of 110
-                            pixelShift = (avg.Value * 110) / 5;
-                            //pixelShift = avg * 2;
-                            avg = (avg * 100) / 5; // to percentage
-                            avg /= 20;
-                            var niceAvg = Math.Round(avg.Value * 100) / 100;
-                        }
-
-                        <span class="product-page-cell-info" style="float: right; font-size: 1em; line-height: 15px;">
-                            (@(PP.ProductRatingCount.HasValue ? PP.ProductRatingCount.Value : 0))
-                        </span>
-
-                        <div class='starRatingMaskWrapper' style="position: relative; float: right; width: 110px; top: 1px; margin-right: 0.25em;">
-                            <div class='fiveStarRating' style='width: @(pixelShift)px'></div>
-
-                            <div class="starRatingMask" style="position: absolute; top: 0; left: 0;"></div>
-                        </div>
-
-                    }
-                </div>
-                <div style="float: right; width: 50%;font-size: 1.1em;">
-                    @if (PriceStock != null)
-                    {
-                        if (PriceStock.PriceIncMin.HasValue)
-                        {
-                            <span class="product-page-cell-info" style="margin-bottom: 0;">
-                                @if (PriceStock.SalePriceIncMax.HasValue || PriceStock.SalePriceIncMin.HasValue)
-                                {
-                                    @:</span><span class="product-page-cell-info" style="float: left; width: 30px; margin-bottom: 0;">was</span><span class="product-page-cell-info" style="margin-bottom: 0;">
-                                }
-                                @(PriceStock.PriceIncMin.Value.ToString("C2", nfi))
-                                @if (PriceStock.PriceIncMax.HasValue)
-                                {
-                                    if (PriceStock.PriceIncMax != PriceStock.PriceIncMin)
-                                    {
-                                        @:-
-                                        @(PriceStock.PriceIncMax.Value.ToString("C2", nfi))
-                                    }
-                                }
-                            </span>
-                        }
-                        if (PriceStock.SalePriceIncMin.HasValue)
-                        {
-                            <span class="product-page-cell-info" style="color: red; float: left; width: 30px;">
-                                now</span><span class="product-page-cell-info" style="color: red;">@(PriceStock.SalePriceIncMin.Value.ToString("C2", nfi))
-                                @if (PriceStock.SalePriceIncMax.HasValue)
-                                {
-                                    if (PriceStock.SalePriceIncMax != PriceStock.SalePriceIncMin)
-                                    {
-                                        @:-
-                                        @(PriceStock.SalePriceIncMax.Value.ToString("C2", nfi))
-                                    }
-                                }
-                            </span>
-                        }
-                    }
-                </div>
-                <div class="clearfix"></div>
-
-                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" style="left: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
-            </div>
-        }
-        else
-        {
-            <div class="product-page-cell" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
-                <img src="/images/admin/image-not-set.png" style="width: 156px;" />
-                <span>Product Page: @(PP.Name)</span>
-                <br />
-                <span><a href="/admin/productpages/compose/@(PP.ProductPageID)">Product Page ID: @(PP.ProductPageID)</a></span>
-                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" style="right: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
-            </div>
-        }
-    }
-    
-    var offProductPages = Model.CoreResults.Where(p => p.WebStatusID == 4).ToList();
-    for (int i = 0; i < offProductPages.Count(); i++)
-    {
-        var PP = offProductPages[i];
-        var Related = Model.RelatedProductPages.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
-        var SecondaryProducts = Model.SecondaryProducts.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
-        var PriceStock = Model.PriceAndStock.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
-        var Launch = Model.Launches.Where(p => p.LaunchID == PP.LaunchID).Select(p => p.LaunchDate).ToList();
-        var Status = Model.Statuses.Where(p => p.WebStatusID == PP.WebStatusID).Select(p => p.Name).ToList();
-
-        if (PP.ImageID != null)
-        {
-            <div class="product-page-cell" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
-                <div>
-                    <img src="https://flock.designersguild.com/imagelibrary/156/@(PP.ImageID).jpeg" />
-                    <span class="product-page-cell-info" style="text-align: center; letter-spacing: 0; font-size: 105%;"><a target="_blank" href="/admin/productpages/compose/@(PP.ProductPageID)">ID: @(PP.ProductPageID) EDIT</a></span>
-                    <span class="product-page-cell-info">Sales Rank: <span style="float: right;">@(PP.SalesRank.HasValue ? PP.SalesRank.Value : 0)</span></span>
-                    <span class="product-page-cell-info">
-                        Total Stock: <span style="float: right;">
-                            @if (PriceStock != null)
-                            { @(PriceStock.TotalStock) }
-                            else
-                            { <text>0</text> }
-                        </span>
-                    </span>
-                    <span class="product-page-cell-info">
-                        Primary Prods: <span style="float: right;">
-                            @if (PriceStock != null)
-                            { @(PriceStock.PrimaryProductCount) }
-                            else
-                            { <text>0</text> }
-                        </span>
-                    </span>
-                    <span class="product-page-cell-info">
-                        Secondary Prods: <span style="float: right;">
-                            @if (SecondaryProducts != null)
-                            { @(SecondaryProducts.SecondaryProductCount) }
-                            else
-                            { <text>0</text> }
-                        </span>
-                    </span>
-                    <span class="product-page-cell-info">
-                        Rel. Prod. Pages: <span style="float: right;">
-                            @if (Related != null)
-                            { @(Related.RelatedProductPageCount) }
-                            else
-                            { <text>0</text> }
-                        </span>
-                    </span>
-                    <span class="product-page-cell-info">Launch: <span style="float: right;">@(Launch.Select(p => p.ToString("dd/MM/yyyy")).FirstOrDefault())</span></span>
-
-                    @{
-                            var j = PP.WebStatusID;
-                            string colour = "black";
-                            string statusText = "unknown";
-                            switch (j)
-                            {
-                                case 0:
-                                    colour = "green";
-                                    break;
-                                case 1:
-                                    colour = "orange";
-                                    break;
-                                case 2:
-                                    colour = "orange";
-                                    break;
-                                case 3:
-                                    colour = "green";
-                                    break;
-                                case 4:
-                                    colour = "red";
-                                    break;
-                                default: break;
-                            }
-                    }
-
-                    <span class="product-page-cell-info">Status: <span style="color: @(colour); float: right;">@(Status.Select(p => p).FirstOrDefault())</span></span>
-                    @if (PP.Clearance)
-                    {
-                        <span class="product-page-cell-info" style="color: red; font-weight: bold; letter-spacing: 0; float: right;">Clearance</span>
-                    }
-                    else
-                    {
-                        <br />
-                    }
-
-                    <div class="clearfix"></div>
-                </div>
-                <p style="height: 40px; margin: 5px 0;">@(PP.Name)</p>
-
-                <div style="float: right; width: 50%;">
-                    @{
-                    decimal? avg = PP.ProductRating;
-                    decimal pixelShift = 0;
-                    if (avg.HasValue)
-                    {
-                        //that ^ is out of 4, need out of 110
-                        pixelShift = (avg.Value * 110) / 5;
-                        //pixelShift = avg * 2;
-                        avg = (avg * 100) / 5; // to percentage
-                        avg /= 20;
-                        var niceAvg = Math.Round(avg.Value * 100) / 100;
-                    }
-
-                    <span class="product-page-cell-info" style="float: right; font-size: 1em; line-height: 15px;">
-                        (@(PP.ProductRatingCount.HasValue ? PP.ProductRatingCount.Value : 0))
-                    </span>
-
-                        <div class='starRatingMaskWrapper' style="position: relative; float: right; width: 110px; top: 1px; margin-right: 0.25em;">
-                            <div class='fiveStarRating' style='width: @(pixelShift)px'></div>
-
-                            <div class="starRatingMask" style="position: absolute; top: 0; left: 0;"></div>
-                        </div>
-
-                    }
-                </div>
-                <div style="float: right; width: 50%;font-size: 1.1em;">
-                    @if (PriceStock != null)
-                    {
-                        if (PriceStock.PriceIncMin.HasValue)
-                        {
-                            <span class="product-page-cell-info" style="margin-bottom: 0;">
-                                @if (PriceStock.SalePriceIncMax.HasValue || PriceStock.SalePriceIncMin.HasValue)
-                                {
-                                    @:</span><span class="product-page-cell-info" style="float: left; width: 30px; margin-bottom: 0;">was</span><span class="product-page-cell-info" style="margin-bottom: 0;">
-                                }
-                                @(PriceStock.PriceIncMin.Value.ToString("C2", nfi))
-                                @if (PriceStock.PriceIncMax.HasValue)
-                                {
-                                    if (PriceStock.PriceIncMax != PriceStock.PriceIncMin)
-                                    {
-                                        @:-
-                                        @(PriceStock.PriceIncMax.Value.ToString("C2", nfi))
-                                    }
-                                }
-                            </span>
-                        }
-                        if (PriceStock.SalePriceIncMin.HasValue)
-                        {
-                            <span class="product-page-cell-info" style="color: red; float: left; width: 30px;">
-                                now
-                            </span><span class="product-page-cell-info" style="color: red;">
-                                @(PriceStock.SalePriceIncMin.Value.ToString("C2", nfi))
-                            @if (PriceStock.SalePriceIncMax.HasValue)
-                            {
-                                if (PriceStock.SalePriceIncMax != PriceStock.SalePriceIncMin)
-                                {
-                                    @:-
-                                    @(PriceStock.SalePriceIncMax.Value.ToString("C2", nfi))
-                                }
-                            }
-                        </span>
-                        }
-                    }
-                </div>
-                <div class="clearfix"></div>
-
-                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" style="left: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
-            </div>
-        }
-        else
-        {
-            <div class="product-page-cell" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
-                <img src="/images/admin/image-not-set.png" style="width: 156px;" />
-                <span>Product Page: @(PP.Name)</span>
-                <br />
-                <span><a href="/admin/productpages/compose/@(PP.ProductPageID)">Product Page ID: @(PP.ProductPageID)</a></span>
-                <img src="/images/systemicons/remove-icon.png" class="image-remove-icon" style="right: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
-            </div>
-        }
-    }
-}
+			if (PP.ImageID != null)
+			{
 
 
-@if (Model.CoreResults.Count == 0)
-{
-    <div class="product-page-cell product-page-placeholder">
-        <h5>No Product Pages have been assigned.</h5>
-    </div>
-}
+				<div class="product-page-cell product-page-cell-five-across" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
+					<img src="https://flock.designersguild.com/imagelibrary/156/@(PP.ImageID).jpeg" />
+					<span>Product Page: @(PP.Name)</span>
+					<br />
+					<span><a href="/admin/productpages/compose/@(PP.ProductPageID)">Product Page ID: @(PP.ProductPageID)</a></span>
+					<img src="/images/systemicons/remove-icon.png" class="image-remove-icon image-remove-icon-five-across" style="right: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
+				</div>
+			}
+			else
+			{
+				<div class="product-page-cell product-page-cell-five-across" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
+					<img src="/images/admin/image-not-set.png" style="width: 156px;" />
+					<span>Product Page: @(PP.Name)</span>
+					<br />
+					<span><a href="/admin/productpages/compose/@(PP.ProductPageID)">Product Page ID: @(PP.ProductPageID)</a></span>
+					<img src="/images/systemicons/remove-icon.png" class="image-remove-icon image-remove-icon-five-across" style="right: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
+				</div>
+			}
+		}
+	}
+	else
+	{
+		var notOffProductPages = Model.CoreResults.Where(p => p.WebStatusID < 4).ToList();
+		for (int i = 0; i < notOffProductPages.Count(); i++)
+		{
+			var PP = notOffProductPages[i];
+			var Related = Model.RelatedProductPages.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
+			var SecondaryProducts = Model.SecondaryProducts.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
+			var PriceStock = Model.PriceAndStock.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
+			var Launch = Model.Launches.Where(p => p.LaunchID == PP.LaunchID).Select(p => p.LaunchDate).ToList();
+			var Status = Model.Statuses.Where(p => p.WebStatusID == PP.WebStatusID).Select(p => p.Name).ToList();
 
-<div style="clear: both" class="product-page-placeholder"></div>
+			if (PP.ImageID != null)
+			{
+				<div class="product-page-cell" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
+					<div>
+						<img src="https://flock.designersguild.com/imagelibrary/239/@(PP.ImageID).jpeg" />
+						<span class="product-page-cell-info" style="text-align: center; letter-spacing: 0; font-size: 105%;"><a target="_blank" href="/admin/productpages/compose/@(PP.ProductPageID)">ID: @(PP.ProductPageID) EDIT</a></span>
+						<span class="product-page-cell-info">Sales Rank: <span style="float: right;">@(PP.SalesRank.HasValue ? PP.SalesRank.Value : 0)</span></span>
+						<span class="product-page-cell-info">
+							Total Stock: <span style="float: right;">
+								@if (PriceStock != null)
+								{@(PriceStock.TotalStock) }
+								else
+								{ <text>0</text>}
+							</span>
+						</span>
+						<span class="product-page-cell-info">
+							Primary Prods: <span style="float: right;">
+								@if (PriceStock != null)
+								{@(PriceStock.PrimaryProductCount) }
+								else
+								{ <text>0</text>}
+							</span>
+						</span>
+						<span class="product-page-cell-info">
+							Secondary Prods: <span style="float: right;">
+								@if (SecondaryProducts != null)
+								{@(SecondaryProducts.SecondaryProductCount) }
+								else
+								{ <text>0</text>}
+							</span>
+						</span>
+						<span class="product-page-cell-info">
+							Rel. Prod. Pages: <span style="float: right;">
+								@if (Related != null)
+								{@(Related.RelatedProductPageCount) }
+								else
+								{ <text>0</text>}
+							</span>
+						</span>
+						<span class="product-page-cell-info">Launch: <span style="float: right;">@(Launch.Select(p => p.ToString("dd/MM/yyyy")).FirstOrDefault())</span></span>
 
-<script type="text/javascript">
+						@{
+							var j = PP.WebStatusID;
+							string colour = "black";
+							string statusText = "unknown";
+							switch (j)
+							{
+								case 0:
+									colour = "green";
+									break;
+								case 1:
+									colour = "orange";
+									break;
+								case 2:
+									colour = "orange";
+									break;
+								case 3:
+									colour = "green";
+									break;
+								case 4:
+									colour = "red";
+									break;
+								default: break;
+							}
+						}
+
+						<span class="product-page-cell-info">Status: <span style="color: @(colour); float: right;">@(Status.Select(p => p).FirstOrDefault())</span></span>
+						@if (PP.Clearance)
+						{
+							<span class="product-page-cell-info" style="color: red; font-weight: bold; letter-spacing: 0; float: right;">Clearance</span>
+						}
+						else
+						{
+							<br />
+						}
+
+						<div class="clearfix"></div>
+					</div>
+					<p style="height: 40px; margin: 5px 0;">@(PP.Name)</p>
+
+					<div style="float: right; width: 50%;">
+						@{
+							decimal? avg = PP.ProductRating;
+							decimal pixelShift = 0;
+							if (avg.HasValue)
+							{
+								//that ^ is out of 4, need out of 110
+								pixelShift = (avg.Value * 110) / 5;
+								//pixelShift = avg * 2;
+								avg = (avg * 100) / 5; // to percentage
+								avg /= 20;
+								var niceAvg = Math.Round(avg.Value * 100) / 100;
+							}
+
+							<span class="product-page-cell-info" style="float: right; font-size: 1em; line-height: 15px;">
+								(@(PP.ProductRatingCount.HasValue ? PP.ProductRatingCount.Value : 0))
+							</span>
+
+							<div class='starRatingMaskWrapper' style="position: relative; float: right; width: 110px; top: 1px; margin-right: 0.25em;">
+								<div class='fiveStarRating' style='width: @(pixelShift)px'></div>
+
+								<div class="starRatingMask" style="position: absolute; top: 0; left: 0;"></div>
+							</div>
+
+						}
+					</div>
+					<div style="float: right; width: 50%;font-size: 1.1em;">
+						@if (PriceStock != null)
+						{
+							if (PriceStock.PriceIncMin.HasValue)
+							{
+								<span class="product-page-cell-info" style="margin-bottom: 0;">
+									@if (PriceStock.SalePriceIncMax.HasValue || PriceStock.SalePriceIncMin.HasValue)
+									{
+									@:</span><span class="product-page-cell-info" style="float: left; width: 30px; margin-bottom: 0;">was</span><span class="product-page-cell-info" style="margin-bottom: 0;">
+									}
+									@(PriceStock.PriceIncMin.Value.ToString("C2", nfi))
+									@if (PriceStock.PriceIncMax.HasValue)
+									{
+										if (PriceStock.PriceIncMax != PriceStock.PriceIncMin)
+										{
+											@:-
+											@(PriceStock.PriceIncMax.Value.ToString("C2", nfi))
+										}
+									}
+								</span>
+							}
+							if (PriceStock.SalePriceIncMin.HasValue)
+							{
+								<span class="product-page-cell-info" style="color: red; float: left; width: 30px;">
+									now
+								</span><span class="product-page-cell-info" style="color: red;">
+									@(PriceStock.SalePriceIncMin.Value.ToString("C2", nfi))
+									@if (PriceStock.SalePriceIncMax.HasValue)
+									{
+										if (PriceStock.SalePriceIncMax != PriceStock.SalePriceIncMin)
+										{
+											@:-
+											@(PriceStock.SalePriceIncMax.Value.ToString("C2", nfi))
+										}
+									}
+								</span>
+							}
+						}
+					</div>
+					<div class="clearfix"></div>
+
+					<img src="/images/systemicons/remove-icon.png" class="image-remove-icon" style="left: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
+				</div>
+			}
+			else
+			{
+				<div class="product-page-cell" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
+					<img src="/images/admin/image-not-set.png" style="width: 156px;" />
+					<span>Product Page: @(PP.Name)</span>
+					<br />
+					<span><a href="/admin/productpages/compose/@(PP.ProductPageID)">Product Page ID: @(PP.ProductPageID)</a></span>
+					<img src="/images/systemicons/remove-icon.png" class="image-remove-icon" style="right: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
+				</div>
+			}
+		}
+
+		var offProductPages = Model.CoreResults.Where(p => p.WebStatusID == 4).ToList();
+		for (int i = 0; i < offProductPages.Count(); i++)
+		{
+			var PP = offProductPages[i];
+			var Related = Model.RelatedProductPages.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
+			var SecondaryProducts = Model.SecondaryProducts.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
+			var PriceStock = Model.PriceAndStock.Where(p => p.ProductPageID == PP.ProductPageID).SingleOrDefault();
+			var Launch = Model.Launches.Where(p => p.LaunchID == PP.LaunchID).Select(p => p.LaunchDate).ToList();
+			var Status = Model.Statuses.Where(p => p.WebStatusID == PP.WebStatusID).Select(p => p.Name).ToList();
+
+			if (PP.ImageID != null)
+			{
+				<div class="product-page-cell" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
+					<div>
+						<img src="https://flock.designersguild.com/imagelibrary/156/@(PP.ImageID).jpeg" />
+						<span class="product-page-cell-info" style="text-align: center; letter-spacing: 0; font-size: 105%;"><a target="_blank" href="/admin/productpages/compose/@(PP.ProductPageID)">ID: @(PP.ProductPageID) EDIT</a></span>
+						<span class="product-page-cell-info">Sales Rank: <span style="float: right;">@(PP.SalesRank.HasValue ? PP.SalesRank.Value : 0)</span></span>
+						<span class="product-page-cell-info">
+							Total Stock: <span style="float: right;">
+								@if (PriceStock != null)
+								{@(PriceStock.TotalStock) }
+								else
+								{ <text>0</text>}
+							</span>
+						</span>
+						<span class="product-page-cell-info">
+							Primary Prods: <span style="float: right;">
+								@if (PriceStock != null)
+								{@(PriceStock.PrimaryProductCount) }
+								else
+								{ <text>0</text>}
+							</span>
+						</span>
+						<span class="product-page-cell-info">
+							Secondary Prods: <span style="float: right;">
+								@if (SecondaryProducts != null)
+								{@(SecondaryProducts.SecondaryProductCount) }
+								else
+								{ <text>0</text>}
+							</span>
+						</span>
+						<span class="product-page-cell-info">
+							Rel. Prod. Pages: <span style="float: right;">
+								@if (Related != null)
+								{@(Related.RelatedProductPageCount) }
+								else
+								{ <text>0</text>}
+							</span>
+						</span>
+						<span class="product-page-cell-info">Launch: <span style="float: right;">@(Launch.Select(p => p.ToString("dd/MM/yyyy")).FirstOrDefault())</span></span>
+
+						@{
+							var j = PP.WebStatusID;
+							string colour = "black";
+							string statusText = "unknown";
+							switch (j)
+							{
+								case 0:
+									colour = "green";
+									break;
+								case 1:
+									colour = "orange";
+									break;
+								case 2:
+									colour = "orange";
+									break;
+								case 3:
+									colour = "green";
+									break;
+								case 4:
+									colour = "red";
+									break;
+								default: break;
+							}
+						}
+
+						<span class="product-page-cell-info">Status: <span style="color: @(colour); float: right;">@(Status.Select(p => p).FirstOrDefault())</span></span>
+						@if (PP.Clearance)
+						{
+							<span class="product-page-cell-info" style="color: red; font-weight: bold; letter-spacing: 0; float: right;">Clearance</span>
+						}
+						else
+						{
+							<br />
+						}
+
+						<div class="clearfix"></div>
+					</div>
+					<p style="height: 40px; margin: 5px 0;">@(PP.Name)</p>
+
+					<div style="float: right; width: 50%;">
+						@{
+							decimal? avg = PP.ProductRating;
+							decimal pixelShift = 0;
+							if (avg.HasValue)
+							{
+								//that ^ is out of 4, need out of 110
+								pixelShift = (avg.Value * 110) / 5;
+								//pixelShift = avg * 2;
+								avg = (avg * 100) / 5; // to percentage
+								avg /= 20;
+								var niceAvg = Math.Round(avg.Value * 100) / 100;
+							}
+
+							<span class="product-page-cell-info" style="float: right; font-size: 1em; line-height: 15px;">
+								(@(PP.ProductRatingCount.HasValue ? PP.ProductRatingCount.Value : 0))
+							</span>
+
+							<div class='starRatingMaskWrapper' style="position: relative; float: right; width: 110px; top: 1px; margin-right: 0.25em;">
+								<div class='fiveStarRating' style='width: @(pixelShift)px'></div>
+
+								<div class="starRatingMask" style="position: absolute; top: 0; left: 0;"></div>
+							</div>
+
+						}
+					</div>
+					<div style="float: right; width: 50%;font-size: 1.1em;">
+						@if (PriceStock != null)
+						{
+							if (PriceStock.PriceIncMin.HasValue)
+							{
+								<span class="product-page-cell-info" style="margin-bottom: 0;">
+									@if (PriceStock.SalePriceIncMax.HasValue || PriceStock.SalePriceIncMin.HasValue)
+									{
+									@:</span><span class="product-page-cell-info" style="float: left; width: 30px; margin-bottom: 0;">was</span><span class="product-page-cell-info" style="margin-bottom: 0;">
+									}
+									@(PriceStock.PriceIncMin.Value.ToString("C2", nfi))
+									@if (PriceStock.PriceIncMax.HasValue)
+									{
+										if (PriceStock.PriceIncMax != PriceStock.PriceIncMin)
+										{
+											@:-
+											@(PriceStock.PriceIncMax.Value.ToString("C2", nfi))
+										}
+									}
+								</span>
+							}
+							if (PriceStock.SalePriceIncMin.HasValue)
+							{
+								<span class="product-page-cell-info" style="color: red; float: left; width: 30px;">
+									now
+								</span><span class="product-page-cell-info" style="color: red;">
+									@(PriceStock.SalePriceIncMin.Value.ToString("C2", nfi))
+									@if (PriceStock.SalePriceIncMax.HasValue)
+									{
+										if (PriceStock.SalePriceIncMax != PriceStock.SalePriceIncMin)
+										{
+											@:-
+											@(PriceStock.SalePriceIncMax.Value.ToString("C2", nfi))
+										}
+									}
+								</span>
+							}
+						}
+					</div>
+					<div class="clearfix"></div>
+
+					<img src="/images/systemicons/remove-icon.png" class="image-remove-icon" style="left: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
+				</div>
+			}
+			else
+			{
+				<div class="product-page-cell" data-product-page-id="@(PP.ProductPageID)" onmouseover="$(this).find('.image-remove-icon').stop().animate({opacity: 0.8}, 300)" onmouseout="$(this).find('.image-remove-icon').stop().animate({opacity: 0.0}, 300)" data-product-type-id="@(PP.ProductTypeID)">
+					<img src="/images/admin/image-not-set.png" style="width: 156px;" />
+					<span>Product Page: @(PP.Name)</span>
+					<br />
+					<span><a href="/admin/productpages/compose/@(PP.ProductPageID)">Product Page ID: @(PP.ProductPageID)</a></span>
+					<img src="/images/systemicons/remove-icon.png" class="image-remove-icon" style="right: 1em; top: 1em;" onclick="event.stopPropagation(); RemoveProductPageFromGrid(@(PP.PageSectionID), @(PP.ProductPageID)); return false; " />
+				</div>
+			}
+		}
+	}
+
+	if (Model.CoreResults.Count == 0)
+	{
+		<div class="product-page-cell product-page-placeholder">
+			<h5>No Product Pages have been assigned.</h5>
+		</div>
+	}
+
+	<div style="clear: both" class="product-page-placeholder"></div>
+
+	<script type="text/javascript">
     //$(".page-section-grid-container").sortable({
     InitProductPagesDragDrop(@(Model.PageSectionID));
     //});
-</script>
+	</script>
+}
+else
+{
+	<h4 style="grid-column-start: 1; grid-column-end: 5" class="not-sortable">
+		There are more than five hundred product pages assigned to this grid.<br />
+		At present, it is not possible to administer this grid via Flock. Administration must be performed directly via SQL statements.
+	</h4>
+}

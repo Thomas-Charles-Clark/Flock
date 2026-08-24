@@ -36,15 +36,9 @@ namespace Flock.Controllers
                     Buster.BustWebCache(new PassBust()
                     {
 #if DEBUG
-                        /// <summary>
-                        // 0 = Localhost
-                        // 1 = Dev
-                        // 2 = Preview
-                        // 3 = Production
-                        /// </summary>
-                        target = 0,
+                        host = "www.designersguild.com",
 #else
-                        target = 3,
+                        host = "localhost:44338",
 #endif
                         items = new List<BustItem>()
                         {
@@ -72,9 +66,9 @@ namespace Flock.Controllers
                         Buster.BustWebCache(new PassBust()
                         {
 #if DEBUG
-                            target = 0,
+                        host = "www.designersguild.com",
 #else
-                            target = 3,
+                        host = "localhost:44338",
 #endif
                             items = new List<BustItem>()
                             {

@@ -87408,6 +87408,8 @@ namespace Flock.Models
 		
 		private bool _ApplyDiscountToTradePrice;
 		
+		private bool _DiscountSamples;
+		
 		public vwPromotionCode()
 		{
 		}
@@ -87792,6 +87794,22 @@ namespace Flock.Models
 				if ((this._ApplyDiscountToTradePrice != value))
 				{
 					this._ApplyDiscountToTradePrice = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DiscountSamples", DbType="BIT")]
+		public bool DiscountSamples
+		{
+			get
+			{
+				return this._DiscountSamples;
+			}
+			set
+			{
+				if ((this._DiscountSamples != value))
+				{
+					this._DiscountSamples = value;
 				}
 			}
 		}
@@ -99176,6 +99194,8 @@ namespace Flock.Models
 		
 		private string _CreatedByUserID;
 		
+		private bool _DiscountSamples;
+		
 		private EntitySet<Transaction> _Transactions;
 		
 		private EntityRef<PromotionGroup> _PromotionGroup;
@@ -99250,6 +99270,8 @@ namespace Flock.Models
     partial void OnApplyDiscountToClearancePriceChanged();
     partial void OnCreatedByUserIDChanging(string value);
     partial void OnCreatedByUserIDChanged();
+    partial void OnDiscountSamplesChanging(bool value);
+    partial void OnDiscountSamplesChanged();
     #endregion
 		
 		public PromotionCode()
@@ -99919,6 +99941,26 @@ namespace Flock.Models
 					this._CreatedByUserID = value;
 					this.SendPropertyChanged("CreatedByUserID");
 					this.OnCreatedByUserIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DiscountSamples", DbType="BIT")]
+		public bool DiscountSamples
+		{
+			get
+			{
+				return this._DiscountSamples;
+			}
+			set
+			{
+				if ((this._DiscountSamples != value))
+				{
+					this.OnDiscountSamplesChanging(value);
+					this.SendPropertyChanging();
+					this._DiscountSamples = value;
+					this.SendPropertyChanged("DiscountSamples");
+					this.OnDiscountSamplesChanged();
 				}
 			}
 		}

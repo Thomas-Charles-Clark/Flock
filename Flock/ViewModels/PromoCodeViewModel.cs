@@ -54,7 +54,8 @@ namespace Flock.ViewModels
                 Model.ApplyDiscountToTradePrice = pc.ApplyDiscountToTradePrice;
                 Model.ApplyDiscountToSalePrice = pc.ApplyDiscountToSalePrice;
                 Model.ApplyDiscountToFullPrice = pc.ApplyDiscountToFullPrice;
-                
+                Model.DiscountSamples = pc.DiscountSamples;
+
                 Model.PromoCode_DeliveryBands = UoW.GetRepository<PromotionCode_DeliveryBand>().GetAll().Where(p => p.PromotionCodeID == Model.PromotionCodeID).ToList();
                 if (Model.PromoCode_DeliveryBands.Count > 0)
                 {
@@ -121,7 +122,9 @@ namespace Flock.ViewModels
 
         public bool ApplyDiscountToSalePrice { get; set; }
 
-        public bool DiscountBundles { get; set; }
+        public bool DiscountSamples { get; set; }
+
+		public bool DiscountBundles { get; set; }
 
         public int? FreeGiftProductID { get; set; }
 

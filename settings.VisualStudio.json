@@ -1,0 +1,4 @@
+/* Visual Studio Settings File */
+{
+  "projectsAndSolutions.webProjects.use64BitIisExpress": true
+}
