@@ -36,11 +36,11 @@ namespace Flock.Controllers
                     Buster.BustWebCache(new PassBust()
                     {
 #if DEBUG
-                        host = "www.designersguild.com",
-#else
                         host = "localhost:44338",
+#else
+                        host = "www.designersguild.com",
 #endif
-                        items = new List<BustItem>()
+						items = new List<BustItem>()
                         {
                             new BustItem(
                                 templateId: null,
